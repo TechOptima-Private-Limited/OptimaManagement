@@ -11,7 +11,6 @@
     idna==3.10
     maxminddb==2.6.3
     multidict==6.1.0
-    mysqlclient==2.2.7
     numpy==2.2.1
     openpyxl==3.1.5
     pandas==2.2.3
@@ -30,8 +29,10 @@
     django-cors-headers==4.6.0
     djangorestframework==3.15.2
     pillow==11.0.0
-    psycopg2==2.9.10
+    psycopg2-binary
     python-dotenv==1.0.1
     sqlparse==0.5.3
     typing_extensions==4.12.2
     tzdata==2024.2
+    whitenoise
+    gunicorn

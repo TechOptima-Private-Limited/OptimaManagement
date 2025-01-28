@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','backend.techoptima.ai', "https://backend.techoptima.ai/", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ['192.168.1.3','backend.techoptima.ai', "https://backend.techoptima.ai/", "localhost", "127.0.0.1", "dev.techoptima.ai"]
 
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai']
 
@@ -36,10 +36,10 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         'PORT': '5432',   # for PostgreSQL
 
-        'NAME': 'crm_db',
+        'NAME': 'optcrm',
         'USER': 'postgres',
-        'PASSWORD': 'demo1234',
-        'HOST': 'localhost',
+        'PASSWORD': 'Welcome123',
+        'HOST': '192.168.1.3',
     }
 }
 
@@ -55,7 +55,7 @@ DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
 ADMINS = [("<Admin1>", "<admin1_box@example.com>")]   # specify admin
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
@@ -284,8 +284,8 @@ INDEX_TITLE = _('Main Menu')
 
 
 # This is copyright information. Please don't change it!
-COPYRIGHT_STRING = "Django-CRM. Copyright (c) 2024"
-PROJECT_NAME = "Django-CRM"
+COPYRIGHT_STRING = "TechOptima Pvt Ltd. Copyright (c) 2024"
+PROJECT_NAME = "Optima Management"
 PROJECT_SITE = "https://github.com/DjangoCRM/django-crm/"
 
 
