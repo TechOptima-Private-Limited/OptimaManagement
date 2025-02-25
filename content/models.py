@@ -7,7 +7,7 @@ from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, max_length=200, blank=True)
     description = models.TextField(blank=True)
     
     def save(self, *args, **kwargs):
@@ -23,7 +23,7 @@ class Category(models.Model):
 
 class Page(models.Model):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, max_length=500, blank=True)
     content = CKEditor5Field('Content', config_name='default')  # Change this field    
     featured_image = models.ImageField(upload_to='pages/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)

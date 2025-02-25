@@ -36,10 +36,10 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         'PORT': '5432',   # for PostgreSQL
 
-        'NAME': 'optcrm',
+        'NAME': 'optcms',
         'USER': 'postgres',
-        'PASSWORD': 'Welcome123',
-        'HOST': '192.168.1.3',
+        'PASSWORD': 'demo1234',
+        'HOST': 'localhost',
     }
 }
 
@@ -55,7 +55,7 @@ DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
 ADMINS = [("<Admin1>", "<admin1_box@example.com>")]   # specify admin
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
@@ -84,6 +84,7 @@ LOCALE_PATHS = [
 ]
 
 LOGIN_URL = '/admin/login/'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Application definition
 INSTALLED_APPS = [
@@ -106,9 +107,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_ckeditor_5',
+    'resource_management',
     'client',
-    'content',
-    'email_service',
+    'content'
     
 ]
 
@@ -357,3 +358,50 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
+
+# Initial data for AccessLevel
+access_levels = [
+    {
+        'name': 'Read',
+        'description': 'Read-only access to the resource'
+    },
+    {
+        'name': 'Write',
+        'description': 'Read and write access to the resource'
+    },
+    {
+        'name': 'Admin',
+        'description': 'Full administrative access to the resource'
+    }
+]
+
+# Initial data for ResourceType
+resource_types = [
+    {
+        'name': 'Repository',
+        'description': 'Code repositories (Git, SVN, etc.)'
+    },
+    {
+        'name': 'Database',
+        'description': 'Database instances (MySQL, PostgreSQL, MongoDB, etc.)'
+    },
+    {
+        'name': 'VM Instance',
+        'description': 'Virtual Machine instances'
+    }
+]
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.office365.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'no-reply@techoptima.ai'
+EMAIL_HOST_PASSWORD = 'G!556540298118om'
+DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
+EMAIL_DOMAIN = 'techoptima.ai' 
+
+EMAIL_THREAD_ID = '1'
+SITE_URL = 'http://127.0.0.1:8000' 
+# USE_TZ = True
+# TIME_ZONE = 'Asia/Kolkata' 

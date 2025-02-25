@@ -1,0 +1,15 @@
+{% extends "resource_management/emails/base_email.html" %}
+{% block content %}
+<p>Dear {{ user }},</p>
+<p>Your access request requires additional approval:</p>
+<ul>
+    <li>Ticket Number: {{ ticket }}</li>
+    <li>Resource: {{ resource }}</li>
+    <li>Access Level: {{ access_level }}</li>
+    <li>Status: Pending Approval</li>
+</ul>
+<p>We will notify you once the approval decision is made.</p>
+{% if notes %}
+<p><strong>Additional Notes:</strong><br>{{ notes }}</p>
+{% endif %}
+{% endblock %}

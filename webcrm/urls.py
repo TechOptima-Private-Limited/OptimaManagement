@@ -51,6 +51,7 @@ urlpatterns += i18n_patterns(
     path("ckeditor5/", include('django_ckeditor_5.urls')),  
     path('api/users/search/', search_users, name='search_users'),  
     path('api/', include('client.urls')),
+    path('api/', include('resource_management.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 )
 

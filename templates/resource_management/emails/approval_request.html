@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Access Approval Required - {{ ticket }}</h2>
+    <p>Your approval is required for the following access request:</p>
+    <ul>
+        <li>Ticket Number: {{ ticket }}</li>
+        <li>Requester: {{ user }}</li>
+        <li>Resource: {{ resource }}</li>
+    </ul>
+    <p>
+        <a href="{{ approve_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            Review Request
+        </a>
+    </p>
+</body>
+</html>
