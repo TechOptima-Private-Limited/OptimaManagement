@@ -5,6 +5,7 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from django.contrib import auth
 
 from common.views.favicon import FaviconRedirect
 from crm.views.contact_form import contact_form
@@ -19,6 +20,10 @@ admin.site.site_header = 'Optima Management Hub'
 admin.site.site_title = 'Optima Management Hub'
 admin.site.index_title = 'Welcome to Optima Management Hub'
 from django.http import HttpResponseForbidden
+from .views import custom_404_view
+
+handler404 = 'OptCMS.views.custom_404_view'
+
 print("STATIC_ROOT:", settings.STATIC_ROOT)
 print("STATICFILES_DIRS:", settings.STATIC_URL)
 
@@ -46,6 +51,8 @@ urlpatterns += i18n_patterns(
     path(settings.SECRET_CRM_PREFIX, include('common.urls')),
     path(settings.SECRET_CRM_PREFIX, include('tasks.urls')),
     path(settings.SECRET_ADMIN_PREFIX, admin.site.urls),
+    
+
     path('contact-form/<uuid:uuid>/', contact_form, name='contact_form'),
     path('api/', include('content.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),  

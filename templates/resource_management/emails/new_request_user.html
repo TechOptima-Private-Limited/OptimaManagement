@@ -3,10 +3,14 @@
 <p>Dear {{ user }},</p>
 <p>Your access request has been submitted successfully:</p>
 <ul>
-    <li>Ticket: {{ ticket }}</li>
-    <li>Resource: {{ resource }}</li>
-    <li>Access Level: {{ access_level }}</li>
-    <li>Priority: {{ priority }}</li>
+    <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+    <li><strong>Resource:</strong> {{ resource }}</li>
+    <li><strong>Access Level:</strong> {{ access_level }}</li>
+    <li><strong>Priority:</strong> {{ priority }}</li>
+    <li><strong>Justification:</strong> {{ justification }}</li>
+    <li><strong>Resource Type:</strong> {{ resource_type }}</li>
+    <li><strong>Duration:</strong> {{ duration }}</li>
+    <li><strong>Your Employee ID:</strong> {{ user.username }}</li>
 </ul>
 <p>Our team will review your request and update you shortly.</p>
 {% endblock %}

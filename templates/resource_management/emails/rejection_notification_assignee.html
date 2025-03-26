@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Request Rejected</title>
+</head>
+<body>
+    <h2>Access Request Rejected - Ticket {{ ticket }}</h2>
+    <p>Dear {{ assignee }},</p>
+    <p>The access request you were assigned to has been rejected:</p>
+    <ul>
+        <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+        <li><strong>Requester:</strong> {{ user_name }} (Employee ID: {{ user.username }})</li>
+        <li><strong>Resource:</strong> {{ resource }}</li>
+        <li><strong>Access Level:</strong> {{ access_level }}</li>
+        <li><strong>Updated By:</strong> {{ updated_by }}</li>
+        <li><strong>Your Employee ID:</strong> {{ assignee_employee_id }}</li>
+        {% if notes %}
+        <li><strong>Notes:</strong> {{ notes }}</li>
+        {% endif %}
+    </ul>
+    <p>Please inform the requester if necessary.</p>
+    <p>Thank you,</p>
+    <p>Access Management Team</p>
+</body>
+</html>

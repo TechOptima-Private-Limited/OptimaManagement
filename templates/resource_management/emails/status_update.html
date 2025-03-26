@@ -6,12 +6,14 @@
 <p>Your access request status has been updated:</p>
 <ul>
     <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+    <li><strong>Requester:</strong> {{ requester }} (Employee ID: {{ user.username }})</li>
     <li><strong>Resource:</strong> {{ resource }}</li>
+    <li><strong>Access Level:</strong> {{ access_level }}</li>
     <li><strong>Previous Status:</strong> {{ old_status }}</li>
     <li><strong>New Status:</strong> {{ new_status }}</li>
     <li><strong>Updated By:</strong> {{ updated_by }}</li>
 </ul>
-{% if justification %}
-<p><strong>Additional Notes:</strong><br>{{ justification }}</p>
+{% if notes %}
+<p><strong>Additional Notes:</strong><br>{{ notes }}</p>
 {% endif %}
 {% endblock %}

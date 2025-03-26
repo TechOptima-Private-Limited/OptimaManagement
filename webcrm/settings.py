@@ -7,7 +7,15 @@ from massmail.settings import *     # NOQA
 from common.settings import *       # NOQA
 from tasks.settings import *        # NOQA
 from voip.settings import *         # NOQA
+
+from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
+
+
+
 # ---- Django settings ---- #
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -21,25 +29,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','backend.techoptima.ai', "https://backend.techoptima.ai/", "localhost", "127.0.0.1", "dev.techoptima.ai"]
+ALLOWED_HOSTS = ['192.168.1.3','192.168.0.5','192.168.1.16','backend.techoptima.ai', "https://backend.techoptima.ai/", "localhost", "127.0.0.1", "dev.techoptima.ai"]
 
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai']
 
 # Database
 DATABASES = {
     'default': {
-        # for MySQl
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'PORT': '3306',
-
         # for PostgreSQL
         "ENGINE": "django.db.backends.postgresql",
-        'PORT': '5432',   # for PostgreSQL
-
-        'NAME': 'optcms',
-        'USER': 'postgres',
-        'PASSWORD': 'demo1234',
-        'HOST': 'localhost',
+        
+        'NAME': os.getenv('DB_NAME'),     # Database name
+        'USER': os.getenv('DB_USER'),          # PostgreSQL username
+        'PASSWORD': os.getenv('DB_PASSWORD'),      # PostgreSQL password
+        'HOST': os.getenv('DB_HOST'),              # Database host
+        'PORT': os.getenv('DB_PORT'),  
     }
 }
 
@@ -190,7 +194,7 @@ SECURE_HSTS_PRELOAD = False
 # For more security, replace the url prefixes
 # with your own unique value.
 SECRET_CRM_PREFIX = '123/'
-SECRET_ADMIN_PREFIX = '456-admin/'
+SECRET_ADMIN_PREFIX = '456/'
 SECRET_LOGIN_PREFIX = '789-login/'
 
 # Specify ip of host to avoid importing emails sent by CRM
@@ -335,8 +339,32 @@ import os
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': ['heading', '|', 'bold', 'italic', 'link',
-                   'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
-        'height': '300px',
+                   'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', '|', 'sourceEditing' '|', 'blockQuote', 'insertTable', '|',
+            'undo', 'redo'],
+        'height': '400px',
+        'extraAllowedContent': 'figure[class], img[class](*)',  # Allow custom classes for images
+        'contentsCss': '/static/css/ckeditor_styles.css',  # Load custom styles
+        'image': {
+            'toolbar': [
+                'imageTextAlternative', '|',
+                'imageStyle:inline',
+                'imageStyle:alignLeft',
+                'imageStyle:alignCenter',
+                'imageStyle:alignRight',
+                'imageStyle:block',
+                'imageStyle:side'
+            ],
+            'styles': {
+                'options': [
+                    'inline',
+                    'alignLeft',
+                    'alignCenter',
+                    'alignRight',
+                    'block',
+                    'side'
+                ]
+            }
+        },
         'heading': {
             'options': [
                 {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
@@ -402,6 +430,6 @@ DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
 EMAIL_DOMAIN = 'techoptima.ai' 
 
 EMAIL_THREAD_ID = '1'
-SITE_URL = 'http://127.0.0.1:8000' 
+SITE_URL = 'http://192.168.1.16:8000' 
 # USE_TZ = True
 # TIME_ZONE = 'Asia/Kolkata' 

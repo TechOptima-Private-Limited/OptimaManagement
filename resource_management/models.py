@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
+import uuid
 
 class ResourceType(models.Model):
     name = models.CharField(max_length=100)
@@ -50,6 +51,8 @@ class AccessRequest(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('APPROVAL_REQUIRED', 'Approval Required'),
+        ('APPROVER_APPROVED', 'Approver Approved'),  # New status
+        ('APPROVER_REJECTED', 'Approver Rejected'),  # New status
         ('APPROVED', 'Approved'),
         ('REJECTED', 'Rejected'),
         ('REVOKED', 'Revoked')
@@ -76,6 +79,9 @@ class AccessRequest(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     requested_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    approval_token = models.CharField(max_length=100, blank=True, null=True, unique=True)  # New field
+    approval_token_expiry = models.DateTimeField(blank=True, null=True)  # New field
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests', verbose_name="Assigned To")
 
     def save(self, *args, **kwargs):
         if self._state.adding:  # Only if creating new instance
@@ -96,17 +102,35 @@ class AccessRequest(models.Model):
         if not self.expires_at and self.duration:
             self.expires_at = datetime.datetime.now() + datetime.timedelta(days=self.duration)
         
+        if self.status == 'APPROVAL_REQUIRED' and not self.approval_token:
+            self.approval_token = uuid.uuid4().hex
+            self.approval_token_expiry = datetime.datetime.now() + datetime.timedelta(hours=24)  # Token expires in 24 hours
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.ticket_number} - {self.user.username} - {self.resource.name}"
 
 class AccessHistory(models.Model):
-    access_request = models.ForeignKey(AccessRequest, on_delete=models.CASCADE)
+    access_request = models.ForeignKey(AccessRequest, on_delete=models.CASCADE, related_name='history')
     action = models.CharField(max_length=50)
-    performed_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    performed_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True,  # Allow null values
+        blank=True,
+        related_name='access_history'
+    )
     performed_at = models.DateTimeField(auto_now_add=True)
-    notes = models.TextField(blank=True)
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.action} - {self.access_request}"
+        return f"{self.action} on {self.access_request.ticket_number} at {self.performed_at}"
+    
+class EmailThread(models.Model):
+    ticket_number = models.CharField(max_length=20, unique=True)
+    thread_index = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Thread for {self.ticket_number}"

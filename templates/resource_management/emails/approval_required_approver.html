@@ -1,68 +1,31 @@
-<!-- templates/resource_management/emails/approval_required_approver.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">Access Request Approval Required</h2>
-        
-        <!-- Request Details -->
-        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Ticket Number:</strong> {{ ticket }}</p>
-            <p><strong>Requester:</strong> {{ requester }}</p>
-            <p><strong>Resource:</strong> {{ resource }}</p>
-            <p><strong>Access Level:</strong> {{ access_level }}</p>
-            {% if justification %}
-            <p><strong>Justification:</strong><br>{{ justification }}</p>
-            {% endif %}
-        </div>
+<!-- resource_management/emails/approval_required_approver.html -->
+{% extends "resource_management/emails/base_email.html" %}
 
-        <!-- Action Buttons -->
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-            <tr>
-                <td align="center">
-                    <table cellpadding="0" cellspacing="0" role="presentation">
-                        <tr>
-                            <td align="center" style="padding: 10px;">
-                                <a href="{{ approve_url }}" 
-                                   style="background-color: #28a745; color: #ffffff; 
-                                          padding: 12px 30px; text-decoration: none; 
-                                          display: inline-block; border-radius: 4px;
-                                          font-weight: bold;">
-                                    Approve Request
-                                </a>
-                            </td>
-                            <td align="center" style="padding: 10px;">
-                                <a href="{{ reject_url }}" 
-                                   style="background-color: #dc3545; color: #ffffff; 
-                                          padding: 12px 30px; text-decoration: none; 
-                                          display: inline-block; border-radius: 4px;
-                                          font-weight: bold;">
-                                    Reject Request
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-
-        <!-- Alternative Links -->
-        <div style="margin-top: 30px; background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
-            <p><strong>Alternative Links:</strong></p>
-            <p>If the buttons above don't work, you can use these links:</p>
-            <p>• To Approve: <a href="{{ approve_url }}" style="color: #28a745; word-break: break-all;">{{ approve_url }}</a></p>
-            <p>• To Reject: <a href="{{ reject_url }}" style="color: #dc3545; word-break: break-all;">{{ reject_url }}</a></p>
-        </div>
-
-        <!-- Footer -->
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
-            <p>This is an automated message. Please do not reply to this email.</p>
-            <p>Reference: {{ ticket }}</p>
-        </div>
-    </div>
-</body>
-</html>
+{% block content %}
+<p>Hello,</p>
+<p>Your approval is required for the following access request:</p>
+<ul>
+    <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+    <li><strong>Requester:</strong> {{ requester.get_full_name|default:requester.username }} (Employee ID: {{ requester.username }})</li>
+    <li><strong>Resource:</strong> {{ resource }}</li>
+    <li><strong>Access Level:</strong> {{ access_level }}</li>
+    <li><strong>Justification:</strong> {{ justification }}</li>
+</ul>
+<p>Please review and take action:</p>
+<p>
+    <a href="{{ approve_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+        Approve
+    </a>
+    <a href="{{ reject_url }}" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+        Reject
+    </a>
+</p>
+<p>If the buttons above are not clickable, please copy and paste the following links into your browser:</p>
+<p><strong>Approve:</strong> {{ approve_url }}</p>
+<p><strong>Reject:</strong> {{ reject_url }}</p>
+{% if notes %}
+<p><strong>Additional Notes:</strong><br>{{ notes }}</p>
+{% endif %}
+<p>Reference: Access Request</p>
+<p>This is an automated message from the Resource Management System.</p>
+{% endblock %}

@@ -7,7 +7,12 @@
 <ul>
     <li><strong>Ticket Number:</strong> {{ ticket }}</li>
     <li><strong>Resource:</strong> {{ resource }}</li>
-    <li><strong>Rejected By:</strong> {{ updated_by }}</li>
+    <li><strong>Access Level:</strong> {{ access_level }}</li>
+    <li><strong>Updated By:</strong> {{ updated_by }}</li>
+    <li><strong>Your Employee ID:</strong> {{ user.username }}</li>
+    {% if notes %}
+    <li><strong>Notes:</strong> {{ notes }}</li>
+    {% endif %}
 </ul>
 {% if justification %}
 <p><strong>Reason:</strong><br>{{ justification }}</p>
