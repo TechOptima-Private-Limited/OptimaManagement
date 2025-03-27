@@ -22,7 +22,7 @@ admin.site.index_title = 'Welcome to Optima Management Hub'
 from django.http import HttpResponseForbidden
 from .views import custom_404_view
 
-handler404 = 'OptCMS.views.custom_404_view'
+handler404 = 'webcrm.views.custom_404_view'
 
 print("STATIC_ROOT:", settings.STATIC_ROOT)
 print("STATICFILES_DIRS:", settings.STATIC_URL)
