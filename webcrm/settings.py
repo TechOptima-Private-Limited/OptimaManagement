@@ -29,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','192.168.0.5','192.168.1.16','backend.techoptima.ai', "https://backend.techoptima.ai/", "localhost", "127.0.0.1", "dev.techoptima.ai"]
+ALLOWED_HOSTS = ['192.168.1.3','192.168.0.5','192.168.1.16','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
 
-CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai']
+CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
 # Database
 DATABASES = {
@@ -377,7 +377,7 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
-DOMAIN_NAME = 'https://backend.techoptima.ai'
+DOMAIN_NAME = os.getenv('SITE_URL')
 
 ADMIN_SITE_HEADER = "Optima CMS"
 ADMIN_SITE_TITLE = "Optima CMS"
@@ -431,6 +431,7 @@ DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
 EMAIL_DOMAIN = 'techoptima.ai' 
 
 EMAIL_THREAD_ID = '1'
-SITE_URL = 'http://192.168.1.16:8000' 
+SITE_URL = os.getenv('SITE_URL') 
+
 # USE_TZ = True
 # TIME_ZONE = 'Asia/Kolkata' 
