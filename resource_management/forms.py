@@ -1,23 +1,17 @@
 from django import forms
-from .models import AccessRequest
-from .utils import get_user_role
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
-class AccessRequestForm(forms.ModelForm):
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True, help_text="Required. Enter a valid email address.")
+
     class Meta:
-        model = AccessRequest
-        fields = ['user', 'resource', 'access_level', 'justification', 'duration', 'priority', 'status', 'requires_approval', 'approver_email', 'notes']
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
 
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        user_role = get_user_role(user)
-
-        if user_role == 'employee':
-            # Hide fields for employees
-            self.fields.pop('priority')
-            self.fields.pop('status')
-            self.fields.pop('requires_approval')
-            self.fields.pop('approver_email')
-            self.fields.pop('notes')
-            # Set the user field to the logged-in user and make it read-only
-            self.fields['user'].initial = user
-            self.fields['user'].disabled = True
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user

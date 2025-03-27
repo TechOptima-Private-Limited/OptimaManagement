@@ -31,9 +31,12 @@ def send_threaded_email(subject, body, recipients, ticket_number, is_reply=True,
         message_id = base_message_id if not is_reply else f"{base_message_id}.{uuid.uuid4().hex[:8]}"
         thread_index = generate_thread_index(ticket_number)
 
-        base_subject = f"Access Request {ticket_number}"
-        if not subject.startswith(base_subject):
-            subject = base_subject if not is_reply else f"Re: {base_subject}"
+        if subject.startswith("Welcome to Optima Hub Management"):
+            subject =subject
+        else:
+            base_subject = f"Access Request {ticket_number}"
+            if not subject.startswith(base_subject):
+                subject = base_subject if not is_reply else f"Re: {base_subject}"
 
         headers = {
             'Message-ID': message_id,
@@ -91,18 +94,23 @@ def get_user_role(user):
 def send_email_notification(obj, subject, template_name, context, recipients=None, is_reply=True):
     try:
         if recipients is None:
+            if obj is None:
+                raise ValueError("Recipients must be provided if obj is None")
             recipients = [obj.user.email]
             if obj.resource.resource_team_email:
                 recipients.append(obj.resource.resource_team_email)
 
         html_message = render_to_string(f'resource_management/emails/{template_name}', context)
         plain_message = strip_tags(html_message)
-
+        print("Subject :", subject)
+        # Use ticket_number from obj if available, otherwise generate a unique message ID
+        ticket_number = f"employee-{context['user'].id}" if obj is None else obj.ticket_number
+        
         send_threaded_email(
             subject=subject,
             body=plain_message,
             recipients=recipients,
-            ticket_number=obj.ticket_number,
+            ticket_number=ticket_number,
             is_reply=is_reply,
             html_message=html_message
         )

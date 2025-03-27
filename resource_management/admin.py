@@ -3,6 +3,27 @@ from django import forms
 from django.utils import timezone
 from .models import *
 from .utils import send_request_notification, send_email_notification, send_status_notification
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from .forms import CustomUserCreationForm
+
+class UserAdmin(BaseUserAdmin):
+    add_form = CustomUserCreationForm
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'password1', 'password2'),
+        }),
+    )
+
+# Re-register the User model with the updated UserAdmin
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+# Re-register the User model with the updated UserAdmin
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 @admin.register(ResourceType)
