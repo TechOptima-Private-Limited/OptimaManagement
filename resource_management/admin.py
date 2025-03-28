@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils import timezone
 from .models import *
-from .utils import send_request_notification, send_email_notification, send_status_notification
+from .utils import send_request_notification, send_email_notification, send_status_notification, send_final_approval_notification
 from .forms import CustomUserCreationForm, AccessRequestForm  # Import AccessRequestForm from forms.py
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
@@ -162,6 +162,9 @@ class AccessRequestAdmin(admin.ModelAdmin):
                     notes=notes
                 )
                 send_status_notification(obj, old_status, notes)
+                # Send final approval notification to the employee if the status is APPROVED
+                if obj.status == 'APPROVED':
+                    send_final_approval_notification(obj)
         except Exception as e:
             print(f"Error sending notification: {str(e)}")
 
@@ -179,7 +182,6 @@ class AccessRequestAdmin(admin.ModelAdmin):
         if obj.assigned_to:
             send_email_notification(obj, subject, 'assignment_notification.html', context, [obj.assigned_to.email])
         send_email_notification(obj, subject, 'assignment_notification_requester.html', context, [obj.user.email])
-
 @admin.register(AccessHistory)
 class AccessHistoryAdmin(admin.ModelAdmin):
     list_display = ('access_request', 'action', 'performed_by', 'performed_at')

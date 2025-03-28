@@ -274,3 +274,29 @@ def send_status_notification(obj, old_status, notes=''):
         approver_context = base_context.copy()
         approver_context['requester'] = base_context['user_name']
         send_approval_request_notification(obj, notes)
+
+def send_final_approval_notification(obj):
+    """Send a final approval notification to the employee when the request is approved"""
+    try:
+        context = {
+            'ticket': obj.ticket_number,
+            'user': obj.user,  # Pass the User object
+            'user_name': obj.user.get_full_name() or obj.user.username,  # Pass the display name
+            'resource': obj.resource.name,
+            'access_level': obj.access_level.name,
+            'status': obj.get_status_display(),
+            'approved_by': obj.approved_by.get_full_name() if obj.approved_by else 'System',
+        }
+
+        send_email_notification(
+            obj,
+            f"Access Request {obj.ticket_number} - Final Approval",
+            'final_approval_notification.html',
+            context,
+            [obj.user.email],
+            is_reply=True
+        )
+        return True
+    except Exception as e:
+        print(f"Failed to send final approval notification: {str(e)}")
+        return False
