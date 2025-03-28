@@ -32,7 +32,7 @@ def send_threaded_email(subject, body, recipients, ticket_number, is_reply=True,
         thread_index = generate_thread_index(ticket_number)
 
         if subject.startswith("Welcome to Optima Hub Management"):
-            subject =subject
+            subject = subject
         else:
             base_subject = f"Access Request {ticket_number}"
             if not subject.startswith(base_subject):
@@ -133,7 +133,8 @@ def send_request_notification(access_request):
             'priority': access_request.get_priority_display(),
             'justification': access_request.justification,
             'resource_type': access_request.resource.resource_type.name,
-            'duration': access_request.duration
+            'duration': access_request.duration,
+            'approval_token_expiry': access_request.approval_token_expiry,
         }
 
         # Notify the requester
@@ -167,7 +168,7 @@ def send_approval_request_notification(obj, notes):
     try:
         if not obj.approval_token:
             obj.approval_token = uuid.uuid4().hex
-            obj.approval_token_expiry = timezone.now() + datetime.timedelta(days=1)
+            obj.approval_token_expiry = timezone.now() + datetime.timedelta(days=15)  # Token expires in 15 days
             obj.save()
             print(f"Generated and saved token: {obj.approval_token}")
 
@@ -181,7 +182,8 @@ def send_approval_request_notification(obj, notes):
             'justification': obj.justification,
             'notes': notes,
             'approve_url': approve_url,
-            'reject_url': reject_url
+            'reject_url': reject_url,
+            'approval_token_expiry': obj.approval_token_expiry,  # Add expiry date to context
         }
 
         print(f"Sending approval email with context: {context}")

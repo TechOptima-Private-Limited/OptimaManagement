@@ -15,6 +15,8 @@ from django.views.static import serve
 from django.urls import re_path
 from content.views import search_users
 from django.conf import settings
+import dal
+
 
 admin.site.site_header = 'Optima Management Hub'
 admin.site.site_title = 'Optima Management Hub'
@@ -51,8 +53,7 @@ urlpatterns += i18n_patterns(
     path(settings.SECRET_CRM_PREFIX, include('common.urls')),
     path(settings.SECRET_CRM_PREFIX, include('tasks.urls')),
     path(settings.SECRET_ADMIN_PREFIX, admin.site.urls),
-    
-
+    path('resource-management/', include('resource_management.urls')),
     path('contact-form/<uuid:uuid>/', contact_form, name='contact_form'),
     path('api/', include('content.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),  

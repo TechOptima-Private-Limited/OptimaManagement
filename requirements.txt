@@ -37,5 +37,6 @@
     beautifulsoup4==4.13.3
     packaging==24.2
     soupsieve==2.6
+    django-autocomplete-light==3.12.1
     whitenoise
     gunicorn

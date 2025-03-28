@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 import uuid
+from django.utils import timezone
 
 class ResourceType(models.Model):
     name = models.CharField(max_length=100)
@@ -34,6 +35,7 @@ class Resource(models.Model):
 
     def __str__(self):
         return f"{self.resource_type.name} - {self.name}"
+
 class AccessLevel(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
@@ -51,42 +53,50 @@ class AccessRequest(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('APPROVAL_REQUIRED', 'Approval Required'),
-        ('APPROVER_APPROVED', 'Approver Approved'),  # New status
-        ('APPROVER_REJECTED', 'Approver Rejected'),  # New status
+        ('APPROVER_APPROVED', 'Approver Approved'),
+        ('APPROVER_REJECTED', 'Approver Rejected'),
         ('APPROVED', 'Approved'),
         ('REJECTED', 'Rejected'),
         ('REVOKED', 'Revoked')
     ]
 
-    ticket_number = models.CharField(max_length=20, unique=True, default='ACC000000001')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='access_requests')
-    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
-    access_level = models.ForeignKey(AccessLevel, on_delete=models.CASCADE)
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM')
-    justification = models.TextField()
-    duration = models.IntegerField(help_text="Access duration in days")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-    requires_approval = models.BooleanField(default=False)
-    notes = models.TextField(blank=True, null=True, help_text="Additional notes or comments")
-    approver_email = models.EmailField(null=True, blank=True)
-    approved_by = models.ForeignKey(
-        User, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+    ticket_number = models.CharField(max_length=20, unique=True, default='ACC000000001', verbose_name="Ticket Number")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='access_requests', verbose_name="Requester")
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE, verbose_name="Resource")
+    access_level = models.ForeignKey(AccessLevel, on_delete=models.CASCADE, verbose_name="Access Level")
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM', verbose_name="Priority")
+    justification = models.TextField(verbose_name="Justification")
+    duration = models.IntegerField(help_text="Access duration in days", verbose_name="Duration (days)")
+    assigned_to = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        related_name='approved_requests'
+        related_name='assigned_requests',
+        verbose_name="Assigned To"
     )
-    approved_at = models.DateTimeField(null=True, blank=True)
-    requested_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(null=True, blank=True)
-    approval_token = models.CharField(max_length=100, blank=True, null=True, unique=True)  # New field
-    approval_token_expiry = models.DateTimeField(blank=True, null=True)  # New field
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests', verbose_name="Assigned To")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING', verbose_name="Status")
+    requires_approval = models.BooleanField(default=False, verbose_name="Requires Approval")
+    notes = models.TextField(blank=True, null=True, help_text="Additional notes or comments", verbose_name="Notes")
+    approver_email = models.EmailField(null=True, blank=True, verbose_name="Approver Email")
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_requests',
+        verbose_name="Approved By"
+    )
+    approved_at = models.DateTimeField(null=True, blank=True, verbose_name="Approved At")
+    requested_at = models.DateTimeField(auto_now_add=True, verbose_name="Requested At")
+    expires_at = models.DateTimeField(null=True, blank=True, verbose_name="Expires At")
+    approval_token = models.CharField(max_length=100, blank=True, null=True, unique=True, verbose_name="Approval Token")
+    approval_token_expiry = models.DateTimeField(blank=True, null=True, verbose_name="Approval Token Expiry")
 
     def save(self, *args, **kwargs):
         if self._state.adding:  # Only if creating new instance
             prefix = 'ACC'
-            date = datetime.datetime.now().strftime('%Y%m%d')
+            date = timezone.now().strftime('%Y%m%d')
             last_ticket = AccessRequest.objects.filter(
                 ticket_number__startswith=f'{prefix}{date}'
             ).order_by('-ticket_number').first()
@@ -100,11 +110,11 @@ class AccessRequest(models.Model):
             self.ticket_number = f'{prefix}{date}{new_number}'
         
         if not self.expires_at and self.duration:
-            self.expires_at = datetime.datetime.now() + datetime.timedelta(days=self.duration)
+            self.expires_at = timezone.now() + datetime.timedelta(days=self.duration)
         
         if self.status == 'APPROVAL_REQUIRED' and not self.approval_token:
             self.approval_token = uuid.uuid4().hex
-            self.approval_token_expiry = datetime.datetime.now() + datetime.timedelta(hours=24)  # Token expires in 24 hours
+            self.approval_token_expiry = timezone.now() + datetime.timedelta(days=15)  # Token expires in 15 days
         
         super().save(*args, **kwargs)
 
@@ -117,7 +127,7 @@ class AccessHistory(models.Model):
     performed_by = models.ForeignKey(
         User, 
         on_delete=models.SET_NULL, 
-        null=True,  # Allow null values
+        null=True, 
         blank=True,
         related_name='access_history'
     )

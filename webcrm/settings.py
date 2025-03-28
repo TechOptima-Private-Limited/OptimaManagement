@@ -11,6 +11,8 @@ from voip.settings import *         # NOQA
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import dal
+import dal_select2
 
 load_dotenv()
 
@@ -29,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','192.168.0.5','192.168.1.16','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
+ALLOWED_HOSTS = ['192.168.1.3','192.168.0.5','192.168.0.3','192.168.1.16','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
 
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
@@ -92,6 +94,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Application definition
 INSTALLED_APPS = [
+    'dal', 
+    'dal_select2',
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
