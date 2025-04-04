@@ -16,7 +16,7 @@ from django.urls import re_path
 from content.views import search_users
 from django.conf import settings
 import dal
-
+from django.conf.urls.i18n import i18n_patterns
 
 admin.site.site_header = 'Optima Management Hub'
 admin.site.site_title = 'Optima Management Hub'
@@ -60,6 +60,9 @@ urlpatterns += i18n_patterns(
     path('api/users/search/', search_users, name='search_users'),  
     path('api/', include('client.urls')),
     path('api/', include('resource_management.urls')),
+    # path('api/', include('assets.urls')),  # API endpoints
+    path('assets/', include('assets.urls', namespace='assets')),
+    path('dashboard/', include('dashboard.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 )
 
@@ -67,3 +70,7 @@ urlpatterns += i18n_patterns(
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# urlpatterns += [
+#     path('i18n/', include('django.conf.urls.i18n')),
+# ]

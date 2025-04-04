@@ -30,13 +30,22 @@
         --task-bg: #fcd4c030;
         --button-hover-bg: #205067;
     }
-.module h2, .module caption, .inline-group h2 {
+    .module h2, .module caption, .inline-group h2 {
         background: var(--primary);
     }
     </style>
 {% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
-{% block extrahead %}{% endblock %}
+{% block extrahead %}
+    {{ block.super }}
+    {# Add django-autocomplete-light dependencies #}
+    <link rel="stylesheet" href="{% static 'autocomplete_light/select2.css' %}">
+    <script src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
+    <script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
+    <script src="{% static 'autocomplete_light/select2.js' %}"></script>
+    {# Ensure jQuery is loaded before select2.js #}
+    <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+{% endblock %}
 {% block responsive %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}">
@@ -99,7 +108,7 @@
         {% block breadcrumbs %}
           <div class="breadcrumbs">
             <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-            {% if title %} &rsaquo; {{ title }}{% endif %}
+            {% if title %} › {{ title }}{% endif %}
           </div>
         {% endblock %}
       </nav>

@@ -1,0 +1,191 @@
+# assets/views.py
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import AssetType, Asset, AssetAssignment, AssetHistory, AssetReturn
+from .serializers import AssetTypeSerializer, AssetSerializer, AssetAssignmentSerializer, AssetHistorySerializer
+from .utils import send_asset_return_report
+from dal import autocomplete
+from django.contrib.auth.models import User
+
+@login_required
+def asset_summary(request):
+    by_type = Asset.objects.values('asset_type__name').annotate(total=Count('id')).order_by('asset_type__name')
+    by_status = Asset.objects.values('status').annotate(total=Count('id')).order_by('status')
+    by_employee = AssetAssignment.objects.values('employee__username').annotate(total=Count('assets')).order_by('employee__username')
+
+    context = {
+        'by_type': by_type,
+        'by_status': by_status,
+        'by_employee': by_employee,
+    }
+    return render(request, 'assets/summary.html', context)
+
+@login_required
+def return_assets_form(request):
+    if 'selected_assignments' not in request.session:
+        messages.error(request, "No assignments selected for return.")
+        return redirect('admin:assets_assetassignment_changelist')
+
+    assignment_ids = request.session.get('selected_assignments', [])
+    queryset = AssetAssignment.objects.filter(id__in=assignment_ids)
+
+    if request.method == 'POST':
+        for assignment in queryset:
+            if not assignment.assets.exists():
+                messages.warning(request, f"No assets to return for {assignment.employee.username}.")
+                continue
+
+            cleared = True
+            for asset in assignment.assets.all():
+                condition = request.POST.get(f'condition_{asset.id}', 'GOOD')
+                notes = request.POST.get(f'notes_{asset.id}', '')
+                image = request.FILES.get(f'image_{asset.id}')
+                asset_return = AssetReturn(
+                    assignment=assignment,
+                    asset=asset,
+                    condition=condition,
+                    notes=notes,
+                    return_image=image
+                )
+                asset_return.save()
+                if image:
+                    asset.image_after = image
+                    asset.save()
+                if condition in ['DAMAGED', 'LOST']:
+                    cleared = False
+
+                AssetHistory.objects.filter(
+                    asset=asset,
+                    action__startswith="Status updated to",
+                    performed_by__isnull=True
+                ).update(performed_by=request.user)
+
+                AssetHistory.objects.create(
+                    asset=asset,
+                    action=f"Returned from {assignment.employee.username}",
+                    performed_by=request.user,
+                    notes=notes,
+                )
+
+            send_asset_return_report(assignment, cleared, request.user)
+
+        messages.success(request, "Assets have been returned and a report has been sent.")
+        if 'selected_assignments' in request.session:
+            del request.session['selected_assignments']
+        return redirect('admin:assets_assetassignment_changelist')
+
+    return render(request, 'assets/return_assets.html', {
+        'assignments': queryset,
+        'admin_changelist_url': reverse('admin:assets_assetassignment_changelist'),
+    })
+
+class AssetAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Asset.objects.none()
+
+        qs = Asset.objects.filter(status='AVAILABLE', is_active=True)
+        print(f"AssetAutocomplete queryset: {qs}")
+        if self.q:
+            qs = qs.filter(
+                Q(asset_tag__icontains=self.q) |
+                Q(name__icontains=self.q) |
+                Q(serial_number__icontains=self.q)
+            )
+        return qs
+
+    def get_result_value(self, result):
+        return str(result.id)
+
+    def get_result_label(self, result):
+        return f"{result.name} - {result.asset_tag}"
+
+class EmployeeAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return User.objects.none()
+
+        qs = User.objects.filter(is_active=True)
+        print(f"EmployeeAutocomplete queryset: {qs}")
+        if self.q:
+            qs = qs.filter(
+                Q(email__icontains=self.q) |
+                Q(username__icontains=self.q)
+            )
+        return qs
+
+    def get_result_value(self, result):
+        return str(result.id)
+
+    def get_result_label(self, result):
+        return f"{result.username} ({result.email})"
+
+class ManagerEmailAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return User.objects.none()
+
+        qs = User.objects.filter(is_active=True, is_staff=True)
+        print(f"ManagerEmailAutocomplete queryset: {qs}")
+        if self.q:
+            qs = qs.filter(
+                Q(email__icontains=self.q) |
+                Q(username__icontains=self.q)
+            )
+        return qs
+
+    def get_result_value(self, result):
+        return result.email
+
+    def get_result_label(self, result):
+        return f"{result.username} ({result.email})"
+
+class AssetTypeViewSet(viewsets.ModelViewSet):
+    queryset = AssetType.objects.all()
+    serializer_class = AssetTypeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_superuser:
+            return qs.filter(asset_team_email=self.request.user.email)
+        return qs
+
+class AssetViewSet(viewsets.ModelViewSet):
+    queryset = Asset.objects.all()
+    serializer_class = AssetSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_superuser:
+            asset_team_emails = AssetType.objects.filter(asset_team_email=self.request.user.email).values_list('id', flat=True)
+            return qs.filter(asset_type__id__in=asset_team_emails)
+        return qs
+
+class AssetAssignmentViewSet(viewsets.ModelViewSet):
+    queryset = AssetAssignment.objects.all()
+    serializer_class = AssetAssignmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_superuser:
+            return qs.filter(employee=self.request.user)
+        return qs
+
+class AssetHistoryViewSet(viewsets.ModelViewSet):
+    queryset = AssetHistory.objects.all()
+    serializer_class = AssetHistorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_superuser:
+            return qs.filter(performed_by=self.request.user)
+        return qs

@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','192.168.0.5','192.168.0.3','192.168.1.16','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
+ALLOWED_HOSTS = ['192.168.1.3','192.168.0.6','192.168.0.8','192.168.1.18','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
 
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
@@ -82,7 +82,7 @@ LANGUAGES = [
 TIME_ZONE = 'UTC'   # specify your time zone
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 LOCALE_PATHS = [
@@ -114,11 +114,12 @@ INSTALLED_APPS = [
     'settings',
     'rest_framework',
     'corsheaders',
-    'django_ckeditor_5',
-    
+    'django_ckeditor_5', 
     'resource_management',
     'client',
-    'content'
+    'content',
+    'assets',
+    'dashboard'
     
 ]
 
@@ -175,6 +176,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [
+    BASE_DIR / "assets/static",
+]
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -332,8 +336,10 @@ CORS_ALLOW_HEADERS = [
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],

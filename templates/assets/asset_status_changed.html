@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Status Changed</title>
+</head>
+<body>
+    <h2>Asset Status Changed - {{ asset.asset_tag }}</h2>
+    <p>The following asset's status has changed:</p>
+    <ul>
+        <li><strong>Asset:</strong> {{ asset.name }} ({{ asset.asset_type.name }})</li>
+        <li><strong>Tag:</strong> {{ asset.asset_tag }}</li>
+        <li><strong>New Status:</strong> {{ status }}</li>
+    </ul>
+    <p>Please take appropriate action if needed.</p>
+    <p>Best regards,<br>The Asset Management Team</p>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multiple Assets Assigned</title>
+</head>
+<body>
+    <h2>Multiple Assets Assigned to {{ employee }}</h2>
+    <p>Dear {{ employee }},</p>
+    <p>The following assets have been assigned to you:</p>
+    <ul>
+        {% for assignment in assignments %}
+        <li>{{ assignment.asset.name }} ({{ assignment.asset.asset_type.name }}) - Tag: {{ assignment.asset.asset_tag }}</li>
+        {% endfor %}
+    </ul>
+    <p>Please take care of the assets. Contact the asset team if you have any questions.</p>
+    <p>Best regards,<br>The Asset Management Team</p>
+</body>
+</html>
