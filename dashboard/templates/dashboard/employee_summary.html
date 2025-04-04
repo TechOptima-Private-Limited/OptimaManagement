@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Summary for {{ employee.username }}</h1>
+    <h2>Resources</h2>
+    <ul>
+        {% for resource in resources %}
+            <li>{{ resource.resource.name }} - {{ resource.access_level.name }} ({{ resource.get_status_display }})</li>
+        {% empty %}
+            <li>No active resources assigned.</li>
+        {% endfor %}
+    </ul>
+    <h2>Assets</h2>
+    <ul>
+        {% for asset in assets %}
+            <li>{{ asset.asset_type.name }} - {{ asset.name }} ({{ asset.asset_tag }})</li>
+        {% empty %}
+            <li>No active assets assigned.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

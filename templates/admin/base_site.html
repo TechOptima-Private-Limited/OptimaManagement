@@ -1,15 +1,14 @@
-{% extends "admin/base.html" %}{% load static %}
+{% extends "admin/base.html" %}
+{% load static %}
 
 {% block title %}
     {% if subtitle %}{{ subtitle }} | {% endif %}
-    {# CRM: add prefix "A:"  for admin page title #}
     {% if "admin" in request.META.PATH_INFO %}A: {% endif %}
     {{ title }} | {{ site_title }}
 {% endblock %}
 
 {% block branding %}
 <div id="site-name"><a href="{% url 'admin:index' %}">
-    {# CRM: add Django-CRM Logo #}
     <img src="{% static 'images/techoptima_logo.png' %}" alt="Django-CRM Logo" style="vertical-align: sub; height: 25px;"> {{ site_header }}</a></div>
 {% if user.is_anonymous %}
   {% include "admin/color_theme_toggle.html" %}
@@ -17,3 +16,148 @@
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        // Ensure CSRF token is included in AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        if (typeof jQuery !== 'undefined') {
+            jQuery.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        }
+    </script>
+    
+    {% if request.path == '/admin/assets/asset/cleanup/' or request.path == '/en/admin/assets/asset/cleanup/' %}
+    <style>
+        .cleanup-container {
+            margin: 20px 0;
+        }
+        .cleanup-section {
+            margin-bottom: 25px;
+        }
+        .cleanup-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .cleanup-table th, .cleanup-table td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .cleanup-table th {
+            background-color: #f5f5f5;
+        }
+        .cleanup-description {
+            margin-bottom: 15px;
+        }
+        .cleanup-description ul {
+            margin-left: 20px;
+        }
+        .cleanup-actions {
+            margin-top: 20px;
+        }
+        .cleanup-button {
+            padding: 8px 16px;
+            background-color: #417690;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .cleanup-button:hover {
+            background-color: #205067;
+        }
+        .cleanup-cancel {
+            margin-left: 10px;
+            text-decoration: none;
+        }
+    </style>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if request.path == '/admin/assets/asset/cleanup/' or request.path == '/en/admin/assets/asset/cleanup/' %}
+        <div class="cleanup-container">
+            <h1>Asset Data Cleanup</h1>
+            
+            <div class="cleanup-section">
+                <div class="cleanup-description">
+                    <p>This tool will fix inconsistencies between asset status and actual assignments.</p>
+                    <ul>
+                        <li>Assets with active assignments will be marked as ASSIGNED</li>
+                        <li>Assets without active assignments will be marked as AVAILABLE</li>
+                        <li>Orphaned assignments (with no assets) will be removed</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="cleanup-section">
+                <h2>HP Notebooks</h2>
+                <table class="cleanup-table">
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Active Assignments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in hp_notebooks %}
+                        <tr>
+                            <td>{{ asset.asset_tag }}</td>
+                            <td>{{ asset.name }}</td>
+                            <td>{{ asset.status }}</td>
+                            <td>{{ asset.assignments.all|length }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No HP notebooks found</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="cleanup-section">
+                <h2>Orphaned Assignments</h2>
+                <p>Number of assignments with no assets: {{ orphaned_count }}</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="cleanup-actions">
+                    <input type="submit" class="cleanup-button" value="Run Cleanup" />
+                    <a href="../" class="cleanup-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock %}

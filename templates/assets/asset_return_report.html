@@ -1,0 +1,57 @@
+<!-- assets/templates/assets/asset_return_report.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Return Report</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: Arial, sans-serif;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h2>Asset Return Report for {{ employee }}</h2>
+    <p>Dear Manager/Asset Team,</p>
+    <p>The following assets have been returned by {{ employee }}:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Asset Type</th>
+                <th>Name</th>
+                <th>Asset Tag</th>
+                <th>Serial Number</th>
+                <th>Condition</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for return in returns %}
+                <tr>
+                    <td>{{ return.asset.asset_type.name }}</td>
+                    <td>{{ return.asset.name }}</td>
+                    <td>{{ return.asset.asset_tag }}</td>
+                    <td>{{ return.asset.serial_number|default:"N/A" }}</td>
+                    <td>{{ return.condition }}</td>
+                    <td>{{ return.notes|default:"N/A" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>Clearance Status: {% if cleared %}Cleared{% else %}Not Cleared (Damaged/Lost Assets Detected){% endif %}</p>
+    <p>Returned by: {{ performed_by }}</p>
+    <p>Best regards,<br>The Asset Management Team</p>
+</body>
+</html>

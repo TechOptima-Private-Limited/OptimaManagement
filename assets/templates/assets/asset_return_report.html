@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Return Report</title>
+</head>
+<body>
+    <h2>Asset Return Report for {{ employee }}</h2>
+    <p>The following assets have been returned by {{ employee }}:</p>
+    <ul>
+        {% for return in returns %}
+            <li>{{ return.asset.asset_type.name }} - {{ return.asset.name }} ({{ return.asset.asset_tag }}): {{ return.condition }} {% if return.notes %} - {{ return.notes }}{% endif %}</li>
+        {% endfor %}
+    </ul>
+    <p><strong>Clearance Status:</strong> {% if cleared %}Cleared{% else %}Not Cleared{% endif %}</p>
+    <p>Best regards,<br>The Asset Management Team</p>
+</body>
+</html>

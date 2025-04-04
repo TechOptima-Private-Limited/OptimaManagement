@@ -1,0 +1,109 @@
+<!-- assets/templates/assets/return_assets.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Return Assets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #23949f; /* Django-CRM primary color */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .submit-row {
+            margin-top: 20px;
+        }
+        .submit-row input[type="submit"], .submit-row button {
+            background-color: #23949f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .submit-row input[type="submit"]:hover, .submit-row button:hover {
+            background-color: #205067;
+        }
+        .cancel-link a {
+            color: #23949f;
+            text-decoration: none;
+        }
+        .cancel-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        function handleFormSubmit() {
+            // Redirect the parent window (admin interface) to the changelist
+            if (window.opener) {
+                window.opener.location.href = "{{ admin_changelist_url|escapejs }}";
+            }
+            // Close the current window after a short delay to ensure the redirect happens
+            setTimeout(function() {
+                window.close();
+            }, 500);
+        }
+    </script>
+</head>
+<body>
+    <h1>Return Assets</h1>
+    <p>Please specify the condition and details for each asset being returned.</p>
+    <form method="post" enctype="multipart/form-data" onsubmit="handleFormSubmit();">
+        {% csrf_token %}
+        {% for assignment in assignments %}
+            <h2>Assignment to {{ assignment.employee.username }} ({{ assignment.assets.count }} assets)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th>Condition</th>
+                        <th>Notes</th>
+                        <th>Return Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assignment.assets.all %}
+                        <tr>
+                            <td>{{ asset.asset_type.name }} - {{ asset.name }} ({{ asset.asset_tag }})</td>
+                            <td>
+                                <select name="condition_{{ asset.id }}">
+                                    <option value="GOOD">Good</option>
+                                    <option value="DAMAGED">Damaged</option>
+                                    <option value="LOST">Lost</option>
+                                </select>
+                            </td>
+                            <td>
+                                <textarea name="notes_{{ asset.id }}" rows="3" cols="30"></textarea>
+                            </td>
+                            <td>
+                                <input type="file" name="image_{{ asset.id }}" accept="image/*">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+        <div class="submit-row">
+            <input type="submit" value="Return Assets">
+            <button type="button" onclick="window.close();">Close</button>
+            <p class="cancel-link">
+                <a href="{% url 'admin:assets_assetassignment_changelist' %}" target="_blank">Cancel</a>
+            </p>
+        </div>
+    </form>
+</body>
+</html>

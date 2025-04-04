@@ -1,0 +1,13 @@
+{% extends "admin/nav_sidebar.html" %}
+
+{% block nav_links %}
+    {{ block.super }}
+    <div class="module">
+        <h2>Dashboard</h2>
+        <ul>
+            <li>
+                <a href="{% url 'employee_summary' user_id=request.user.id %}">My Dashboard</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

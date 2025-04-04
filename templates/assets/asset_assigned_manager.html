@@ -1,0 +1,64 @@
+<!-- assets/templates/assets/asset_assigned_manager.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Assignment Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #23949f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Asset Assignment Notification</h1>
+        <p>Dear Manager,</p>
+        <p>The following assets have been assigned to {{ employee }} under your supervision:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset Tag</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in assets %}
+                <tr>
+                    <td>{{ asset.asset_tag }}</td>
+                    <td>{{ asset.name }}</td>
+                    <td>{{ asset.asset_type.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>Total assets assigned: {{ count }}</p>
+        <p>Please contact the asset management team if you have any questions.</p>
+        <p>Best regards,<br>Asset Management Team</p>
+    </div>
+</body>
+</html>

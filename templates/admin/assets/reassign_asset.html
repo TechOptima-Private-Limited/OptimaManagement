@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Reassign Asset: {{ asset.asset_tag }}</h1>
+    
+    <div style="margin-bottom: 20px;">
+        <p>The asset <strong>{{ asset.asset_tag }}</strong> ({{ asset.name }}) is currently assigned to:</p>
+        
+        <ul>
+        {% for assignment in active_assignments %}
+            <li>
+                Employee: <strong>{{ assignment.employee.username }}</strong> 
+                (Assignment #{{ assignment.id }} from {{ assignment.assigned_at|date:"M d, Y" }})
+            </li>
+        {% endfor %}
+        </ul>
+        
+        <p>Do you want to automatically return this asset from its current assignment and make it available for a new assignment?</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            {% for field in form %}
+                <div class="form-row">
+                    {{ field.errors }}
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+        </fieldset>
+        
+        <div style="margin-top: 20px;">
+            <input type="submit" value="Confirm" class="default" />
+            <a href="{% url 'admin:assets_assetassignment_add' %}" style="margin-left: 10px;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
