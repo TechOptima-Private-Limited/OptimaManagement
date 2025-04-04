@@ -1,26 +1,12 @@
-<!-- assets/templates/assets/asset_assigned.html -->
+<!-- templates/assets/asset_assigned.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Asset Assignment Notification</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        h1 {
-            color: #23949f;
-        }
         table {
-            width: 100%;
             border-collapse: collapse;
+            width: 100%;
             margin: 20px 0;
         }
         th, td {
@@ -31,34 +17,53 @@
         th {
             background-color: #f2f2f2;
         }
+        .notes {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #007bff;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Asset Assignment Notification</h1>
-        <p>Dear {{ employee }},</p>
-        <p>The following assets have been assigned to you:</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Asset Tag</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asset in assets %}
-                <tr>
-                    <td>{{ asset.asset_tag }}</td>
-                    <td>{{ asset.name }}</td>
-                    <td>{{ asset.asset_type.name }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p>Total assets assigned: {{ count }}</p>
-        <p>Please take care of these assets and report any issues to your manager or the asset management team.</p>
-        <p>Best regards,<br>Asset Management Team</p>
+    <h2>Asset Assignment Notification</h2>
+    <p>Dear {{ employee }},</p>
+    <p>You have been assigned the following assets:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Asset Type</th>
+                <th>Name</th>
+                <th>Asset Tag</th>
+                <th>Serial Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td>{{ asset.asset_type.name }}</td>
+                <td>{{ asset.name }}</td>
+                <td>{{ asset.asset_tag }}</td>
+                <td>{{ asset.serial_number|default:"N/A" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No assets assigned.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p>Total Assets Assigned: {{ count }}</p>
+
+    {% if notes %}
+    <div class="notes">
+        <h3>Additional Notes:</h3>
+        <p>{{ notes }}</p>
     </div>
+    {% endif %}
+
+    <p>Best regards,<br>Asset Management Team</p>
 </body>
 </html>

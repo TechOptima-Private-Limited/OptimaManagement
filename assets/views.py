@@ -45,6 +45,7 @@ def return_assets_form(request):
                 condition = request.POST.get(f'condition_{asset.id}', 'GOOD')
                 notes = request.POST.get(f'notes_{asset.id}', '')
                 image = request.FILES.get(f'image_{asset.id}')
+                print(f"Returning asset {asset.asset_tag} (ID: {asset.id}) with condition {condition}")
                 asset_return = AssetReturn(
                     assignment=assignment,
                     asset=asset,
@@ -53,9 +54,11 @@ def return_assets_form(request):
                     return_image=image
                 )
                 asset_return.save()
+                print(f"AssetReturn {asset_return.id} created for asset {asset.asset_tag}")
                 if image:
                     asset.image_after = image
                     asset.save()
+                    print(f"Updated image_after for asset {asset.asset_tag}")
                 if condition in ['DAMAGED', 'LOST']:
                     cleared = False
 
@@ -71,8 +74,10 @@ def return_assets_form(request):
                     performed_by=request.user,
                     notes=notes,
                 )
+                print(f"Created AssetHistory entry for return of asset {asset.asset_tag}")
 
             send_asset_return_report(assignment, cleared, request.user)
+            print(f"Sent return report for assignment {assignment.id}")
 
         messages.success(request, "Assets have been returned and a report has been sent.")
         if 'selected_assignments' in request.session:
