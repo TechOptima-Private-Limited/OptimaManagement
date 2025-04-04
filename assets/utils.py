@@ -11,6 +11,7 @@ def send_asset_assignment_notification(assignment):
         'employee': assignment.employee.get_full_name() or assignment.employee.username,
         'assets': assets,
         'count': assets.count(),
+        'notes': assignment.notes,
     }
 
     try:
@@ -50,30 +51,47 @@ def send_asset_return_report(assignment, cleared, performed_by):
     }
 
     try:
-        html_message = render_to_string('assets/asset_return_report.html', context)
-        plain_message = strip_tags(html_message)
+        # Email to the employee using the new template
+        html_message_employee = render_to_string('assets/asset_return_report_employee.html', context)
+        plain_message_employee = strip_tags(html_message_employee)
+        send_threaded_email(
+            subject=f"Asset Return Report for {assignment.employee.username}",
+            body=plain_message_employee,
+            recipients=[assignment.employee.email],
+            ticket_number=f"asset-return-{assignment.id}-employee",
+            html_message=html_message_employee,
+            is_reply=False
+        )
+        print(f"Sent return report to employee: {assignment.employee.email}")
 
-        recipients = [assignment.manager_email] if assignment.manager_email else []
+        # Email to the manager and asset team using the existing template
+        html_message_manager = render_to_string('assets/asset_return_report.html', context)
+        plain_message_manager = strip_tags(html_message_manager)
+
+        manager_team_recipients = []
+        if assignment.manager_email:
+            manager_team_recipients.append(assignment.manager_email)
         returned_assets = [return_item.asset for return_item in returns]
         asset_team_emails = Asset.objects.filter(
             id__in=[asset.id for asset in returned_assets]
         ).values_list('asset_type__asset_team_email', flat=True).distinct()
         for email in asset_team_emails:
             if email:
-                recipients.append(email)
+                manager_team_recipients.append(email)
 
-        if not recipients:
-            print("No recipients found for return report.")
-            return
+        if manager_team_recipients:
+            print(f"Sending return report to manager/team recipients: {manager_team_recipients}")
+            send_threaded_email(
+                subject=f"Asset Return Report for {assignment.employee.username}",
+                body=plain_message_manager,
+                recipients=manager_team_recipients,
+                ticket_number=f"asset-return-{assignment.id}-manager",
+                html_message=html_message_manager,
+                is_reply=False
+            )
+        else:
+            print("No manager or asset team recipients found for return report.")
 
-        send_threaded_email(
-            subject=f"Asset Return Report for {assignment.employee.username}",
-            body=plain_message,
-            recipients=recipients,
-            ticket_number=f"asset-return-{assignment.id}",
-            html_message=html_message,
-            is_reply=False
-        )
     except Exception as e:
         print(f"Failed to send return report: {e}")
 

@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 email_validator = RegexValidator(
-    regex=r'^[a-zA.Z0-9_.+-]+@[a-zA.Z0-9-]+\.[a-zA.Z0-9-.]+$',
+    regex=r'^[a-zA-Z0-9_.+-]+@[a-zA.Z0-9-]+\.[a-zA.Z0-9-.]+$',
     message="Enter a valid email address."
 )
 
@@ -108,10 +108,15 @@ class EmployeeStatus(models.Model):
 
 @receiver(post_save, sender=AssetAssignment)
 def update_asset_status_on_assignment(sender, instance, created, **kwargs):
-    if created:
-        print(f"post_save signal fired for AssetAssignment {instance.id}")
-        for asset in instance.assets.all():
-            print(f"Updating asset {asset.asset_tag} status to ASSIGNED")
+    print(f"post_save signal fired for AssetAssignment {instance.id}, created={created}")
+    assets = instance.assets.all()
+    if not assets:
+        print(f"No assets associated with AssetAssignment {instance.id} at post_save")
+        return
+    print(f"Found {assets.count()} assets for AssetAssignment {instance.id}: {[asset.asset_tag for asset in assets]}")
+    for asset in assets:
+        if asset.status != 'ASSIGNED':
+            print(f"Updating asset {asset.asset_tag} (ID: {asset.id}) status to ASSIGNED")
             asset.status = 'ASSIGNED'
             asset.save()
             AssetHistory.objects.create(
@@ -119,34 +124,41 @@ def update_asset_status_on_assignment(sender, instance, created, **kwargs):
                 action="Status updated to ASSIGNED",
                 performed_by=None,
             )
+            print(f"Asset {asset.asset_tag} status updated to ASSIGNED")
+        else:
+            print(f"Asset {asset.asset_tag} (ID: {asset.id}) is already ASSIGNED")
 
 @receiver(m2m_changed, sender=AssetAssignment.assets.through)
 def update_asset_status_on_assignment_change(sender, instance, action, pk_set, **kwargs):
-    print(f"m2m_changed signal fired with action: {action}, pk_set: {pk_set}")
+    print(f"m2m_changed signal fired for AssetAssignment {instance.id} with action: {action}, pk_set: {pk_set}")
     if action == "post_add":
         if pk_set:
             assets = Asset.objects.filter(pk__in=pk_set)
-            print(f"post_add: Processing {len(assets)} assets")
+            print(f"post_add: Processing {len(assets)} assets: {[asset.asset_tag for asset in assets]}")
             for asset in assets:
-                print(f"Updating asset {asset.asset_tag} status to ASSIGNED")
-                asset.status = 'ASSIGNED'
-                asset.save()
-                AssetHistory.objects.create(
-                    asset=asset,
-                    action="Status updated to ASSIGNED",
-                    performed_by=None,
-                )
+                if asset.status != 'ASSIGNED':
+                    print(f"Updating asset {asset.asset_tag} (ID: {asset.id}) status to ASSIGNED")
+                    asset.status = 'ASSIGNED'
+                    asset.save()
+                    AssetHistory.objects.create(
+                        asset=asset,
+                        action="Status updated to ASSIGNED",
+                        performed_by=None,
+                    )
+                    print(f"Asset {asset.asset_tag} status updated to ASSIGNED")
+                else:
+                    print(f"Asset {asset.asset_tag} (ID: {asset.id}) is already ASSIGNED")
     elif action == "post_remove":
         if pk_set:
             assets = Asset.objects.filter(pk__in=pk_set)
-            print(f"post_remove: Processing {len(assets)} assets")
+            print(f"post_remove: Processing {len(assets)} assets: {[asset.asset_tag for asset in assets]}")
             for asset in assets:
                 active_assignments = AssetAssignment.objects.filter(
                     assets=asset,
                     returns__isnull=True
                 ).count()
                 if active_assignments == 0:
-                    print(f"Setting asset {asset.asset_tag} to AVAILABLE (no active assignments)")
+                    print(f"Setting asset {asset.asset_tag} (ID: {asset.id}) to AVAILABLE (no active assignments)")
                     asset.status = 'AVAILABLE'
                     asset.save()
                     AssetHistory.objects.create(
@@ -154,23 +166,36 @@ def update_asset_status_on_assignment_change(sender, instance, action, pk_set, *
                         action="Status updated to AVAILABLE",
                         performed_by=None,
                     )
+                    print(f"Asset {asset.asset_tag} status updated to AVAILABLE")
                 else:
-                    print(f"Asset {asset.asset_tag} still has {active_assignments} active assignments")
+                    print(f"Asset {asset.asset_tag} (ID: {asset.id}) still has {active_assignments} active assignments")
 
 @receiver(post_save, sender=AssetReturn)
 def update_asset_status_on_return(sender, instance, created, **kwargs):
     if created:
+        print(f"post_save signal fired for AssetReturn {instance.id}")
         asset = instance.asset
         assignment = instance.assignment
+        print(f"Removing asset {asset.asset_tag} (ID: {asset.id}) from AssetAssignment {assignment.id}")
         assignment.assets.remove(asset)
+        print(f"Asset {asset.asset_tag} removed from assignment. Current assets in assignment: {[a.asset_tag for a in assignment.assets.all()]}")
+        
+        # Update the asset status based on the return condition
         if instance.condition == 'GOOD':
-            asset.status = 'AVAILABLE'
+            new_status = 'AVAILABLE'
         else:
-            asset.status = instance.condition
-        asset.save()
-        AssetHistory.objects.create(
-            asset=asset,
-            action=f"Status updated to {asset.status} after return",
-            performed_by=None,
-            notes=instance.notes
-        )
+            new_status = instance.condition  # 'DAMAGED' or 'LOST'
+        
+        if asset.status != new_status:
+            print(f"Updating asset {asset.asset_tag} (ID: {asset.id}) status from {asset.status} to {new_status}")
+            asset.status = new_status
+            asset.save()
+            AssetHistory.objects.create(
+                asset=asset,
+                action=f"Status updated to {asset.status} after return",
+                performed_by=None,
+                notes=instance.notes
+            )
+            print(f"Asset {asset.asset_tag} status updated to {asset.status}")
+        else:
+            print(f"Asset {asset.asset_tag} (ID: {asset.id}) status is already {asset.status}")

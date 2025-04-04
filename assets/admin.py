@@ -139,6 +139,7 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
                     condition = request.POST.get(f'condition_{asset.id}', 'GOOD')
                     notes = request.POST.get(f'notes_{asset.id}', '')
                     image = request.FILES.get(f'image_{asset.id}')
+                    print(f"Returning asset {asset.asset_tag} (ID: {asset.id}) with condition {condition}")
                     asset_return = AssetReturn(
                         assignment=assignment,
                         asset=asset,
@@ -147,9 +148,11 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
                         return_image=image
                     )
                     asset_return.save()
+                    print(f"AssetReturn {asset_return.id} created for asset {asset.asset_tag}")
                     if image:
                         asset.image_after = image
                         asset.save()
+                        print(f"Updated image_after for asset {asset.asset_tag}")
                     if condition in ['DAMAGED', 'LOST']:
                         cleared = False
 
@@ -165,8 +168,10 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
                         performed_by=request.user,
                         notes=notes,
                     )
+                    print(f"Created AssetHistory entry for return of asset {asset.asset_tag}")
 
                 send_asset_return_report(assignment, cleared, request.user)
+                print(f"Sent return report for assignment {assignment.id}")
 
             self.message_user(request, "Assets have been returned and a report has been sent.")
             return redirect('admin:assets_assetassignment_changelist')
@@ -193,19 +198,13 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
         super().save_formset(request, form, formset, change)
 
     def save_model(self, request, obj, form, change):
+        print(f"Saving AssetAssignment {obj.id if obj.id else 'new'}, change={change}")
         super().save_model(request, obj, form, change)
         selected_assets = form.cleaned_data['assets']
-        if change:
-            for idx, asset in enumerate(selected_assets):
-                image = request.FILES.get(f'assetassignmentimage_set-{idx}-image')
-                if image:
-                    AssetAssignmentImage.objects.create(
-                        assignment=obj,
-                        asset=asset,
-                        image=image
-                    )
-                    asset.image_before = image
-                    asset.save()
+        print(f"Selected assets: {[asset.asset_tag for asset in selected_assets]}")
+        # Ensure the assets are associated with the assignment
+        if not change:  # On add
+            obj.assets.set(selected_assets)
         action = "Updated assets for" if change else "Assigned assets to"
         for asset in selected_assets:
             AssetHistory.objects.create(
@@ -216,7 +215,13 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
             )
 
     def save_related(self, request, form, formsets, change):
+        print(f"Saving related objects for AssetAssignment {form.instance.id}, change={change}")
         super().save_related(request, form, formsets, change)
+        # Ensure assets are saved before signals fire
+        if not change:  # On add
+            selected_assets = form.cleaned_data['assets']
+            form.instance.assets.set(selected_assets)
+            print(f"Assets set for AssetAssignment {form.instance.id}: {[asset.asset_tag for asset in selected_assets]}")
         # Only send the notification after the images are saved on the edit page
         if change:
             send_asset_assignment_notification(form.instance)
