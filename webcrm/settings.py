@@ -120,7 +120,8 @@ INSTALLED_APPS = [
     'content',
     'assets',
     'dashboard',
-    'resource_requests'
+    'django_select2',
+    'resource_requests.apps.ResourceRequestConfig',
     
 ]
 

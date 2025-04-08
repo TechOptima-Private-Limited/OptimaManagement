@@ -52,7 +52,7 @@ urlpatterns += i18n_patterns(
     path(settings.SECRET_CRM_PREFIX, include('crm.urls')),
     path(settings.SECRET_CRM_PREFIX, include('common.urls')),
     path(settings.SECRET_CRM_PREFIX, include('tasks.urls')),
-    path('', admin.site.urls),
+    path(settings.SECRET_ADMIN_PREFIX, admin.site.urls),
     path('resource-management/', include('resource_management.urls')),
     path('contact-form/<uuid:uuid>/', contact_form, name='contact_form'),
     path('api/', include('content.urls')),
@@ -63,6 +63,7 @@ urlpatterns += i18n_patterns(
     # path('api/', include('assets.urls')),  # API endpoints
     path('assets/', include('assets.urls', namespace='assets')),
     path('dashboard/', include('dashboard.urls')),
+    path('resource-request/', include('resource_requests.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 )
 
