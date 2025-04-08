@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h2>New Resource Request: {{ pmo.ri_no }}</h2>
+  <h3>Account Details</h3>
+  <table>
+    <tr><th>Field</th><th>Value</th></tr>
+    <tr><td>Account Name</td><td>{{ resource_request.account_name }}</td></tr>
+    <tr><td>Engagement Manager</td><td>{{ resource_request.engagement_manager_delivery_director }}</td></tr>
+    <tr><td>Raised Date</td><td>{{ resource_request.resource_request_raised_date }}</td></tr>
+    <tr><td>Request Owner</td><td>{{ resource_request.request_owner }}</td></tr>
+  </table>
+  <h3>Business/Project Details</h3>
+  <table>
+    <tr><th>Field</th><th>Value</th></tr>
+    <tr><td>Business Unit</td><td>{{ resource_request.business_unit }}</td></tr>
+    <tr><td>Region</td><td>{{ resource_request.region|default:"N/A" }}</td></tr>
+  </table>
+  <h3>Delivery Request</h3>
+  <table>
+    <tr><th>ID</th><th>Competency Group</th><th>Primary Skill</th><th>Designation</th></tr>
+    <tr>
+      <td>{{ delivery.id }}</td>
+      <td>{{ delivery.competency_group }}</td>
+      <td>{{ delivery.primary_skill }}</td>
+      <td>{{ delivery.designation }}</td>
+    </tr>
+  </table>
+  <h3>PMO Request</h3>
+  <table>
+    <tr><th>RI No</th><th>Created Date</th></tr>
+    <tr><td>{{ pmo.ri_no }}</td><td>{{ pmo.ri_created_date }}</td></tr>
+  </table>
+</body>
+</html>
