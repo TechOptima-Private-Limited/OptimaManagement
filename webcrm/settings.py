@@ -119,7 +119,8 @@ INSTALLED_APPS = [
     'client',
     'content',
     'assets',
-    'dashboard'
+    'dashboard',
+    'resource_requests'
     
 ]
 
