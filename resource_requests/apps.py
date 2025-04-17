@@ -6,3 +6,8 @@ class ResourceRequestConfig(AppConfig):
 
     def ready(self):
         import resource_requests.signals
+        from django.contrib.admin import widgets as admin_widgets
+        from .widgets import CustomDatePickerWidget
+        
+        # This is optional but can help ensure our widget is used
+        admin_widgets.AdminDateWidget = CustomDatePickerWidget

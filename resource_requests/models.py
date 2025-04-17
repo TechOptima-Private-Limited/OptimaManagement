@@ -19,6 +19,11 @@ class ResourceRequest(models.Model):
         return f"{self.account_name} - {self.resource_request_raised_date}"
 
 class DeliveryRequest(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    ]
     resource_request = models.ForeignKey(ResourceRequest, on_delete=models.CASCADE, related_name='delivery_requests')
     id = models.AutoField(primary_key=True)
     competency_group = models.CharField(max_length=50, choices=[
@@ -27,6 +32,12 @@ class DeliveryRequest(models.Model):
         ('Quality Assurance', 'Quality Assurance'),
     ])
     primary_skill = models.CharField(max_length=50, blank=True)
+    secondary_skill = models.CharField(max_length=50, blank=True)
+    education_qualification = models.CharField(max_length=100, blank=True)
+    experience_in_years = models.CharField(max_length=20, blank=True)
+    certifications = models.TextField(blank=True)
+    job_description_text = models.TextField(blank=True)
+    number_of_positions = models.PositiveIntegerField(default=1)
     trainable = models.BooleanField(default=False)
     is_replacement_indent = models.BooleanField(default=False)
     emp_id_replaced = models.CharField(max_length=20, blank=True)
@@ -83,7 +94,9 @@ class DeliveryRequest(models.Model):
     buddy_mentor_name = models.CharField(max_length=100, blank=True)
     l1_panel_name = models.CharField(max_length=100)
     l2_panel_name = models.CharField(max_length=100, blank=True)
-    job_description = models.ForeignKey('JobDescription', on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    approval_token = models.CharField(max_length=100, blank=True, null=True)
+    approval_token_expiry = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"Delivery Request {self.id} for {self.resource_request}"
@@ -105,6 +118,7 @@ class PMORequest(models.Model):
     resource_required_date = models.DateField(editable=False)
     business_type = models.CharField(max_length=20, editable=False)
     opportunity_probability = models.CharField(max_length=50, editable=False)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"PMO Request {self.ri_no}"

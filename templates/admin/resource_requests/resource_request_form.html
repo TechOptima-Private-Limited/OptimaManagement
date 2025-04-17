@@ -1,0 +1,224 @@
+// STEP 1: Create or update resource_request_form.html with these inline modifications
+// Save this as templates/admin/resource_request/resource_request_form.html
+
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'resource_requests/css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'resource_requests/css/resource_request.css' %}">
+
+    <script src="{% static 'resource_requests/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'resource_requests/js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'resource_requests/js/resource_request.js' %}"></script>
+    <script>
+        console.log("Template loaded: admin/resource_request/resource_request_form.html");
+    </script>
+
+    <style type="text/css">
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            display: none;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #fdeaea;
+            border-radius: 3px;
+            border-left: 3px solid #e74c3c;
+        }
+
+        .error-field {
+            border: 2px solid #e74c3c !important;
+            background-color: #fef9f9 !important;
+        }
+        
+        /* Hide approval token fields */
+        .field-approval_token, 
+        .field-approval_token_expiry, 
+        label[for="id_delivery_requests-0-approval_token"],
+        input#id_delivery_requests-0-approval_token,
+        label[for="id_delivery_requests-0-approval_token_expiry"],
+        input#id_delivery_requests-0-approval_token_expiry {
+            display: none !important;
+        }
+        
+        /* Enhance datepicker styling */
+        .ui-datepicker {
+            width: 300px;
+            padding: 10px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .ui-datepicker .ui-datepicker-header {
+            position: relative;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+
+        .ui-datepicker .ui-datepicker-prev,
+        .ui-datepicker .ui-datepicker-next {
+            position: absolute;
+            top: 5px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+
+        .ui-datepicker .ui-datepicker-prev {
+            left: 5px;
+        }
+
+        .ui-datepicker .ui-datepicker-next {
+            right: 5px;
+        }
+
+        .ui-datepicker .ui-datepicker-title {
+            margin: 0 30px;
+            text-align: center;
+        }
+
+        .ui-datepicker .ui-datepicker-title select {
+            font-size: 14px;
+            margin: 1px 3px;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .ui-datepicker select.ui-datepicker-month,
+        .ui-datepicker select.ui-datepicker-year {
+            width: 45%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <h2>Resource Request Information</h2>
+            {% for field in form %}
+                <div class="form-row field-{{ field.html_name }}">
+                    <div class="fieldWrapper">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="help">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="errors">{{ field.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <h2>Delivery Request Information</h2>
+            {{ formset.management_form }}
+            {% for form in formset %}
+                {% for field in form.visible_fields %}
+                    <div class="form-row field-{{ field.html_name }}" 
+                        {% if field.name == 'approval_token' or field.name == 'approval_token_expiry' %}style="display: none;"{% endif %}>
+                        <div class="fieldWrapper">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <p class="help">{{ field.help_text }}</p>
+                            {% endif %}
+                            
+                            {% if field.name == 'delivery_buy_rate_tag_usd_hr' %}
+                                <div id="delivery_buy_rate_error" class="error-message">Delivery buy rate cannot exceed the maximum guidance rate!</div>
+                            {% endif %}
+                            
+                            {% if field.errors %}
+                                <p class="errors">{{ field.errors }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                {% for field in form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+            {% endfor %}
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default" name="_save">
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    // Hide approval token fields explicitly
+    $('label[for="id_delivery_requests-0-approval_token"], ' +
+      '#id_delivery_requests-0-approval_token, ' +
+      'label[for="id_delivery_requests-0-approval_token_expiry"], ' +
+      '#id_delivery_requests-0-approval_token_expiry, ' +
+      '.field-approval_token, ' +
+      '.field-approval_token_expiry').hide();
+    
+    // Initialize datepicker with improved year/month navigation
+    $('.datepicker').datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '2020:2030',
+        showButtonPanel: true,
+        buttonImageOnly: false,
+        buttonText: "Select date",
+        showOn: "both"
+    }).attr('readonly', 'readonly'); // Prevent manual typing
+
+    // Enhanced rate validation
+    function validateDeliveryRate() {
+        var $deliveryInput = $('#id_delivery_requests-0-delivery_buy_rate_tag_usd_hr');
+        var deliveryRate = parseFloat($deliveryInput.val()) || 0;
+        var guidanceRate = parseFloat($('#id_delivery_requests-0-buy_rate_guidance_to_usd_hr').val()) || 0;
+        var $errorMessage = $('#delivery_buy_rate_error');
+        
+        if (deliveryRate > guidanceRate && guidanceRate > 0) {
+            $deliveryInput.addClass('error-field');
+            $errorMessage.show();
+            return false;
+        } else {
+            $deliveryInput.removeClass('error-field');
+            $errorMessage.hide();
+            return true;
+        }
+    }
+
+    // Add validation on change and blur
+    $('#id_delivery_requests-0-delivery_buy_rate_tag_usd_hr').on('input blur', function() {
+        validateDeliveryRate();
+    });
+
+    // Re-check on guidance rate change
+    $('#id_delivery_requests-0-buy_rate_guidance_to_usd_hr').on('input blur', function() {
+        validateDeliveryRate();
+    });
+
+    // Add validation on form submit
+    $('form').on('submit', function(e) {
+        if (!validateDeliveryRate()) {
+            e.preventDefault();
+            $('html, body').animate({
+                scrollTop: $('#id_delivery_requests-0-delivery_buy_rate_tag_usd_hr').offset().top - 100
+            }, 200);
+        }
+    });
+
+    // Run initial validation
+    validateDeliveryRate();
+});
+</script>
+{% endblock %}

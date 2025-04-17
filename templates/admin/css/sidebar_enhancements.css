@@ -1,0 +1,67 @@
+/* Additional styles for enhanced sidebar navigation */
+
+/* Ensure sub-options don't get hidden on navigation */
+.sub-options.active {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Active link styling */
+.model-link.active-link {
+  background-color: rgba(35, 148, 159, 0.15);
+  font-weight: bold;
+  position: relative;
+}
+
+.model-link.active-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: var(--primary);
+}
+
+/* Selected text in active link */
+.model-link.active-link {
+  color: var(--primary) !important;
+}
+
+/* Active app styling */
+.app-title.active-app {
+  background-color: #1c7a82;
+}
+
+/* Make toggle button more visible with hover effect */
+.toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* Prevent text selection on app titles */
+.app-title {
+  user-select: none;
+}
+
+/* Improve link area for better click target */
+.model-link {
+  display: block;
+  padding: 6px 8px;
+  margin: -6px -8px;
+}
+
+/* Animation for expanding/collapsing */
+.sub-options {
+  transition: max-height 0.3s ease;
+  overflow: hidden;
+}
+
+/* Prevent sidebar collapse on small screens */
+@media (max-width: 767px) {
+  #nav-sidebar.show-sidebar {
+      display: block !important;
+      width: 260px !important;
+  }
+}

@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Resource Requests" %} | {{ site_title }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+    {% trans "Resource Requests" %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans "Resource Requests" %}</h1>
+<ul>
+    {% for request in requests %}
+        <li>{{ request.account_name }} - {{ request.resource_request_raised_date }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'admin:resource_request_resourcerequest_add' %}">{% trans "Create New Request" %}</a>
+{% endblock %}

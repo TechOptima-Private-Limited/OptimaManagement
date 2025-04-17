@@ -1,13 +1,33 @@
-{% extends "admin/nav_sidebar.html" %}
-
-{% block nav_links %}
-    {{ block.super }}
-    <div class="module">
-        <h2>Dashboard</h2>
-        <ul>
-            <li>
-                <a href="{% url 'employee_summary' user_id=request.user.id %}">My Dashboard</a>
-            </li>
-        </ul>
+{% load i18n static %}
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="{% translate 'Toggle navigation' %}"></button>
+<nav class="sticky" id="nav-sidebar" aria-label="{% translate 'Sidebar' %}">
+  <input type="search" id="nav-filter"
+         placeholder="{% translate 'Start typing to filter…' %}"
+         aria-label="{% translate 'Filter navigation items' %}">
+  {% for app in available_apps %}
+    <div class="app-group">
+      <div class="app-title" data-app-name="{{ app.name }}">
+        <span class="app-title-text">{{ app.name }}</span>
+        <button class="toggle-button">+</button>
+      </div>
+      <div class="sub-options">
+        <table>
+          {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+              <th scope="row" id="{{ app.app_label }}-{{ model.object_name|lower }}">
+                <a href="{{ model.admin_url }}" class="model-link"{% if model.admin_url == request.path %} aria-current="page"{% endif %}>{{ model.name }}</a>
+              </th>
+              {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink" aria-describedby="{{ app.app_label }}-{{ model.object_name|lower }}">Add</a></td>
+              {% else %}
+                <td></td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td>{% translate 'No items' %}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
     </div>
-{% endblock %}
+  {% endfor %}
+</nav>
