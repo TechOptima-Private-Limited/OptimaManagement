@@ -1,54 +1,273 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
+<style>
+    #content-main { padding: 20px; background: #fff; }
+    .dashboard-toggle { margin-bottom: 20px; }
+    .dashboard-toggle button {
+        margin-right: 10px;
+        padding: 5px 15px;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .tab-buttons {
+        margin-bottom: 20px;
+    }
+    .tab-buttons button {
+        margin-right: 10px;
+        padding: 5px 15px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .tab-buttons button.active {
+        background: #3498db;
+        color: #fff;
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .dashboard-card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        text-align: center;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        color: #fff;
+    }
+    .dashboard-chart { height: 200px; }
+    .hidden { display: none; }
+    .card-title { font-weight: bold; margin-bottom: 10px; }
+    .card-value { font-size: 1.5em; }
 
-{% block coltype %}colMS{% endblock %}
+    /* Colorful card styles */
+    .card-computers { background: #e74c3c; } /* Red */
+    .card-software { background: #2ecc71; } /* Green */
+    .card-network { background: #3498db; } /* Blue */
+    .card-racks { background: #f1c40f; } /* Yellow */
+    .card-monitors { background: #e74c3c; } /* Red */
+    .card-licenses { background: #2ecc71; } /* Green */
+    .card-printers { background: #3498db; } /* Blue */
+    .card-pdus { background: #f1c40f; } /* Yellow */
+    .card-location { background: #9b59b6; } /* Purple */
+    .card-access { background: #e67e22; } /* Orange */
+    .card-asset { background: #1abc9c; } /* Teal */
+    .card-monitor { background: #34495e; } /* Dark Blue */
+</style>
+{% endblock %}
 
-{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block extrahead %}{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggle = document.querySelector('.dashboard-toggle');
+        const dashboard = document.getElementById('dashboard');
+        const recentActions = document.getElementById('recent-actions');
+        const tabButtons = document.querySelectorAll('.tab-buttons button');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-{% block nav-breadcrumbs %}{% endblock %}
+        if (toggle && dashboard && recentActions) {
+            toggle.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.textContent === 'Dashboard') {
+                        dashboard.classList.remove('hidden');
+                        recentActions.classList.add('hidden');
+                    } else {
+                        dashboard.classList.add('hidden');
+                        recentActions.classList.remove('hidden');
+                    }
+                });
+            });
+        }
 
-{% block nav-sidebar %}{% endblock %}
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                tabContents.forEach(content => content.classList.add('hidden'));
+                document.getElementById(this.dataset.tab).classList.remove('hidden');
+            });
+        });
+        // Activate the first tab by default
+        tabButtons[0].classList.add('active');
+        tabContents[0].classList.remove('hidden');
+
+        // Chart.js initialization with dynamic data
+        if (dashboard) {
+            const locationData = {
+                labels: Object.keys({{ dashboard_data.resource_request.by_location|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.resource_request.by_location|safe }}),
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            };
+            new Chart(document.getElementById('resourceLocationChart'), {
+                type: 'pie',
+                data: locationData
+            });
+
+            const accessStatusData = {
+                labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
+                    backgroundColor: ['#FF6384', '#2ecc71', '#e74c3c']
+                }]
+            };
+            new Chart(document.getElementById('accessStatusChart'), {
+                type: 'pie',
+                data: accessStatusData
+            });
+
+            const assetStatusData = {
+                labels: Object.keys({{ dashboard_data.asset_management.assets_by_status|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.asset_management.assets_by_status|safe }}),
+                    backgroundColor: ['#3498db', '#1abc9c', '#e67e22', '#f1c40f']
+                }]
+            };
+            new Chart(document.getElementById('assetStatusChart'), {
+                type: 'pie',
+                data: assetStatusData
+            });
+
+            const monitorData = {
+                labels: ['Manufacturer A', 'Manufacturer B', 'Manufacturer C'],
+                datasets: [{
+                    data: [50, 30, 20],
+                    backgroundColor: ['#9b59b6', '#34495e', '#e74c3c']
+                }]
+            };
+            new Chart(document.getElementById('monitorChart'), {
+                type: 'pie',
+                data: monitorData
+            });
+        }
+    });
+</script>
+{% endblock %}
 
 {% block content %}
 <div id="content-main">
-  {% for app in app_list %}
-    <div class="app-group">
-      <div class="app-title" data-app-name="{{ app.name }}">
-        <span class="app-title-text">{{ app.name }}</span>
-        <button class="toggle-button">+</button>
-      </div>
-      <div class="sub-options">
-        <div class="app-{{ app.app_label }} module">
-          <table>
-            {% for model in app.models %}
-              <tr class="model-{{ model.object_name|lower }}">
-                {% if model.admin_url %}
-                  <th scope="row"><a href="{{ model.admin_url }}" class="section" title="{% if model.admin_url %} {% endif %}">{{ model.name }}</a></th>
-                {% else %}
-                  <th scope="row">{{ model.name }}</th>
-                {% endif %}
-                {% if model.add_url %}
-                  <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
-                {% else %}
-                  <td></td>
-                {% endif %}
-              </tr>
-            {% empty %}
-              <tr><td>{% translate 'No items' %}</td></tr>
-            {% endfor %}
-          </table>
+    {% if dashboard_data %}
+        <div class="dashboard-toggle">
+            <button>Dashboard</button>
+            <button>Recent Actions</button>
         </div>
-      </div>
-    </div>
-  {% endfor %}
-</div>
-{% endblock %}
 
-{% block sidebar %}
-<div id="content-related">
-    <div class="module" id="recent-actions-module">
+        <div id="dashboard">
+            <div class="tab-buttons">
+                <button data-tab="resource-request-tab">Resource Requests</button>
+                <button data-tab="resource-management-tab">ITSM</button>
+                <button data-tab="asset-management-tab">Assets</button>
+            </div>
+
+            <!-- Resource Requests Tab -->
+            <div id="resource-request-tab" class="tab-content dashboard-grid">
+                <div class="dashboard-card card-computers">
+                    <div class="card-title">Total Requests</div>
+                    <div class="card-value">{{ dashboard_data.resource_request.total_requests }}</div>
+                </div>
+                <div class="dashboard-card card-software">
+                    <div class="card-title">Pending Deliveries</div>
+                    <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.pending }}</div>
+                </div>
+                <div class="dashboard-card card-network">
+                    <div class="card-title">Approved PMOs</div>
+                    <div class="card-value">{{ dashboard_data.resource_request.pmo_requests_approved }}</div>
+                </div>
+                <div class="dashboard-card card-racks">
+                    <div class="card-title">Rejected Deliveries</div>
+                    <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.rejected }}</div>
+                </div>
+                <div class="dashboard-card card-location dashboard-chart">
+                    <canvas id="resourceLocationChart"></canvas>
+                </div>
+                <div class="dashboard-card card-access dashboard-chart">
+                    <canvas id="accessStatusChart" style="display:none;"></canvas>
+                </div>
+                <div class="dashboard-card card-asset dashboard-chart">
+                    <canvas id="assetStatusChart" style="display:none;"></canvas>
+                </div>
+                <div class="dashboard-card card-monitor dashboard-chart">
+                    <canvas id="monitorChart" style="display:none;"></canvas>
+                </div>
+            </div>
+
+            <!-- Resource Management Tab -->
+            <div id="resource-management-tab" class="tab-content dashboard-grid hidden">
+                <div class="dashboard-card card-monitors">
+                    <div class="card-title">Total Access Requests</div>
+                    <div class="card-value">{{ dashboard_data.resource_management.total_access_requests }}</div>
+                </div>
+                <div class="dashboard-card card-licenses">
+                    <div class="card-title">Pending Access</div>
+                    <div class="card-value">{% for status, count in dashboard_data.resource_management.access_requests_by_status.items %}{% if status == 'PENDING' %}{{ count }}{% endif %}{% endfor %}</div>
+                </div>
+                <div class="dashboard-card card-printers">
+                    <div class="card-title">Active Resources</div>
+                    <div class="card-value">{{ dashboard_data.resource_management.active_resources }}</div>
+                </div>
+                <div class="dashboard-card card-pdus">
+                    <div class="card-title">Priority High</div>
+                    <div class="card-value">{% for priority, count in dashboard_data.resource_management.access_requests_by_priority.items %}{% if priority == 'HIGH' %}{{ count }}{% endif %}{% endfor %}</div>
+                </div>
+                <div class="dashboard-card card-location dashboard-chart">
+                    <canvas id="resourceLocationChart" style="display:none;"></canvas>
+                </div>
+                <div class="dashboard-card card-access dashboard-chart">
+                    <canvas id="accessStatusChart"></canvas>
+                </div>
+                <div class="dashboard-card card-asset dashboard-chart">
+                    <canvas id="assetStatusChart" style="display:none;"></canvas>
+                </div>
+                <div class="dashboard-card card-monitor dashboard-chart">
+                    <canvas id="monitorChart" style="display:none;"></canvas>
+                </div>
+            </div>
+
+            <!-- Assets Tab -->
+            <div id="asset-management-tab" class="tab-content dashboard-grid hidden">
+                <div class="dashboard-card card-computers">
+                    <div class="card-title">Total Assets</div>
+                    <div class="card-value">{{ dashboard_data.asset_management.total_assets }}</div>
+                </div>
+                <div class="dashboard-card card-software">
+                    <div class="card-title">Assigned Assets</div>
+                    <div class="card-value">{{ dashboard_data.asset_management.assigned_assets }}</div>
+                </div>
+                <div class="dashboard-card card-network">
+                    <div class="card-title">Available Assets</div>
+                    <div class="card-value">{% for status, count in dashboard_data.asset_management.assets_by_status.items %}{% if status == 'AVAILABLE' %}{{ count }}{% endif %}{% endfor %}</div>
+                </div>
+                <div class="dashboard-card card-racks">
+                    <div class="card-title">Returned Good</div>
+                    <div class="card-value">{% for condition, count in dashboard_data.asset_management.returned_assets_by_condition.items %}{% if condition == 'GOOD' %}{{ count }}{% endif %}{% endfor %}</div>
+                </div>
+                <div class="dashboard-card card-location dashboard-chart">
+                    <canvas id="resourceLocationChart" style="display:none;"></canvas>
+                </div>
+                <div class="dashboard-card card-access dashboard-chart">
+                    <canvas id="accessStatusChart" style="display:none;"></canvas>
+                </div>
+                <div class="dashboard-card card-asset dashboard-chart">
+                    <canvas id="assetStatusChart"></canvas>
+                </div>
+                <div class="dashboard-card card-monitor dashboard-chart">
+                    <canvas id="monitorChart" style="display:none;"></canvas>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div id="recent-actions" class="module {% if dashboard_data %}hidden{% endif %}">
         <h2>{% translate 'Recent actions' %}</h2>
         <h3>{% translate 'My actions' %}</h3>
         {% load log %}
