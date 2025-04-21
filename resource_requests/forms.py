@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import ResourceRequest, DeliveryRequest, JobDescription, BuyRateGuidance
+from .models import ResourceRequest, DeliveryRequest, BuyRateGuidance
 # Import the custom widget
 from .widgets import CustomDatePickerWidget
 from django.db.models import Q
@@ -80,23 +80,23 @@ DeliveryRequestFormSet = inlineformset_factory(
     can_delete=False,
 )
 
-class JobDescriptionForm(forms.ModelForm):
-    class Meta:
-        model = JobDescription
-        fields = [
-            'primary_skill', 'secondary_skill', 'technical_skills', 'domain_skills',
-            'soft_skills', 'leadership_skills', 'education_qualification',
-            'experience_in_years', 'certifications', 'uploaded_file',
-        ]
-        widgets = {
-            'primary_skill': forms.TextInput(attrs={'class': 'select2'}),
-            'secondary_skill': forms.TextInput(attrs={'class': 'select2'}),
-            'technical_skills': forms.Textarea(attrs={'class': 'select2'}),
-            'domain_skills': forms.Textarea(attrs={'class': 'select2'}),
-            'soft_skills': forms.Textarea(attrs={'class': 'select2'}),
-            'leadership_skills': forms.Textarea(attrs={'class': 'select2'}),
-            'education_qualification': forms.TextInput(attrs={'class': 'select2'}),
-            'experience_in_years': forms.TextInput(attrs={'class': 'select2'}),
-            'certifications': forms.Textarea(attrs={'class': 'select2'}),
-            'uploaded_file': forms.FileInput(attrs={'class': 'select2'}),
-        }
+# class JobDescriptionForm(forms.ModelForm):
+#     class Meta:
+#         model = JobDescription
+#         fields = [
+#             'primary_skill', 'secondary_skill', 'technical_skills', 'domain_skills',
+#             'soft_skills', 'leadership_skills', 'education_qualification',
+#             'experience_in_years', 'certifications', 'uploaded_file',
+#         ]
+#         widgets = {
+#             'primary_skill': forms.TextInput(attrs={'class': 'select2'}),
+#             'secondary_skill': forms.TextInput(attrs={'class': 'select2'}),
+#             'technical_skills': forms.Textarea(attrs={'class': 'select2'}),
+#             'domain_skills': forms.Textarea(attrs={'class': 'select2'}),
+#             'soft_skills': forms.Textarea(attrs={'class': 'select2'}),
+#             'leadership_skills': forms.Textarea(attrs={'class': 'select2'}),
+#             'education_qualification': forms.TextInput(attrs={'class': 'select2'}),
+#             'experience_in_years': forms.TextInput(attrs={'class': 'select2'}),
+#             'certifications': forms.Textarea(attrs={'class': 'select2'}),
+#             'uploaded_file': forms.FileInput(attrs={'class': 'select2'}),
+#         }

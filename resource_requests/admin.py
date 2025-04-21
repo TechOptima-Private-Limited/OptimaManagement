@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.forms import DateInput
-from .models import ResourceRequest, DeliveryRequest, PMORequest, JobDescription, BuyRateGuidance
+from .models import ResourceRequest, DeliveryRequest, PMORequest, BuyRateGuidance
 from .forms import ResourceRequestForm, DeliveryRequestFormSet
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+
 # Custom DateInput widget with specific attributes
 class EnhancedDateInput(DateInput):
     def __init__(self, attrs=None, format=None):
@@ -42,7 +43,7 @@ class DeliveryRequestInline(admin.StackedInline):
 class ResourceRequestAdmin(admin.ModelAdmin):
     form = ResourceRequestForm
     inlines = [DeliveryRequestInline]
-    list_display = ('account_name', 'resource_request_raised_date', 'request_owner')
+    list_display = ('account_name', 'resource_request_raised_date', 'request_owner', 'get_latest_status')
     search_fields = ('account_name', 'engagement_manager_delivery_director')
     
     # Add these class attributes to override the default admin templates
@@ -85,6 +86,7 @@ class ResourceRequestAdmin(admin.ModelAdmin):
     
     # Add variables to changelist view as well
     def changelist_view(self, request, extra_context=None):
+        print("I am the culprit")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,
@@ -93,6 +95,7 @@ class ResourceRequestAdmin(admin.ModelAdmin):
             'project_site_name': 'Resource Management',
             'original': None,  # Add this to fix the missing 'original' variable
         })
+        print(request)
         return super().changelist_view(request, extra_context=extra_context)
     
     # Load jQuery UI explicitly
@@ -108,6 +111,12 @@ class ResourceRequestAdmin(admin.ModelAdmin):
             'admin/js/resource_request_calculation.js',
         )
 
+    def get_latest_status(self, obj):
+        """Return the status of the latest DeliveryRequest for this ResourceRequest."""
+        latest_delivery = obj.delivery_requests.order_by('-id').first()  # Updated to use 'delivery_requests'
+        return latest_delivery.status if latest_delivery else 'N/A'
+    get_latest_status.short_description = 'Status'
+
 @admin.register(DeliveryRequest)
 class DeliveryRequestAdmin(admin.ModelAdmin):
     list_display = ('id', 'resource_request', 'competency_group', 'primary_skill', 'designation', 'status')
@@ -116,6 +125,7 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
     
     # Add the same fixes to this admin class
     def changelist_view(self, request, extra_context=None):
+        print("DeliveryRequest changelist_view")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,
@@ -137,6 +147,7 @@ class PMORequestAdmin(admin.ModelAdmin):
     
     # Add the same fixes to this admin class
     def changelist_view(self, request, extra_context=None):
+        print("PMORequest changelist_view")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,
@@ -147,22 +158,23 @@ class PMORequestAdmin(admin.ModelAdmin):
         })
         return super().changelist_view(request, extra_context=extra_context)
 
-@admin.register(JobDescription)
-class JobDescriptionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'primary_skill', 'secondary_skill')
-    search_fields = ('primary_skill', 'secondary_skill')
+# @admin.register(JobDescription)
+# class JobDescriptionAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'primary_skill', 'secondary_skill')
+#     search_fields = ('primary_skill', 'secondary_skill')
     
-    # Add the same fixes to this admin class
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context.update({
-            'help_url': None,
-            'copyright_string': None,
-            'project_site': None,
-            'project_site_name': 'Resource Management',
-            'original': None,
-        })
-        return super().changelist_view(request, extra_context=extra_context)
+#     # Add the same fixes to this admin class
+#     def changelist_view(self, request, extra_context=None):
+#         print("JobDescription changelist_view")
+#         extra_context = extra_context or {}
+#         extra_context.update({
+#             'help_url': None,
+#             'copyright_string': None,
+#             'project_site': None,
+#             'project_site_name': 'Resource Management',
+#             'original': None,
+#         })
+#         return super().changelist_view(request, extra_context=extra_context)
 
 @admin.register(BuyRateGuidance)
 class BuyRateGuidanceAdmin(admin.ModelAdmin):
@@ -170,6 +182,7 @@ class BuyRateGuidanceAdmin(admin.ModelAdmin):
     
     # Add the same fixes to this admin class
     def changelist_view(self, request, extra_context=None):
+        print("BuyRateGuidance changelist_view")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,

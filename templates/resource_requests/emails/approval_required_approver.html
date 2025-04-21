@@ -1,5 +1,3 @@
-<!-- Save this file to templates/resource_request/emails/approval_required_approver.html -->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -48,6 +46,9 @@
             font-style: italic;
             color: #666;
             margin-top: 20px;
+        }
+        .highlighted {
+            background-color: #fff3cd; /* Light yellow background for highlighting */
         }
     </style>
 </head>
@@ -111,6 +112,22 @@
             <tr>
                 <td>Designation</td>
                 <td>{{ designation }}</td>
+            </tr>
+            <tr class="highlighted">
+                <td>Bill Rate (SOW USD/Hr)</td>
+                <td>{{ bill_rate_sow_usd_hr }}</td>
+            </tr>
+            <tr class="highlighted">
+                <td>Buy Rate Guidance From (USD/Hr)</td>
+                <td>{{ buy_rate_guidance_from_usd_hr }}</td>
+            </tr>
+            <tr class="highlighted">
+                <td>Buy Rate Guidance To (USD/Hr)</td>
+                <td>{{ buy_rate_guidance_to_usd_hr }}</td>
+            </tr>
+            <tr class="highlighted">
+                <td>Delivery Buy Rate Tag (USD/Hr)</td>
+                <td>{{ delivery_buy_rate_tag_usd_hr }}</td>
             </tr>
             <tr>
                 <td>Allocation Start Date</td>

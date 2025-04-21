@@ -8,8 +8,8 @@ class ResourceRequest(models.Model):
     account_name = models.CharField(max_length=100)
     engagement_manager_delivery_director = models.CharField(max_length=100)
     business_unit = models.CharField(max_length=50, choices=[
-        ('Corporate', 'Corporate'),
-        ('Cigniti-Digital', 'Cigniti-Digital'),
+        ('TechOptima', 'TechOptima'),
+        ('Branta', 'Branta'),
     ])
     region = models.CharField(max_length=50, blank=True)
     function = models.CharField(max_length=50, blank=True)
@@ -28,11 +28,10 @@ class DeliveryRequest(models.Model):
     id = models.AutoField(primary_key=True)
     competency_group = models.CharField(max_length=50, choices=[
         ('AI/ML', 'AI/ML'),
-        ('Development', 'Development'),
-        ('Quality Assurance', 'Quality Assurance'),
+        ('Cyber Security', 'Cyber Security')
     ])
-    primary_skill = models.CharField(max_length=50, blank=True)
-    secondary_skill = models.CharField(max_length=50, blank=True)
+    primary_skill = models.TextField(blank=False)
+    secondary_skill = models.TextField(blank=True)
     education_qualification = models.CharField(max_length=100, blank=True)
     experience_in_years = models.CharField(max_length=20, blank=True)
     certifications = models.TextField(blank=True)
@@ -41,10 +40,7 @@ class DeliveryRequest(models.Model):
     trainable = models.BooleanField(default=False)
     is_replacement_indent = models.BooleanField(default=False)
     emp_id_replaced = models.CharField(max_length=20, blank=True)
-    designation = models.CharField(max_length=50, choices=[
-        ('Associate Consultant I', 'Associate Consultant I'),
-        ('Project Lead', 'Project Lead'),
-    ])
+    designation = models.CharField(max_length=50, blank=False)
     billing_title_in_sow = models.CharField(max_length=100, blank=True)
     allocation_type = models.CharField(max_length=20, choices=[
         ('Billing', 'Billing'),
@@ -123,21 +119,21 @@ class PMORequest(models.Model):
     def __str__(self):
         return f"PMO Request {self.ri_no}"
 
-class JobDescription(models.Model):
-    id = models.AutoField(primary_key=True)
-    primary_skill = models.CharField(max_length=50)
-    secondary_skill = models.CharField(max_length=50, blank=True)
-    technical_skills = models.TextField(blank=True)
-    domain_skills = models.TextField(blank=True)
-    soft_skills = models.TextField(blank=True)
-    leadership_skills = models.TextField(blank=True)
-    education_qualification = models.CharField(max_length=100, blank=True)
-    experience_in_years = models.CharField(max_length=20, blank=True)
-    certifications = models.TextField(blank=True)
-    uploaded_file = models.FileField(upload_to='job_descriptions/', null=True, blank=True)
+# class JobDescription(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     primary_skill = models.CharField(max_length=50)
+#     secondary_skill = models.CharField(max_length=50, blank=True)
+#     technical_skills = models.TextField(blank=True)
+#     domain_skills = models.TextField(blank=True)
+#     soft_skills = models.TextField(blank=True)
+#     leadership_skills = models.TextField(blank=True)
+#     education_qualification = models.CharField(max_length=100, blank=True)
+#     experience_in_years = models.CharField(max_length=20, blank=True)
+#     certifications = models.TextField(blank=True)
+#     uploaded_file = models.FileField(upload_to='job_descriptions/', null=True, blank=True)
 
-    def __str__(self):
-        return f"Job Description {self.id} - {self.primary_skill}"
+#     def __str__(self):
+#         return f"Job Description {self.id} - {self.primary_skill}"
 
 class BuyRateGuidance(models.Model):
     location = models.CharField(max_length=20)

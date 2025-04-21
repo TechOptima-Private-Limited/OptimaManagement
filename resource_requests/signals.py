@@ -2,81 +2,38 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import DeliveryRequest, PMORequest
 from django.utils import timezone
-from django.utils.html import strip_tags, format_html
-from django.template.loader import render_to_string
-from .utils import send_pmo_approval_request, generate_approval_token, get_approval_urls, send_email_with_threading
+from .utils import send_pmo_approval_request, generate_approval_token
+import logging
 import datetime
+# from datetime import timedelta
+
+logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=DeliveryRequest)
 def handle_delivery_request_save(sender, instance, created, **kwargs):
     if created:
-        # Only call send_pmo_approval_request for newly created instances
-        send_pmo_approval_request(instance)
-
-@receiver(post_save, sender=DeliveryRequest)
-def send_pmo_approval_email(sender, instance, created, **kwargs):
-    if created:
+        logger.info(f"Processing new DeliveryRequest {instance.id}")
         # Generate approval token if not exists
         if not instance.approval_token:
             instance.approval_token = generate_approval_token(instance)
             instance.approval_token_expiry = timezone.now() + datetime.timedelta(days=15)
             instance.save(update_fields=['approval_token', 'approval_token_expiry'])
+            logger.debug(f"Generated approval token for DeliveryRequest {instance.id}")
         
-        # Get approval URLs
-        approve_url, reject_url = get_approval_urls(instance.id, instance.approval_token)
-        
-        subject = f"Resource Request Approval Needed - ID {instance.id}"
-        
-        # Context for the email template
-        context = {
-            'ticket': instance.id,
-            'requester': instance.resource_request.request_owner,
-            'account_name': instance.resource_request.account_name,
-            'competency_group': instance.competency_group,
-            'primary_skill': instance.primary_skill,
-            'secondary_skill': instance.secondary_skill,
-            'education_qualification': instance.education_qualification,
-            'experience_in_years': instance.experience_in_years,
-            'certifications': instance.certifications,
-            'job_description': instance.job_description_text,
-            'number_of_positions': instance.number_of_positions,
-            'designation': instance.designation,
-            'allocation_start_date': instance.allocation_start_date,
-            'allocation_end_date': instance.allocation_end_date,
-            'resource_required_date': instance.resource_required_date,
-            'location': instance.location,
-            'business_type': instance.business_type,
-            'opportunity_probability': instance.opportunity_probability,
-            'approve_url': approve_url,
-            'reject_url': reject_url,
-            'approval_token_expiry': instance.approval_token_expiry,
-        }
-        
-        # Render the template with the context
-        html_message = render_to_string('resource_requests/emails/approval_required_approver.html', context)
-        plain_message = strip_tags(html_message)
-        
-        # Send the email
-        send_email_with_threading(
-            subject=subject,
-            body=plain_message,
-            recipients=['gbvmanikanta13@gmail.com'],  # Replace with PMO email
-            ticket_number=str(instance.id),
-            html_message=html_message,
-            is_reply=False
-        )
+        # Send PMO approval request email
+        send_pmo_approval_request(instance)
+        logger.info(f"Initiated PMO approval email for DeliveryRequest {instance.id}")
 
-# Function for approving PMO requests
 def approve_pmo_request(delivery_request_id):
     try:
         delivery_request = DeliveryRequest.objects.get(id=delivery_request_id)
         
-        # Generate RI number - You can customize this format
+        # Generate RI number
         ri_no = f"RI-{delivery_request.id}-{timezone.now().strftime('%Y%m')}"
         
         PMORequest.objects.create(
             delivery_request=delivery_request,
-            ri_no=ri_no,  # Using a more descriptive format
+            ri_no=ri_no,
             business_unit=delivery_request.resource_request.business_unit,
             account_name=delivery_request.resource_request.account_name,
             competency_group=delivery_request.competency_group,

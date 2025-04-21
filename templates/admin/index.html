@@ -114,6 +114,30 @@
                 data: locationData
             });
 
+            const deliveryStatusData = {
+                labels: Object.keys({{ dashboard_data.resource_request.delivery_status_dist|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.resource_request.delivery_status_dist|safe }}),
+                    backgroundColor: ['#FF6384', '#2ecc71', '#e74c3c']
+                }]
+            };
+            new Chart(document.getElementById('deliveryStatusChart'), {
+                type: 'pie',
+                data: deliveryStatusData
+            });
+
+            const businessTypeData = {
+                labels: Object.keys({{ dashboard_data.resource_request.pmo_by_business_type|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.resource_request.pmo_by_business_type|safe }}),
+                    backgroundColor: ['#9b59b6', '#3498db', '#e67e22']
+                }]
+            };
+            new Chart(document.getElementById('businessTypeChart'), {
+                type: 'pie',
+                data: businessTypeData
+            });
+
             const accessStatusData = {
                 labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
                 datasets: [{
@@ -124,6 +148,18 @@
             new Chart(document.getElementById('accessStatusChart'), {
                 type: 'pie',
                 data: accessStatusData
+            });
+
+            const accessDateData = {
+                labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_date|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.resource_management.access_requests_by_date|safe }}),
+                    backgroundColor: ['#e67e22']
+                }]
+            };
+            new Chart(document.getElementById('accessDateChart'), {
+                type: 'bar',
+                data: accessDateData
             });
 
             const assetStatusData = {
@@ -138,16 +174,28 @@
                 data: assetStatusData
             });
 
-            const monitorData = {
-                labels: ['Manufacturer A', 'Manufacturer B', 'Manufacturer C'],
+            const returnConditionData = {
+                labels: Object.keys({{ dashboard_data.asset_management.returned_assets_by_condition|safe }}),
                 datasets: [{
-                    data: [50, 30, 20],
+                    data: Object.values({{ dashboard_data.asset_management.returned_assets_by_condition|safe }}),
                     backgroundColor: ['#9b59b6', '#34495e', '#e74c3c']
                 }]
             };
-            new Chart(document.getElementById('monitorChart'), {
+            new Chart(document.getElementById('returnConditionChart'), {
                 type: 'pie',
-                data: monitorData
+                data: returnConditionData
+            });
+
+            const returnDateData = {
+                labels: Object.keys({{ dashboard_data.asset_management.return_by_date|safe }}),
+                datasets: [{
+                    data: Object.values({{ dashboard_data.asset_management.return_by_date|safe }}),
+                    backgroundColor: ['#34495e']
+                }]
+            };
+            new Chart(document.getElementById('returnDateChart'), {
+                type: 'bar',
+                data: returnDateData
             });
         }
     });
@@ -191,13 +239,13 @@
                     <canvas id="resourceLocationChart"></canvas>
                 </div>
                 <div class="dashboard-card card-access dashboard-chart">
-                    <canvas id="accessStatusChart" style="display:none;"></canvas>
+                    <canvas id="deliveryStatusChart"></canvas>
                 </div>
                 <div class="dashboard-card card-asset dashboard-chart">
-                    <canvas id="assetStatusChart" style="display:none;"></canvas>
+                    <canvas id="businessTypeChart"></canvas>
                 </div>
-                <div class="dashboard-card card-monitor dashboard-chart">
-                    <canvas id="monitorChart" style="display:none;"></canvas>
+                <div class="dashboard-card card-monitor dashboard-chart" style="display:none;">
+                    <canvas id="returnConditionChart"></canvas>
                 </div>
             </div>
 
@@ -219,17 +267,17 @@
                     <div class="card-title">Priority High</div>
                     <div class="card-value">{% for priority, count in dashboard_data.resource_management.access_requests_by_priority.items %}{% if priority == 'HIGH' %}{{ count }}{% endif %}{% endfor %}</div>
                 </div>
-                <div class="dashboard-card card-location dashboard-chart">
-                    <canvas id="resourceLocationChart" style="display:none;"></canvas>
+                <div class="dashboard-card card-location dashboard-chart" style="display:none;">
+                    <canvas id="resourceLocationChart"></canvas>
                 </div>
                 <div class="dashboard-card card-access dashboard-chart">
                     <canvas id="accessStatusChart"></canvas>
                 </div>
-                <div class="dashboard-card card-asset dashboard-chart">
-                    <canvas id="assetStatusChart" style="display:none;"></canvas>
+                <div class="dashboard-card card-asset dashboard-chart" style="display:none;">
+                    <canvas id="assetStatusChart"></canvas>
                 </div>
                 <div class="dashboard-card card-monitor dashboard-chart">
-                    <canvas id="monitorChart" style="display:none;"></canvas>
+                    <canvas id="accessDateChart"></canvas>
                 </div>
             </div>
 
@@ -248,20 +296,20 @@
                     <div class="card-value">{% for status, count in dashboard_data.asset_management.assets_by_status.items %}{% if status == 'AVAILABLE' %}{{ count }}{% endif %}{% endfor %}</div>
                 </div>
                 <div class="dashboard-card card-racks">
-                    <div class="card-title">Returned Good</div>
-                    <div class="card-value">{% for condition, count in dashboard_data.asset_management.returned_assets_by_condition.items %}{% if condition == 'GOOD' %}{{ count }}{% endif %}{% endfor %}</div>
+                    <div class="card-title">Damaged Assets</div>
+                    <div class="card-value">{{ dashboard_data.asset_management.damaged_assets }}</div>
                 </div>
-                <div class="dashboard-card card-location dashboard-chart">
-                    <canvas id="resourceLocationChart" style="display:none;"></canvas>
+                <div class="dashboard-card card-location dashboard-chart" style="display:none;">
+                    <canvas id="resourceLocationChart"></canvas>
                 </div>
-                <div class="dashboard-card card-access dashboard-chart">
-                    <canvas id="accessStatusChart" style="display:none;"></canvas>
+                <div class="dashboard-card card-access dashboard-chart" style="display:none;">
+                    <canvas id="accessStatusChart"></canvas>
                 </div>
                 <div class="dashboard-card card-asset dashboard-chart">
                     <canvas id="assetStatusChart"></canvas>
                 </div>
                 <div class="dashboard-card card-monitor dashboard-chart">
-                    <canvas id="monitorChart" style="display:none;"></canvas>
+                    <canvas id="returnConditionChart"></canvas>
                 </div>
             </div>
         </div>

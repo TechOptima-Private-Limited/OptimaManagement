@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import ResourceRequest, DeliveryRequest, PMORequest, BuyRateGuidance
-from .forms import ResourceRequestForm, DeliveryRequestFormSet, JobDescriptionForm
-from .utils import send_email_with_threading
+from .forms import ResourceRequestForm, DeliveryRequestFormSet
+from .utils import send_email
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -12,6 +12,8 @@ from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from django.template import TemplateDoesNotExist
+from django.db.models import Max
 import logging
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -25,7 +27,6 @@ def get_buy_rate_guidance(request):
     business_type = request.GET.get('business_type')
     location = request.GET.get('location')
     
-    # Log request parameters for debugging
     logger.debug(f"Buy rate guidance request - Business Type: {business_type}, Location: {location}")
     
     try:
@@ -34,7 +35,6 @@ def get_buy_rate_guidance(request):
         logger.warning(f"Invalid bill rate value: {request.GET.get('bill_rate')}")
         bill_rate = 0
     
-    # Validate required parameters
     if not business_type or business_type == '-------':
         logger.warning("Missing or invalid business_type parameter")
         return JsonResponse({
@@ -60,7 +60,6 @@ def get_buy_rate_guidance(request):
         })
     
     try:
-        # Get the margin guidance record
         logger.debug(f"Looking up BuyRateGuidance for {business_type}/{location}")
         guidance = BuyRateGuidance.objects.get(
             business_type=business_type,
@@ -69,8 +68,6 @@ def get_buy_rate_guidance(request):
         
         logger.debug(f"Found guidance - Lower limit: {guidance.lower_limit}, Upper limit: {guidance.upper_limit}")
         
-        # Calculate the rates using the formula
-        # Formula: Bill Rate - (margin_guidance * Bill Rate)
         from_rate = bill_rate - (guidance.lower_limit * bill_rate)
         to_rate = bill_rate - (guidance.upper_limit * bill_rate)
         
@@ -98,7 +95,7 @@ def get_buy_rate_guidance(request):
 
 @login_required
 def resource_request_create(request):
-    print("I have executed!..")
+    logger.debug("Executing resource_request_create")
     if request.method == 'POST':
         form = ResourceRequestForm(request.POST)
         formset = DeliveryRequestFormSet(request.POST, instance=ResourceRequest())
@@ -109,18 +106,16 @@ def resource_request_create(request):
             formset.instance = resource_request
             formset.save()
             messages.success(request, 'Resource Request submitted successfully! Awaiting PMO approval.')
-            return redirect('admin:resource_request_resourcerequest_changelist')
+            return redirect('admin:resource_requests_resourcerequest_changelist')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
         form = ResourceRequestForm()
         formset = DeliveryRequestFormSet(instance=ResourceRequest())
     
-    # Fetch all BuyRateGuidance records for client-side calculation
     guidance_records = BuyRateGuidance.objects.all()
-    print(f"Number of BuyRateGuidance records fetched: {guidance_records.count()}")
+    logger.debug(f"Number of BuyRateGuidance records fetched: {guidance_records.count()}")
     
-    # Create a dictionary for easy lookup in JavaScript with lowercase keys
     guidance_data = {}
     for record in guidance_records:
         key = f"{record.location.lower()}_{record.business_type.lower().replace(' ', '_')}"
@@ -128,11 +123,10 @@ def resource_request_create(request):
             'lower_limit': float(record.lower_limit),
             'upper_limit': float(record.upper_limit)
         }
-    print(f"Raw guidance data: {guidance_data}")
+    logger.debug(f"Raw guidance data: {guidance_data}")
     
-    # Convert to JSON for template and log for debugging
     guidance_json = json.dumps(guidance_data, cls=DjangoJSONEncoder)
-    print(f"Guidance data JSON: {guidance_json}")
+    logger.debug(f"Guidance data JSON: {guidance_json}")
     
     return render(request, 'admin/resource_requests/resourcerequest/custom_change_form.html', {
         'form': form,
@@ -143,20 +137,23 @@ def resource_request_create(request):
     
 @login_required
 def resource_request_list(request):
-    requests = ResourceRequest.objects.all()
+    print("I have triggered!..")
+    requests = ResourceRequest.objects.prefetch_related('deliveryrequest_set').annotate(
+        latest_status=Max('deliveryrequest__status')
+    )
     return render(request, 'admin/resource_request/resource_request_list.html', {'requests': requests})
 
-@login_required
-def job_description_create(request):
-    if request.method == 'POST':
-        form = JobDescriptionForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Job Description created successfully!')
-            return redirect('admin:resource_request_jobdescription_changelist')
-    else:
-        form = JobDescriptionForm()
-    return render(request, 'admin/resource_request/job_description_form.html', {'form': form})
+# @login_required
+# def job_description_create(request):
+#     if request.method == 'POST':
+#         form = JobDescriptionForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, 'Job Description created successfully!')
+#             return redirect('admin:resource_requests_jobdescription_changelist')
+#     else:
+#         form = JobDescriptionForm()
+#     return render(request, 'admin/resource_request/job_description_form.html', {'form': form})
 
 @login_required
 def job_description_list(request):
@@ -169,12 +166,15 @@ def handle_pmo_approval(request, request_id, token, action):
         delivery_request = get_object_or_404(DeliveryRequest, id=request_id)
         
         if delivery_request.approval_token != token:
+            logger.warning(f"Invalid approval token for DeliveryRequest {request_id}")
             return HttpResponse('Invalid or expired approval link.', status=403)
 
         if delivery_request.approval_token_expiry and delivery_request.approval_token_expiry < timezone.now():
+            logger.warning(f"Expired approval token for DeliveryRequest {request_id}")
             return HttpResponse('Approval link has expired.', status=403)
 
         if delivery_request.status not in ['PENDING']:
+            logger.warning(f"DeliveryRequest {request_id} already processed with status {delivery_request.status}")
             return HttpResponse('This request has already been processed.')
 
         old_status = delivery_request.status
@@ -184,10 +184,8 @@ def handle_pmo_approval(request, request_id, token, action):
             delivery_request.status = 'APPROVED'
             delivery_request.approved_at = timezone.now()
             
-            # Generate a more descriptive RI number
             ri_no = f"RI-{delivery_request.id}-{timezone.now().strftime('%Y%m')}"
             
-            # Create PMORequest
             PMORequest.objects.create(
                 delivery_request=delivery_request,
                 ri_no=ri_no,
@@ -210,14 +208,14 @@ def handle_pmo_approval(request, request_id, token, action):
             delivery_request.status = 'REJECTED'
             status_text = 'rejected'
         else:
+            logger.warning(f"Invalid action '{action}' for DeliveryRequest {request_id}")
             return HttpResponse('Invalid action')
 
-        # Clear token
         delivery_request.approval_token = None
         delivery_request.approval_token_expiry = None
         delivery_request.save()
+        logger.info(f"Updated DeliveryRequest {request_id} to status {delivery_request.status}")
 
-        # Prepare context for email template
         context = {
             'request_id': delivery_request.id,
             'account_name': delivery_request.resource_request.account_name,
@@ -226,21 +224,29 @@ def handle_pmo_approval(request, request_id, token, action):
             'ri_no': ri_no,
         }
         
-        # Render email using the improved template
-        html_message = render_to_string('resource_request/emails/request_status_notification.html', context)
-        plain_message = strip_tags(html_message)
-        
-        # Send notification to requester
-        send_threaded_email(
-            subject=f"Resource Request {delivery_request.id} {status_text.capitalize()}",
-            body=plain_message,
-            recipients=[delivery_request.resource_request.request_owner.email],
-            ticket_number=str(delivery_request.id),
-            html_message=html_message,
-            is_reply=False
-        )
+        try:
+            html_message = render_to_string('resource_requests/emails/request_status_notification.html', context)
+            plain_message = strip_tags(html_message)
+            
+            requester_email = delivery_request.resource_request.request_owner.email
+            if not requester_email:
+                logger.warning(f"No email found for requester of DeliveryRequest {request_id}")
+            
+            send_email(
+                subject=f"Resource Request {delivery_request.id} {status_text.capitalize()}",
+                body=plain_message,
+                recipients=[requester_email] if requester_email else [],
+                html_message=html_message
+            )
+            logger.info(f"Sent status notification to {requester_email} for DeliveryRequest {request_id}")
+        except TemplateDoesNotExist as e:
+            logger.error(f"Template not found: {str(e)}")
+            # Continue execution to ensure status update is not rolled back
+        except Exception as e:
+            logger.error(f"Failed to send status notification for DeliveryRequest {request_id}: {str(e)}")
+            # Continue execution
 
         return HttpResponse(f'Request has been {status_text}.')
     except Exception as e:
-        print(f"Error in handle_pmo_approval: {str(e)}")
+        logger.error(f"Error in handle_pmo_approval for DeliveryRequest {request_id}: {str(e)}")
         return HttpResponse(f'Error processing request: {str(e)}', status=500)

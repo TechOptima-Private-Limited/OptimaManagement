@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','192.168.1.51','192.168.0.8','192.168.1.18','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
+ALLOWED_HOSTS = ['192.168.1.3','192.168.1.51','192.168.0.8','192.168.1.18', '192.168.1.121','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
 
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
@@ -472,6 +472,11 @@ EMAIL_DOMAIN = 'techoptima.ai'
 
 EMAIL_THREAD_ID = '1'
 SITE_URL = os.getenv('SITE_URL') 
+pmo_emails_str = os.getenv('PMO_EMAILS', '')
+
+# Convert to list by splitting on commas
+PMO_EMAILS = [email.strip() for email in pmo_emails_str.split(',') if email.strip()]
+
 
 # USE_TZ = True
 # TIME_ZONE = 'Asia/Kolkata' 
