@@ -176,7 +176,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'resource_requests.context_processors.admin_settings'
+                'resource_requests.context_processors.admin_settings',
+                'dashboard.context_processors.dashboard_data',
             ],
             'debug': False,
         },
