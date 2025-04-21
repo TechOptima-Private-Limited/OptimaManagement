@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Create Resource Request</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2>Account Details</h2>
+    {{ form.resource_request_raised_date }}
+    {{ form.request_owner }}
+    {{ form.account_name.label_tag }} {{ form.account_name }} {{ form.account_name.errors }}
+    {{ form.engagement_manager_delivery_director.label_tag }} {{ form.engagement_manager_delivery_director }} {{ form.engagement_manager_delivery_director.errors }}
+    <h2>Business/Project Details</h2>
+    {{ form.business_unit.label_tag }} {{ form.business_unit }} {{ form.business_unit.errors }}
+    {{ form.region.label_tag }} {{ form.region }} {{ form.region.errors }}
+    {{ form.function.label_tag }} {{ form.function }} {{ form.function.errors }}
+    {{ form.bdm_client_partner.label_tag }} {{ form.bdm_client_partner }} {{ form.bdm_client_partner.errors }}
+    <h2>Filled By Delivery</h2>
+    {{ form.delivery_job_description.label_tag }} {{ form.delivery_job_description }} {{ form.delivery_job_description.errors }}
+    {{ form.delivery_competency_group.label_tag }} {{ form.delivery_competency_group }} {{ form.delivery_competency_group.errors }}
+    {{ form.delivery_primary_skill.label_tag }} {{ form.delivery_primary_skill }} {{ form.delivery_primary_skill.errors }}
+    {{ form.delivery_trainable.label_tag }} {{ form.delivery_trainable }} {{ form.delivery_trainable.errors }}
+    {{ form.delivery_is_replacement_indent.label_tag }} {{ form.delivery_is_replacement_indent }} {{ form.delivery_is_replacement_indent.errors }}
+    {{ form.delivery_emp_id_replaced.label_tag }} {{ form.delivery_emp_id_replaced }} {{ form.delivery_emp_id_replaced.errors }}
+    {{ form.delivery_designation.label_tag }} {{ form.delivery_designation }} {{ form.delivery_designation.errors }}
+    {{ form.delivery_billing_title_in_sow.label_tag }} {{ form.delivery_billing_title_in_sow }} {{ form.delivery_billing_title_in_sow.errors }}
+    {{ form.delivery_allocation_type.label_tag }} {{ form.delivery_allocation_type }} {{ form.delivery_allocation_type.errors }}
+    {{ form.delivery_offer_type.label_tag }} {{ form.delivery_offer_type }} {{ form.delivery_offer_type.errors }}
+    {{ form.delivery_operating_model.label_tag }} {{ form.delivery_operating_model }} {{ form.delivery_operating_model.errors }}
+    {{ form.delivery_frequency.label_tag }} {{ form.delivery_frequency }} {{ form.delivery_frequency.errors }}
+    {{ form.delivery_allocation_start_date.label_tag }} {{ form.delivery_allocation_start_date }} {{ form.delivery_allocation_start_date.errors }}
+    {{ form.delivery_allocation_end_date.label_tag }} {{ form.delivery_allocation_end_date }} {{ form.delivery_allocation_end_date.errors }}
+    {{ form.delivery_resource_required_date.label_tag }} {{ form.delivery_resource_required_date }} {{ form.delivery_resource_required_date.errors }}
+    {{ form.delivery_location.label_tag }} {{ form.delivery_location }} {{ form.delivery_location.errors }}
+    {{ form.delivery_country.label_tag }} {{ form.delivery_country }} {{ form.delivery_country.errors }}
+    {{ form.delivery_opportunity_probability.label_tag }} {{ form.delivery_opportunity_probability }} {{ form.delivery_opportunity_probability.errors }}
+    {{ form.delivery_client_interview.label_tag }} {{ form.delivery_client_interview }} {{ form.delivery_client_interview.errors }}
+    {{ form.delivery_business_type.label_tag }} {{ form.delivery_business_type }} {{ form.delivery_business_type.errors }}
+    {{ form.delivery_bill_rate_sow_usd_hr.label_tag }} {{ form.delivery_bill_rate_sow_usd_hr }} {{ form.delivery_bill_rate_sow_usd_hr.errors }}
+    {{ form.delivery_delivery_buy_rate_tag_usd_hr.label_tag }} {{ form.delivery_delivery_buy_rate_tag_usd_hr }} {{ form.delivery_delivery_buy_rate_tag_usd_hr.errors }}
+    {{ form.delivery_address.label_tag }} {{ form.delivery_address }} {{ form.delivery_address.errors }}
+    {{ form.delivery_buddy_mentor_name.label_tag }} {{ form.delivery_buddy_mentor_name }} {{ form.delivery_buddy_mentor_name.errors }}
+    {{ form.delivery_l1_panel_name.label_tag }} {{ form.delivery_l1_panel_name }} {{ form.delivery_l1_panel_name.errors }}
+    {{ form.delivery_l2_panel_name.label_tag }} {{ form.delivery_l2_panel_name }} {{ form.delivery_l2_panel_name.errors }}
+    <button type="submit">Submit</button>
+  </form>
+  <a href="{% url 'create_job_description' %}">Add Job Description</a>
+{% endblock %}

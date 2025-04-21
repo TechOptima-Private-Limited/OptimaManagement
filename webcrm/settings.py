@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'j1c=6$s-dh#$ywt@(q4cm=j&0c*!0x!e-qm6k1%yoliec(15tn'
 
 # Add your hosts to the list.
-ALLOWED_HOSTS = ['192.168.1.3','192.168.0.6','192.168.0.8','192.168.1.18','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
+ALLOWED_HOSTS = ['192.168.1.3','192.168.1.51','192.168.0.8','192.168.1.18','backend.techoptima.ai', 'https://backend.techoptima.ai', 'localhost', '127.0.0.1', 'dev.techoptima.ai', 'https://helpdesk.techoptima.ai', "helpdesk.techoptima.ai"]
 
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
@@ -65,6 +65,25 @@ DEBUG = False
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.template': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}
 # Internationalization
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
@@ -119,7 +138,9 @@ INSTALLED_APPS = [
     'client',
     'content',
     'assets',
-    'dashboard'
+    'dashboard',
+    'django_select2',
+    'resource_requests.apps.ResourceRequestConfig',
     
 ]
 
@@ -134,8 +155,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'common.utils.usermiddleware.UserMiddleware'
+    'common.utils.usermiddleware.UserMiddleware',
+    'webcrm.middleware.TemplateDebugMiddleware',
 ]
+
+ADMIN_HELP_URL = None
+ADMIN_COPYRIGHT_STRING = None
+ADMIN_PROJECT_SITE = None
 
 ROOT_URLCONF = 'webcrm.urls'
 
@@ -150,7 +176,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'resource_requests.context_processors.admin_settings'
             ],
+            'debug': False,
         },
     },
 ]
@@ -178,6 +206,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = [
     BASE_DIR / "assets/static",
+    BASE_DIR / "resource_requests/static",
 ]
 
 MEDIA_URL = 'media/'

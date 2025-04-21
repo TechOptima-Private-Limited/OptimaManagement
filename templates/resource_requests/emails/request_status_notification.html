@@ -1,0 +1,84 @@
+<!-- Save this as templates/resource_request/emails/request_status_notification.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Resource Request Status Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .approved {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .rejected {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .ri-number {
+            font-weight: bold;
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Resource Request Status Update</h2>
+        
+        <p>Your Resource Request (ID: {{ request_id }}) has been <span class="{% if status == 'APPROVED' %}approved{% else %}rejected{% endif %}">{{ status_text }}</span>.</p>
+        
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Account Name</td>
+                <td>{{ account_name }}</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td class="{% if status == 'APPROVED' %}approved{% else %}rejected{% endif %}">{{ status }}</td>
+            </tr>
+            {% if status == 'APPROVED' and ri_no %}
+            <tr>
+                <td>RI Number</td>
+                <td class="ri-number">{{ ri_no }}</td>
+            </tr>
+            {% endif %}
+        </table>
+        
+        {% if status == 'APPROVED' %}
+        <p>Your resource request has been approved and assigned RI Number: <span class="ri-number">{{ ri_no }}</span>.</p>
+        <p>The PMO team will now proceed with resource allocation based on your requirements.</p>
+        {% else %}
+        <p>Your resource request was not approved at this time. Please review the requirements and submit a new request if needed.</p>
+        {% endif %}
+        
+        <p>If you have any questions, please contact the PMO team.</p>
+        
+        <p>This is an automated message from the Resource Management System.</p>
+    </div>
+</body>
+</html>

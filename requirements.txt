@@ -40,3 +40,5 @@
     django-autocomplete-light==3.12.1
     whitenoise
     gunicorn
+    django-select2 
+    openpyxl

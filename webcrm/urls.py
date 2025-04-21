@@ -63,6 +63,8 @@ urlpatterns += i18n_patterns(
     # path('api/', include('assets.urls')),  # API endpoints
     path('assets/', include('assets.urls', namespace='assets')),
     path('dashboard/', include('dashboard.urls')),
+    path('resource-request/', include('resource_requests.urls')),
+    path('api/', include('resource_requests.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 )
 

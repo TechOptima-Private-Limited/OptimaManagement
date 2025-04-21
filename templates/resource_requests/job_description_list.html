@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Job Descriptions" %} | {{ site_title }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+    {% trans "Job Descriptions" %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans "Job Descriptions" %}</h1>
+<ul>
+    {% for jd in job_descriptions %}
+        <li>{{ jd.id }} - {{ jd.primary_skill }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'admin:resource_request_jobdescription_add' %}">{% trans "Create New Job Description" %}</a>
+{% endblock %}

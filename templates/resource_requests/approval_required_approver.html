@@ -1,0 +1,34 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<p>Hello,</p>
+<p>Your approval is required for the following resource request:</p>
+<table border="1" style="border-collapse: collapse; width: 100%;">
+    <tr><th style="padding: 8px;">Field</th><th style="padding: 8px;">Value</th></tr>
+    <tr><td style="padding: 8px;">Ticket Number</td><td style="padding: 8px;">{{ ticket }}</td></tr>
+    <tr><td style="padding: 8px;">Requester</td><td style="padding: 8px;">{{ requester.get_full_name|default:requester.username }}</td></tr>
+    <tr><td style="padding: 8px;">Account Name</td><td style="padding: 8px;">{{ account_name }}</td></tr>
+    <tr><td style="padding: 8px;">Competency Group</td><td style="padding: 8px;">{{ competency_group }}</td></tr>
+    <tr><td style="padding: 8px;">Primary Skill</td><td style="padding: 8px;">{{ primary_skill }}</td></tr>
+    <tr><td style="padding: 8px;">Secondary Skill</td><td style="padding: 8px;">{{ secondary_skill }}</td></tr>
+    <tr><td style="padding: 8px;">Education Qualification</td><td style="padding: 8px;">{{ education_qualification }}</td></tr>
+    <tr><td style="padding: 8px;">Experience in Years</td><td style="padding: 8px;">{{ experience_in_years }}</td></tr>
+    <tr><td style="padding: 8px;">Certifications</td><td style="padding: 8px;">{{ certifications }}</td></tr>
+    <tr><td style="padding: 8px;">Job Description</td><td style="padding: 8px;">{{ job_description }}</td></tr>
+    <tr><td style="padding: 8px;">Number of Positions</td><td style="padding: 8px;">{{ number_of_positions }}</td></tr>
+</table>
+<p>Please review and take action:</p>
+<p>
+    <a href="{{ approve_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+        Approve
+    </a>
+    <a href="{{ reject_url }}" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+        Reject
+    </a>
+</p>
+<p><strong>Note:</strong> This approval link will expire on {{ approval_token_expiry }}.</p>
+<p>If the buttons above are not clickable, please copy and paste the following links into your browser:</p>
+<p><strong>Approve:</strong> {{ approve_url }}</p>
+<p><strong>Reject:</strong> {{ reject_url }}</p>
+<p>This is an automated message from the Resource Management System.</p>
+{% endblock %}
