@@ -1,6 +1,9 @@
 # dashboard/permissions.py
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from resource_requests.models import ResourceRequest, DeliveryRequest, PMORequest
+from resource_management.models import Resource, AccessRequest
+from assets.models import Asset
 
 def setup_dashboard_permissions():
     # Create a group for dashboard access

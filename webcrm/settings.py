@@ -477,6 +477,11 @@ pmo_emails_str = os.getenv('PMO_EMAILS', '')
 # Convert to list by splitting on commas
 PMO_EMAILS = [email.strip() for email in pmo_emails_str.split(',') if email.strip()]
 
+team_emails_str = os.getenv('TEAM_EMAILS', '')
+
+# Convert to list by splitting on commas
+TEAM_EMAILS = [email.strip() for email in team_emails_str.split(',') if email.strip()]
+
 
 # USE_TZ = True
 # TIME_ZONE = 'Asia/Kolkata' 

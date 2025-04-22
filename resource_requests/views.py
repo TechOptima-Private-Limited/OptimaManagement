@@ -13,10 +13,10 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.template import TemplateDoesNotExist
-from django.db.models import Max
 import logging
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -137,10 +137,7 @@ def resource_request_create(request):
     
 @login_required
 def resource_request_list(request):
-    print("I have triggered!..")
-    requests = ResourceRequest.objects.prefetch_related('deliveryrequest_set').annotate(
-        latest_status=Max('deliveryrequest__status')
-    )
+    requests = ResourceRequest.objects.all()
     return render(request, 'admin/resource_request/resource_request_list.html', {'requests': requests})
 
 # @login_required
@@ -155,10 +152,10 @@ def resource_request_list(request):
 #         form = JobDescriptionForm()
 #     return render(request, 'admin/resource_request/job_description_form.html', {'form': form})
 
-@login_required
-def job_description_list(request):
-    job_descriptions = JobDescription.objects.all()
-    return render(request, 'admin/resource_request/job_description_list.html', {'job_descriptions': job_descriptions})
+# @login_required
+# def job_description_list(request):
+#     job_descriptions = JobDescription.objects.all()
+#     return render(request, 'admin/resource_request/job_description_list.html', {'job_descriptions': job_descriptions})
 
 @api_view(['GET'])
 def handle_pmo_approval(request, request_id, token, action):
@@ -241,10 +238,55 @@ def handle_pmo_approval(request, request_id, token, action):
             logger.info(f"Sent status notification to {requester_email} for DeliveryRequest {request_id}")
         except TemplateDoesNotExist as e:
             logger.error(f"Template not found: {str(e)}")
-            # Continue execution to ensure status update is not rolled back
         except Exception as e:
             logger.error(f"Failed to send status notification for DeliveryRequest {request_id}: {str(e)}")
-            # Continue execution
+
+        # Send delivery request details to team email after PMO details are generated (only on approval)
+        if action == 'approve' and ri_no:
+            team_context = {
+                'ticket': delivery_request.id,
+                'requester': delivery_request.resource_request.request_owner,
+                'account_name': delivery_request.resource_request.account_name,
+                'competency_group': delivery_request.competency_group,
+                'primary_skill': delivery_request.primary_skill,
+                'secondary_skill': delivery_request.secondary_skill,
+                'education_qualification': delivery_request.education_qualification,
+                'experience_in_years': delivery_request.experience_in_years,
+                'certifications': delivery_request.certifications,
+                'job_description': delivery_request.job_description_text,
+                'number_of_positions': delivery_request.number_of_positions,
+                'designation': delivery_request.designation,
+                'bill_rate_sow_usd_hr': delivery_request.bill_rate_sow_usd_hr,
+                'buy_rate_guidance_from_usd_hr': delivery_request.buy_rate_guidance_from_usd_hr,
+                'buy_rate_guidance_to_usd_hr': delivery_request.buy_rate_guidance_to_usd_hr,
+                'delivery_buy_rate_tag_usd_hr': delivery_request.delivery_buy_rate_tag_usd_hr,
+                'allocation_start_date': delivery_request.allocation_start_date,
+                'allocation_end_date': delivery_request.allocation_end_date,
+                'resource_required_date': delivery_request.resource_required_date,
+                'location': delivery_request.location,
+                'business_type': delivery_request.business_type,
+                'opportunity_probability': delivery_request.opportunity_probability,
+                'ri_no': ri_no,
+            }
+            
+            try:
+                team_html_message = render_to_string('resource_requests/emails/delivery_request_team_notification.html', team_context)
+                team_plain_message = strip_tags(team_html_message)
+                
+                if not settings.TEAM_EMAILS:
+                    logger.warning("No team email recipients configured in settings.TEAM_EMAILS")
+                else:
+                    send_email(
+                        subject=f"Delivery Request {delivery_request.id} Details - PMO Generated",
+                        body=team_plain_message,
+                        recipients=settings.TEAM_EMAILS,
+                        html_message=team_html_message
+                    )
+                    logger.info(f"Sent delivery request details to {', '.join(settings.TEAM_EMAILS)} for DeliveryRequest {request_id}")
+            except TemplateDoesNotExist as e:
+                logger.error(f"Team notification template not found: {str(e)}")
+            except Exception as e:
+                logger.error(f"Failed to send team notification for DeliveryRequest {request_id}: {str(e)}")
 
         return HttpResponse(f'Request has been {status_text}.')
     except Exception as e:

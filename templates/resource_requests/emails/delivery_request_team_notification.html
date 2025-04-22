@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Delivery Request Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Delivery Request Details - PMO Generated</h2>
+        
+        <p>The following delivery request details are provided for your action after PMO approval:</p>
+        
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Ticket Number</td>
+                <td>{{ ticket }}</td>
+            </tr>
+            <tr>
+                <td>Requester</td>
+                <td>{{ requester.get_full_name|default:requester.username }}</td>
+            </tr>
+            <tr>
+                <td>Account Name</td>
+                <td>{{ account_name }}</td>
+            </tr>
+            <tr>
+                <td>Competency Group</td>
+                <td>{{ competency_group }}</td>
+            </tr>
+            <tr>
+                <td>Primary Skill</td>
+                <td>{{ primary_skill }}</td>
+            </tr>
+            <tr>
+                <td>Secondary Skill</td>
+                <td>{{ secondary_skill }}</td>
+            </tr>
+            <tr>
+                <td>Education Qualification</td>
+                <td>{{ education_qualification }}</td>
+            </tr>
+            <tr>
+                <td>Experience in Years</td>
+                <td>{{ experience_in_years }}</td>
+            </tr>
+            <tr>
+                <td>Certifications</td>
+                <td>{{ certifications }}</td>
+            </tr>
+            <tr>
+                <td>Job Description</td>
+                <td>{{ job_description }}</td>
+            </tr>
+            <tr>
+                <td>Number of Positions</td>
+                <td>{{ number_of_positions }}</td>
+            </tr>
+            <tr>
+                <td>Designation</td>
+                <td>{{ designation }}</td>
+            </tr>
+            <tr>
+                <td>Bill Rate (SOW USD/Hr)</td>
+                <td>{{ bill_rate_sow_usd_hr }}</td>
+            </tr>
+            <tr>
+                <td>Buy Rate Guidance From (USD/Hr)</td>
+                <td>{{ buy_rate_guidance_from_usd_hr }}</td>
+            </tr>
+            <tr>
+                <td>Buy Rate Guidance To (USD/Hr)</td>
+                <td>{{ buy_rate_guidance_to_usd_hr }}</td>
+            </tr>
+            <tr>
+                <td>Delivery Buy Rate Tag (USD/Hr)</td>
+                <td>{{ delivery_buy_rate_tag_usd_hr }}</td>
+            </tr>
+            <tr>
+                <td>Allocation Start Date</td>
+                <td>{{ allocation_start_date }}</td>
+            </tr>
+            <tr>
+                <td>Allocation End Date</td>
+                <td>{{ allocation_end_date }}</td>
+            </tr>
+            <tr>
+                <td>Resource Required Date</td>
+                <td>{{ resource_required_date }}</td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td>{{ location }}</td>
+            </tr>
+            <tr>
+                <td>Business Type</td>
+                <td>{{ business_type }}</td>
+            </tr>
+            <tr>
+                <td>Opportunity Probability</td>
+                <td>{{ opportunity_probability }}</td>
+            </tr>
+            <tr>
+                <td>RI Number</td>
+                <td>{{ ri_no }}</td>
+            </tr>
+        </table>
+        
+        <p>Please proceed with the necessary actions based on these details.</p>
+        
+        <p>This is an automated message from the Resource Management System.</p>
+    </div>
+</body>
+</html>
