@@ -58,11 +58,11 @@ class ResourceRequestAdmin(admin.ModelAdmin):
     
     # Add variables to changeform view
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        print("I have initialized!")
+        #print("I have initialized!")
         extra_context = extra_context or {}
         # Fetch guidance data
         guidance_records = BuyRateGuidance.objects.all()
-        print(f"Number of BuyRateGuidance records fetched in changeform_view: {guidance_records.count()}")
+        #print(f"Number of BuyRateGuidance records fetched in changeform_view: {guidance_records.count()}")
         guidance_data = {}
         for record in guidance_records:
             key = f"{record.location.lower()}_{record.business_type.lower().replace(' ', '_')}"
@@ -70,11 +70,11 @@ class ResourceRequestAdmin(admin.ModelAdmin):
                 'lower_limit': float(record.lower_limit),
                 'upper_limit': float(record.upper_limit)
             }
-        print("Gided data: ", guidance_data)
-        print(type(guidance_data))
+        #print("Gided data: ", guidance_data)
+        #print(type(guidance_data))
         guidance_json = json.dumps(guidance_data, cls=DjangoJSONEncoder)
-        print((f"Guidance data JSON in changeform_view: {guidance_json}"))
-        print(type(guidance_json))
+        #print((f"Guidance data JSON in changeform_view: {guidance_json}"))
+        #print(type(guidance_json))
         extra_context.update({
             'help_url': None,
             'copyright_string': None,
@@ -86,7 +86,7 @@ class ResourceRequestAdmin(admin.ModelAdmin):
     
     # Add variables to changelist view as well
     def changelist_view(self, request, extra_context=None):
-        print("I am the culprit")
+        #print("I am the culprit")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,
@@ -95,7 +95,7 @@ class ResourceRequestAdmin(admin.ModelAdmin):
             'project_site_name': 'Resource Management',
             'original': None,  # Add this to fix the missing 'original' variable
         })
-        print(request)
+        #print(request)
         return super().changelist_view(request, extra_context=extra_context)
     
     # Load jQuery UI explicitly
@@ -103,12 +103,10 @@ class ResourceRequestAdmin(admin.ModelAdmin):
         css = {
             'all': (
                 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
-                'admin/css/resource_request_styles.css',
             )
         }
         js = (
             'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js',
-            'admin/js/resource_request_calculation.js',
         )
 
     def get_latest_status(self, obj):
@@ -125,7 +123,7 @@ class DeliveryRequestAdmin(admin.ModelAdmin):
     
     # Add the same fixes to this admin class
     def changelist_view(self, request, extra_context=None):
-        print("DeliveryRequest changelist_view")
+        #print("DeliveryRequest changelist_view")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,
@@ -182,7 +180,7 @@ class BuyRateGuidanceAdmin(admin.ModelAdmin):
     
     # Add the same fixes to this admin class
     def changelist_view(self, request, extra_context=None):
-        print("BuyRateGuidance changelist_view")
+        #print("BuyRateGuidance changelist_view")
         extra_context = extra_context or {}
         extra_context.update({
             'help_url': None,

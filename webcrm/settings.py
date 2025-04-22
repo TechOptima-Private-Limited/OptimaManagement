@@ -156,7 +156,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'common.utils.usermiddleware.UserMiddleware',
-    'webcrm.middleware.TemplateDebugMiddleware',
+    #'webcrm.middleware.TemplateDebugMiddleware',
 ]
 
 ADMIN_HELP_URL = None
