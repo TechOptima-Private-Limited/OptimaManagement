@@ -59,6 +59,7 @@ class PageViewSet(viewsets.ModelViewSet):
             serializer.save(author=self.request.user)
         else:
             serializer.save()  # Save without author if user is not authenticated
+            
     @action(detail=False, methods=['post'])
     def upload_image(self, request):
         try:

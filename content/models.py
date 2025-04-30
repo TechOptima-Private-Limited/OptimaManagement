@@ -1,6 +1,4 @@
 from django.db import models
-
-from django.db import models
 from django.contrib.auth.models import User
 from django_ckeditor_5.fields import CKEditor5Field  # Change this import
 from django.utils.text import slugify
@@ -35,6 +33,7 @@ class Page(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     meta_description = models.CharField(max_length=160, blank=True)
     meta_keywords = models.CharField(max_length=200, blank=True)
+
 
     def process_content_images(self, content):
         if not content:
@@ -196,3 +195,14 @@ class Page(models.Model):
 
     def __str__(self):
         return self.title
+class Comment(models.Model):
+    page = models.ForeignKey(Page, related_name='comments', on_delete=models.CASCADE)
+    author=models.ForeignKey(User,on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent=models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Comment by {self.author.username} on {self.page.title}"

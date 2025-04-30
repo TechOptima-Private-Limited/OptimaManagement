@@ -180,7 +180,7 @@ def send_approval_request_notification(obj, notes):
             'resource': obj.resource.name,
             'access_level': obj.access_level.name,
             'justification': obj.justification,
-            'notes': notes,
+            'notes': obj.notes,
             'approve_url': approve_url,
             'reject_url': reject_url,
             'approval_token_expiry': obj.approval_token_expiry,  # Add expiry date to context
