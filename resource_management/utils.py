@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from .models import Resource, EmailThread
 
+
 def get_or_create_thread_index(ticket_number):
     thread, created = EmailThread.objects.get_or_create(
         ticket_number=ticket_number,
@@ -123,45 +124,82 @@ def send_email_notification(obj, subject, template_name, context, recipients=Non
 
 def send_request_notification(access_request):
     """Send email notification for new access request"""
+    print("Sending email notification...") 
     try:
-        user_context = {
-            'ticket': access_request.ticket_number,
-            'user': access_request.user,  # Pass the User object
-            'user_name': access_request.user.get_full_name() or access_request.user.username,  # Pass the display name
-            'resource': access_request.resource.name,
-            'access_level': access_request.access_level.name,
-            'priority': access_request.get_priority_display(),
-            'justification': access_request.justification,
-            'resource_type': access_request.resource.resource_type.name,
-            'duration': access_request.duration,
-            'approval_token_expiry': access_request.approval_token_expiry,
-        }
+        if access_request.request_type == 'IT':
+            # IT support-specific context
+            it_support_context = {
+                'ticket': access_request.ticket_number,
+                'user': access_request.user,
+                'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
+                'priority': access_request.get_priority_display(),
+                'justification': access_request.justification,
+            }
+            print(f"Sending IT support email with context: {it_support_context}")
+            send_email_notification(
+                access_request,
+                f"New IT Support Ticket - ID {access_request.ticket_number}",
+                'it_support_user.html',
+                it_support_context,
+                [access_request.user.email],
+                is_reply=False
+            )
+            print("Successfully sent IT support email")
+        else:
+            user_context = {
+                'ticket': access_request.ticket_number,
+                'user': access_request.user,
+                'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
+                'resource': getattr(access_request.resource, 'name', 'N/A') if access_request.resource else "N/A",
+                'access_level': getattr(access_request.access_level, 'name', 'N/A') if access_request.access_level else "N/A",
+                'priority': access_request.get_priority_display(),
+                'justification': access_request.justification,
+                'resource_type': getattr(access_request.resource.resource_type, 'name', 'N/A') if access_request.resource and access_request.resource.resource_type else "N/A",
+                'duration': access_request.duration,
+                'approval_token_expiry': access_request.approval_token_expiry,
+            }
+            print(f"Sending user email with context: {user_context}")
+            send_email_notification(
+                access_request,
+                f"Access Request {access_request.ticket_number}",
+                'new_request_user.html',
+                user_context,
+                [access_request.user.email],
+                is_reply=False
+            )
+            print("Successfully sent email to user")
 
-        # Notify the requester
-        send_email_notification(
-            access_request,
-            f"Access Request {access_request.ticket_number}",
-            'new_request_user.html',
-            user_context,
-            [access_request.user.email],
-            is_reply=False
-        )
+    except Exception as e:
+        print(f"Failed to send user notification: {str(e)}")
 
-        # Notify the resource team
-        team_context = user_context.copy()
-        team_context['requester'] = user_context['user_name']
-        send_email_notification(
-            access_request,
-            f"Access Request {access_request.ticket_number}",
-            'new_request_team.html',
-            team_context,
-            [access_request.resource.resource_team_email],
-            is_reply=True
-        )
+    try:
+        if access_request.request_type == 'IT':
+            team_context = it_support_context.copy()
+            team_context['requester'] = team_context['user_name']
+            send_email_notification(
+                access_request,
+                f"Access Request {access_request.ticket_number}",
+                'it_support_team.html',
+                team_context,
+                [getattr(access_request.resource, 'resource_team_email', 'default@example.com')],
+                is_reply=True
+            )
+        else:
+            team_context = user_context.copy()
+            team_context['requester'] = user_context['user_name']
+            send_email_notification(
+                access_request,
+                f"Access Request {access_request.ticket_number}",
+                'new_request_team.html',
+                team_context,
+                [getattr(access_request.resource, 'resource_team_email', 'default@example.com')],
+                is_reply=True
+            )
         return True
     except Exception as e:
-        print(f"Failed to send request notification: {str(e)}")
+        print(f"Failed to send team notification: {str(e)}")
         return False
+
 
 def send_approval_request_notification(obj, notes):
     """Send approval request with proper URLs"""

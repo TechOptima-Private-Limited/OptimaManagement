@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import *
 from . import views
-from .autocomplete import UserAutocomplete
+from .autocomplete import UserAutocomplete, ResourceAutocomplete,ResourceTypeAutocomplete
 
 router = DefaultRouter()
 router.register(r'resource-types', ResourceTypeViewSet)
@@ -20,4 +20,6 @@ urlpatterns = [
     path('api/resource-owner-approve/<int:request_id>/<str:token>/<str:action>/', 
          views.handle_resource_owner_approval, name='handle_resource_owner_approval'),
      path('user-autocomplete/', UserAutocomplete.as_view(), name='user-autocomplete'),
+     path('resource-autocomplete/', ResourceAutocomplete.as_view(), name='resource-autocomplete'),
+     path('resourcetype-autocomplete/', ResourceTypeAutocomplete.as_view(), name='resourcetype-autocomplete'),
 ]
