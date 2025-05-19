@@ -1,0 +1,15 @@
+{% extends "resource_management/emails/base_email.html" %}
+
+{% block content %}
+<p>Dear {{ user_name }},</p>
+<p>Your IT request has been submitted successfully:</p>
+<ul>
+    <li><strong>Ticket Number:</strong>  {{ ticket }}</li>
+    <li><strong>User:</strong> {{ user_name }}</li>
+    <li><strong>Priority:</strong> {{ priority }}</li>
+    <li><strong>Justification:</strong>{{ justification|safe }}</li>
+</ul>
+<br>
+<br>
+<p>Our team will review your request and update you shortly.</p>
+{% endblock %}

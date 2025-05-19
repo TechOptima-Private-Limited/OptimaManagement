@@ -1,0 +1,10 @@
+{% extends "resource_management/emails/base_email.html" %}
+{% block content %}
+<p>New IT Request Received</p>
+<ul>
+    <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+    <li><strong>Requester:</strong> {{ requester }} (Employee ID: {{ user.username }})</li>
+    <li><strong>Priority:</strong> {{ priority }}</li>
+    <li><strong>Justification:</strong>{{ justification|safe  }}</li>
+</ul>
+{% endblock %}

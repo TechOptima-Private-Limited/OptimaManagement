@@ -1,0 +1,124 @@
+/* Target the admin form container */
+#accessrequest_form {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Apply inline layout to all form rows */
+#accessrequest_form .form-row {
+    display: flex !important;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    justify-content: flex-start !important; /* Ensure consistent starting point */
+}
+
+/* Align labels to the left with a fixed width, ensure boldness */
+#accessrequest_form .form-row label {
+    width: 150px !important; /* Fixed width for labels */
+    text-align: left !important;
+    margin: 0 5px 0 0 !important; /* Space between label and field */
+    padding-left: 0 !important;
+    white-space: nowrap;
+    font-weight: 700 !important; /* Use numeric value for stronger boldness */
+    display: inline-block !important; /* Ensure consistent rendering */
+    box-sizing: border-box !important; /* Include padding/margin in width */
+}
+
+/* Reinforce left alignment with higher specificity */
+#accessrequest_form .form-row label,
+#accessrequest_form .form-row.field-justification label {
+    text-align: left !important;
+    justify-content: flex-start !important; /* Ensure alignment in flex context */
+}
+
+/* Ensure fields align properly */
+#accessrequest_form .form-row .fieldBox {
+    flex: 1;
+    max-width: 300px;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Adjust Select2 fields */
+#accessrequest_form .form-row .select2-container {
+    width: 300px !important;
+}
+
+/* Adjust textarea for Justification */
+#accessrequest_form .form-row.field-justification .fieldBox {
+    max-width: 500px !important; /* Increase width for Justification field */
+    align-items: flex-start !important; /* Align to top for taller field */
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+#accessrequest_form .form-row.field-justification .django-ckeditor-5-container {
+    width: 500px !important; /* Match the fieldBox width */
+    min-height: 200px !important; /* Ensure enough height for CKEditor */
+}
+
+/* Remove the direct textarea styling to avoid conflicts with CKEditor */
+#accessrequest_form .form-row textarea {
+    width: 100% !important; /* Let CKEditor control the width */
+    height: auto !important; /* Let CKEditor control the height */
+}
+
+/* Specific override for Justification label to ensure alignment */
+#accessrequest_form .form-row.field-justification label,
+#accessrequest_form .form-row.field-justification .django-ckeditor-5-container label,
+#accessrequest_form .form-row.field-justification div label,
+#accessrequest_form .form-row.field-justification *[for="id_justification"] {
+    font-weight: 700 !important;
+    font-family: inherit !important;
+    text-align: left !important;
+    width: 150px !important; /* Reinforce width */
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Remove extra padding/margins from parent containers */
+#accessrequest_form fieldset.module,
+#accessrequest_form .form-content,
+#accessrequest_form div.aligned {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Remove padding from the content container */
+#accessrequest_form .content {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Ensure the module container has no padding */
+#accessrequest_form .module {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Responsive design: Stack on smaller screens */
+@media (max-width: 768px) {
+    #accessrequest_form .form-row {
+        display: block !important;
+    }
+    #accessrequest_form .form-row label {
+        display: block;
+        text-align: left !important;
+        margin: 0 0 5px 0 !important;
+        width: auto !important;
+        font-weight: 700 !important; /* Ensure boldness on mobile */
+    }
+    #accessrequest_form .form-row .fieldBox,
+    #accessrequest_form .form-row .select2-container,
+    #accessrequest_form .form-row.field-justification .fieldBox,
+    #accessrequest_form .form-row.field-justification .django-ckeditor-5-container {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    #accessrequest_form .form-row textarea {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
