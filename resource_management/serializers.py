@@ -1,6 +1,8 @@
 # resource_management/serializers.py
 from rest_framework import serializers
 from .models import *
+import re
+from django.conf import settings
 
 class ResourceTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,12 +27,25 @@ class AccessRequestSerializer(serializers.ModelSerializer):
     access_level_name = serializers.CharField(source='access_level.name', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)
+    justification = serializers.SerializerMethodField()
 
     class Meta:
         model = AccessRequest
         fields = '__all__'
         read_only_fields = ('ticket_number', 'user', 'status', 'approved_by', 
                           'approved_at', 'requested_at', 'expires_at')
+   
+    def get_justification(self, obj):
+        if obj.justification:
+            # Replace relative media URLs with absolute URLs
+            justification = obj.justification
+            # Find all image sources in the content
+            img_pattern = r'src=\"(/media/[^\"]+)\"'
+            # Replace with absolute URLs
+            justification = re.sub(img_pattern, f'src="{settings.DOMAIN_NAME}\\1"', justification)
+            return justification
+        return None
+  
 
 class AccessHistorySerializer(serializers.ModelSerializer):
     performed_by_name = serializers.CharField(source='performed_by.get_full_name', read_only=True)
