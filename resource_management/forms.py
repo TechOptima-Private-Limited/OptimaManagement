@@ -169,10 +169,40 @@ class AccessRequestForm(forms.ModelForm):
         self.fields['justification'].label = mark_safe('<span style="font-weight: 700;">Justification</span>')
         
 
+    # def clean_justification(self):
+    #     justification = self.cleaned_data.get('justification', '')
+    #     return strip_tags(justification) if justification else ''
     def clean_justification(self):
         justification = self.cleaned_data.get('justification', '')
-        return strip_tags(justification) if justification else ''
-
+        print(f"🔧 FORM CLEAN: Raw justification length: {len(justification)}")
+        print(f"🔧 FORM CLEAN: Has img tags: {'<img' in justification}")
+        print(f"🔧 FORM CLEAN: First 200 chars: {justification[:200]}...")
+        
+        # DON'T strip all tags - preserve img tags and safe HTML
+        if justification:
+            # Only strip dangerous tags, keep img and safe formatting tags
+            from django.utils.html import strip_tags
+            import re
+            
+            # Instead of stripping ALL tags, let's preserve img tags and basic formatting
+            # We'll only remove script, style, and other dangerous tags
+            dangerous_tags = ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button']
+            cleaned = justification
+            
+            for tag in dangerous_tags:
+                # Remove dangerous tags and their content
+                pattern = f'<{tag}[^>]*>.*?</{tag}>'
+                cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE | re.DOTALL)
+                # Also remove self-closing versions
+                pattern = f'<{tag}[^>]*/?>'
+                cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
+            
+            print(f"🔧 FORM CLEAN: After cleaning length: {len(cleaned)}")
+            print(f"🔧 FORM CLEAN: Still has img tags: {'<img' in cleaned}")
+            
+            return cleaned
+        
+        return ''
     def clean_approver_email(self):
         user = self.cleaned_data.get('approver_email')
         return user.email if user else None

@@ -358,30 +358,86 @@ from django.core.files.base import ContentFile
 from .models import Resource, EmailThread
 
 
+# def extract_images_from_html(html_content):
+#     """
+#     Extract all image sources from HTML content
+#     Returns list of image paths found in the HTML
+#     """
+#     if not html_content:
+#         return []
+    
+#     # Find all img tags with src attributes
+#     img_pattern = r'<img[^>]*src=["\']([^"\']+)["\'][^>]*>'
+#     matches = re.findall(img_pattern, html_content, re.IGNORECASE)
+    
+#     image_paths = []
+#     for src in matches:
+#         # Handle both relative and absolute URLs
+#         if src.startswith('/media/'):
+#             # Remove leading slash and media/ for default_storage
+#             clean_path = src.replace('/media/', '')
+#             image_paths.append(clean_path)
+#         elif src.startswith(settings.MEDIA_URL):
+#             # Handle full media URLs
+#             clean_path = src.replace(settings.MEDIA_URL, '')
+#             image_paths.append(clean_path)
+    
+#     return image_paths
+
 def extract_images_from_html(html_content):
     """
     Extract all image sources from HTML content
     Returns list of image paths found in the HTML
     """
+    print(f"🔍 extract_images_from_html called with content length: {len(html_content) if html_content else 0}")
+    
     if not html_content:
+        print(f"❌ No HTML content provided")
         return []
     
+    print(f"📝 HTML content preview (first 300 chars): {html_content[:300]}...")
+    
     # Find all img tags with src attributes
+    import re
     img_pattern = r'<img[^>]*src=["\']([^"\']+)["\'][^>]*>'
     matches = re.findall(img_pattern, html_content, re.IGNORECASE)
     
+    print(f"🔍 Found {len(matches)} img src matches using pattern: {img_pattern}")
+    for i, match in enumerate(matches):
+        print(f"  Match {i+1}: {match}")
+    
     image_paths = []
-    for src in matches:
+    for i, src in enumerate(matches):
+        print(f"🖼️ Processing src {i+1}: {src}")
+        
         # Handle both relative and absolute URLs
         if src.startswith('/media/'):
             # Remove leading slash and media/ for default_storage
             clean_path = src.replace('/media/', '')
-            image_paths.append(clean_path)
+            
+            # 🔧 URL DECODE THE FILENAME
+            from urllib.parse import unquote
+            decoded_path = unquote(clean_path)
+            
+            image_paths.append(decoded_path)
+            print(f"  ✅ Added relative media path: {clean_path}")
+            print(f"  🔧 URL decoded to: {decoded_path}")
+            
         elif src.startswith(settings.MEDIA_URL):
             # Handle full media URLs
             clean_path = src.replace(settings.MEDIA_URL, '')
-            image_paths.append(clean_path)
+            
+            # 🔧 URL DECODE THE FILENAME
+            from urllib.parse import unquote
+            decoded_path = unquote(clean_path)
+            
+            image_paths.append(decoded_path)
+            print(f"  ✅ Added full media URL path: {clean_path}")
+            print(f"  🔧 URL decoded to: {decoded_path}")
+        else:
+            print(f"  ⚠️ Skipping non-media URL: {src}")
     
+    print(f"📸 Final image_paths extracted: {image_paths}")
     return image_paths
 
 
@@ -449,10 +505,10 @@ def process_base64_images(html_content, ticket_number):
             
             # Save to storage
             path = default_storage.save(filename, ContentFile(image_data))
-            
+            DOMAIN_NAME = os.getenv('SITE_URL')
             # Generate URL for email
             if settings.DEBUG:
-                image_url = f"http://127.0.0.1:8000{settings.MEDIA_URL}{path}"
+                image_url = f"{DOMAIN_NAME}{settings.MEDIA_URL}{path}"
             else:
                 image_url = default_storage.url(path)
             
@@ -476,9 +532,101 @@ def process_base64_images(html_content, ticket_number):
     return updated_html, saved_images
 
 
+# def send_threaded_email_with_images(subject, body, recipients, ticket_number, is_reply=True, html_message=None):
+#     """
+#     Enhanced email sending function that handles images from media folder
+#     """
+#     try:
+#         base_message_id = generate_message_id(ticket_number)
+#         message_id = base_message_id if not is_reply else f"{base_message_id}.{uuid.uuid4().hex[:8]}"
+#         thread_index = generate_thread_index(ticket_number)
+
+#         if subject.startswith("Welcome to Optima Hub Management"):
+#             subject = subject
+#         else:
+#             base_subject = f"Access Request {ticket_number}"
+#             if not subject.startswith(base_subject):
+#                 subject = base_subject if not is_reply else f"Re: {base_subject}"
+
+#         headers = {
+#             'Message-ID': message_id,
+#             'References': base_message_id,
+#             'In-Reply-To': base_message_id if is_reply else None,
+#             'Thread-Index': thread_index,
+#             'Subject': subject,
+#         }
+
+#         all_attachments = []
+#         processed_html = html_message
+
+#         if html_message:
+#             # First, process any base64 images
+#             processed_html, base64_images = process_base64_images(html_message, ticket_number)
+#             all_attachments.extend(base64_images)
+            
+#             # Then, find and attach existing images from media folder
+#             final_html, media_images = process_html_for_email(processed_html, ticket_number)
+#             all_attachments.extend(media_images)
+            
+#             processed_html = final_html
+
+#         # Create email with attachments
+#         if processed_html and all_attachments:
+#             # Use EmailMultiAlternatives for HTML with attachments
+#             email = EmailMultiAlternatives(
+#                 subject=subject,
+#                 body=strip_tags(processed_html) if processed_html else body,
+#                 from_email=settings.DEFAULT_FROM_EMAIL,
+#                 to=recipients,
+#                 headers=headers
+#             )
+            
+#             # Attach HTML version
+#             email.attach_alternative(processed_html, "text/html")
+            
+#             # Attach all images
+#             for attachment in all_attachments:
+#                 email.attach(
+#                     attachment['filename'],
+#                     attachment['data'],
+#                     attachment['content_type']
+#                 )
+#                 print(f"Attached image: {attachment['filename']}")
+                
+#         elif processed_html:
+#             # HTML email without attachments
+#             email = EmailMultiAlternatives(
+#                 subject=subject,
+#                 body=strip_tags(processed_html),
+#                 from_email=settings.DEFAULT_FROM_EMAIL,
+#                 to=recipients,
+#                 headers=headers
+#             )
+#             email.attach_alternative(processed_html, "text/html")
+#         else:
+#             # Plain text email
+#             email = EmailMessage(
+#                 subject=subject,
+#                 body=body,
+#                 from_email=settings.DEFAULT_FROM_EMAIL,
+#                 to=recipients,
+#                 headers=headers
+#             )
+
+#         email.send()
+#         print(f"Email sent successfully to {', '.join(recipients)} with {len(all_attachments)} image attachments")
+#         return True
+        
+#     except Exception as e:
+#         print(f"Failed to send email: {str(e)}")
+#         import traceback
+#         traceback.print_exc()
+#         return False
+
+
 def send_threaded_email_with_images(subject, body, recipients, ticket_number, is_reply=True, html_message=None):
     """
-    Enhanced email sending function that handles images from media folder
+    Enhanced email sending function that handles images with CID embedding for inline display
     """
     try:
         base_message_id = generate_message_id(ticket_number)
@@ -502,6 +650,7 @@ def send_threaded_email_with_images(subject, body, recipients, ticket_number, is
 
         all_attachments = []
         processed_html = html_message
+        cid_mapping = {}  # Store filename -> CID mapping
 
         if html_message:
             # First, process any base64 images
@@ -514,9 +663,29 @@ def send_threaded_email_with_images(subject, body, recipients, ticket_number, is
             
             processed_html = final_html
 
-        # Create email with attachments
+        # 🔧 NEW: Create CID mappings and update HTML for inline display
+        if processed_html and all_attachments:
+            import re
+            
+            # Create CID for each image and update HTML
+            for i, attachment in enumerate(all_attachments):
+                filename = attachment['filename']
+                cid = f"image{i+1}_{uuid.uuid4().hex[:8]}"
+                cid_mapping[filename] = cid
+                
+                # Replace /media/ URLs with cid: URLs in HTML
+                media_pattern = f"/media/{re.escape(filename.replace(' ', '%20'))}"
+                cid_url = f"cid:{cid}"
+                processed_html = re.sub(media_pattern, cid_url, processed_html)
+                
+                print(f"🔗 Mapped {filename} -> cid:{cid}")
+
+        # Create email with attachments and CID embedding
         if processed_html and all_attachments:
             # Use EmailMultiAlternatives for HTML with attachments
+            from django.core.mail import EmailMultiAlternatives
+            from email.mime.image import MIMEImage
+            
             email = EmailMultiAlternatives(
                 subject=subject,
                 body=strip_tags(processed_html) if processed_html else body,
@@ -528,17 +697,28 @@ def send_threaded_email_with_images(subject, body, recipients, ticket_number, is
             # Attach HTML version
             email.attach_alternative(processed_html, "text/html")
             
-            # Attach all images
+            # Attach all images with CID for inline display
             for attachment in all_attachments:
-                email.attach(
-                    attachment['filename'],
-                    attachment['data'],
-                    attachment['content_type']
-                )
-                print(f"Attached image: {attachment['filename']}")
+                filename = attachment['filename']
+                image_data = attachment['data']
+                content_type = attachment['content_type']
+                
+                # Create MIMEImage for proper inline embedding
+                if content_type.startswith('image/'):
+                    img = MIMEImage(image_data)
+                    cid = cid_mapping.get(filename, f"image_{uuid.uuid4().hex[:8]}")
+                    img.add_header('Content-ID', f'<{cid}>')
+                    img.add_header('Content-Disposition', 'inline', filename=filename)
+                    email.attach(img)
+                    print(f"📎 Attached inline image: {filename} with CID: {cid}")
+                else:
+                    # Fallback for non-image files
+                    email.attach(filename, image_data, content_type)
+                    print(f"📎 Attached file: {filename}")
                 
         elif processed_html:
             # HTML email without attachments
+            from django.core.mail import EmailMultiAlternatives
             email = EmailMultiAlternatives(
                 subject=subject,
                 body=strip_tags(processed_html),
@@ -549,6 +729,7 @@ def send_threaded_email_with_images(subject, body, recipients, ticket_number, is
             email.attach_alternative(processed_html, "text/html")
         else:
             # Plain text email
+            from django.core.mail import EmailMessage
             email = EmailMessage(
                 subject=subject,
                 body=body,
@@ -558,11 +739,12 @@ def send_threaded_email_with_images(subject, body, recipients, ticket_number, is
             )
 
         email.send()
-        print(f"Email sent successfully to {', '.join(recipients)} with {len(all_attachments)} image attachments")
+        print(f"📧 Email sent successfully to {', '.join(recipients)} with {len(all_attachments)} image attachments")
+        print(f"🖼️ Images embedded inline with CID mapping: {cid_mapping}")
         return True
         
     except Exception as e:
-        print(f"Failed to send email: {str(e)}")
+        print(f"❌ Failed to send email: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
@@ -618,32 +800,161 @@ def get_user_role(user):
         return 'resource_owner'
     return 'employee'
 
+# def send_email_notification(obj, subject, template_name, context, recipients=None, is_reply=True):
+#     try:
+#         if recipients is None:
+#             if obj is None:
+#                 raise ValueError("Recipients must be provided if obj is None")
+#             recipients = [obj.user.email]
+#             print(f"🔍 DEBUG: obj.resource = {obj.resource}")
+#             print(f"🔍 DEBUG: obj.resource.name = {obj.resource.name if obj.resource else 'No Resource'}")
+            
+#             if obj.resource.resource_team_email:
+#                 print(f"🔍 DEBUG: Found resource_team_email = {obj.resource.resource_team_email}")
+#                 recipients.append(obj.resource.resource_team_email)
+#                 print(f"🔍 DEBUG: Added to recipients. Final recipients = {recipients}")
+#             else:
+#                 print(f"🔍 DEBUG: No resource_team_email found for resource {obj.resource.name if obj.resource else 'None'}")
+
+#             # if obj.resource.resource_team_email:
+#             #     recipients.append(obj.resource.resource_team_email)
+
+#         html_message = render_to_string(f'resource_management/emails/{template_name}', context)
+#         plain_message = strip_tags(html_message)
+#         print("Subject :", subject)
+#         # Use ticket_number from obj if available, otherwise generate a unique message ID
+#         ticket_number = f"employee-{context['user'].id}" if obj is None else obj.ticket_number
+        
+#         send_threaded_email(
+#             subject=subject,
+#             body=plain_message,
+#             recipients=recipients,
+#             ticket_number=ticket_number,
+#             is_reply=is_reply,
+#             html_message=html_message
+#         )
+
+#         print(f"Email sent successfully to {', '.join(recipients)}")
+#         return True
+#     except Exception as e:
+#         print(f"Failed to send email: {str(e)}")
+#         return False
+
+
 def send_email_notification(obj, subject, template_name, context, recipients=None, is_reply=True):
+    print(f"🚀 Starting send_email_notification for template: {template_name}")
+    print(f"🎯 Subject: {subject}")
+    print(f"👥 Recipients provided: {recipients}")
+    
     try:
         if recipients is None:
+            print("📝 Recipients is None, determining from obj...")
             if obj is None:
                 raise ValueError("Recipients must be provided if obj is None")
             recipients = [obj.user.email]
+            print(f"📧 Added user email: {obj.user.email}")
             print(f"🔍 DEBUG: obj.resource = {obj.resource}")
             print(f"🔍 DEBUG: obj.resource.name = {obj.resource.name if obj.resource else 'No Resource'}")
             
-            if obj.resource.resource_team_email:
+            if obj.resource and obj.resource.resource_team_email:
                 print(f"🔍 DEBUG: Found resource_team_email = {obj.resource.resource_team_email}")
                 recipients.append(obj.resource.resource_team_email)
                 print(f"🔍 DEBUG: Added to recipients. Final recipients = {recipients}")
             else:
                 print(f"🔍 DEBUG: No resource_team_email found for resource {obj.resource.name if obj.resource else 'None'}")
 
-            # if obj.resource.resource_team_email:
-            #     recipients.append(obj.resource.resource_team_email)
-
-        html_message = render_to_string(f'resource_management/emails/{template_name}', context)
+        print(f"👥 Final recipients list: {recipients}")
+        
+        # 🖼️ DETAILED IMAGE DEBUGGING
+        processed_justification = context.get('justification', '')
+        print(f"🖼️ DEBUGGING JUSTIFICATION CONTENT:")
+        print(f"📝 Raw justification type: {type(processed_justification)}")
+        print(f"📝 Raw justification length: {len(str(processed_justification))} characters")
+        print(f"📝 First 200 chars: {str(processed_justification)[:200]}...")
+        
+        # Check for image indicators
+        has_img_tag = '<img' in str(processed_justification)
+        has_src_attr = 'src=' in str(processed_justification)
+        has_media_url = '/media/' in str(processed_justification)
+        has_base64 = 'data:image' in str(processed_justification)
+        
+        print(f"🔍 Image indicators:")
+        print(f"  - Has <img tag: {has_img_tag}")
+        print(f"  - Has src= attribute: {has_src_attr}")
+        print(f"  - Has /media/ URL: {has_media_url}")
+        print(f"  - Has base64 data: {has_base64}")
+        
+        if processed_justification and obj:
+            print(f"🖼️ Processing justification content for images...")
+            
+            # Check if justification contains images
+            if has_img_tag or has_src_attr:
+                print(f"🖼️ Found images in justification content")
+                
+                # Show what images we're trying to extract
+                image_paths = extract_images_from_html(str(processed_justification))
+                print(f"📸 extract_images_from_html found: {len(image_paths)} images")
+                for i, path in enumerate(image_paths):
+                    print(f"  Image {i+1}: {path}")
+                
+                # Process base64 images and save them
+                if has_base64:
+                    print(f"💾 Processing base64 images...")
+                    processed_justification, base64_images = process_base64_images(str(processed_justification), obj.ticket_number)
+                    if base64_images:
+                        print(f"💾 Processed {len(base64_images)} base64 images")
+                        for i, img in enumerate(base64_images):
+                            print(f"  Base64 Image {i+1}: {img['filename']} ({img['content_type']})")
+                    else:
+                        print(f"💾 No base64 images processed")
+                else:
+                    print(f"📷 No base64 images found, processing existing media images...")
+                
+                # Update context with processed justification
+                context = context.copy()  # Don't modify original context
+                context['justification'] = processed_justification
+                print(f"📝 Updated context with processed justification")
+            else:
+                print(f"📝 No images found in justification content")
+        else:
+            print(f"📝 No justification content to process (empty or no obj)")
+        
+        # Try to render the template
+        print(f"🎨 Attempting to render template: resource_management/emails/{template_name}")
+        print(f"📋 Template context keys: {list(context.keys())}")
+        
+        try:
+            html_message = render_to_string(f'resource_management/emails/{template_name}', context)
+            print(f"✅ Template rendered successfully, length: {len(html_message)} characters")
+            
+            # Check if the rendered HTML contains images
+            rendered_has_img = '<img' in html_message
+            rendered_has_media = '/media/' in html_message
+            print(f"🎨 Rendered template image check:")
+            print(f"  - Rendered HTML has <img: {rendered_has_img}")
+            print(f"  - Rendered HTML has /media/: {rendered_has_media}")
+            
+            if rendered_has_img:
+                print(f"📸 Images found in rendered HTML - first 300 chars around img:")
+                import re
+                img_matches = re.findall(r'.{0,50}<img[^>]*>.{0,50}', html_message)
+                for i, match in enumerate(img_matches[:3]):  # Show first 3 matches
+                    print(f"  Match {i+1}: {match}")
+            
+        except Exception as template_error:
+            print(f"❌ Template rendering failed: {str(template_error)}")
+            raise template_error
+        
         plain_message = strip_tags(html_message)
-        print("Subject :", subject)
+        print(f"📄 Plain message length: {len(plain_message)} characters")
+        
         # Use ticket_number from obj if available, otherwise generate a unique message ID
         ticket_number = f"employee-{context['user'].id}" if obj is None else obj.ticket_number
+        print(f"🎫 Using ticket_number: {ticket_number}")
         
-        send_threaded_email(
+        # 🖼️ Use the enhanced email function that handles images
+        print(f"📤 Calling send_threaded_email_with_images (image-aware)...")
+        email_result = send_threaded_email_with_images(
             subject=subject,
             body=plain_message,
             recipients=recipients,
@@ -651,27 +962,145 @@ def send_email_notification(obj, subject, template_name, context, recipients=Non
             is_reply=is_reply,
             html_message=html_message
         )
-
-        print(f"Email sent successfully to {', '.join(recipients)}")
-        return True
+        
+        if email_result:
+            print(f"✅ Email sent successfully to {', '.join(recipients)}")
+            return True
+        else:
+            print(f"❌ send_threaded_email_with_images returned False")
+            return False
+            
     except Exception as e:
-        print(f"Failed to send email: {str(e)}")
+        print(f"❌ EXCEPTION in send_email_notification: {str(e)}")
+        print(f"🔍 Exception type: {type(e)}")
+        import traceback
+        print(f"📜 Full traceback:")
+        traceback.print_exc()
         return False
 
+
+
 # Keep all your other existing functions (send_request_notification, etc.)
+# def send_request_notification(access_request):
+#     """Send email notification for new access request"""
+#     print("Sending email notification...") 
+#     """Send email notification for new access request"""
+#     print("Sending email notification...") 
+    
+#     # 🔍 ADD THIS DEBUG BLOCK
+#     print(f"🔍 DEBUG: access_request.resource = {access_request.resource}")
+#     if access_request.resource:
+#         print(f"🔍 DEBUG: resource.name = {access_request.resource.name}")
+#         print(f"🔍 DEBUG: resource.resource_team_email = {access_request.resource.resource_team_email}")
+#     else:
+#         print(f"🔍 DEBUG: No resource found for this request")
+
+#     try:
+#         if access_request.request_type == 'IT':
+#             # IT support-specific context
+#             it_support_context = {
+#                 'ticket': access_request.ticket_number,
+#                 'user': access_request.user,
+#                 'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
+#                 'priority': access_request.get_priority_display(),
+#                 'justification': access_request.justification,
+#             }
+#             team_email = getattr(access_request.resource, 'resource_team_email', 'default@example.com')
+#             print(f"🔍 DEBUG: Sending IT team email to: {team_email}")
+#             send_email_notification(
+#                 access_request,
+#                 f"New IT Support Ticket - ID {access_request.ticket_number}",
+#                 'it_support_user.html',
+#                 it_support_context,
+#                 [access_request.user.email],
+#                 is_reply=False
+#             )
+#             print("Successfully sent IT support email")
+#         else:
+#             user_context = {
+#                 'ticket': access_request.ticket_number,
+#                 'user': access_request.user,
+#                 'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
+#                 'resource': getattr(access_request.resource, 'name', 'N/A') if access_request.resource else "N/A",
+#                 'access_level': getattr(access_request.access_level, 'name', 'N/A') if access_request.access_level else "N/A",
+#                 'priority': access_request.get_priority_display(),
+#                 'justification': access_request.justification,
+#                 'resource_type': getattr(access_request.resource.resource_type, 'name', 'N/A') if access_request.resource and access_request.resource.resource_type else "N/A",
+#                 'duration': access_request.duration,
+#                 'approval_token_expiry': access_request.approval_token_expiry,
+#             }
+#             print(f"Sending user email with context: {user_context}")
+#             send_email_notification(
+#                 access_request,
+#                 f"Access Request {access_request.ticket_number}",
+#                 'new_request_user.html',
+#                 user_context,
+#                 [access_request.user.email],
+#                 is_reply=False
+#             )
+#             print("Successfully sent email to user")
+
+#     except Exception as e:
+#         print(f"Failed to send user notification: {str(e)}")
+
+#     try:
+#         if access_request.request_type == 'IT':
+#             team_context = it_support_context.copy()
+#             team_context['requester'] = team_context['user_name']
+#             send_email_notification(
+#                 access_request,
+#                 f"Access Request {access_request.ticket_number}",
+#                 'it_support_team.html',
+#                 team_context,
+#                 [getattr(access_request.resource, 'resource_team_email', 'default@example.com')],
+#                 is_reply=True
+#             )
+#         else:
+#             team_context = user_context.copy()
+#             team_context['requester'] = user_context['user_name']
+#             send_email_notification(
+#                 access_request,
+#                 f"Access Request {access_request.ticket_number}",
+#                 'new_request_team.html',
+#                 team_context,
+#                 [getattr(access_request.resource, 'resource_team_email', 'default@example.com')],
+#                 is_reply=True
+#             )
+#         return True
+#     except Exception as e:
+#         print(f"Failed to send team notification: {str(e)}")
+#         return False
+from resource_management.models import ResourceType, Resource
 def send_request_notification(access_request):
     """Send email notification for new access request"""
-    print("Sending email notification...") 
-    """Send email notification for new access request"""
-    print("Sending email notification...") 
+    print("🚀 Starting send_request_notification...") 
     
-    # 🔍 ADD THIS DEBUG BLOCK
+    # 🔍 Debug the resource assignment
     print(f"🔍 DEBUG: access_request.resource = {access_request.resource}")
     if access_request.resource:
         print(f"🔍 DEBUG: resource.name = {access_request.resource.name}")
         print(f"🔍 DEBUG: resource.resource_team_email = {access_request.resource.resource_team_email}")
     else:
         print(f"🔍 DEBUG: No resource found for this request")
+        
+        # 🚨 CRITICAL FIX: Auto-assign IT Support resource if missing
+        if access_request.request_type == 'IT':
+            try:
+                print("🔧 Attempting to auto-assign IT Support resource...")
+                it_resource_type = ResourceType.objects.get(name='IT Support')
+                it_resource = Resource.objects.filter(
+                    resource_type=it_resource_type,
+                    is_active=True
+                ).first()
+                
+                if it_resource:
+                    access_request.resource = it_resource
+                    access_request.save()
+                    print(f"✅ AUTO-ASSIGNED IT resource: {it_resource.name} with email: {it_resource.resource_team_email}")
+                else:
+                    print("❌ No active IT Support resource found in database")
+            except ResourceType.DoesNotExist:
+                print("❌ IT Support resource type not found in database")
 
     try:
         if access_request.request_type == 'IT':
@@ -682,19 +1111,70 @@ def send_request_notification(access_request):
                 'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
                 'priority': access_request.get_priority_display(),
                 'justification': access_request.justification,
+                'duration': access_request.duration,
             }
-            team_email = getattr(access_request.resource, 'resource_team_email', 'default@example.com')
-            print(f"🔍 DEBUG: Sending IT team email to: {team_email}")
-            send_email_notification(
-                access_request,
-                f"New IT Support Ticket - ID {access_request.ticket_number}",
-                'it_support_user.html',
-                it_support_context,
-                [access_request.user.email],
-                is_reply=False
-            )
-            print("Successfully sent IT support email")
+            print(f"📧 Preparing to send IT support emails with context: {list(it_support_context.keys())}")
+            
+            # 📧 Send email to user (try multiple templates as fallback)
+            print("📤 Attempting to send user email...")
+            user_templates = ['it_support_user.html', 'new_request_user.html']
+            
+            for template in user_templates:
+                print(f"🎨 Trying user template: {template}")
+                result = send_email_notification(
+                    access_request,
+                    f"New IT Support Ticket - ID {access_request.ticket_number}",
+                    template,
+                    it_support_context,
+                    [access_request.user.email],
+                    is_reply=False
+                )
+                
+                if result:
+                    print(f"✅ USER EMAIL SUCCESS with template: {template}")
+                    break
+                else:
+                    print(f"❌ USER EMAIL FAILED with template: {template}")
+            
+            # 📧 Send email to IT team
+            team_email = None
+            if access_request.resource and access_request.resource.resource_team_email:
+                team_email = access_request.resource.resource_team_email
+            else:
+                # Use your specific email as fallback
+                team_email = access_request.user.email  # Your email
+                print(f"⚠️ Using fallback email: {team_email}")
+            
+            print(f"📧 Preparing to send IT team email to: {team_email}")
+            
+            team_context = it_support_context.copy()
+            team_context['requester'] = team_context['user_name']
+            team_context['requester_employee_id'] = access_request.user.username
+            
+            # Try multiple team templates as fallback
+            print("📤 Attempting to send team email...")
+            team_templates = ['it_support_team.html', 'new_request_team.html']
+            
+            for template in team_templates:
+                print(f"🎨 Trying team template: {template}")
+                result = send_email_notification(
+                    access_request,
+                    f"Access Request {access_request.ticket_number}",
+                    template,
+                    team_context,
+                    [team_email],
+                    is_reply=True
+                )
+                
+                if result:
+                    print(f"✅ TEAM EMAIL SUCCESS with template: {template}")
+                    break
+                else:
+                    print(f"❌ TEAM EMAIL FAILED with template: {template}")
+            
         else:
+            # Regular access request (non-IT)
+            print("📧 Processing regular access request...")
             user_context = {
                 'ticket': access_request.ticket_number,
                 'user': access_request.user,
@@ -707,8 +1187,9 @@ def send_request_notification(access_request):
                 'duration': access_request.duration,
                 'approval_token_expiry': access_request.approval_token_expiry,
             }
-            print(f"Sending user email with context: {user_context}")
-            send_email_notification(
+            
+            # Send to user
+            user_result = send_email_notification(
                 access_request,
                 f"Access Request {access_request.ticket_number}",
                 'new_request_user.html',
@@ -716,38 +1197,43 @@ def send_request_notification(access_request):
                 [access_request.user.email],
                 is_reply=False
             )
-            print("Successfully sent email to user")
+            
+            if user_result:
+                print("✅ Regular access request user email sent")
+            else:
+                print("❌ Regular access request user email failed")
+
+            # Send to team
+            if access_request.resource and access_request.resource.resource_team_email:
+                team_context = user_context.copy()
+                team_context['requester'] = user_context['user_name']
+                team_result = send_email_notification(
+                    access_request,
+                    f"Access Request {access_request.ticket_number}",
+                    'new_request_team.html',
+                    team_context,
+                    [access_request.resource.resource_team_email],
+                    is_reply=True
+                )
+                
+                if team_result:
+                    print(f"✅ Regular access request team email sent to: {access_request.resource.resource_team_email}")
+                else:
+                    print(f"❌ Regular access request team email failed")
+            else:
+                print("❌ No resource team email found for regular access request")
 
     except Exception as e:
-        print(f"Failed to send user notification: {str(e)}")
-
-    try:
-        if access_request.request_type == 'IT':
-            team_context = it_support_context.copy()
-            team_context['requester'] = team_context['user_name']
-            send_email_notification(
-                access_request,
-                f"Access Request {access_request.ticket_number}",
-                'it_support_team.html',
-                team_context,
-                [getattr(access_request.resource, 'resource_team_email', 'default@example.com')],
-                is_reply=True
-            )
-        else:
-            team_context = user_context.copy()
-            team_context['requester'] = user_context['user_name']
-            send_email_notification(
-                access_request,
-                f"Access Request {access_request.ticket_number}",
-                'new_request_team.html',
-                team_context,
-                [getattr(access_request.resource, 'resource_team_email', 'default@example.com')],
-                is_reply=True
-            )
-        return True
-    except Exception as e:
-        print(f"Failed to send team notification: {str(e)}")
+        print(f"❌ CRITICAL ERROR in send_request_notification: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return False
+
+    print("🏁 send_request_notification completed")
+    return True
+
+
+
 
 
 def send_approval_request_notification(obj, notes):

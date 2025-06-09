@@ -159,6 +159,7 @@ class AccessRequestAdmin(admin.ModelAdmin):
 
         try:
             if is_new:
+                print("yes called")
                 send_request_notification(obj)
             elif change and old_status and old_status != obj.status:
                 notes = form.cleaned_data.get('justification', '')

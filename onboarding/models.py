@@ -166,7 +166,7 @@ class Employee(models.Model):
     relieving_experience_letters_collected = models.BooleanField(default=False, verbose_name="Relieving & Experience Letters")
     relieving_experience_letters_file = models.FileField(upload_to='documents/relieving_experience/', blank=True, null=True, verbose_name="Relieving & Experience Letters File")
     
-    appraisal_hike_letters_collected = models.BooleanField(default=False, verbose_name="Appraisal/Hike Letters")
+    appraisal_hike_letters_collected = models.BooleanField(default=False, verbose_name="Appraisal/Hike Letters ")
     appraisal_hike_letters_file = models.FileField(upload_to='documents/appraisal_hike/', blank=True, null=True, verbose_name="Appraisal/Hike Letters File")
     
     class Meta:
