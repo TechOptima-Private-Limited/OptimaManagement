@@ -36,16 +36,26 @@ ALLOWED_HOSTS = ['192.168.1.3','192.168.1.51','192.168.0.8','192.168.1.18', '192
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
 # Database
+# DATABASES = {
+#     'default': {
+#         # for PostgreSQL
+#         "ENGINE": "django.db.backends.postgresql",
+        
+#         'NAME': os.getenv('DB_NAME'),     # Database name
+#         'USER': os.getenv('DB_USER'),          # PostgreSQL username
+#         'PASSWORD': os.getenv('DB_PASSWORD'),      # PostgreSQL password
+#         'HOST': os.getenv('DB_HOST'),              # Database host
+#         'PORT': os.getenv('DB_PORT'),  
+#     }
+# }
 DATABASES = {
     'default': {
-        # for PostgreSQL
-        "ENGINE": "django.db.backends.postgresql",
-        
-        'NAME': os.getenv('DB_NAME'),     # Database name
-        'USER': os.getenv('DB_USER'),          # PostgreSQL username
-        'PASSWORD': os.getenv('DB_PASSWORD'),      # PostgreSQL password
-        'HOST': os.getenv('DB_HOST'),              # Database host
-        'PORT': os.getenv('DB_PORT'),  
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hr_management',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -141,7 +151,8 @@ INSTALLED_APPS = [
     'dashboard',
     'django_select2',
     'resource_requests.apps.ResourceRequestConfig',
-    
+    'onboarding.apps.OnboardingConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -205,9 +216,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
+# STATIC_ROOT = BASE_DIR / "staticfiles"  # ✅ use a clean folder name
+
 STATICFILES_DIRS = [
     BASE_DIR / "assets/static",
     BASE_DIR / "resource_requests/static",
+    BASE_DIR / "resource_management/static",
 ]
 
 MEDIA_URL = 'media/'
@@ -418,7 +432,7 @@ CKEDITOR_5_CONFIGS = {
 }
 
 DOMAIN_NAME = os.getenv('SITE_URL')
-
+# DOMAIN_NAME = 'http://127.0.0.1:8000'
 ADMIN_SITE_HEADER = "Optima CMS"
 ADMIN_SITE_TITLE = "Optima CMS"
 ADMIN_INDEX_TITLE = "Welcome to Optima CMS"

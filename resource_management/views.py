@@ -9,6 +9,9 @@ from django.contrib.auth.decorators import login_required
 from .models import *
 from .serializers import *
 from .utils import send_request_notification, send_status_notification, send_email_notification, get_approval_urls
+import base64
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 @login_required
 def resource_owner_dashboard(request):
@@ -205,8 +208,32 @@ class AccessRequestViewSet(viewsets.ModelViewSet):
         return AccessRequest.objects.filter(user=user)
 
     def perform_create(self, serializer):
+        print("perform_create called") 
         instance = serializer.save(user=self.request.user)
         send_request_notification(instance)
+
+    @action(detail=False, methods=['post'])
+    def upload_image(self, request):
+        try:
+            image_data = request.data.get('image')
+            filename = request.data.get('filename')
+            if not image_data or not filename:
+                return Response({'error': 'Image data or filename missing.'}, status=400)
+            if ';base64,' not in image_data:
+                return Response({'error': 'Invalid image data format.'}, status=400)
+            format, imgstr = image_data.split(';base64,')
+            ext = format.split('/')[-1]  # e.g., 'png', 'jpeg'
+            if not ext or ext.lower() not in ['jpg', 'jpeg', 'png', 'gif']:
+                return Response({'error': 'Unsupported image format.'}, status=400)
+            # Save the file
+            data = ContentFile(base64.b64decode(imgstr))
+            file_path = f'page_images/{filename}'
+            saved_path = default_storage.save(file_path, data)
+            # Return full media URL
+            image_url = default_storage.url(saved_path)
+            return Response({'url': image_url})
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):

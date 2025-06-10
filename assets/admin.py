@@ -71,15 +71,189 @@ class AssetTypeAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     search_fields = ('name', 'tag_prefix')
 
+# @admin.register(Asset)
+# class AssetAdmin(admin.ModelAdmin):
+#     form = AssetForm
+#     list_display = ('asset_tag', 'name', 'asset_type', 'assigned_employee', 'status', 'is_active')
+#     list_filter = ('asset_type', 'status', 'is_active')
+#     search_fields = ('asset_tag', 'name', 'serial_number', 'assignments__employee__username', 
+#                      'assignments__employee__first_name', 'assignments__employee__last_name')
+    
+#     # Add fieldsets to organize the form and show the assignment field
+#     fieldsets = (
+#         ('Basic Information', {
+#             'fields': ('asset_type', 'name', 'asset_tag', 'serial_number', 'status', 'is_active')
+#         }),
+#         ('Current Assignment', {
+#             'fields': ('currently_assigned_to',),
+#             'description': 'Current assignment information (read-only). Use "Asset assignments" menu to assign/reassign assets.',
+#             'classes': ('collapse',)
+#         }),
+#         ('Additional Details', {
+#             'fields': ('custom_attributes',),
+#             'classes': ('collapse',)
+#         }),
+#         ('Images', {
+#             'fields': ('image_before', 'image_after'),
+#             'classes': ('collapse',)
+#         }),
+#     )
+    
+#     inlines = [AssetHistoryInline]
+#     actions = ['mark_as_damaged', 'mark_as_available']
+
+#     def assigned_employee(self, obj):
+#         """Display the employee who currently has this asset assigned"""
+#         # Get active assignment (assignment without a return record)
+#         current_assignment = obj.assignments.filter(
+#             returns__isnull=True
+#         ).first()
+        
+#         if current_assignment:
+#             employee = current_assignment.employee
+#             if employee.first_name and employee.last_name:
+#                 full_name = f"{employee.first_name} {employee.last_name}"
+#                 return f"{full_name} ({employee.username})"
+#             elif employee.first_name:
+#                 return f"{employee.first_name} ({employee.username})"
+#             return employee.username
+#         return "-"
+    
+#     assigned_employee.short_description = "Assigned To"
+#     assigned_employee.admin_order_field = 'assignments__employee__last_name'
+
+#     def get_queryset(self, request):
+#         """Optimize queryset to reduce database queries"""
+#         queryset = super().get_queryset(request)
+#         return queryset.select_related('asset_type').prefetch_related(
+#             'assignments__employee',
+#             'assignments__returns'
+#         )
+
+#     def mark_as_damaged(self, request, queryset):
+#         for asset in queryset:
+#             if asset.status != 'DAMAGED':
+#                 asset.status = 'DAMAGED'
+#                 asset.save()
+#                 AssetHistory.objects.create(
+#                     asset=asset,
+#                     action="Marked as Damaged",
+#                     performed_by=request.user,
+#                 )
+#         self.message_user(request, "Selected assets marked as damaged.")
+#     mark_as_damaged.short_description = "Mark selected assets as damaged"
+
+#     def mark_as_available(self, request, queryset):
+#         for asset in queryset:
+#             if asset.status != 'AVAILABLE':
+#                 asset.status = 'AVAILABLE'
+#                 asset.save()
+#                 AssetHistory.objects.create(
+#                     asset=asset,
+#                     action="Marked as Available",
+#                     performed_by=request.user,
+#                 )
+#         self.message_user(request, "Selected assets marked as available.")
+#     mark_as_available.short_description = "Mark selected assets as available"
+# In assets/admin.py - Enhanced assigned_employee method
+
 @admin.register(Asset)
 class AssetAdmin(admin.ModelAdmin):
     form = AssetForm
-    list_display = ('asset_tag', 'name', 'asset_type', 'status', 'is_active')
+    list_display = ('asset_tag', 'name', 'asset_type', 'assigned_employee', 'status', 'is_active')
     list_filter = ('asset_type', 'status', 'is_active')
-    search_fields = ('asset_tag', 'name', 'serial_number')
+    search_fields = ('asset_tag', 'name', 'serial_number', 'assignments__employee__username', 
+                     'assignments__employee__first_name', 'assignments__employee__last_name', 
+                     'assignments__employee__email')
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('asset_type', 'name', 'asset_tag', 'serial_number', 'status', 'is_active')
+        }),
+        ('Current Assignment', {
+            'fields': ('currently_assigned_to',),
+            'description': 'Current assignment information (read-only). Use "Asset assignments" menu to assign/reassign assets.',
+            'classes': ('collapse',)
+        }),
+        ('Additional Details', {
+            'fields': ('custom_attributes',),
+            'classes': ('collapse',)
+        }),
+        ('Images', {
+            'fields': ('image_before', 'image_after'),
+            'classes': ('collapse',)
+        }),
+    )
+    
     inlines = [AssetHistoryInline]
-
     actions = ['mark_as_damaged', 'mark_as_available']
+
+    def assigned_employee(self, obj):
+        """Display the employee with first/last name who currently has this asset assigned"""
+        current_assignment = obj.assignments.filter(returns__isnull=True).first()
+        
+        if current_assignment:
+            employee = current_assignment.employee
+            
+            # Try to get full name from first_name and last_name
+            if employee.first_name and employee.last_name:
+                full_name = f"{employee.first_name} {employee.last_name}"
+                return f"{full_name} ({employee.username})"
+            elif employee.first_name:
+                return f"{employee.first_name} ({employee.username})"
+            else:
+                # If no first/last name, try to derive from email or username
+                return self.get_display_name_from_username(employee)
+        
+        return "-"
+    
+    def get_display_name_from_username(self, employee):
+        """Extract display name from username or email"""
+        # If email exists, try to extract name from email
+        if employee.email:
+            email_part = employee.email.split('@')[0]
+            # Try to split by common separators
+            if '.' in email_part:
+                parts = email_part.split('.')
+                if len(parts) >= 2:
+                    first_name = parts[0].title()
+                    last_name = parts[1].title()
+                    return f"{first_name} {last_name} ({employee.username})"
+            elif '_' in email_part:
+                parts = email_part.split('_')
+                if len(parts) >= 2:
+                    first_name = parts[0].title()
+                    last_name = parts[1].title()
+                    return f"{first_name} {last_name} ({employee.username})"
+        
+        # If username has separators, try to extract names
+        username = employee.username
+        if '.' in username:
+            parts = username.split('.')
+            if len(parts) >= 2:
+                first_name = parts[0].title()
+                last_name = parts[1].title()
+                return f"{first_name} {last_name} ({username})"
+        elif '_' in username:
+            parts = username.split('_')
+            if len(parts) >= 2:
+                first_name = parts[0].title()
+                last_name = parts[1].title()
+                return f"{first_name} {last_name} ({username})"
+        
+        # If no pattern found, just return username
+        return username
+    
+    assigned_employee.short_description = "Assigned To"
+    assigned_employee.admin_order_field = 'assignments__employee__last_name'
+
+    def get_queryset(self, request):
+        """Optimize queryset to reduce database queries"""
+        queryset = super().get_queryset(request)
+        return queryset.select_related('asset_type').prefetch_related(
+            'assignments__employee',
+            'assignments__returns'
+        )
 
     def mark_as_damaged(self, request, queryset):
         for asset in queryset:
@@ -106,7 +280,6 @@ class AssetAdmin(admin.ModelAdmin):
                 )
         self.message_user(request, "Selected assets marked as available.")
     mark_as_available.short_description = "Mark selected assets as available"
-
 @admin.register(AssetAssignment)
 class AssetAssignmentAdmin(admin.ModelAdmin):
     form = AssetAssignmentForm

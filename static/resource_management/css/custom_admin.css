@@ -1,0 +1,68 @@
+/* Apply inline layout to all form rows */
+.form-row {
+    display: flex; /* Use flex for consistent inline layout */
+    align-items: center; /* Vertically center align labels and inputs */
+    margin-bottom: 1rem; /* Match admin row spacing */
+    padding-left: 0 !important; /* Remove any left padding to align with edge */
+    margin-left: 0 !important; /* Remove any left margin to align with edge */
+}
+
+.form-row label {
+    flex: 0 0 auto; /* Prevent label from shrinking or growing */
+    width: 120px; /* Fixed width for consistency */
+    margin: 0 0.5rem 0 0; /* Right margin for space between label and input, matching admin default */
+    text-align: right; /* Align label text to the right */
+    white-space: nowrap; /* Prevent label wrapping */
+    vertical-align: middle; /* Align vertically with input */
+}
+
+.form-row .select2-container,
+.form-row input,
+.form-row .django-ckeditor-5 {
+    flex: 1; /* Allow inputs to take remaining space */
+    width: auto !important; /* Override Select2 full-width default */
+    max-width: 300px; /* Limit input width for control */
+    vertical-align: middle; /* Align vertically with label */
+}
+
+.form-row .select2-container .select2-selection {
+    height: 34px; /* Match Django admin input height */
+    line-height: 34px; /* Ensure text aligns vertically */
+    padding: 0 8px; /* Match admin input padding */
+    box-sizing: border-box; /* Include padding in height calculation */
+}
+
+/* Ensure the fieldset and container align to the left */
+fieldset.module {
+    padding-left: 0 !important; /* Remove fieldset padding */
+    margin-left: 0 !important; /* Remove fieldset margin */
+}
+
+div.aligned label {
+    margin-left: 0 !important; /* Remove any additional label margin */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .form-row {
+        display: block; /* Stack on small screens */
+    }
+    .form-row label {
+        display: block; /* Stack label above input */
+        text-align: left;
+        margin: 0 0 0.25rem 0; /* Reset margin for vertical layout */
+        width: auto; /* Allow label to adjust */
+    }
+    .form-row .select2-container,
+    .form-row input,
+    .form-row .django-ckeditor-5 {
+        display: block; /* Stack input below label */
+        width: 100% !important; /* Full width on mobile */
+        max-width: none; /* Remove max-width constraint */
+    }
+}
+
+/* Override any inherited admin padding to align fields */
+.form-content {
+    padding-left: 0 !important; /* Remove content padding */
+}

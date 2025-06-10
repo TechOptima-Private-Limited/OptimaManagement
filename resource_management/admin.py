@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
+
 from .models import *
 from .utils import send_request_notification, send_email_notification, send_status_notification, send_final_approval_notification
 from .forms import CustomUserCreationForm, AccessRequestForm  # Import AccessRequestForm from forms.py
@@ -57,11 +58,17 @@ class AccessHistoryInline(admin.TabularInline):
 @admin.register(AccessRequest)
 class AccessRequestAdmin(admin.ModelAdmin):
     form = AccessRequestForm  # Use the form from forms.py
-    list_display = ('ticket_number', 'user', 'resource', 'access_level', 'priority', 'status', 'requested_at', 'expires_at', 'assigned_to')
-    list_filter = ('status', 'priority', 'resource__resource_type', 'access_level', 'assigned_to')
+    list_display = ('ticket_number', 'user', 'request_type','resource', 'access_level','justification', 'priority', 'status', 'requested_at', 'expires_at', 'assigned_to')
+    list_filter = ('status', 'priority', 'request_type','resource__resource_type', 'access_level', 'assigned_to')
     search_fields = ('ticket_number', 'user__username', 'resource__name', 'assigned_to__username')
     readonly_fields = ('ticket_number', 'requested_at')
     inlines = [AccessHistoryInline]
+
+    class Media:
+        js = ('resource_management/js/hide_fields.js',)
+        css = {
+            'all': ('resource_management/css/custom_admin.css',)
+        }
 
     def get_form(self, request, obj=None, **kwargs):
         Form = super().get_form(request, obj, **kwargs)
@@ -74,7 +81,7 @@ class AccessRequestAdmin(admin.ModelAdmin):
     def get_fields(self, request, obj=None):
         if not request.user.is_superuser and request.user.email not in Resource.objects.values_list('resource_team_email', flat=True) and (not obj or obj.assigned_to != request.user):
             print("Returning limited fields for employee in get_fields")
-            return ['resource', 'access_level', 'priority', 'justification', 'duration']
+            return ['request_type', 'resource_type', 'resource', 'access_level', 'priority', 'justification', 'duration']
         fields = super().get_fields(request, obj)
         print(f"Returning all fields for SuperUser, resource owner, or assignee: {fields}")
         return fields
@@ -152,6 +159,7 @@ class AccessRequestAdmin(admin.ModelAdmin):
 
         try:
             if is_new:
+                print("yes called")
                 send_request_notification(obj)
             elif change and old_status and old_status != obj.status:
                 notes = form.cleaned_data.get('justification', '')
