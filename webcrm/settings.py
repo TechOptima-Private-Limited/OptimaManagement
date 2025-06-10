@@ -36,28 +36,28 @@ ALLOWED_HOSTS = ['192.168.1.3','192.168.1.51','192.168.0.8','192.168.1.18', '192
 CSRF_TRUSTED_ORIGINS = ['https://backend.techoptima.ai', 'https://helpdesk.techoptima.ai']
 
 # Database
-# DATABASES = {
-#     'default': {
-#         # for PostgreSQL
-#         "ENGINE": "django.db.backends.postgresql",
-        
-#         'NAME': os.getenv('DB_NAME'),     # Database name
-#         'USER': os.getenv('DB_USER'),          # PostgreSQL username
-#         'PASSWORD': os.getenv('DB_PASSWORD'),      # PostgreSQL password
-#         'HOST': os.getenv('DB_HOST'),              # Database host
-#         'PORT': os.getenv('DB_PORT'),  
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hr_management',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        # for PostgreSQL
+        "ENGINE": "django.db.backends.postgresql",
+        
+        'NAME': os.getenv('DB_NAME'),     # Database name
+        'USER': os.getenv('DB_USER'),          # PostgreSQL username
+        'PASSWORD': os.getenv('DB_PASSWORD'),      # PostgreSQL password
+        'HOST': os.getenv('DB_HOST'),              # Database host
+        'PORT': os.getenv('DB_PORT'),  
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'hr_management',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
