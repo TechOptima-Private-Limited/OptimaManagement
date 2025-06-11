@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IT Support Ticket Created</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .header { 
+            background-color: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 5px; 
+            text-align: center; 
+        }
+        .content { 
+            padding: 20px; 
+        }
+        .ticket-info { 
+            background-color: #e9ecef; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 15px 0; 
+        }
+        .justification-content {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            margin: 15px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .justification-content img {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 10px auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .justification-content p {
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+        .footer { 
+            color: #666; 
+            font-size: 12px; 
+            margin-top: 30px; 
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .ticket-number {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🎫 IT Support Ticket Created</h2>
+        <p>Your request has been submitted successfully</p>
+    </div>
+    
+    <div class="content">
+        <p>Dear <strong>{{ user_name }}</strong>,</p>
+        
+        <p>Your IT support ticket has been successfully created and assigned to our IT team.</p>
+        
+        <div class="ticket-info">
+            <h3>📋 Ticket Details:</h3>
+            <p><strong>Ticket Number:</strong> <span class="ticket-number">{{ ticket }}</span></p>
+            <p><strong>Priority:</strong> {{ priority }}</p>
+            <p><strong>Duration:</strong> {{ duration }} days</p>
+            <p><strong>Status:</strong> Pending Review</p>
+        </div>
+        
+        {% if justification %}
+        <div class="justification-content">
+            <h4>📝 Request Description:</h4>
+            <div>{{ justification|safe }}</div>
+        </div>
+        {% endif %}
+        
+        <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745; margin: 20px 0;">
+            <h4 style="color: #155724; margin-top: 0;">🚀 What happens next?</h4>
+            <ul style="color: #155724;">
+                <li>Our IT team will review your request within 24 hours</li>
+                <li>You'll receive updates via email as your ticket progresses</li>
+                <li>For urgent issues, please call our IT helpdesk directly</li>
+            </ul>
+        </div>
+        
+        <p>You can reference your ticket using the number <strong>{{ ticket }}</strong> in any future communications.</p>
+        
+        <p>Thank you for using our IT support system!</p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <p><em>Need immediate assistance? Contact our IT helpdesk at ext. 1234</em></p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>This is an automated message from the Optima Management Hub.</p>
+        <p>Please do not reply directly to this email. For questions, contact your IT administrator.</p>
+    </div>
+</body>
+</html>
