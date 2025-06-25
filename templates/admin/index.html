@@ -4,63 +4,477 @@
 {% block extrastyle %}{{ block.super }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
 <style>
-    #content-main { padding: 20px; background: #fff; }
-    .dashboard-toggle { margin-bottom: 20px; }
+    /* Light Theme (Professional & Clean) */
+    :root {
+        --dashboard-primary: #2F80ED;
+        --dashboard-secondary: #56CCF2;
+        --dashboard-accent: #800020;
+        --dashboard-text: #333333;
+        --dashboard-bg: #F9FAFB;
+        --dashboard-card-bg: rgba(255, 255, 255, 0.9);
+        --dashboard-glass-bg: rgba(255, 255, 255, 0.8);
+        --dashboard-glass-border: #2F80ED;
+        --dashboard-shadow: rgba(47, 128, 237, 0.15);
+        --dashboard-chart-text: #333333;
+        --dashboard-chart-grid: rgba(51, 51, 51, 0.1);
+        --dashboard-card-text: #2F80ED;
+        --dashboard-card-border: #2F80ED;
+    }
+    
+    /* Dark Theme (Modern & Stylish) */
+    [data-theme="dark"],
+    .theme-dark {
+        --dashboard-primary: #0F62FE;
+        --dashboard-secondary: #393939;
+        --dashboard-accent: #DC143C;
+        --dashboard-text: #440808;
+        --dashboard-bg: #121212;
+        --dashboard-card-bg: rgba(57, 57, 57, 0.9);
+        --dashboard-glass-bg: rgba(57, 57, 57, 0.8);
+        --dashboard-glass-border: rgba(15, 98, 254, 0.3);
+        --dashboard-shadow: rgba(15, 98, 254, 0.2);
+        --dashboard-chart-text: #333333;
+        --dashboard-chart-grid: rgba(224, 224, 224, 0.1);
+        --dashboard-card-text: #440808;
+        --dashboard-card-border: #0F62FE;
+    }
+    
+    /* Auto-detect system theme */
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+            --dashboard-primary: #0F62FE;
+            --dashboard-secondary: #393939;
+            --dashboard-accent: #DC143C;
+            --dashboard-text: #440808;
+            --dashboard-bg: #121212;
+            --dashboard-card-bg: rgba(57, 57, 57, 0.9);
+            --dashboard-glass-bg: rgba(57, 57, 57, 0.8);
+            --dashboard-glass-border: rgba(15, 98, 254, 0.3);
+            --dashboard-shadow: rgba(15, 98, 254, 0.2);
+            --dashboard-chart-text: #333333;
+            --dashboard-chart-grid: rgba(224, 224, 224, 0.1);
+            --dashboard-card-text: #440808;
+            --dashboard-card-border: #0F62FE;
+        }
+    }
+    
+    body {
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--dashboard-bg) !important;
+        color: var(--dashboard-text) !important;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Force background update for main content area */
+    #content-main { 
+        padding: 20px;
+        background: var(--dashboard-bg) !important;
+        max-width: 1400px;
+        margin: 0 auto;
+        min-height: 100vh;
+        transition: background-color 0.3s ease;
+    }
+    
+    /* Ensure main container follows theme */
+    .main,
+    #main {
+        background: var(--dashboard-bg) !important;
+        transition: background-color 0.3s ease;
+    }
+    
+    /* Dashboard Toggle Buttons */
+    .dashboard-toggle { 
+        margin-bottom: 25px;
+        background: var(--dashboard-glass-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        padding: 6px;
+        display: inline-flex;
+        box-shadow: 0 4px 16px var(--dashboard-shadow);
+        border: 1px solid var(--dashboard-glass-border);
+    }
+    
     .dashboard-toggle button {
-        margin-right: 10px;
-        padding: 5px 15px;
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 3px;
+        margin: 0;
+        margin-right: 6px;
+        padding: 10px 20px;
+        background: transparent;
+        border: none;
+        border-radius: 6px;
         cursor: pointer;
+        color: var(--dashboard-text);
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        position: relative;
     }
+    
+    .dashboard-toggle button:last-child {
+        margin-right: 0;
+    }
+    
+    .dashboard-toggle button:hover {
+        background: var(--dashboard-glass-border);
+        transform: translateY(-1px);
+    }
+    
+    .dashboard-toggle button.active {
+        background: var(--dashboard-primary);
+        color: white;
+        box-shadow: 0 2px 8px var(--dashboard-shadow);
+        transform: translateY(-1px);
+    }
+    
+    /* Tab Buttons */
     .tab-buttons {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
     }
+    
     .tab-buttons button {
-        margin-right: 10px;
-        padding: 5px 15px;
-        background: #f0f0f0;
-        border: 1px solid #ddd;
-        border-radius: 3px;
+        padding: 12px 24px;
+        background: var(--dashboard-glass-bg);
+        border: 1px solid var(--dashboard-glass-border);
+        border-radius: 8px;
         cursor: pointer;
+        color: var(--dashboard-text);
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
     }
+    
+    .tab-buttons button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--dashboard-shadow);
+        border-color: var(--dashboard-primary);
+        background: var(--dashboard-glass-border);
+    }
+    
     .tab-buttons button.active {
-        background: #3498db;
-        color: #fff;
+        background: var(--dashboard-primary);
+        color: white;
+        border-color: var(--dashboard-primary);
+        box-shadow: 0 4px 12px var(--dashboard-shadow);
+        transform: translateY(-2px);
     }
+    
+    /* Dashboard Grid */
     .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
+    
+    /* Dashboard Cards - Light Theme with Blue Borders and Blue Text */
     .dashboard-card {
-        border: 1px solid #ddd;
-        padding: 15px;
+        background: var(--dashboard-card-bg);
+        backdrop-filter: blur(15px);
+        border: 3px solid var(--dashboard-card-border);
+        padding: 20px;
         text-align: center;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px var(--dashboard-shadow);
+        color: var(--dashboard-card-text);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    .dashboard-chart { height: 200px; }
-    .hidden { display: none; }
-    .card-title { font-weight: bold; margin-bottom: 10px; }
-    .card-value { font-size: 1.5em; }
+    
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px var(--dashboard-shadow);
+        border-color: var(--dashboard-primary);
+    }
+    
+    .dashboard-chart { 
+        height: 200px; 
+        padding: 10px;
+    }
+    
+    .hidden { 
+        display: none !important; 
+    }
+    
+    .card-title { 
+        font-weight: 600; 
+        margin-bottom: 12px; 
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+        color: var(--dashboard-card-text);
+    }
+    
+    .card-value { 
+        font-size: 2.2em; 
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--dashboard-card-text);
+    }
 
-    /* Colorful card styles */
-    .card-computers { background: #e74c3c; } /* Red */
-    .card-software { background: #2ecc71; } /* Green */
-    .card-network { background: #3498db; } /* Blue */
-    .card-racks { background: #f1c40f; } /* Yellow */
-    .card-monitors { background: #e74c3c; } /* Red */
-    .card-licenses { background: #2ecc71; } /* Green */
-    .card-printers { background: #3498db; } /* Blue */
-    .card-pdus { background: #f1c40f; } /* Yellow */
-    .card-location { background: #9b59b6; } /* Purple */
-    .card-access { background: #e67e22; } /* Orange */
-    .card-asset { background: #1abc9c; } /* Teal */
-    .card-monitor { background: #34495e; } /* Dark Blue */
+    /* Metric Cards - Default styling for light theme */
+    .card-computers,
+    .card-software,
+    .card-network,
+    .card-racks,
+    .card-monitors,
+    .card-licenses,
+    .card-printers,
+    .card-pdus {
+        --card-accent: #FF4757;
+    }
+    
+    /* Chart Cards */
+    .card-location,
+    .card-access,
+    .card-asset,
+    .card-monitor {
+        --card-accent: var(--dashboard-primary);
+    }
+    
+    /* Dark theme specific card styling - Red background cards with white text */
+    [data-theme="dark"] .card-computers,
+    [data-theme="dark"] .card-software,
+    [data-theme="dark"] .card-network,
+    [data-theme="dark"] .card-racks,
+    [data-theme="dark"] .card-monitors,
+    [data-theme="dark"] .card-licenses,
+    [data-theme="dark"] .card-printers,
+    [data-theme="dark"] .card-pdus,
+    .theme-dark .card-computers,
+    .theme-dark .card-software,
+    .theme-dark .card-network,
+    .theme-dark .card-racks,
+    .theme-dark .card-monitors,
+    .theme-dark .card-licenses,
+    .theme-dark .card-printers,
+    .theme-dark .card-pdus {
+        background: linear-gradient(135deg, #FF4757, #FF3742);
+        color: white;
+        border-color: #FF4757;
+    }
+    
+    [data-theme="dark"] .card-computers .card-title,
+    [data-theme="dark"] .card-computers .card-value,
+    [data-theme="dark"] .card-software .card-title,
+    [data-theme="dark"] .card-software .card-value,
+    [data-theme="dark"] .card-network .card-title,
+    [data-theme="dark"] .card-network .card-value,
+    [data-theme="dark"] .card-racks .card-title,
+    [data-theme="dark"] .card-racks .card-value,
+    [data-theme="dark"] .card-monitors .card-title,
+    [data-theme="dark"] .card-monitors .card-value,
+    [data-theme="dark"] .card-licenses .card-title,
+    [data-theme="dark"] .card-licenses .card-value,
+    [data-theme="dark"] .card-printers .card-title,
+    [data-theme="dark"] .card-printers .card-value,
+    [data-theme="dark"] .card-pdus .card-title,
+    [data-theme="dark"] .card-pdus .card-value,
+    .theme-dark .card-computers .card-title,
+    .theme-dark .card-computers .card-value,
+    .theme-dark .card-software .card-title,
+    .theme-dark .card-software .card-value,
+    .theme-dark .card-network .card-title,
+    .theme-dark .card-network .card-value,
+    .theme-dark .card-racks .card-title,
+    .theme-dark .card-racks .card-value,
+    .theme-dark .card-monitors .card-title,
+    .theme-dark .card-monitors .card-value,
+    .theme-dark .card-licenses .card-title,
+    .theme-dark .card-licenses .card-value,
+    .theme-dark .card-printers .card-title,
+    .theme-dark .card-printers .card-value,
+    .theme-dark .card-pdus .card-title,
+    .theme-dark .card-pdus .card-value {
+        color: white;
+    }
+    
+    /* Dark theme chart cards with white background */
+    [data-theme="dark"] .card-location,
+    [data-theme="dark"] .card-access,
+    [data-theme="dark"] .card-asset,
+    [data-theme="dark"] .card-monitor,
+    .theme-dark .card-location,
+    .theme-dark .card-access,
+    .theme-dark .card-asset,
+    .theme-dark .card-monitor {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333333;
+        border-color: #333333;
+    }
+    
+    [data-theme="dark"] .card-location .card-title,
+    [data-theme="dark"] .card-access .card-title,
+    [data-theme="dark"] .card-asset .card-title,
+    [data-theme="dark"] .card-monitor .card-title,
+    .theme-dark .card-location .card-title,
+    .theme-dark .card-access .card-title,
+    .theme-dark .card-asset .card-title,
+    .theme-dark .card-monitor .card-title {
+        color: #333333;
+    }
+    
+    /* Recent Actions Styling */
+    .module {
+        background: var(--dashboard-card-bg);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--dashboard-glass-border);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 16px var(--dashboard-shadow);
+    }
+    
+    .module h2, .module h3 {
+        color: var(--dashboard-text);
+        font-weight: 600;
+        margin-bottom: 16px;
+        background: none;
+        padding: 0;
+    }
+    
+    .module p {
+        color: var(--dashboard-text);
+    }
+    
+    .actionlist {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .actionlist li {
+        background: var(--dashboard-glass-bg);
+        margin-bottom: 10px;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 3px solid var(--dashboard-primary);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .actionlist li:hover {
+        background: var(--dashboard-glass-border);
+        transform: translateX(3px);
+        box-shadow: 0 2px 8px var(--dashboard-shadow);
+    }
+    
+    .actionlist li a {
+        color: var(--dashboard-primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .actionlist li a:hover {
+        color: var(--dashboard-secondary);
+    }
+    
+    .mini.quiet {
+        color: var(--dashboard-text);
+        opacity: 0.7;
+        font-size: 12px;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        #content-main {
+            padding: 15px;
+        }
+        
+        .dashboard-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        #content-main {
+            padding: 12px;
+        }
+        
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .tab-buttons {
+            flex-direction: column;
+        }
+        
+        .tab-buttons button {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .dashboard-toggle {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .card-value {
+            font-size: 1.8em;
+        }
+        
+        .dashboard-chart {
+            height: 180px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        #content-main {
+            padding: 10px;
+        }
+        
+        .dashboard-card {
+            padding: 15px;
+        }
+        
+        .card-value {
+            font-size: 1.6em;
+        }
+        
+        .card-title {
+            font-size: 11px;
+        }
+        
+        .dashboard-chart {
+            height: 160px;
+        }
+    }
+    
+    /* Animation for page load */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .dashboard-card {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+    
+    .dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+    .dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+    .dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+    .dashboard-card:nth-child(4) { animation-delay: 0.4s; }
+    .dashboard-card:nth-child(5) { animation-delay: 0.5s; }
+    .dashboard-card:nth-child(6) { animation-delay: 0.6s; }
+    .dashboard-card:nth-child(7) { animation-delay: 0.7s; }
+    .dashboard-card:nth-child(8) { animation-delay: 0.8s; }
+    
+    /* Ensure proper contrast in both light and dark modes */
+    @media (prefers-color-scheme: dark) {
+        .card-title {
+            opacity: 0.9;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -77,6 +491,11 @@
         if (toggle && dashboard && recentActions) {
             toggle.querySelectorAll('button').forEach(btn => {
                 btn.addEventListener('click', function() {
+                    // Remove active class from all toggle buttons
+                    toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
                     if (this.textContent === 'Dashboard') {
                         dashboard.classList.remove('hidden');
                         recentActions.classList.add('hidden');
@@ -86,6 +505,9 @@
                     }
                 });
             });
+            
+            // Set default active state for Dashboard button
+            toggle.querySelector('button').classList.add('active');
         }
 
         tabButtons.forEach(button => {
@@ -97,107 +519,338 @@
             });
         });
         // Activate the first tab by default
-        tabButtons[0].classList.add('active');
-        tabContents[0].classList.remove('hidden');
+        if (tabButtons.length > 0) {
+            tabButtons[0].classList.add('active');
+            tabContents[0].classList.remove('hidden');
+        }
 
-        // Chart.js initialization with dynamic data
+        // Enhanced Chart.js initialization with theme-aware styling
         if (dashboard) {
+            // Detect current theme more reliably
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' ||
+                             document.body.classList.contains('dark-theme') ||
+                             document.body.classList.contains('theme-dark') ||
+                             (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            
+            // Theme-aware text colors for charts
+            const chartTextColor = isDarkMode ? '#440808' : '#333333'; // Light gray for dark theme, dark gray for light theme
+            const gridColor = isDarkMode ? 'rgba(224, 224, 224, 0.1)' : 'rgba(51, 51, 51, 0.1)';
+            const tooltipBgColor = isDarkMode ? 'rgba(57, 57, 57, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+            const tooltipTextColor = isDarkMode ? '#440808' : '#333333';
+            const borderColor = isDarkMode ? '#0F62FE' : '#2F80ED';
+            
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: chartTextColor, // Theme-aware text color
+                            font: {
+                                size: 12,
+                                family: 'Roboto',
+                                weight: 'bold'
+                            },
+                            padding: 15,
+                            boxWidth: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: tooltipBgColor,
+                        titleColor: tooltipTextColor,
+                        bodyColor: tooltipTextColor,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        borderColor: borderColor,
+                        borderWidth: 1
+                    }
+                }
+            };
+
+            const barChartOptions = {
+                ...chartOptions,
+                scales: {
+                    y: {
+                        ticks: {
+                            color: chartTextColor, // Theme-aware text color
+                            font: {
+                                family: 'Roboto',
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: chartTextColor, // Theme-aware text color
+                            font: {
+                                family: 'Roboto',
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        }
+                    }
+                }
+            };
+
+            // Consistent color palette for all themes - Orange, Purple, Blue
+            const chartColors = {
+                orange: '#FFA502',
+                purple: '#A55EEA', 
+                blue: '#3742FA',
+                red: '#FF4757',
+                yellow: '#FFC312',
+                // Chart specific colors
+                pending: '#A55EEA',
+                approved: '#FFA502',
+                rejected: '#FF4757',
+                onsite: '#FFA502',
+                nearShore: '#A55EEA', 
+                offshore: '#3742FA'
+            };
+
             const locationData = {
                 labels: Object.keys({{ dashboard_data.resource_request.by_location|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.resource_request.by_location|safe }}),
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                    backgroundColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderWidth: 2,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('resourceLocationChart'), {
                 type: 'pie',
-                data: locationData
+                data: locationData,
+                options: chartOptions
             });
 
             const deliveryStatusData = {
                 labels: Object.keys({{ dashboard_data.resource_request.delivery_status_dist|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.resource_request.delivery_status_dist|safe }}),
-                    backgroundColor: ['#FF6384', '#2ecc71', '#e74c3c']
+                    backgroundColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderWidth: 5,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('deliveryStatusChart'), {
                 type: 'pie',
-                data: deliveryStatusData
+                data: deliveryStatusData,
+                options: chartOptions
             });
 
             const businessTypeData = {
                 labels: Object.keys({{ dashboard_data.resource_request.pmo_by_business_type|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.resource_request.pmo_by_business_type|safe }}),
-                    backgroundColor: ['#9b59b6', '#3498db', '#e67e22']
+                    backgroundColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderWidth: 5,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('businessTypeChart'), {
                 type: 'pie',
-                data: businessTypeData
+                data: businessTypeData,
+                options: chartOptions
             });
 
             const accessStatusData = {
                 labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
-                    backgroundColor: ['#FF6384', '#2ecc71', '#e74c3c']
+                    backgroundColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderWidth: 5,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('accessStatusChart'), {
                 type: 'pie',
-                data: accessStatusData
+                data: accessStatusData,
+                options: chartOptions
             });
 
             const accessDateData = {
                 labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_date|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.resource_management.access_requests_by_date|safe }}),
-                    backgroundColor: ['#e67e22']
+                    backgroundColor: chartColors.orange,
+                    borderColor: chartColors.orange,
+                    borderWidth: 2,
+                    hoverBackgroundColor: chartColors.orange,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('accessDateChart'), {
                 type: 'bar',
-                data: accessDateData
+                data: accessDateData,
+                options: barChartOptions
             });
 
             const assetStatusData = {
                 labels: Object.keys({{ dashboard_data.asset_management.assets_by_status|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.asset_management.assets_by_status|safe }}),
-                    backgroundColor: ['#3498db', '#1abc9c', '#e67e22', '#f1c40f']
+                    backgroundColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue,
+                        chartColors.red
+                    ],
+                    borderColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue,
+                        chartColors.red
+                    ],
+                    borderWidth: 2,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('assetStatusChart'), {
                 type: 'pie',
-                data: assetStatusData
+                data: assetStatusData,
+                options: chartOptions
             });
 
             const returnConditionData = {
                 labels: Object.keys({{ dashboard_data.asset_management.returned_assets_by_condition|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.asset_management.returned_assets_by_condition|safe }}),
-                    backgroundColor: ['#9b59b6', '#34495e', '#e74c3c']
+                    backgroundColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderColor: [
+                        chartColors.orange,
+                        chartColors.purple,
+                        chartColors.blue
+                    ],
+                    borderWidth: 2,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('returnConditionChart'), {
                 type: 'pie',
-                data: returnConditionData
+                data: returnConditionData,
+                options: chartOptions
             });
 
             const returnDateData = {
                 labels: Object.keys({{ dashboard_data.asset_management.return_by_date|safe }}),
                 datasets: [{
                     data: Object.values({{ dashboard_data.asset_management.return_by_date|safe }}),
-                    backgroundColor: ['#34495e']
+                    backgroundColor: chartColors.blue,
+                    borderColor: chartColors.blue,
+                    borderWidth: 2,
+                    hoverBackgroundColor: chartColors.blue,
+                    hoverBorderWidth: 3
                 }]
             };
             new Chart(document.getElementById('returnDateChart'), {
                 type: 'bar',
-                data: returnDateData
+                data: returnDateData,
+                options: barChartOptions
             });
         }
+        
+        // Listen for theme changes and update charts
+        const themeObserver = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && 
+                    (mutation.attributeName === 'data-theme' || mutation.attributeName === 'class')) {
+                    // Update background immediately
+                    document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
+                    document.getElementById('content-main').style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
+                    
+                    // Small delay to ensure CSS variables are updated, then reload charts
+                    setTimeout(() => {
+                        location.reload();
+                    }, 200);
+                }
+            });
+        });
+        
+        // Observe changes to html element and body
+        themeObserver.observe(document.documentElement, { 
+            attributes: true, 
+            attributeFilter: ['data-theme', 'class'] 
+        });
+        themeObserver.observe(document.body, { 
+            attributes: true, 
+            attributeFilter: ['class'] 
+        });
+        
+        // Also listen for system theme changes
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function() {
+                // Update background immediately
+                document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
+                document.getElementById('content-main').style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 200);
+            });
+        }
+        
+        // Force background update on load
+        setTimeout(() => {
+            document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
+            document.getElementById('content-main').style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
+        }, 100);
     });
 </script>
 {% endblock %}
@@ -223,7 +876,7 @@
                     <div class="card-title">Total Requests</div>
                     <div class="card-value">{{ dashboard_data.resource_request.total_requests }}</div>
                 </div>
-                <div class="dashboard-card card-software">
+                <div class="dashboard-card card-network">
                     <div class="card-title">Pending Deliveries</div>
                     <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.pending }}</div>
                 </div>
@@ -255,9 +908,13 @@
                     <div class="card-title">Total Access Requests</div>
                     <div class="card-value">{{ dashboard_data.resource_management.total_access_requests }}</div>
                 </div>
-                <div class="dashboard-card card-licenses">
+                <div class="dashboard-card card-monitors">
                     <div class="card-title">Pending Access</div>
-                    <div class="card-value">{% for status, count in dashboard_data.resource_management.access_requests_by_status.items %}{% if status == 'PENDING' %}{{ count }}{% endif %}{% endfor %}</div>
+                    <div class="card-value">
+                        {% for status, count in dashboard_data.resource_management.access_requests_by_status.items %}
+                            {% if status == 'PENDING' %}{{ count }}{% endif %}
+                        {% endfor %}{% if 'PENDING' not in dashboard_data.resource_management.access_requests_by_status.keys %}0{% endif %}
+                    </div>
                 </div>
                 <div class="dashboard-card card-printers">
                     <div class="card-title">Active Resources</div>
@@ -265,7 +922,11 @@
                 </div>
                 <div class="dashboard-card card-pdus">
                     <div class="card-title">Priority High</div>
-                    <div class="card-value">{% for priority, count in dashboard_data.resource_management.access_requests_by_priority.items %}{% if priority == 'HIGH' %}{{ count }}{% endif %}{% endfor %}</div>
+                    <div class="card-value">
+                        {% for priority, count in dashboard_data.resource_management.access_requests_by_priority.items %}
+                            {% if priority == 'HIGH' %}{{ count }}{% endif %}
+                        {% endfor %}{% if 'HIGH' not in dashboard_data.resource_management.access_requests_by_priority.keys %}0{% endif %}
+                    </div>
                 </div>
                 <div class="dashboard-card card-location dashboard-chart" style="display:none;">
                     <canvas id="resourceLocationChart"></canvas>
@@ -293,7 +954,11 @@
                 </div>
                 <div class="dashboard-card card-network">
                     <div class="card-title">Available Assets</div>
-                    <div class="card-value">{% for status, count in dashboard_data.asset_management.assets_by_status.items %}{% if status == 'AVAILABLE' %}{{ count }}{% endif %}{% endfor %}</div>
+                    <div class="card-value">
+                        {% for status, count in dashboard_data.asset_management.assets_by_status.items %}
+                            {% if status == 'AVAILABLE' %}{{ count }}{% endif %}
+                        {% endfor %}{% if 'AVAILABLE' not in dashboard_data.asset_management.assets_by_status.keys %}0{% endif %}
+                    </div>
                 </div>
                 <div class="dashboard-card card-racks">
                     <div class="card-title">Damaged Assets</div>
