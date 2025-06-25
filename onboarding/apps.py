@@ -5,5 +5,5 @@ class OnboardingConfig(AppConfig):
     name = 'onboarding'
     verbose_name = 'HR Management'
 
-#     def ready(self):
-#         import onboarding.signals  # 👈 this ensures the signal is registered
+    def ready(self):
+        import onboarding.signals  # 👈 this ensures the signal is registered

@@ -483,7 +483,7 @@ EMAIL_HOST_USER = 'no-reply@techoptima.ai'
 EMAIL_HOST_PASSWORD = 'G!556540298118om'
 DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
 EMAIL_DOMAIN = 'techoptima.ai' 
-
+IT_SUPPORT_EMAIL = 'support@techoptima.com'
 EMAIL_THREAD_ID = '1'
 SITE_URL = os.getenv('SITE_URL') 
 pmo_emails_str = os.getenv('PMO_EMAILS', '')
