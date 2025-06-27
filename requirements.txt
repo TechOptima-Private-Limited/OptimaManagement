@@ -42,3 +42,4 @@
     gunicorn
     django-select2 
     openpyxl
+    xhtml2pdf
