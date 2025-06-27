@@ -54,6 +54,8 @@ urlpatterns += i18n_patterns(
     path(settings.SECRET_CRM_PREFIX, include('tasks.urls')),
     path(settings.SECRET_ADMIN_PREFIX, admin.site.urls),
     path('resource-management/', include('resource_management.urls')),
+    path('onboarding/', include('onboarding.urls')),  # 👈 ADD THIS LINE
+    
     path('contact-form/<uuid:uuid>/', contact_form, name='contact_form'),
     path('api/', include('content.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),  
