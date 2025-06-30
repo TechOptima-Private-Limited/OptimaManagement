@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+# from .views import admin_user_assets_api
 
 app_name = 'onboarding'
 
@@ -12,4 +13,6 @@ urlpatterns = [
     
     # Success page
     path('success/', views.employee_onboarding_success, name='employee_onboarding_success'),
+
+    path('user-assets/<int:user_id>/', views.admin_user_assets_api, name='admin_user_assets_api'),
 ]

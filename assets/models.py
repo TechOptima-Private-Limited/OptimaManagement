@@ -47,6 +47,32 @@ class Asset(models.Model):
             models.Index(fields=['asset_tag']),
         ]
 
+
+class OffboardingAssetReturn(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='asset_offboarding_records')
+    returned_assets = models.ManyToManyField(Asset, blank=True)
+    
+    # Damaged assets file upload
+    damaged_assets_file = models.FileField(upload_to='offboarding/damaged_assets/', blank=True, null=True, verbose_name="Damaged Assets File")
+    
+    remarks = models.TextField(blank=True, null=True)
+    
+    # Add timestamp fields
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Offboarding Asset Return'
+        verbose_name_plural = 'Offboarding Asset Returns'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        if self.user.first_name or self.user.last_name:
+            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
+            return f"Asset Return for {full_name} (@{self.user.username})"
+        return f"Asset Return for @{self.user.username}"
+    
+    
 class AssetAssignment(models.Model):
     employee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
     assets = models.ManyToManyField(Asset, related_name='assignments')
