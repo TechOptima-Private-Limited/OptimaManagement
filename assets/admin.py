@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django import forms
-from .models import AssetType, Asset, AssetAssignment, AssetAssignmentImage, AssetReturn, AssetHistory, EmployeeStatus
+from .models import AssetType, Asset, AssetAssignment, AssetAssignmentImage, AssetReturn, AssetHistory, EmployeeStatus, OffboardingAssetReturn
 from .forms import AssetForm, AssetAssignmentForm, AssetReturnForm
 from .utils import send_asset_assignment_notification, send_asset_return_report
 
@@ -428,3 +428,125 @@ class EmployeeStatusAdmin(admin.ModelAdmin):
     list_display = ('employee', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('employee__username',)
+
+from django.contrib import admin
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from assets.models import AssetAssignment, Asset
+# from onboarding.models import Offboarding
+from django.contrib.auth.models import User
+
+# assets/admin.py - Add this simple admin
+class OffboardingAssetReturnAdmin(admin.ModelAdmin):
+    list_display = ['user_display', 'user_email', 'assets_status', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name', 'user__email']
+    list_display_links = ['user_display']
+    date_hierarchy = 'created_at'
+
+    readonly_fields = ['dynamic_asset_checkboxes']
+    exclude = ['returned_assets']  # Managed manually
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('user', 'dynamic_asset_checkboxes')
+        }),
+        ('Damaged Assets & Remarks', {
+            'fields': ('damaged_assets_file', 'remarks'),
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "user":
+            kwargs["queryset"] = User.objects.filter(is_active=True).order_by('username')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def user_display(self, obj):
+        if obj.user.first_name or obj.user.last_name:
+            full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()
+            return format_html('<strong>{}</strong><br><small style="color: #666;">@{}</small>', 
+                               full_name, obj.user.username)
+        return format_html('<strong>@{}</strong>', obj.user.username)
+    user_display.short_description = 'User'
+    user_display.admin_order_field = 'user__username'
+
+    def user_email(self, obj):
+        return obj.user.email or '—'
+    user_email.short_description = 'Email'
+    user_email.admin_order_field = 'user__email'
+
+    def assets_status(self, obj):
+        total = obj.returned_assets.count()
+        if total > 0:
+            return format_html('<span style="color: green;">✓ Returned {}</span>', total)
+        return format_html('<span style="color: red;">✗ None Returned</span>')
+    assets_status.short_description = 'Returned Assets'
+
+    def dynamic_asset_checkboxes(self, obj):
+        return mark_safe("""
+        <div id="returned-assets-container"><em>Select a user to load assigned assets.</em></div>
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userSelect = document.getElementById("id_user");
+            const container = document.getElementById("returned-assets-container");
+
+            function loadAssets(userId) {
+                if (!userId) {
+                    container.innerHTML = "<em>Select a user to load assigned assets.</em>";
+                    return;
+                }
+
+                fetch(`${window.location.origin}/onboarding/user-assets/${userId}/`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.assets && data.assets.length > 0) {
+                            let html = "<strong>Returned Assets:</strong><ul style='list-style:none; padding:0;'>";
+                            data.assets.forEach(asset => {
+                                html += `<li>
+                                    <label>
+                                        <input type="checkbox" name="returned_asset_${asset.id}" />
+                                        ${asset.type} - ${asset.name} (${asset.tag})
+                                    </label>
+                                </li>`;
+                            });
+                            html += "</ul>";
+                            container.innerHTML = html;
+                        } else {
+                            container.innerHTML = "<em>No assets assigned to this user.</em>";
+                        }
+                    })
+                    .catch(err => {
+                        container.innerHTML = "<em>Error loading assets.</em>";
+                        console.error(err);
+                    });
+            }
+
+            if (userSelect) {
+                userSelect.addEventListener("change", () => {
+                    loadAssets(userSelect.value);
+                });
+
+                if (userSelect.value) {
+                    loadAssets(userSelect.value);
+                }
+            }
+        });
+        </script>
+        """)
+
+    dynamic_asset_checkboxes.short_description = "Returned Assets"
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        returned_ids = [
+            int(k.replace("returned_asset_", ""))
+            for k in request.POST if k.startswith("returned_asset_")
+        ]
+        assets = Asset.objects.filter(id__in=returned_ids)
+        obj.returned_assets.set(assets)
+
+# Register the admin
+admin.site.register(OffboardingAssetReturn, OffboardingAssetReturnAdmin)
