@@ -459,9 +459,15 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user')
 
+    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    #     if db_field.name == "user":
+    #         kwargs["queryset"] = User.objects.filter(is_active=False).order_by('username')
+    #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "user":
-            kwargs["queryset"] = User.objects.filter(is_active=True).order_by('username')
+            # Filter: is_active=False AND user not already offboarded
+            already_offboarded_user_ids = OffboardingAssetReturn.objects.filter(is_offboarded=True).values_list('user_id', flat=True)
+            kwargs["queryset"] = User.objects.filter(is_active=False).exclude(id__in=already_offboarded_user_ids).order_by('username')
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def user_display(self, obj):
@@ -539,14 +545,29 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
 
     dynamic_asset_checkboxes.short_description = "Returned Assets"
 
+    # def save_model(self, request, obj, form, change):
+    #     super().save_model(request, obj, form, change)
+    #     returned_ids = [
+    #         int(k.replace("returned_asset_", ""))
+    #         for k in request.POST if k.startswith("returned_asset_")
+    #     ]
+    #     assets = Asset.objects.filter(id__in=returned_ids)
+    #     obj.returned_assets.set(assets)
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
+
         returned_ids = [
             int(k.replace("returned_asset_", ""))
             for k in request.POST if k.startswith("returned_asset_")
         ]
         assets = Asset.objects.filter(id__in=returned_ids)
         obj.returned_assets.set(assets)
+
+        # Automatically mark as offboarded (optional)
+        if not obj.is_offboarded:
+            obj.is_offboarded = True
+            obj.save()
+
 
 # Register the admin
 admin.site.register(OffboardingAssetReturn, OffboardingAssetReturnAdmin)

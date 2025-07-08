@@ -175,6 +175,16 @@
             font-size: 1rem;
         }
 
+        .form-label.required {
+            color: #dc3545;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: #dc3545;
+            font-weight: bold;
+        }
+
         .form-control {
             width: 100%;
             padding: 15px 20px;
@@ -267,12 +277,14 @@
             font-size: 18px;
         }
 
-        .file-input-wrapper:nth-child(1) .form-label::before { content: '🆔'; }
-        .file-input-wrapper:nth-child(2) .form-label::before { content: '💰'; }
-        .file-input-wrapper:nth-child(3) .form-label::before { content: '🎓'; }
-        .file-input-wrapper:nth-child(4) .form-label::before { content: '📄'; }
-        .file-input-wrapper:nth-child(5) .form-label::before { content: '📜'; }
-        .file-input-wrapper:nth-child(6) .form-label::before { content: '📈'; }
+        /* Document icons */
+        .upload-section .row:nth-child(2) .file-input-wrapper:nth-child(1) .form-label::before { content: '🆔'; }
+        .upload-section .row:nth-child(2) .file-input-wrapper:nth-child(2) .form-label::before { content: '🎓'; }
+        .upload-section .row:nth-child(3) .file-input-wrapper:nth-child(1) .form-label::before { content: '🏦'; }
+        .upload-section .row:nth-child(3) .file-input-wrapper:nth-child(2) .form-label::before { content: '📄'; }
+        .upload-section .row:nth-child(4) .file-input-wrapper:nth-child(1) .form-label::before { content: '💰'; }
+        .upload-section .row:nth-child(4) .file-input-wrapper:nth-child(2) .form-label::before { content: '📜'; }
+        .upload-section .row:nth-child(5) .file-input-wrapper:nth-child(1) .form-label::before { content: '📈'; }
 
         input[type="file"] {
             position: relative;
@@ -490,25 +502,17 @@
                     <h3 class="section-title">Personal Information</h3>
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                {{ form.first_name.label }}
-                            </label>
+                            <label for="id_first_name" class="form-label required">First Name</label>
                             <input type="text" class="form-control" name="first_name" id="id_first_name" required>
-                            {% if form.first_name.help_text %}
-                                <div class="form-text">{{ form.first_name.help_text }}</div>
-                            {% endif %}
+                            <div class="form-text">Enter your first name as per official documents</div>
                             {% if form.first_name.errors %}
                                 <div class="text-danger">{{ form.first_name.errors }}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                {{ form.last_name.label }}
-                            </label>
+                            <label for="id_last_name" class="form-label required">Last Name</label>
                             <input type="text" class="form-control" name="last_name" id="id_last_name" required>
-                            {% if form.last_name.help_text %}
-                                <div class="form-text">{{ form.last_name.help_text }}</div>
-                            {% endif %}
+                            <div class="form-text">Enter your last name as per official documents</div>
                             {% if form.last_name.errors %}
                                 <div class="text-danger">{{ form.last_name.errors }}</div>
                             {% endif %}
@@ -516,25 +520,17 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">
-                                {{ form.email.label }}
-                            </label>
+                            <label for="id_email" class="form-label required">Personal Email Address</label>
                             <input type="email" class="form-control" name="email" id="id_email" required>
-                            {% if form.email.help_text %}
-                                <div class="form-text">{{ form.email.help_text }}</div>
-                            {% endif %}
+                            <div class="form-text">Use your personal email address</div>
                             {% if form.email.errors %}
                                 <div class="text-danger">{{ form.email.errors }}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">
-                                {{ form.phone_number.label }}
-                            </label>
+                            <label for="id_phone_number" class="form-label required">Phone Number</label>
                             <input type="text" class="form-control" name="phone_number" id="id_phone_number" required>
-                            {% if form.phone_number.help_text %}
-                                <div class="form-text">{{ form.phone_number.help_text }}</div>
-                            {% endif %}
+                            <div class="form-text">Include country code (e.g., +91 9876543210)</div>
                             {% if form.phone_number.errors %}
                                 <div class="text-danger">{{ form.phone_number.errors }}</div>
                             {% endif %}
@@ -542,25 +538,17 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="{{ form.current_address.id_for_label }}" class="form-label">
-                                {{ form.current_address.label }}
-                            </label>
+                            <label for="id_current_address" class="form-label required">Current Address</label>
                             <textarea class="form-control" name="current_address" id="id_current_address" rows="3" required></textarea>
-                            {% if form.current_address.help_text %}
-                                <div class="form-text">{{ form.current_address.help_text }}</div>
-                            {% endif %}
+                            <div class="form-text">Include complete current address with city, state, and PIN code</div>
                             {% if form.current_address.errors %}
                                 <div class="text-danger">{{ form.current_address.errors }}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label for="{{ form.permanent_address.id_for_label }}" class="form-label">
-                                {{ form.permanent_address.label }}
-                            </label>
+                            <label for="id_permanent_address" class="form-label required">Permanent Address</label>
                             <textarea class="form-control" name="permanent_address" id="id_permanent_address" rows="3" required></textarea>
-                            {% if form.permanent_address.help_text %}
-                                <div class="form-text">{{ form.permanent_address.help_text }}</div>
-                            {% endif %}
+                            <div class="form-text">Include complete permanent address with city, state, and PIN code</div>
                             {% if form.permanent_address.errors %}
                                 <div class="text-danger">{{ form.permanent_address.errors }}</div>
                             {% endif %}
@@ -573,19 +561,15 @@
                     <h3 class="section-title documents">Document Upload</h3>
                     <div class="upload-section">
                         <div class="upload-info">
-                            <span>Please upload all required documents. Accepted formats: PDF, JPG, PNG (Max size: 10MB per file)</span>
+                            <span>Please upload all required documents. Some documents are mandatory while others should be uploaded if available. Accepted formats: PDF, JPG, PNG (Max size: 10MB per file)</span>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="file-input-wrapper">
-                                    <label for="{{ form.aadhar_pan_file.id_for_label }}" class="form-label">
-                                        {{ form.aadhar_pan_file.label }}
-                                    </label>
-                                    <input type="file" class="form-control" name="aadhar_pan_file" id="id_aadhar_pan_file" accept=".pdf,.jpg,.jpeg,.png">
-                                    {% if form.aadhar_pan_file.help_text %}
-                                        <div class="form-text">{{ form.aadhar_pan_file.help_text }}</div>
-                                    {% endif %}
+                                    <label for="id_aadhar_pan_file" class="form-label required">Aadhar & PAN Card (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="aadhar_pan_file" id="id_aadhar_pan_file" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    <div class="form-text">Upload scanned copy of Aadhar and PAN card in single file</div>
                                     {% if form.aadhar_pan_file.errors %}
                                         <div class="text-danger">{{ form.aadhar_pan_file.errors }}</div>
                                     {% endif %}
@@ -593,15 +577,11 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="file-input-wrapper">
-                                    <label for="{{ form.payslips_file.id_for_label }}" class="form-label">
-                                        {{ form.payslips_file.label }}
-                                    </label>
-                                    <input type="file" class="form-control" name="payslips_file" id="id_payslips_file" accept=".pdf,.jpg,.jpeg,.png">
-                                    {% if form.payslips_file.help_text %}
-                                        <div class="form-text">{{ form.payslips_file.help_text }}</div>
-                                    {% endif %}
-                                    {% if form.payslips_file.errors %}
-                                        <div class="text-danger">{{ form.payslips_file.errors }}</div>
+                                    <label for="id_educational_certificates_file" class="form-label required">Educational Certificates/Degree (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="educational_certificates_file" id="id_educational_certificates_file" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    <div class="form-text">Upload degree certificates and mark sheets</div>
+                                    {% if form.educational_certificates_file.errors %}
+                                        <div class="text-danger">{{ form.educational_certificates_file.errors }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -610,27 +590,19 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="file-input-wrapper">
-                                    <label for="{{ form.educational_certificates_file.id_for_label }}" class="form-label">
-                                        {{ form.educational_certificates_file.label }}
-                                    </label>
-                                    <input type="file" class="form-control" name="educational_certificates_file" id="id_educational_certificates_file" accept=".pdf,.jpg,.jpeg,.png">
-                                    {% if form.educational_certificates_file.help_text %}
-                                        <div class="form-text">{{ form.educational_certificates_file.help_text }}</div>
-                                    {% endif %}
-                                    {% if form.educational_certificates_file.errors %}
-                                        <div class="text-danger">{{ form.educational_certificates_file.errors }}</div>
+                                    <label for="id_bank_statements_file" class="form-label required">Last 6 Months Bank Statements (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="bank_statements_file" id="id_bank_statements_file" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    <div class="form-text">Upload last 6 months bank statements</div>
+                                    {% if form.bank_statements_file.errors %}
+                                        <div class="text-danger">{{ form.bank_statements_file.errors }}</div>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="file-input-wrapper">
-                                    <label for="{{ form.previous_offer_letter_file.id_for_label }}" class="form-label">
-                                        {{ form.previous_offer_letter_file.label }}
-                                    </label>
-                                    <input type="file" class="form-control" name="previous_offer_letter_file" id="id_previous_offer_letter_file" accept=".pdf,.jpg,.jpeg,.png">
-                                    {% if form.previous_offer_letter_file.help_text %}
-                                        <div class="form-text">{{ form.previous_offer_letter_file.help_text }}</div>
-                                    {% endif %}
+                                    <label for="id_previous_offer_letter_file" class="form-label required">Previous Offer Letter (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="previous_offer_letter_file" id="id_previous_offer_letter_file" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    <div class="form-text">Upload your previous company offer letter</div>
                                     {% if form.previous_offer_letter_file.errors %}
                                         <div class="text-danger">{{ form.previous_offer_letter_file.errors }}</div>
                                     {% endif %}
@@ -641,27 +613,32 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="file-input-wrapper">
-                                    <label for="{{ form.relieving_experience_letters_file.id_for_label }}" class="form-label">
-                                        {{ form.relieving_experience_letters_file.label }}
-                                    </label>
-                                    <input type="file" class="form-control" name="relieving_experience_letters_file" id="id_relieving_experience_letters_file" accept=".pdf,.jpg,.jpeg,.png">
-                                    {% if form.relieving_experience_letters_file.help_text %}
-                                        <div class="form-text">{{ form.relieving_experience_letters_file.help_text }}</div>
-                                    {% endif %}
-                                    {% if form.relieving_experience_letters_file.errors %}
-                                        <div class="text-danger">{{ form.relieving_experience_letters_file.errors }}</div>
+                                    <label for="id_payslips_file" class="form-label">Last 6 Months Payslips (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="payslips_file" id="id_payslips_file" accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="form-text">Upload last 6 months salary slips (if available - can be combined in single PDF)</div>
+                                    {% if form.payslips_file.errors %}
+                                        <div class="text-danger">{{ form.payslips_file.errors }}</div>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="file-input-wrapper">
-                                    <label for="{{ form.appraisal_hike_letters_file.id_for_label }}" class="form-label">
-                                        {{ form.appraisal_hike_letters_file.label }}
-                                    </label>
-                                    <input type="file" class="form-control" name="appraisal_hike_letters_file" id="id_appraisal_hike_letters_file" accept=".pdf,.jpg,.jpeg,.png">
-                                    {% if form.appraisal_hike_letters_file.help_text %}
-                                        <div class="form-text">{{ form.appraisal_hike_letters_file.help_text }}</div>
+                                    <label for="id_relieving_experience_letters_file" class="form-label">Relieving & Experience Letters (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="relieving_experience_letters_file" id="id_relieving_experience_letters_file" accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="form-text">Upload relieving letter and experience letter from previous company (if available)</div>
+                                    {% if form.relieving_experience_letters_file.errors %}
+                                        <div class="text-danger">{{ form.relieving_experience_letters_file.errors }}</div>
                                     {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="file-input-wrapper">
+                                    <label for="id_appraisal_hike_letters_file" class="form-label">Appraisal/Hike Letters (PDF/Image)</label>
+                                    <input type="file" class="form-control" name="appraisal_hike_letters_file" id="id_appraisal_hike_letters_file" accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="form-text">Upload any appraisal or salary hike letters from previous company (if available)</div>
                                     {% if form.appraisal_hike_letters_file.errors %}
                                         <div class="text-danger">{{ form.appraisal_hike_letters_file.errors }}</div>
                                     {% endif %}

@@ -1,6 +1,4 @@
 
-
-
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse, path
@@ -26,14 +24,14 @@ class ITSupporterAdmin(admin.ModelAdmin):
 
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = [
-        'full_name_display', 'email', 'phone_number', 'department', 'position', 'employee_type', 
-        'submission_status', 'documents_status', 'files_status', 'it_status', 'soft_delete_status', 'actions_column'
+        'full_name_display', 'email', 'company_email_display', 'phone_number', 'department', 'position', 'employee_type', 
+        'submission_status', 'mandatory_docs_status', 'all_docs_status', 'files_status', 'it_status', 'soft_delete_status', 'actions_column'
     ]
     list_filter = [
         'employee_type', 'department', 'position', 'is_self_submitted', 
         'it_notification_sent', 'submitted_at', 'is_deleted'
     ]
-    search_fields = ['first_name', 'last_name', 'email', 'phone_number', 'department', 'position']
+    search_fields = ['first_name', 'last_name', 'email', 'company_email', 'phone_number', 'department', 'position']
     list_display_links = ['full_name_display']
     date_hierarchy = 'submitted_at'
     
@@ -43,7 +41,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Basic Information', {
             'fields': (
-                'first_name', 'last_name', 'email', 'phone_number', 'employee_type','employee_id', 'department', 'position', 
+                'first_name', 'last_name', 'email', 'company_email', 'phone_number', 'employee_type', 'employee_id', 'department', 'position', 
                 'current_address', 'permanent_address', 'joining_date'
             )
         }),
@@ -52,17 +50,24 @@ class EmployeeAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
             'description': 'Information about employee submission status.'
         }),
-        ('Document Collection', {
+        ('Mandatory Document Collection', {
             'fields': (
                 ('aadhar_pan_collected', 'aadhar_pan_file'),
-                ('payslips_collected', 'payslips_file'),
                 ('educational_certificates_collected', 'educational_certificates_file'),
+                ('bank_statements_collected', 'bank_statements_file'),
                 ('previous_offer_letter_collected', 'previous_offer_letter_file'),
+            ),
+            'classes': ('collapse',),
+            'description': 'MANDATORY documents required for onboarding. Check the box when document is collected and upload the file.'
+        }),
+        ('Optional Document Collection', {
+            'fields': (
+                ('payslips_collected', 'payslips_file'),
                 ('relieving_experience_letters_collected', 'relieving_experience_letters_file'),
                 ('appraisal_hike_letters_collected', 'appraisal_hike_letters_file'),
             ),
             'classes': ('collapse',),
-            'description': 'Check the box when document is collected and upload the file.'
+            'description': 'OPTIONAL documents. Check the box when document is collected and upload the file.'
         }),
         ('IT Notification', {
             'fields': ('it_notification_sent',),
@@ -80,7 +85,6 @@ class EmployeeAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         """Override to show all employees including soft-deleted ones in admin"""
-        # return Employee.all_objects.all().order_by('-submitted_at', '-id')
         return Employee.all_objects.filter(is_deleted=False)
 
     
@@ -137,6 +141,54 @@ class EmployeeAdmin(admin.ModelAdmin):
         return name
     full_name_display.short_description = 'Name'
     
+    def company_email_display(self, obj):
+        if obj.is_deleted:
+            return format_html('<span style="color: #6c757d;">N/A</span>')
+        elif obj.company_email:
+            return format_html('<span style="color: #007bff; font-weight: bold;">{}</span>', obj.company_email)
+        else:
+            return format_html('<span style="color: #ffc107;">Not Set</span>')
+    company_email_display.short_description = 'Company Email'
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
+
+        # List of file fields where we want to add download links
+        file_fields = [
+            'aadhar_pan_file',
+            'educational_certificates_file',
+            'bank_statements_file',
+            'previous_offer_letter_file',
+            'payslips_file',
+            'relieving_experience_letters_file',
+            'appraisal_hike_letters_file',
+        ]
+        from django.utils.safestring import mark_safe
+
+        if db_field.name in file_fields:
+            original_help_text = formfield.help_text or ''
+            obj_id = request.resolver_match.kwargs.get('object_id')
+
+            if obj_id:
+                from .models import Employee
+                try:
+                    employee = Employee.all_objects.get(pk=obj_id)
+                    file_field = getattr(employee, db_field.name)
+                    
+                    if file_field:
+                        # File exists - show download link
+                        file_url = file_field.url
+                        download_html = f'<br><a href="{file_url}" download style="color: #007bff; font-weight: 600;" target="_blank">⬇ Download current file</a>'
+                        formfield.help_text = mark_safe(original_help_text + download_html)
+                    else:
+                        # No file uploaded yet - show informative message
+                        no_file_html = f'<br><span style="color: #6c757d; font-style: italic;">No file uploaded yet</span>'
+                        formfield.help_text = mark_safe(original_help_text + no_file_html)
+                        
+                except Employee.DoesNotExist:
+                    pass
+
+        return formfield
+    formfield_for_dbfield.short_description = 'Actions'
     def submission_status(self, obj):
         if obj.is_deleted:
             return format_html('<span style="color: #dc3545;">🗑️ Deleted</span>')
@@ -146,41 +198,63 @@ class EmployeeAdmin(admin.ModelAdmin):
             return format_html('<span style="color: orange;">⏳ Pending</span>')
     submission_status.short_description = 'Onboarding Status'
     
-    def documents_status(self, obj):
+    def mandatory_docs_status(self, obj):
         if obj.is_deleted:
             return format_html('<span style="color: #6c757d;">N/A</span>')
-        elif obj.all_documents_collected:
+        elif obj.mandatory_documents_collected:
             return format_html('<span style="color: green;">✓ Complete</span>')
         else:
             return format_html('<span style="color: red;">✗ Incomplete</span>')
-    documents_status.short_description = 'Documents Collected'
+    mandatory_docs_status.short_description = 'Mandatory Docs'
+    
+    def all_docs_status(self, obj):
+        if obj.is_deleted:
+            return format_html('<span style="color: #6c757d;">N/A</span>')
+        elif obj.all_documents_collected:
+            return format_html('<span style="color: green;">✓ All Complete</span>')
+        else:
+            return format_html('<span style="color: orange;">⚠ Partial</span>')
+    all_docs_status.short_description = 'All Documents'
     
     def files_status(self, obj):
         if obj.is_deleted:
             return format_html('<span style="color: #6c757d;">N/A</span>')
             
-        files_uploaded = 0
-        total_files = 6
+        # Count mandatory files
+        mandatory_files_uploaded = 0
+        total_mandatory_files = 4
         
         if obj.aadhar_pan_file:
-            files_uploaded += 1
-        if obj.payslips_file:
-            files_uploaded += 1
+            mandatory_files_uploaded += 1
         if obj.educational_certificates_file:
-            files_uploaded += 1
+            mandatory_files_uploaded += 1
+        if obj.bank_statements_file:
+            mandatory_files_uploaded += 1
         if obj.previous_offer_letter_file:
-            files_uploaded += 1
-        if obj.relieving_experience_letters_file:
-            files_uploaded += 1
-        if obj.appraisal_hike_letters_file:
-            files_uploaded += 1
+            mandatory_files_uploaded += 1
             
-        if files_uploaded == total_files:
-            return format_html('<span style="color: green;">✓ All Files ({}/{})</span>', files_uploaded, total_files)
-        elif files_uploaded > 0:
-            return format_html('<span style="color: orange;">⚠ Partial ({}/{})</span>', files_uploaded, total_files)
+        # Count optional files
+        optional_files_uploaded = 0
+        total_optional_files = 3
+        
+        if obj.payslips_file:
+            optional_files_uploaded += 1
+        if obj.relieving_experience_letters_file:
+            optional_files_uploaded += 1
+        if obj.appraisal_hike_letters_file:
+            optional_files_uploaded += 1
+            
+        if mandatory_files_uploaded == total_mandatory_files:
+            if optional_files_uploaded == total_optional_files:
+                return format_html('<span style="color: green;">✓ All Files ({}/{}+{}/{})</span>', 
+                                 mandatory_files_uploaded, total_mandatory_files, optional_files_uploaded, total_optional_files)
+            else:
+                return format_html('<span style="color: #28a745;">✓ Mandatory ({}/{}) + Opt ({}/{})</span>', 
+                                 mandatory_files_uploaded, total_mandatory_files, optional_files_uploaded, total_optional_files)
+        elif mandatory_files_uploaded > 0:
+            return format_html('<span style="color: orange;">⚠ Partial Mandatory ({}/{})</span>', mandatory_files_uploaded, total_mandatory_files)
         else:
-            return format_html('<span style="color: red;">✗ No Files (0/{})</span>', total_files)
+            return format_html('<span style="color: red;">✗ No Files</span>')
     files_status.short_description = 'Files Uploaded'
     
     def it_status(self, obj):
@@ -208,15 +282,15 @@ class EmployeeAdmin(admin.ModelAdmin):
                 reverse('admin:restore_employee', args=[obj.pk])
             )
         else:
-            # Show edit and soft delete buttons for active employees
+            # Show edit and permanent delete buttons for active employees
             edit_url = reverse('admin:onboarding_employee_change', args=[obj.pk])
-            delete_url = reverse('admin:soft_delete_employee', args=[obj.pk])
+            delete_url = reverse('admin:permanent_delete_employee', args=[obj.pk])
             return format_html(
                 '<div style="display: flex; gap: 5px;">'
                 '<a class="button" href="{}" style="margin-right: 5px;">Edit</a>'
-                '<a class="button" href="{}" style="background: #dc3545; color: white;" onclick="return confirm(\'Are you sure you want to delete this employee? This will soft delete the record.\')">Delete</a>'
+                '<a class="button" href="{}" style="background: #dc3545; color: white;" onclick="return confirm(\'⚠️ WARNING: This will PERMANENTLY delete this employee and their user account from the database. This action CANNOT be undone!\\n\\nEmployee: {}\\n\\nAre you absolutely sure you want to continue?\')">Permanent Delete</a>'
                 '</div>',
-                edit_url, delete_url
+                edit_url, delete_url, obj.full_name
             )
     actions_column.short_description = 'Actions'
     actions_column.allow_tags = True
@@ -224,7 +298,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            path('soft-delete/<int:employee_id>/', self.admin_site.admin_view(self.soft_delete_employee), name='soft_delete_employee'),
+            path('permanent-delete/<int:employee_id>/', self.admin_site.admin_view(self.permanent_delete_employee), name='permanent_delete_employee'),
             path('restore/<int:employee_id>/', self.admin_site.admin_view(self.restore_employee), name='restore_employee'),
             path('onboarding-only/', self.admin_site.admin_view(self.onboarding_only_view), name='onboarding_employees_only'),
         ]
@@ -270,40 +344,66 @@ class EmployeeAdmin(admin.ModelAdmin):
         
         return super().changelist_view(request, extra_context)
     
-    def soft_delete_employee(self, request, employee_id):
-        """Custom view to soft delete an employee"""
+    def permanent_delete_employee(self, request, employee_id):
+        """Custom view to permanently delete an employee and their user account"""
         try:
             employee = Employee.all_objects.get(id=employee_id)
-            if not employee.is_deleted:
-                employee.soft_delete()
-                 # Deactivate associated User (if exists)
+            employee_name = employee.full_name
+            
+            # First, delete associated User account (if exists)
+            from django.contrib.auth.models import User
+            user_deleted = False
+            
+            # Check company email first, then personal email
+            user = User.objects.filter(email=employee.company_email).first()
+            if not user and employee.email:
                 user = User.objects.filter(email=employee.email).first()
-                if user:
-                    user.is_active = False
-                    user.save()
-                messages.success(request, f'Employee "{employee.full_name}" has been soft deleted successfully.')
+                
+            if user:
+                user_email = user.email
+                user.delete()  # Permanent delete from User table
+                user_deleted = True
+                print(f"🗑️ PERMANENTLY DELETED User: {user_email}")
+            
+            # Then permanently delete the Employee record
+            employee.delete()  # This is permanent delete, not soft delete
+            print(f"🗑️ PERMANENTLY DELETED Employee: {employee_name}")
+            
+            # Success message
+            if user_deleted:
+                messages.success(
+                    request, 
+                    f'Employee "{employee_name}" and their user account have been permanently deleted from the database.'
+                )
             else:
-                messages.warning(request, f'Employee "{employee.full_name}" is already deleted.')
+                messages.success(
+                    request, 
+                    f'Employee "{employee_name}" has been permanently deleted from the database. No associated user account was found.'
+                )
+                
         except Employee.DoesNotExist:
             messages.error(request, 'Employee not found.')
+        except Exception as e:
+            messages.error(request, f'Error deleting employee: {str(e)}')
         
         return HttpResponseRedirect(reverse('admin:onboarding_employee_changelist'))
     
     def restore_employee(self, request, employee_id):
         """Custom view to restore a soft deleted employee"""
         try:
-            
             employee = Employee.all_objects.get(id=employee_id)
-            print("🔁 Restore triggered for employee:", employee.email)
+            print("🔁 Restore triggered for employee:", employee.company_email or employee.email)
 
             if employee.is_deleted:
                 employee.restore()
                 employee.save()  # 🔑 ensure the changes (like `is_deleted = False`) are persisted
 
-                # Reactivate associated User (if exists)
-                user = User.objects.filter(email=employee.email).first()
-                print("🔁 Restore triggered for employee:", employee.email)
-
+                # Reactivate associated User (if exists) - check company email first
+                from django.contrib.auth.models import User
+                user = User.objects.filter(email=employee.company_email).first()
+                if not user:
+                    user = User.objects.filter(email=employee.email).first()
+                    
                 if user:
                     user.is_active = True
                     user.save()
@@ -340,127 +440,229 @@ class EmployeeAdmin(admin.ModelAdmin):
         """Allow delete permission (we're doing soft delete anyway)"""
         return True
 
-
-
-# from django.contrib import admin
-# from django.utils.html import format_html
-# from django.utils.safestring import mark_safe
-# from assets.models import AssetAssignment, Asset
-# from .models import Offboarding
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        """Add JavaScript for conditional save button with enhanced UI"""
+        response = super().render_change_form(request, context, add, change, form_url, obj)
+        
+        if change and obj and obj.is_self_submitted:
+            # Check which fields are missing
+            missing_fields = []
+            if not obj.employee_id:
+                missing_fields.append('employee_id')
+            if not obj.company_email:
+                missing_fields.append('company_email')
+            if not obj.department:
+                missing_fields.append('department')
+            if not obj.position:
+                missing_fields.append('position')
+            if not obj.employee_type:
+                missing_fields.append('employee_type')
+            
+            has_missing_fields = len(missing_fields) > 0
+            
+            additional_js = f"""
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {{
+                // Configuration
+                const requiredFields = ['employee_id', 'company_email', 'department', 'position', 'employee_type'];
+                const fieldLabels = {{
+                    'employee_id': 'Employee ID',
+                    'company_email': 'Company Email',
+                    'department': 'Department',
+                    'position': 'Position',
+                    'employee_type': 'Employee Type'
+                }};
+                
+                const saveButtons = document.querySelectorAll('input[name="_save"], input[name="_continue"], input[name="_addanother"]');
+                const hasMissingFields = {str(has_missing_fields).lower()};
+                
+                // Add main status banner
+                function createStatusBanner() {{
+                    const banner = document.createElement('div');
+                    banner.id = 'hr-completion-banner';
+                    banner.style.cssText = `
+                        margin: 20px 0;
+                        padding: 20px;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    `;
+                    
+                    const contentDiv = document.querySelector('#content') || document.querySelector('.colM');
+                    if (contentDiv) {{
+                        contentDiv.insertBefore(banner, contentDiv.firstChild);
+                    }}
+                    
+                    return banner;
+                }}
+                
+                // Update banner content
+                function updateStatusBanner(allComplete, missingFields) {{
+                    let banner = document.getElementById('hr-completion-banner');
+                    if (!banner) {{
+                        banner = createStatusBanner();
+                    }}
+                    
+                    if (allComplete) {{
+                        banner.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="font-size: 24px;">✅</div>
+                                <div>
+                                    <strong style="color: #155724;">Employment Details Complete!</strong><br>
+                                    <span style="color: #6c757d; font-weight: normal;">All required HR fields have been filled. You can now save the employee record.</span>
+                                </div>
+                            </div>
+                        `;
+                        banner.style.background = 'linear-gradient(135deg, #d4edda, #c3e6cb)';
+                        banner.style.border = '2px solid #28a745';
+                    }} else {{
+                        const missingList = missingFields.map(field => fieldLabels[field] || field).join(', ');
+                        banner.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="font-size: 24px;">⚠️</div>
+                                <div>
+                                    <strong style="color: #856404;">HR Action Required</strong><br>
+                                    <span style="color: #6c757d; font-weight: normal;">Please complete the following employment details to enable saving:</span><br>
+                                    <em style="color: #856404;">${{missingList}}</em>
+                                </div>
+                            </div>
+                        `;
+                        banner.style.background = 'linear-gradient(135deg, #fff3cd, #ffeaa7)';
+                        banner.style.border = '2px solid #ffc107';
+                    }}
+                }}
+                
+                // Enhanced field validation
+                function checkRequiredFields() {{
+                    let allFieldsFilled = true;
+                    let missingFields = [];
+                    
+                    requiredFields.forEach(function(fieldName) {{
+                        const field = document.getElementById('id_' + fieldName);
+                        if (field) {{
+                            const isEmpty = !field.value || field.value.trim() === '';
+                            if (isEmpty) {{
+                                allFieldsFilled = false;
+                                missingFields.push(fieldName);
+                                
+                                // Highlight empty required fields
+                                field.style.cssText += `
+                                    border: 2px solid #dc3545 !important;
+                                    box-shadow: 0 0 8px rgba(220, 53, 69, 0.3) !important;
+                                `;
+                                
+                                // Add required indicator to label
+                                const label = document.querySelector(`label[for="id_${{fieldName}}"]`);
+                                if (label && !label.querySelector('.required-indicator')) {{
+                                    const indicator = document.createElement('span');
+                                    indicator.className = 'required-indicator';
+                                    indicator.innerHTML = ' <strong style="color: #dc3545;">*REQUIRED*</strong>';
+                                    label.appendChild(indicator);
+                                }}
+                            }} else {{
+                                // Field is filled - remove highlighting
+                                field.style.border = '';
+                                field.style.boxShadow = '';
+                                
+                                // Remove required indicator
+                                const label = document.querySelector(`label[for="id_${{fieldName}}"]`);
+                                if (label) {{
+                                    const indicator = label.querySelector('.required-indicator');
+                                    if (indicator) indicator.remove();
+                                }}
+                            }}
+                        }}
+                    }});
+                    
+                    // Update save buttons
+                    saveButtons.forEach(function(button) {{
+                        if (allFieldsFilled) {{
+                            button.disabled = false;
+                            button.style.cssText += `
+                                opacity: 1 !important;
+                                cursor: pointer !important;
+                                background: #28a745 !important;
+                                border-color: #28a745 !important;
+                            `;
+                            button.title = '';
+                        }} else {{
+                            button.disabled = true;
+                            button.style.cssText += `
+                                opacity: 0.5 !important;
+                                cursor: not-allowed !important;
+                                background: #6c757d !important;
+                                border-color: #6c757d !important;
+                            `;
+                            button.title = `Please complete: ${{missingFields.map(f => fieldLabels[f] || f).join(', ')}}`;
+                        }}
+                    }});
+                    
+                    // Update status banner
+                    updateStatusBanner(allFieldsFilled, missingFields);
+                }}
+                
+                // Add event listeners
+                requiredFields.forEach(function(fieldName) {{
+                    const field = document.getElementById('id_' + fieldName);
+                    if (field) {{
+                        field.addEventListener('input', checkRequiredFields);
+                        field.addEventListener('change', checkRequiredFields);
+                        field.addEventListener('blur', checkRequiredFields);
+                    }}
+                }});
+                
+                // Initial check
+                if (hasMissingFields) {{
+                    checkRequiredFields();
+                }}
+                
+                // Add helpful tooltip to Basic Information fieldset
+                const basicInfoFieldset = document.querySelector('fieldset');
+                if (basicInfoFieldset && hasMissingFields) {{
+                    const legend = basicInfoFieldset.querySelector('h2');
+                    if (legend) {{
+                        legend.style.cssText += 'color: #dc3545; font-weight: bold;';
+                        legend.innerHTML += ' <span style="font-size: 14px; color: #856404;">(⚠️ HR Completion Required)</span>';
+                    }}
+                }}
+                
+                // Prevent form submission if fields are incomplete
+                const form = document.querySelector('#content form');
+                if (form) {{
+                    form.addEventListener('submit', function(e) {{
+                        let hasIncomplete = false;
+                        requiredFields.forEach(function(fieldName) {{
+                            const field = document.getElementById('id_' + fieldName);
+                            if (field && (!field.value || field.value.trim() === '')) {{
+                                hasIncomplete = true;
+                            }}
+                        }});
+                        
+                        if (hasIncomplete) {{
+                            e.preventDefault();
+                            alert('⚠️ Please complete all required employment details before saving.');
+                            return false;
+                        }}
+                    }});
+                }}
+            }});
+            </script>
+            """
+            
+            # FIXED: Render the response first before accessing content
+            response.render()  # This line fixes the error
+            
+            # Now we can safely access and modify the content
+            content = response.content.decode('utf-8')
+            content = content.replace('</body>', additional_js + '</body>')
+            response.content = content.encode('utf-8')
+        
+        return response
+    
 from django.contrib.auth.models import User
 
-# class OffboardingAdmin(admin.ModelAdmin):
-#     list_display = ['user_display', 'user_email', 'assets_status', 'created_at']
-#     list_filter = ['created_at']
-#     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'user__email']
-#     list_display_links = ['user_display']
-#     date_hierarchy = 'created_at'
-
-#     readonly_fields = ['dynamic_asset_checkboxes']
-#     exclude = ['returned_assets']  # Managed manually
-
-#     fieldsets = (
-#         ('Basic Information', {
-#             'fields': ('user', 'dynamic_asset_checkboxes')
-#         }),
-#         ('Damaged Assets & Remarks', {
-#             'fields': ('damaged_assets_file', 'remarks'),
-#         }),
-#     )
-
-#     def get_queryset(self, request):
-#         return super().get_queryset(request).select_related('user')
-
-#     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-#         if db_field.name == "user":
-#             kwargs["queryset"] = User.objects.filter(is_active=True).order_by('username')
-#         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-#     def user_display(self, obj):
-#         if obj.user.first_name or obj.user.last_name:
-#             full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()
-#             return format_html('<strong>{}</strong><br><small style="color: #666;">@{}</small>', 
-#                                full_name, obj.user.username)
-#         return format_html('<strong>@{}</strong>', obj.user.username)
-#     user_display.short_description = 'User'
-#     user_display.admin_order_field = 'user__username'
-
-#     def user_email(self, obj):
-#         return obj.user.email or '—'
-#     user_email.short_description = 'Email'
-#     user_email.admin_order_field = 'user__email'
-
-#     def assets_status(self, obj):
-#         total = obj.returned_assets.count()
-#         if total > 0:
-#             return format_html('<span style="color: green;">✓ Returned {}</span>', total)
-#         return format_html('<span style="color: red;">✗ None Returned</span>')
-#     assets_status.short_description = 'Returned Assets'
-
-#     def dynamic_asset_checkboxes(self, obj):
-#         return mark_safe("""
-#         <div id="returned-assets-container"><em>Select a user to load assigned assets.</em></div>
-#         <script>
-#         document.addEventListener("DOMContentLoaded", function () {
-#             const userSelect = document.getElementById("id_user");
-#             const container = document.getElementById("returned-assets-container");
-
-#             function loadAssets(userId) {
-#                 if (!userId) {
-#                     container.innerHTML = "<em>Select a user to load assigned assets.</em>";
-#                     return;
-#                 }
-
-#                 fetch(`${window.location.origin}/onboarding/user-assets/${userId}/`)
-
-#                     .then(res => res.json())
-#                     .then(data => {
-#                         if (data.assets && data.assets.length > 0) {
-#                             let html = "<strong>Returned Assets:</strong><ul style='list-style:none; padding:0;'>";
-#                             data.assets.forEach(asset => {
-#                                 html += `<li>
-#                                     <label>
-#                                         <input type="checkbox" name="returned_asset_${asset.id}" />
-#                                         ${asset.type} - ${asset.name} (${asset.tag})
-#                                     </label>
-#                                 </li>`;
-#                             });
-#                             html += "</ul>";
-#                             container.innerHTML = html;
-#                         } else {
-#                             container.innerHTML = "<em>No assets assigned to this user.</em>";
-#                         }
-#                     })
-#                     .catch(err => {
-#                         container.innerHTML = "<em>Error loading assets.</em>";
-#                         console.error(err);
-#                     });
-#             }
-
-#             if (userSelect) {
-#                 userSelect.addEventListener("change", () => {
-#                     loadAssets(userSelect.value);
-#                 });
-
-#                 if (userSelect.value) {
-#                     loadAssets(userSelect.value);
-#                 }
-#             }
-#         });
-#         </script>
-#         """)
-
-#     dynamic_asset_checkboxes.short_description = "Returned Assets"
-
-#     def save_model(self, request, obj, form, change):
-#         super().save_model(request, obj, form, change)
-#         returned_ids = [
-#             int(k.replace("returned_asset_", ""))
-#             for k in request.POST if k.startswith("returned_asset_")
-#         ]
-#         assets = Asset.objects.filter(id__in=returned_ids)
-#         obj.returned_assets.set(assets)
-# onboarding/admin.py - Simple Offboarding Admin (replace the complex one)
+# In admin.py - Enhanced OffboardingAdmin
 
 class OffboardingAdmin(admin.ModelAdmin):
     list_display = ['user_display', 'last_working_date', 'created_at']
@@ -473,9 +675,11 @@ class OffboardingAdmin(admin.ModelAdmin):
         ('Employee Information', {
             'fields': ('user', 'last_working_date')
         }),
-        # ('HR Notes', {
-        #     'fields': ('remarks',),
-        # }),
+        ('Additional Information', {
+            'fields': ('remarks',),
+            'classes': ('collapse',),
+            'description': 'Optional remarks about the offboarding process.'
+        }),
     )
     
     def get_queryset(self, request):
@@ -499,7 +703,10 @@ class OffboardingAdmin(admin.ModelAdmin):
         self.message_user(
             request, 
             f"Offboarding record created for {obj.user.first_name} {obj.user.last_name}. "
-            f"IT team has been automatically notified for asset collection.",
+            f"The following actions have been automatically completed: "
+            f"✅ Employee record soft deleted, "
+            f"✅ User account deactivated, "
+            f"✅ IT team notified for asset collection.",
             level='success'
         )
         return super().response_add(request, obj, post_url_continue)
@@ -597,7 +804,7 @@ class OnboardingLinkAdmin(admin.ModelAdmin):
                                         <li>Send this link to employees via email</li>
                                         <li>Each employee can use this same link</li>
                                         <li>Once an employee submits, they cannot submit again</li>
-                                        <li><strong>Note:</strong> Employees will only fill personal info and upload documents. HR will complete employment details after review.</li>
+                                        <li><strong>Note:</strong> Employees will fill personal info and upload documents. HR will complete employment details and set company email after review.</li>
                                     </ul>
                                 </div>
                             </div>
@@ -688,176 +895,11 @@ class OnboardingLinkAdmin(admin.ModelAdmin):
         return False
 
 
-from django.http import HttpResponse
-from django.utils.html import escape
-from .models import Employee, DeletedEmployees
-
-class DeletedEmployeeAdmin(admin.ModelAdmin):
-    def get_urls(self):
-        from django.urls import path
-        custom_urls = [
-            path('deleted-employees/', self.admin_site.admin_view(self.changelist_view), name='deleted_employees'),
-        ]
-        return custom_urls + super().get_urls()
-
-    def changelist_view(self, request, extra_context=None):
-        # Handle restore POST request
-        if request.method == "POST" and "restore_id" in request.POST:
-            employee_id = request.POST["restore_id"]
-            try:
-                emp = Employee.all_objects.get(id=employee_id)
-                emp.is_deleted = False
-                emp.save()
-                from django.contrib.auth.models import User
-                user = User.objects.filter(email__iexact=emp.email).first()
-                if user:
-                    user.is_active = True
-                    user.save()
-                    print(f"✅ Reactivated user: {user.username} (is_active={user.is_active})")
-                else:
-                    print(f"❌ No matching user found for {emp.email}")
-                self.message_user(request, f"Employee '{emp.full_name}' restored successfully.")
-            except Employee.DoesNotExist:
-                self.message_user(request, "Employee not found.", level='error')
-
-        # Fetch soft-deleted employees
-        deleted_employees = Employee.all_objects.filter(is_deleted=True)
-
-        # Generate table rows
-        rows = ""
-        for emp in deleted_employees:
-            rows += f"""
-                <tr>
-                    <td>{escape(emp.full_name)}</td>
-                    <td>{escape(emp.email)}</td>
-                    <td>{escape(emp.get_department_display() if emp.department else 'Not Set')}</td>
-                    <td>{escape(emp.get_position_display() if emp.position else 'Not Set')}</td>
-                    <td>{emp.deleted_at.strftime('%Y-%m-%d %H:%M') if emp.deleted_at else '—'}</td>
-                    <td>
-                        <form method="post" style="display:inline;">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="{request.META.get("CSRF_COOKIE", "")}">
-                            <input type="hidden" name="restore_id" value="{emp.id}">
-                            <button type="submit" style="padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                                Restore
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            """
-
-        # Render HTML
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Deleted Employees</title>
-            <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">
-            <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
-            <style type="text/css">
-                table.enhanced-table {{
-                    width: 100%;
-                    border-collapse: separate;
-                    border-spacing: 0;
-                    margin-top: 20px;
-                    font-family: 'Segoe UI', sans-serif;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-                    border-radius: 10px;
-                    overflow: hidden;
-                }}
-                table.enhanced-table thead {{
-                    background: linear-gradient(135deg, #007bff, #0056b3);
-                    color: white;
-                }}
-                table.enhanced-table th,
-                table.enhanced-table td {{
-                    padding: 14px 18px;
-                    border-bottom: 1px solid #eaeaea;
-                    text-align: left;
-                    font-size: 15px;
-                }}
-                table.enhanced-table tbody tr:nth-child(even) {{
-                    background-color: #f9f9f9;
-                }}
-                table.enhanced-table tbody tr:hover {{
-                    background-color: #eef6ff;
-                }}
-                .restore-button {{
-                    padding: 6px 14px;
-                    background: linear-gradient(135deg, #28a745, #218838);
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: background 0.3s ease;
-                }}
-                .restore-button:hover {{
-                    background: linear-gradient(135deg, #218838, #1e7e34);
-                }}
-            </style>
-        </head>
-        <body class="app-onboarding model-deletedemployees change-list">
-            <div id="container">
-                <div id="header">
-                    <div id="branding"><h1 id="site-name">Techoptima HR Management</h1></div>
-                    <div id="user-tools">
-                        <a href="/admin/">Home</a> / 
-                        <a href="/admin/onboarding/">Onboarding</a> / 
-                        Deleted Employees
-                    </div>
-                </div>
-
-                <div class="breadcrumbs">
-                    <a href="/admin/">Home</a> &rsaquo; 
-                    <a href="/admin/onboarding/">Onboarding</a> &rsaquo; 
-                    Deleted Employees
-                </div>
-
-                <div id="content" class="colM">
-                    <a href="/en/456/onboarding/employee/" 
-                    style="display: inline-block; margin-bottom: 20px; padding: 10px 20px; font-size: 16px; 
-                            background: linear-gradient(135deg, #007bff, #0056b3); color: white; 
-                            border: none; border-radius: 5px; text-decoration: none; font-weight: 600;">
-                        ← Back
-                    </a>
-
-                    <h1 style="margin-bottom: 25px;">Deleted Employees</h1>
-                    <table class="enhanced-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Department</th>
-                                <th>Position</th>
-                                <th>Deleted On</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rows or '<tr><td colspan="6" style="padding:14px; text-align:center;">No deleted employees found.</td></tr>'}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-
-        return HttpResponse(html_content)
-
-    def has_add_permission(self, request): return False
-    def has_change_permission(self, request, obj=None): return False
-    def has_delete_permission(self, request, obj=None): return False
-
-
-
 # Register models
 admin.site.register(ITSupporter, ITSupporterAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Offboarding, OffboardingAdmin)
 admin.site.register(OnboardingLink, OnboardingLinkAdmin)
-admin.site.register(DeletedEmployees,DeletedEmployeeAdmin)
 
 # Customize admin site header
 admin.site.site_header = "Techoptima HR Management"

@@ -56,7 +56,8 @@ class OffboardingAssetReturn(models.Model):
     damaged_assets_file = models.FileField(upload_to='offboarding/damaged_assets/', blank=True, null=True, verbose_name="Damaged Assets File")
     
     remarks = models.TextField(blank=True, null=True)
-    
+    is_offboarded = models.BooleanField(default=False, help_text="Mark this when offboarding process is completed.")
+
     # Add timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
