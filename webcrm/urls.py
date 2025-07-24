@@ -30,7 +30,7 @@ handler404 = 'webcrm.views.custom_404_view'
 #print("STATICFILES_DIRS:", settings.STATIC_URL)
 
 urlpatterns = [
-    path('api/', include('content.urls')),
+    path('api/', include('client.urls')),
     path('favicon.ico', FaviconRedirect.as_view()),
     path('voip/', include('voip.urls')),
     path(
@@ -58,7 +58,7 @@ urlpatterns += i18n_patterns(
     path('onboarding/', include('onboarding.urls')),  # 👈 ADD THIS LINE
     
     path('contact-form/<uuid:uuid>/', contact_form, name='contact_form'),
-    # path('api/', include('content.urls')),
+    path('api/', include('content.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),  
     path('api/users/search/', search_users, name='search_users'),  
     
