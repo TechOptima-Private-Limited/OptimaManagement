@@ -292,6 +292,17 @@ class LoginLockoutMiddleware:
 
     def handle_user_failed_login(self, request, username):
         """Handle failed login for specific user"""
+        # ❗ Check if the user exists
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        user_exists = User.objects.filter(username=username).exists()
+
+        if not user_exists:
+            logger.warning(f"Login attempt for non-existent user: {username} from IP: {self.get_client_ip(request)}")
+            messages.error(request, f"⚠️ '{username}' has not been onboarded. Please contact your HR team to create your account.")
+            return  # Exit early — no tracking or locking
+
         if self.is_user_locked_out(username):
             return
 

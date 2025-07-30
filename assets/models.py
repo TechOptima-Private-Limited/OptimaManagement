@@ -11,14 +11,21 @@ email_validator = RegexValidator(
 )
 
 class AssetType(models.Model):
+    CATEGORY_CHOICES = [
+        ('HARDWARE', 'Hardware'),
+        ('SOFTWARE', 'Software'),
+    ]
+
     name = models.CharField(max_length=100)
     tag_prefix = models.CharField(max_length=10, unique=True)
     description = models.TextField(blank=True)
     asset_team_email = models.EmailField(blank=True)
     is_active = models.BooleanField(default=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='HARDWARE')  # <--- Add this
 
     def __str__(self):
         return self.name
+
 
 class Asset(models.Model):
     STATUS_CHOICES = [
