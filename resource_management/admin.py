@@ -79,11 +79,48 @@
 #         return Form
 
 #     def get_fields(self, request, obj=None):
-#         if not request.user.is_superuser and request.user.email not in Resource.objects.values_list('resource_team_email', flat=True) and (not obj or obj.assigned_to != request.user):
+#         print(f"🔧 ADMIN get_fields: User: {request.user}")
+#         print(f"🔧 ADMIN get_fields: Obj: {obj}")
+#         print(f"🔧 ADMIN get_fields: Obj request_type: {obj.request_type if obj else 'None'}")
+        
+#         # Check if user is an employee (not superuser, not resource owner, not assignee)
+#         is_employee = not request.user.is_superuser and request.user.email not in Resource.objects.values_list('resource_team_email', flat=True) and (not obj or obj.assigned_to != request.user)
+        
+#         # Check if this is an IT request
+#         is_it_request = obj and obj.request_type == 'IT'
+        
+#         print(f"🔧 ADMIN get_fields: is_employee: {is_employee}")
+#         print(f"🔧 ADMIN get_fields: is_it_request: {is_it_request}")
+        
+#         if is_employee:
 #             print("Returning limited fields for employee in get_fields")
-#             return ['request_type', 'resource_type', 'resource', 'access_level', 'priority', 'justification', 'duration']
-#         fields = super().get_fields(request, obj)
-#         print(f"Returning all fields for SuperUser, resource owner, or assignee: {fields}")
+#             base_fields = ['request_type', 'priority', 'justification', 'duration']
+            
+#             # Only include resource-related fields for non-IT requests
+#             if not is_it_request:
+#                 base_fields.insert(1, 'resource_type')  # Insert after request_type
+#                 base_fields.insert(2, 'resource')       # Insert after resource_type
+#                 base_fields.insert(3, 'access_level')   # Insert after resource
+            
+#             print(f"🔧 ADMIN get_fields: Employee fields: {base_fields}")
+#             return base_fields
+        
+#         # For superusers, resource owners, and assignees, get all fields first
+#         fields = list(super().get_fields(request, obj))
+#         print(f"🔧 ADMIN get_fields: All fields before IT check: {fields}")
+        
+#         # Remove resource-related fields for IT requests regardless of user type
+#         if is_it_request:
+#             print("Removing resource-related fields for IT request")
+#             fields_to_remove = ['resource_type', 'resource', 'access_level']
+#             for field in fields_to_remove:
+#                 if field in fields:
+#                     fields.remove(field)
+#                     print(f"  Removed admin field: {field}")
+#                 else:
+#                     print(f"  Field {field} not found in admin fields")
+        
+#         print(f"🔧 ADMIN get_fields: Final fields: {fields}")
 #         return fields
 
 #     def get_readonly_fields(self, request, obj=None):
@@ -181,8 +218,8 @@
 #         context = {
 #             'ticket': obj.ticket_number,
 #             'user': obj.user.get_full_name() or obj.user.username,
-#             'resource': obj.resource.name,
-#             'access_level': obj.access_level.name,
+#             'resource': obj.resource.name if obj.resource else 'N/A',
+#             'access_level': obj.access_level.name if obj.access_level else 'N/A',
 #             'assigned_by': assigned_by.get_full_name() or assigned_by.username,
 #             'assigned_to': obj.assigned_to.get_full_name() or obj.assigned_to.username if obj.assigned_to else 'None',
 #             'status': obj.get_status_display(),
@@ -190,6 +227,7 @@
 #         if obj.assigned_to:
 #             send_email_notification(obj, subject, 'assignment_notification.html', context, [obj.assigned_to.email])
 #         send_email_notification(obj, subject, 'assignment_notification_requester.html', context, [obj.user.email])
+
 # @admin.register(AccessHistory)
 # class AccessHistoryAdmin(admin.ModelAdmin):
 #     list_display = ('access_request', 'action', 'performed_by', 'performed_at')
@@ -233,10 +271,10 @@
 
 
 
-
-
 from django.contrib import admin
 from django.utils import timezone
+from django.utils.html import strip_tags, format_html
+from django.utils.safestring import mark_safe
 
 from .models import *
 from .utils import send_request_notification, send_email_notification, send_status_notification, send_final_approval_notification
@@ -295,17 +333,56 @@ class AccessHistoryInline(admin.TabularInline):
 @admin.register(AccessRequest)
 class AccessRequestAdmin(admin.ModelAdmin):
     form = AccessRequestForm  # Use the form from forms.py
-    list_display = ('ticket_number', 'user', 'request_type','resource', 'access_level','justification', 'priority', 'status', 'requested_at', 'expires_at', 'assigned_to')
+    # ⭐ CHANGED: Use custom method for justification display
+    list_display = ('ticket_number', 'user', 'request_type','resource', 'access_level','justification_preview', 'priority', 'status', 'requested_at', 'expires_at', 'assigned_to')
     list_filter = ('status', 'priority', 'request_type','resource__resource_type', 'access_level', 'assigned_to')
     search_fields = ('ticket_number', 'user__username', 'resource__name', 'assigned_to__username')
     readonly_fields = ('ticket_number', 'requested_at')
     inlines = [AccessHistoryInline]
 
+    # class Media:
+    #     js = ('resource_management/js/hide_fields.js',)
+    #     css = {
+    #         'all': ('resource_management/css/custom_admin.css',)
+    #     }
     class Media:
-        js = ('resource_management/js/hide_fields.js',)
+        js = (
+            'resource_management/js/hide_fields.js',
+            'resource_management/js/ckeditor5-csrf-fix.js',  # ✅ Add this line
+        )
         css = {
             'all': ('resource_management/css/custom_admin.css',)
         }
+
+
+    # ⭐ NEW: Custom method to display justification preview in list view
+    def justification_preview(self, obj):
+        """Display a clean text preview of justification in the admin list view"""
+        if obj.justification:
+            # Strip HTML tags and get clean text
+            clean_text = strip_tags(obj.justification)
+            # Truncate to 100 characters for better display in list
+            if len(clean_text) > 100:
+                preview = clean_text[:100] + "..."
+            else:
+                preview = clean_text
+            # Return as safe HTML to prevent escaping
+            return format_html('<span title="{}">{}</span>', clean_text, preview)
+        return "-"
+    
+    justification_preview.short_description = "Justification"  # Column header name
+    justification_preview.admin_order_field = 'justification'  # Allow sorting by this field
+
+    # ⭐ NEW: Custom method to display full justification with images in detail view
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if not request.user.is_superuser and request.user.email not in Resource.objects.values_list('resource_team_email', flat=True) and (not obj or obj.assigned_to != request.user):
+            return readonly_fields + ['user', 'status', 'requires_approval', 'approver_email', 
+                                     'approved_by', 'approved_at', 'expires_at', 'approval_token', 
+                                     'approval_token_expiry', 'assigned_to']
+        if not request.user.is_staff and (not obj or obj.assigned_to != request.user):
+            return readonly_fields + ['status', 'approved_by', 'approved_at']
+        return readonly_fields
 
     def get_form(self, request, obj=None, **kwargs):
         Form = super().get_form(request, obj, **kwargs)
@@ -359,16 +436,6 @@ class AccessRequestAdmin(admin.ModelAdmin):
         
         print(f"🔧 ADMIN get_fields: Final fields: {fields}")
         return fields
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        if not request.user.is_superuser and request.user.email not in Resource.objects.values_list('resource_team_email', flat=True) and (not obj or obj.assigned_to != request.user):
-            return readonly_fields + ('user', 'status', 'requires_approval', 'approver_email', 
-                                     'approved_by', 'approved_at', 'expires_at', 'approval_token', 
-                                     'approval_token_expiry', 'assigned_to')
-        if not request.user.is_staff and (not obj or obj.assigned_to != request.user):
-            return readonly_fields + ('status', 'approved_by', 'approved_at')
-        return readonly_fields
 
     def has_change_permission(self, request, obj=None):
         if obj and obj.assigned_to and obj.assigned_to != request.user:

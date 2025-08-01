@@ -218,8 +218,8 @@ SESSION_COOKIE_HTTPONLY = True        # Prevent JavaScript access to session coo
 SESSION_COOKIE_SAMESITE = 'Strict'    # CSRF protection
 
 CSRF_COOKIE_SECURE = True             # Send CSRF cookie only over HTTPS  
-CSRF_COOKIE_HTTPONLY = True           # Prevent JavaScript access to CSRF cookie
-CSRF_COOKIE_SAMESITE = 'Strict'       # CSRF protection
+# CSRF_COOKIE_HTTPONLY = True           # Prevent JavaScript access to CSRF cookie
+# CSRF_COOKIE_SAMESITE = 'Strict'       # CSRF protection
 
 # HTTPS ENFORCEMENT (HSTS)
 SECURE_HSTS_SECONDS = 31536000        # 1 year
@@ -231,7 +231,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
-
+# Fix for CKEditor image upload
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
 # # HTTPS REDIRECTION (Enable in production)
 # SECURE_SSL_REDIRECT = True            # Automatically redirect HTTP to HTTPS
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
