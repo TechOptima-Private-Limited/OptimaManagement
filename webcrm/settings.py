@@ -48,10 +48,11 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),  
     }
 }
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'hr_management',
+#         'NAME': 'hr_management2',
 #         'USER': 'postgres',
 #         'PASSWORD': 'postgres',
 #         'HOST': 'localhost',
@@ -152,8 +153,11 @@ INSTALLED_APPS = [
     'django_select2',
     'resource_requests.apps.ResourceRequestConfig',
     'onboarding.apps.OnboardingConfig',
+   
 
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -167,8 +171,70 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'common.utils.usermiddleware.UserMiddleware',
+    # Add IDOR protection EARLY in the middleware stack
+    # 'common.middleware.IDORProtectionMiddleware',
+    'common.middleware.UserProfileURLRedirectMiddleware',
+    # Add security middleware in order
+    'common.middleware.HSTSSecurityMiddleware',      # HSTS and security headers
+    'common.middleware.CookieSecurityMiddleware',    # Cookie security
+    # Add session management AFTER auth middleware
+    'common.middleware.SessionManagementMiddleware',
     #'webcrm.middleware.TemplateDebugMiddleware',
+    'common.middleware.LoginLockoutMiddleware',
+    # Add this new one for password change:
+    'common.middleware.PasswordChangeLockoutMiddleware',
+    'common.middleware.SecurityMiddleware',
+
+     # Add this ONE line:
+    'common.middleware.SimplePhoneValidationMiddleware',
+
 ]
+
+# # For production security, also add:
+# DEBUG = False  # Set to False in production
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# X_FRAME_OPTIONS = 'DENY'
+
+# Session security settings
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
+# SESSION_COOKIE_SECURE = True  # HTTPS only in production
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+# Cache for session management (if not already configured)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'session-cache',
+    }
+}
+
+# COOKIE SECURITY SETTINGS
+SESSION_COOKIE_SECURE = True          # Send session cookie only over HTTPS
+SESSION_COOKIE_HTTPONLY = True        # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'    # CSRF protection
+
+CSRF_COOKIE_SECURE = True             # Send CSRF cookie only over HTTPS  
+CSRF_COOKIE_HTTPONLY = False           # Prevent JavaScript access to CSRF cookie
+CSRF_COOKIE_SAMESITE = 'Lax'       # CSRF protection
+
+# HTTPS ENFORCEMENT (HSTS)
+SECURE_HSTS_SECONDS = 31536000        # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# ADDITIONAL SECURITY HEADERS
+SECURE_SSL_REDIRECT = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 ADMIN_HELP_URL = None
 ADMIN_COPYRIGHT_STRING = None
