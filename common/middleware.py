@@ -583,69 +583,69 @@ class SecurityMiddleware:
         return None
     
 
-# Add this to your existing common/middleware.py
+# # Add this to your existing common/middleware.py
 
-from django.contrib.auth import logout
-from django.contrib import messages
-from django.core.cache import cache
-from django.utils import timezone
-import logging
+# from django.contrib.auth import logout
+# from django.contrib import messages
+# from django.core.cache import cache
+# from django.utils import timezone
+# import logging
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
-class SessionManagementMiddleware:
-    """
-    Middleware to manage concurrent sessions
-    """
-    def __init__(self, get_response):
-        self.get_response = get_response
+# class SessionManagementMiddleware:
+#     """
+#     Middleware to manage concurrent sessions
+#     """
+#     def __init__(self, get_response):
+#         self.get_response = get_response
 
-    def __call__(self, request):
-        # Check session before processing request
-        if request.user.is_authenticated:
-            if not self.is_session_valid(request):
-                logout(request)
-                messages.warning(request, "Your session was terminated due to login from another device.")
-                logger.warning(f"Session invalidated for user {request.user.username} - concurrent login detected")
+#     def __call__(self, request):
+#         # Check session before processing request
+#         if request.user.is_authenticated:
+#             if not self.is_session_valid(request):
+#                 logout(request)
+#                 messages.warning(request, "Your session was terminated due to login from another device.")
+#                 logger.warning(f"Session invalidated for user {request.user.username} - concurrent login detected")
 
-        response = self.get_response(request)
+#         response = self.get_response(request)
 
-        # Update session info after successful login
-        if (request.user.is_authenticated and 
-            request.path.endswith('/login/') and 
-            request.method == 'POST'):
-            self.update_user_session(request)
+#         # Update session info after successful login
+#         if (request.user.is_authenticated and 
+#             request.path.endswith('/login/') and 
+#             request.method == 'POST'):
+#             self.update_user_session(request)
 
-        return response
+#         return response
 
-    def is_session_valid(self, request):
-        """Check if current session is valid (not replaced by newer login)"""
-        user_session_key = f"user_session_{request.user.username}"
-        stored_session = cache.get(user_session_key)
-        current_session = request.session.session_key
+#     def is_session_valid(self, request):
+#         """Check if current session is valid (not replaced by newer login)"""
+#         user_session_key = f"user_session_{request.user.username}"
+#         stored_session = cache.get(user_session_key)
+#         current_session = request.session.session_key
         
-        # If no stored session or sessions match, it's valid
-        if not stored_session or stored_session == current_session:
-            return True
+#         # If no stored session or sessions match, it's valid
+#         if not stored_session or stored_session == current_session:
+#             return True
         
-        return False
+#         return False
 
-    def update_user_session(self, request):
-        """Update the user's active session"""
-        user_session_key = f"user_session_{request.user.username}"
+#     def update_user_session(self, request):
+#         """Update the user's active session"""
+#         user_session_key = f"user_session_{request.user.username}"
         
-        # Store the new session key
-        cache.set(user_session_key, request.session.session_key, timeout=86400)  # 24 hours
+#         # Store the new session key
+#         cache.set(user_session_key, request.session.session_key, timeout=86400)  # 24 hours
         
-        # Log the session update
-        logger.info(f"Session updated for user {request.user.username} from IP {self.get_client_ip(request)}")
+#         # Log the session update
+#         logger.info(f"Session updated for user {request.user.username} from IP {self.get_client_ip(request)}")
 
-    def get_client_ip(self, request):
-        """Get client IP address"""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            return x_forwarded_for.split(',')[0].strip()
-        return request.META.get('REMOTE_ADDR', 'Unknown')
+#     def get_client_ip(self, request):
+#         """Get client IP address"""
+#         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+#         if x_forwarded_for:
+#             return x_forwarded_for.split(',')[0].strip()
+#         return request.META.get('REMOTE_ADDR', 'Unknown')
     
 
 # Add this to your existing common/middleware.py
