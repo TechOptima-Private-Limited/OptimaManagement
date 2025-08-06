@@ -49,6 +49,7 @@ DATABASES = {
     }
 }
 
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -178,7 +179,7 @@ MIDDLEWARE = [
     'common.middleware.HSTSSecurityMiddleware',      # HSTS and security headers
     'common.middleware.CookieSecurityMiddleware',    # Cookie security
     # Add session management AFTER auth middleware
-    'common.middleware.SessionManagementMiddleware',
+    # 'common.middleware.SessionManagementMiddleware',
     #'webcrm.middleware.TemplateDebugMiddleware',
     'common.middleware.LoginLockoutMiddleware',
     # Add this new one for password change:
@@ -204,13 +205,13 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
 
-# Cache for session management (if not already configured)
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'session-cache',
-    }
-}
+# # Cache for session management (if not already configured)
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#         'LOCATION': 'session-cache',
+#     }
+# }
 
 # COOKIE SECURITY SETTINGS
 SESSION_COOKIE_SECURE = True          # Send session cookie only over HTTPS
