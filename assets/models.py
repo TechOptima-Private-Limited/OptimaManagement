@@ -45,6 +45,14 @@ class Asset(models.Model):
     image_before = models.ImageField(upload_to='assets/before/', blank=True, null=True)
     image_after = models.ImageField(upload_to='assets/after/', blank=True, null=True)
 
+    # ✅ NEW FIELDS BELOW
+    purchased_date = models.DateField(blank=True, null=True)
+    previously_used_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='previous_assets', help_text="Previous user of the asset"
+    )
+    how_long_used = models.DurationField(blank=True, null=True, help_text="Duration the previous user used the asset")
+
     def __str__(self):
         return f"{self.asset_type.name} - {self.name} ({self.asset_tag})"
 
@@ -53,6 +61,7 @@ class Asset(models.Model):
             models.Index(fields=['status']),
             models.Index(fields=['asset_tag']),
         ]
+
 
 
 class OffboardingAssetReturn(models.Model):

@@ -163,7 +163,7 @@ class AssetAdmin(admin.ModelAdmin):
     form = AssetForm
     list_display = (
         'asset_tag', 'name', 'asset_type', 'assigned_employee', 'status',
-        'is_active', 'get_hardware_assets', 'get_software_assets'  # ✅ Add new columns
+        'is_active', 'get_hardware_assets', 'get_software_assets' ,'purchased_date', 'previously_used_by', 'how_long_used' # ✅ Add new columns
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
@@ -179,6 +179,11 @@ class AssetAdmin(admin.ModelAdmin):
         ('Current Assignment', {
             'fields': ('currently_assigned_to',),
             'description': 'Current assignment information (read-only). Use "Asset assignments" menu to assign/reassign assets.',
+            'classes': ('collapse',)
+        })
+        ,
+        ('Purchase & Usage History', {  # New fieldset for the new fields
+            'fields': ('purchased_date', 'previously_used_by', 'how_long_used'),
             'classes': ('collapse',)
         }),
         ('Additional Details', {
