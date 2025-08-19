@@ -51,7 +51,7 @@ class Asset(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='previous_assets', help_text="Previous user of the asset"
     )
-    how_long_used = models.DurationField(blank=True, null=True, help_text="Duration the previous user used the asset")
+    laptop_age = models.DurationField(blank=True, null=True, help_text="Duration the previous user used the asset")
 
     def __str__(self):
         return f"{self.asset_type.name} - {self.name} ({self.asset_tag})"

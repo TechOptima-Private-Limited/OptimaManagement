@@ -163,7 +163,7 @@ class AssetAdmin(admin.ModelAdmin):
     form = AssetForm
     list_display = (
         'asset_tag', 'name', 'asset_type', 'assigned_employee', 'status',
-        'is_active', 'get_hardware_assets', 'get_software_assets' ,'purchased_date', 'previously_used_by', 'how_long_used' # ✅ Add new columns
+        'is_active', 'get_hardware_assets', 'get_software_assets' ,'purchased_date', 'previously_used_by', 'laptop_age' # ✅ Add new columns
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
@@ -183,11 +183,11 @@ class AssetAdmin(admin.ModelAdmin):
         })
         ,
         ('Purchase & Usage History', {  # New fieldset for the new fields
-            'fields': ('purchased_date', 'previously_used_by', 'how_long_used'),
+            'fields': ('purchased_date', 'previously_used_by', 'laptop_age'),
             'classes': ('collapse',)
         }),
         ('Additional Details', {
-            'fields': ('custom_attributes',),
+            'fields': ('custom_attributes',),   
             'classes': ('collapse',)
         }),
         ('Images', {
