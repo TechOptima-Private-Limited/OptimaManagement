@@ -22,7 +22,9 @@ class AssetType(models.Model):
     asset_team_email = models.EmailField(blank=True)
     is_active = models.BooleanField(default=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='HARDWARE')  # <--- Add this
-
+    class Meta:
+        verbose_name = '1. Asset Type'
+        verbose_name_plural = '1. Asset Types'
     def __str__(self):
         return self.name
 
@@ -62,25 +64,86 @@ class Asset(models.Model):
             models.Index(fields=['asset_tag']),
         ]
 
+class HardwareAsset(Asset):
+    class Meta:
+        proxy = True
+        verbose_name = '2. Hardware Asset'
+        verbose_name_plural = '2. Hardware Assets'
 
+class SoftwareAsset(Asset):
+    class Meta:
+        proxy = True
+        verbose_name = '3. Software Asset'
+        verbose_name_plural = '3. Software Assets'
+
+# class OffboardingAssetReturn(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='asset_offboarding_records')
+#     returned_assets = models.ManyToManyField(Asset, blank=True)
+    
+#     # Damaged assets file upload
+#     damaged_assets_file = models.FileField(upload_to='offboarding/damaged_assets/', blank=True, null=True, verbose_name="Damaged Assets File")
+    
+#     remarks = models.TextField(blank=True, null=True)
+#     is_offboarded = models.BooleanField(default=False, help_text="Mark this when offboarding process is completed.")
+
+#     # Add timestamp fields
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+    
+#     class Meta:
+#         verbose_name = 'Offboarding Asset Return'
+#         verbose_name_plural = 'Offboarding Asset Returns'
+#         ordering = ['-created_at']
+    
+#     def __str__(self):
+#         if self.user.first_name or self.user.last_name:
+#             full_name = f"{self.user.first_name} {self.user.last_name}".strip()
+#             return f"Asset Return for {full_name} (@{self.user.username})"
+#         return f"Asset Return for @{self.user.username}"
+    
+# Update your OffboardingAssetReturn model in models.py:
 
 class OffboardingAssetReturn(models.Model):
+    STATUS_CHOICES = [
+        ('AVAILABLE', 'Available'),
+        ('ASSIGNED', 'Assigned'),
+        ('DAMAGED', 'Damaged'),
+        ('LOST', 'Lost'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='asset_offboarding_records')
     returned_assets = models.ManyToManyField(Asset, blank=True)
     
+    # Add laptop/asset return status
+    laptop_status = models.CharField(
+        max_length=20, 
+        choices=STATUS_CHOICES, 
+        default='AVAILABLE',
+        verbose_name="Asset Return Status",
+        help_text="Condition of returned assets"
+    )
+    
     # Damaged assets file upload
-    damaged_assets_file = models.FileField(upload_to='offboarding/damaged_assets/', blank=True, null=True, verbose_name="Damaged Assets File")
+    damaged_assets_file = models.FileField(
+        upload_to='offboarding/damaged_assets/', 
+        blank=True, 
+        null=True, 
+        verbose_name="Damaged Assets File"
+    )
     
     remarks = models.TextField(blank=True, null=True)
-    is_offboarded = models.BooleanField(default=False, help_text="Mark this when offboarding process is completed.")
+    is_offboarded = models.BooleanField(
+        default=False, 
+        help_text="Mark this when offboarding process is completed."
+    )
 
     # Add timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = 'Offboarding Asset Return'
-        verbose_name_plural = 'Offboarding Asset Returns'
+        verbose_name = '5. Offboarding Asset Return'
+        verbose_name_plural = '5. Offboarding Asset Returns'
         ordering = ['-created_at']
     
     def __str__(self):
@@ -88,8 +151,6 @@ class OffboardingAssetReturn(models.Model):
             full_name = f"{self.user.first_name} {self.user.last_name}".strip()
             return f"Asset Return for {full_name} (@{self.user.username})"
         return f"Asset Return for @{self.user.username}"
-    
-    
 class AssetAssignment(models.Model):
     employee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
     assets = models.ManyToManyField(Asset, related_name='assignments')
@@ -102,6 +163,8 @@ class AssetAssignment(models.Model):
         return f"Assignment to {self.employee.username} at {self.assigned_at}"
 
     class Meta:
+        verbose_name = '4. Asset Assignment'
+        verbose_name_plural = '4. Asset Assignments'
         indexes = [
             models.Index(fields=['employee']),
             models.Index(fields=['assigned_at']),
@@ -145,6 +208,9 @@ class AssetHistory(models.Model):
 class EmployeeStatus(models.Model):
     employee = models.OneToOneField(User, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    class Meta:
+        verbose_name = '6. Employee Status'
+        verbose_name_plural = '6. Employee Statuses'
 
     def __str__(self):
         return f"{self.employee.username} - {'Active' if self.is_active else 'Inactive'}"
@@ -213,32 +279,91 @@ def update_asset_status_on_assignment_change(sender, instance, action, pk_set, *
                 else:
                     print(f"Asset {asset.asset_tag} (ID: {asset.id}) still has {active_assignments} active assignments")
 
+# @receiver(post_save, sender=AssetReturn)
+# def update_asset_status_on_return(sender, instance, created, **kwargs):
+#     if created:
+#         print(f"post_save signal fired for AssetReturn {instance.id}")
+#         asset = instance.asset
+#         assignment = instance.assignment
+#         print(f"Removing asset {asset.asset_tag} (ID: {asset.id}) from AssetAssignment {assignment.id}")
+#         assignment.assets.remove(asset)
+#         print(f"Asset {asset.asset_tag} removed from assignment. Current assets in assignment: {[a.asset_tag for a in assignment.assets.all()]}")
+        
+#         # Update the asset status based on the return condition
+#         if instance.condition == 'GOOD':
+#             new_status = 'AVAILABLE'
+#         else:
+#             new_status = instance.condition  # 'DAMAGED' or 'LOST'
+        
+#         if asset.status != new_status:
+#             print(f"Updating asset {asset.asset_tag} (ID: {asset.id}) status from {asset.status} to {new_status}")
+#             asset.status = new_status
+#             asset.save()
+#             AssetHistory.objects.create(
+#                 asset=asset,
+#                 action=f"Status updated to {asset.status} after return",
+#                 performed_by=None,
+#                 notes=instance.notes
+#             )
+#             print(f"Asset {asset.asset_tag} status updated to {asset.status}")
+#         else:
+#             print(f"Asset {asset.asset_tag} (ID: {asset.id}) status is already {asset.status}")
+
+# @receiver(post_save, sender=AssetReturn)
+# def update_asset_status_on_return(sender, instance, created, **kwargs):
+#     if created:
+#         print(f"post_save signal fired for AssetReturn {instance.id}")
+#         asset = instance.asset
+#         assignment = instance.assignment
+        
+#         # Remove the asset from the assignment
+#         print(f"Removing asset {asset.asset_tag} (ID: {asset.id}) from AssetAssignment {assignment.id}")
+#         assignment.assets.remove(asset)
+#         print(f"Asset {asset.asset_tag} removed from assignment. Current assets in assignment: {[a.asset_tag for a in assignment.assets.all()]}")
+        
+#         # Update the asset status based on the return condition
+#         if instance.condition == 'GOOD':
+#             new_status = 'AVAILABLE'  # This makes it available for reassignment
+#         elif instance.condition == 'DAMAGED':
+#             new_status = 'DAMAGED'  # Keep as damaged
+#         else:  # LOST
+#             new_status = 'LOST'  # Keep as lost
+        
+#         # Force update the status
+#         asset.status = new_status
+#         asset.save(update_fields=['status'])  # Explicitly save only the status field
+        
+#         print(f"Asset {asset.asset_tag} (ID: {asset.id}) status updated to {new_status}")
+        
+#         # Create history record
+#         AssetHistory.objects.create(
+#             asset=asset,
+#             action=f"Status updated to {new_status} after return",
+#             performed_by=None,
+#             notes=instance.notes
+#         )
+        
+#         # Double-check there are no other active assignments
+#         other_assignments = AssetAssignment.objects.filter(
+#             assets=asset,
+#             returns__isnull=True
+#         ).exclude(id=assignment.id)
+        
+#         if other_assignments.exists():
+#             print(f"Warning: Asset {asset.asset_tag} has other active assignments: {other_assignments}")
+#             # This shouldn't happen, but if it does, keep it as ASSIGNED
+#             asset.status = 'ASSIGNED'
+#             asset.save(update_fields=['status'])
+
+# Replace the AssetReturn signal in your models.py with this simplified version:
+
 @receiver(post_save, sender=AssetReturn)
 def update_asset_status_on_return(sender, instance, created, **kwargs):
     if created:
-        print(f"post_save signal fired for AssetReturn {instance.id}")
         asset = instance.asset
-        assignment = instance.assignment
-        print(f"Removing asset {asset.asset_tag} (ID: {asset.id}) from AssetAssignment {assignment.id}")
-        assignment.assets.remove(asset)
-        print(f"Asset {asset.asset_tag} removed from assignment. Current assets in assignment: {[a.asset_tag for a in assignment.assets.all()]}")
         
-        # Update the asset status based on the return condition
-        if instance.condition == 'GOOD':
-            new_status = 'AVAILABLE'
-        else:
-            new_status = instance.condition  # 'DAMAGED' or 'LOST'
+        # Simply update the asset status to AVAILABLE when returned
+        asset.status = 'AVAILABLE'
+        asset.save()
         
-        if asset.status != new_status:
-            print(f"Updating asset {asset.asset_tag} (ID: {asset.id}) status from {asset.status} to {new_status}")
-            asset.status = new_status
-            asset.save()
-            AssetHistory.objects.create(
-                asset=asset,
-                action=f"Status updated to {asset.status} after return",
-                performed_by=None,
-                notes=instance.notes
-            )
-            print(f"Asset {asset.asset_tag} status updated to {asset.status}")
-        else:
-            print(f"Asset {asset.asset_tag} (ID: {asset.id}) status is already {asset.status}")
+        print(f"Asset {asset.asset_tag} returned and marked as AVAILABLE")

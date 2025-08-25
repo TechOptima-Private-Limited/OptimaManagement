@@ -320,6 +320,132 @@ class AssetForm(forms.ModelForm):
             del cleaned_data['currently_assigned_to']
         return cleaned_data
 
+# Add these forms to your existing forms.py file:
+
+class HardwareAssetForm(forms.ModelForm):
+    currently_assigned_to = forms.CharField(
+        label="Currently Assigned To",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'readonly': 'readonly', 
+            'style': 'background-color: #f5f5f5; cursor: not-allowed;',
+            'title': 'This field is read-only. Use Asset Assignments to assign/reassign assets.'
+        })
+    )
+
+    class Meta:
+        model = Asset
+        fields = '__all__'
+        widgets = {
+            'custom_attributes': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
+            'asset_type': forms.Select(attrs={'style': 'pointer-events: none; background-color: #f5f5f5;'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Filter asset types to show only hardware
+        from .models import AssetType
+        self.fields['asset_type'].queryset = AssetType.objects.filter(category='HARDWARE')
+        
+        # If creating new asset, set default to first hardware type
+        if not self.instance.pk:
+            hardware_types = AssetType.objects.filter(category='HARDWARE')
+            if hardware_types.exists():
+                self.fields['asset_type'].initial = hardware_types.first()
+        
+        # Handle current assignment display
+        if self.instance and self.instance.pk:
+            current_assignment = self.instance.assignments.filter(
+                returns__isnull=True
+            ).first()
+            
+            if current_assignment:
+                employee = current_assignment.employee
+                if employee.first_name and employee.last_name:
+                    full_name = f"{employee.first_name} {employee.last_name}"
+                    assignment_text = f"{full_name} ({employee.username})"
+                elif employee.first_name:
+                    assignment_text = f"{employee.first_name} ({employee.username})"
+                else:
+                    assignment_text = employee.username
+                
+                assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
+                self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
+            else:
+                self.fields['currently_assigned_to'].initial = "Not assigned"
+        else:
+            self.fields['currently_assigned_to'].widget = forms.HiddenInput()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if 'currently_assigned_to' in cleaned_data:
+            del cleaned_data['currently_assigned_to']
+        return cleaned_data
+
+
+class SoftwareAssetForm(forms.ModelForm):
+    currently_assigned_to = forms.CharField(
+        label="Currently Assigned To",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'readonly': 'readonly', 
+            'style': 'background-color: #f5f5f5; cursor: not-allowed;',
+            'title': 'This field is read-only. Use Asset Assignments to assign/reassign assets.'
+        })
+    )
+
+    class Meta:
+        model = Asset
+        fields = '__all__'
+        widgets = {
+            'custom_attributes': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
+            'asset_type': forms.Select(attrs={'style': 'pointer-events: none; background-color: #f5f5f5;'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Filter asset types to show only software
+        from .models import AssetType
+        self.fields['asset_type'].queryset = AssetType.objects.filter(category='SOFTWARE')
+        
+        # If creating new asset, set default to first software type
+        if not self.instance.pk:
+            software_types = AssetType.objects.filter(category='SOFTWARE')
+            if software_types.exists():
+                self.fields['asset_type'].initial = software_types.first()
+        
+        # Handle current assignment display
+        if self.instance and self.instance.pk:
+            current_assignment = self.instance.assignments.filter(
+                returns__isnull=True
+            ).first()
+            
+            if current_assignment:
+                employee = current_assignment.employee
+                if employee.first_name and employee.last_name:
+                    full_name = f"{employee.first_name} {employee.last_name}"
+                    assignment_text = f"{full_name} ({employee.username})"
+                elif employee.first_name:
+                    assignment_text = f"{employee.first_name} ({employee.username})"
+                else:
+                    assignment_text = employee.username
+                
+                assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
+                self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
+            else:
+                self.fields['currently_assigned_to'].initial = "Not assigned"
+        else:
+            self.fields['currently_assigned_to'].widget = forms.HiddenInput()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if 'currently_assigned_to' in cleaned_data:
+            del cleaned_data['currently_assigned_to']
+        return cleaned_data
+
+
 class AssetAssignmentForm(forms.ModelForm):
     manager_email = EmailModelChoiceField(
         queryset=User.objects.all(),

@@ -25,6 +25,185 @@ def asset_summary(request):
     }
     return render(request, 'assets/summary.html', context)
 
+# @login_required
+# def return_assets_form(request):
+#     if 'selected_assignments' not in request.session:
+#         messages.error(request, "No assignments selected for return.")
+#         return redirect('admin:assets_assetassignment_changelist')
+
+#     assignment_ids = request.session.get('selected_assignments', [])
+#     queryset = AssetAssignment.objects.filter(id__in=assignment_ids)
+
+#     if request.method == 'POST':
+#         for assignment in queryset:
+#             if not assignment.assets.exists():
+#                 messages.warning(request, f"No assets to return for {assignment.employee.username}.")
+#                 continue
+
+#             cleared = True
+#             for asset in assignment.assets.all():
+#                 condition = request.POST.get(f'condition_{asset.id}', 'GOOD')
+#                 notes = request.POST.get(f'notes_{asset.id}', '')
+#                 image = request.FILES.get(f'image_{asset.id}')
+#                 print(f"Returning asset {asset.asset_tag} (ID: {asset.id}) with condition {condition}")
+#                 asset_return = AssetReturn(
+#                     assignment=assignment,
+#                     asset=asset,
+#                     condition=condition,
+#                     notes=notes,
+#                     return_image=image
+#                 )
+#                 asset_return.save()
+#                 print(f"AssetReturn {asset_return.id} created for asset {asset.asset_tag}")
+#                 if image:
+#                     asset.image_after = image
+#                     asset.save()
+#                     print(f"Updated image_after for asset {asset.asset_tag}")
+#                 if condition in ['DAMAGED', 'LOST']:
+#                     cleared = False
+
+#                 AssetHistory.objects.filter(
+#                     asset=asset,
+#                     action__startswith="Status updated to",
+#                     performed_by__isnull=True
+#                 ).update(performed_by=request.user)
+
+#                 AssetHistory.objects.create(
+#                     asset=asset,
+#                     action=f"Returned from {assignment.employee.username}",
+#                     performed_by=request.user,
+#                     notes=notes,
+#                 )
+#                 print(f"Created AssetHistory entry for return of asset {asset.asset_tag}")
+
+#             send_asset_return_report(assignment, cleared, request.user)
+#             print(f"Sent return report for assignment {assignment.id}")
+
+#         messages.success(request, "Assets have been returned and a report has been sent.")
+#         if 'selected_assignments' in request.session:
+#             del request.session['selected_assignments']
+#         return redirect('admin:assets_assetassignment_changelist')
+
+#     return render(request, 'assets/return_assets.html', {
+#         'assignments': queryset,
+#         'admin_changelist_url': reverse('admin:assets_assetassignment_changelist'),
+#     })
+
+
+# Replace the return_assets_form function in your views.py with this:
+
+# @login_required
+# def return_assets_form(request):
+#     if 'selected_assignments' not in request.session:
+#         messages.error(request, "No assignments selected for return.")
+#         return redirect('admin:assets_assetassignment_changelist')
+
+#     assignment_ids = request.session.get('selected_assignments', [])
+#     queryset = AssetAssignment.objects.filter(id__in=assignment_ids)
+
+#     if request.method == 'POST':
+#         for assignment in queryset:
+#             if not assignment.assets.exists():
+#                 messages.warning(request, f"No assets to return for {assignment.employee.username}.")
+#                 continue
+
+#             cleared = True
+#             returned_assets = []
+            
+#             for asset in assignment.assets.all():
+#                 condition = request.POST.get(f'condition_{asset.id}', 'GOOD')
+#                 notes = request.POST.get(f'notes_{asset.id}', '')
+#                 image = request.FILES.get(f'image_{asset.id}')
+                
+#                 print(f"Returning asset {asset.asset_tag} (ID: {asset.id}) with condition {condition}")
+                
+#                 # Check if return already exists
+#                 existing_return = AssetReturn.objects.filter(
+#                     assignment=assignment,
+#                     asset=asset
+#                 ).first()
+                
+#                 if not existing_return:
+#                     asset_return = AssetReturn(
+#                         assignment=assignment,
+#                         asset=asset,
+#                         condition=condition,
+#                         notes=notes,
+#                         return_image=image
+#                     )
+#                     asset_return.save()
+#                     print(f"AssetReturn {asset_return.id} created for asset {asset.asset_tag}")
+                    
+#                     # Update image if provided
+#                     if image:
+#                         asset.image_after = image
+#                         asset.save()
+#                         print(f"Updated image_after for asset {asset.asset_tag}")
+                    
+#                     # Update asset status based on condition
+#                     if condition == 'GOOD':
+#                         asset.status = 'AVAILABLE'
+#                     elif condition == 'DAMAGED':
+#                         asset.status = 'DAMAGED'
+#                     elif condition == 'LOST':
+#                         asset.status = 'LOST'
+                    
+#                     asset.save()
+#                     print(f"Asset {asset.asset_tag} status updated to {asset.status}")
+                    
+#                     if condition in ['DAMAGED', 'LOST']:
+#                         cleared = False
+                    
+#                     # Update history records
+#                     AssetHistory.objects.filter(
+#                         asset=asset,
+#                         action__startswith="Status updated to",
+#                         performed_by__isnull=True
+#                     ).update(performed_by=request.user)
+                    
+#                     AssetHistory.objects.create(
+#                         asset=asset,
+#                         action=f"Returned from {assignment.employee.username} - Status: {asset.status}",
+#                         performed_by=request.user,
+#                         notes=notes,
+#                     )
+#                     print(f"Created AssetHistory entry for return of asset {asset.asset_tag}")
+                    
+#                     returned_assets.append(asset)
+#                 else:
+#                     print(f"Asset {asset.asset_tag} already has a return record")
+            
+#             # Remove returned assets from the assignment
+#             for asset in returned_assets:
+#                 assignment.assets.remove(asset)
+#                 print(f"Removed {asset.asset_tag} from assignment")
+            
+#             # Send return report
+#             if returned_assets:
+#                 send_asset_return_report(assignment, cleared, request.user)
+#                 print(f"Sent return report for assignment {assignment.id}")
+            
+#             # If user is being offboarded, mark them as inactive
+#             if request.POST.get(f'offboard_user_{assignment.employee.id}'):
+#                 assignment.employee.is_active = False
+#                 assignment.employee.save()
+#                 messages.info(request, f"User {assignment.employee.username} has been marked as inactive.")
+
+#         messages.success(request, "Assets have been returned and are now available for reassignment.")
+        
+#         # Clean up any inconsistencies
+#         from .utils import cleanup_returned_assets
+#         cleanup_returned_assets()
+        
+#         if 'selected_assignments' in request.session:
+#             del request.session['selected_assignments']
+        
+#         return redirect('admin:assets_assetassignment_changelist')
+
+#     return render(request, 'assets/return_assets.html', {
+#         'assignments': queryset,
+#         'admin_changelist_url': reverse('admin:assets_assetassignment_changelist'),
+#     })
 @login_required
 def return_assets_form(request):
     if 'selected_assignments' not in request.session:
@@ -45,7 +224,8 @@ def return_assets_form(request):
                 condition = request.POST.get(f'condition_{asset.id}', 'GOOD')
                 notes = request.POST.get(f'notes_{asset.id}', '')
                 image = request.FILES.get(f'image_{asset.id}')
-                print(f"Returning asset {asset.asset_tag} (ID: {asset.id}) with condition {condition}")
+                
+                # Create the return record
                 asset_return = AssetReturn(
                     assignment=assignment,
                     asset=asset,
@@ -54,41 +234,39 @@ def return_assets_form(request):
                     return_image=image
                 )
                 asset_return.save()
-                print(f"AssetReturn {asset_return.id} created for asset {asset.asset_tag}")
+                
+                # The signal will automatically update asset status to AVAILABLE
+                print(f"AssetReturn created for asset {asset.asset_tag}")
+                
+                # Update image if provided
                 if image:
                     asset.image_after = image
                     asset.save()
-                    print(f"Updated image_after for asset {asset.asset_tag}")
+                
                 if condition in ['DAMAGED', 'LOST']:
                     cleared = False
 
-                AssetHistory.objects.filter(
-                    asset=asset,
-                    action__startswith="Status updated to",
-                    performed_by__isnull=True
-                ).update(performed_by=request.user)
-
+                # Create history record
                 AssetHistory.objects.create(
                     asset=asset,
                     action=f"Returned from {assignment.employee.username}",
                     performed_by=request.user,
                     notes=notes,
                 )
-                print(f"Created AssetHistory entry for return of asset {asset.asset_tag}")
 
             send_asset_return_report(assignment, cleared, request.user)
-            print(f"Sent return report for assignment {assignment.id}")
 
-        messages.success(request, "Assets have been returned and a report has been sent.")
+        messages.success(request, "Assets have been returned and are now available for reassignment.")
+        
         if 'selected_assignments' in request.session:
             del request.session['selected_assignments']
+        
         return redirect('admin:assets_assetassignment_changelist')
 
     return render(request, 'assets/return_assets.html', {
         'assignments': queryset,
         'admin_changelist_url': reverse('admin:assets_assetassignment_changelist'),
     })
-
 class AssetAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
