@@ -61,14 +61,20 @@ DATABASES = {
 #     }
 # }
 
+
 EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_SUBJECT_PREFIX = 'CRM: '
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-SERVER_EMAIL = 'no-reply@techoptima.ai'
-DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
+SERVER_EMAIL = os.getenv('SERVER_EMAIL')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_DOMAIN = os.getenv('EMAIL_DOMAIN')
+IT_SUPPORT_EMAIL = os.getenv('IT_SUPPORT_EMAIL')
+SITE_URL = os.getenv('SITE_URL') 
+
 
 ADMINS = [("<Admin1>", "<admin1_box@example.com>")]   # specify admin
 
@@ -542,17 +548,7 @@ resource_types = [
 ]
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'no-reply@techoptima.ai'
-EMAIL_HOST_PASSWORD = 'G!556540298118om'
-DEFAULT_FROM_EMAIL = 'no-reply@techoptima.ai'
-EMAIL_DOMAIN = 'techoptima.ai' 
-IT_SUPPORT_EMAIL = 'support@techoptima.com'
-EMAIL_THREAD_ID = '1'
-SITE_URL = os.getenv('SITE_URL') 
+
 pmo_emails_str = os.getenv('PMO_EMAILS', '')
 
 # Convert to list by splitting on commas
