@@ -1186,8 +1186,12 @@ def handle_approval(request, request_id, token, action):
             notes=f"Automatically {action_text.lower()} via email approval link on {timezone.now()}"
         )
 
-        # Send notifications to all relevant parties
-        send_approval_completion_notifications(access_request, old_status, display_action)
+        # Send notifications to all relevant parties (with error handling)
+        try:
+            send_approval_completion_notifications(access_request, old_status, display_action)
+        except Exception as notification_error:
+            print(f"Warning: Notification failed: {str(notification_error)}")
+            # Continue execution even if notifications fail
 
         return render(request, 'resource_management/approval_success.html', {
             'action': display_action,
@@ -1223,7 +1227,10 @@ def send_approval_completion_notifications(access_request, old_status, action):
         # 2. Notify IT Support/Resource Team  
         send_it_support_notification(access_request, action)
         
-        # 3. Send confirmation to approver
+        # 3. Notify assignee if there is one
+        send_assignee_notification(access_request, action)
+        
+        # 4. Send confirmation to approver
         send_approval_confirmation_email(access_request, action, "Approver")
         
         print("✅ All completion notifications sent successfully")
@@ -1278,6 +1285,12 @@ def send_it_support_notification(access_request, action):
         # Determine who to notify
         recipients = []
         
+        # Always include IT Support email from settings for approval/rejection actions
+        from django.conf import settings
+        if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
+            recipients.append(settings.IT_SUPPORT_EMAIL)
+            print(f"📧 Added IT Support email: {settings.IT_SUPPORT_EMAIL}")
+        
         # If it's an IT request, notify the IT team
         if access_request.request_type == 'IT':
             if access_request.resource and access_request.resource.resource_team_email:
@@ -1290,9 +1303,10 @@ def send_it_support_notification(access_request, action):
         elif access_request.resource and access_request.resource.resource_team_email:
             recipients.append(access_request.resource.resource_team_email)
             
-        # Also notify assigned person if there is one
+        # Always notify assigned person if there is one
         if access_request.assigned_to:
             recipients.append(access_request.assigned_to.email)
+            print(f"📧 Added assignee email: {access_request.assigned_to.email}")
             
         if not recipients:
             print("⚠️ No IT/Resource team recipients found")
@@ -1300,6 +1314,8 @@ def send_it_support_notification(access_request, action):
             
         # Remove duplicates
         recipients = list(set(recipients))
+        
+        print(f"📧 IT Support notification recipients: {recipients}")
         
         subject = f"Access Request {access_request.ticket_number} - {action.upper()} - Action Required"
         
@@ -1329,6 +1345,10 @@ def send_it_support_notification(access_request, action):
             else:
                 template = 'resource_team_rejected_notification.html'
         
+        print(f"📧 Attempting to send IT notification to: {recipients}")
+        print(f"📧 Subject: {subject}")
+        print(f"📧 Template: {template}")
+        
         result = send_email_notification(
             access_request,
             subject,
@@ -1345,6 +1365,60 @@ def send_it_support_notification(access_request, action):
             
     except Exception as e:
         print(f"Error sending IT/Resource team notification: {str(e)}")
+
+
+def send_assignee_notification(access_request, action):
+    """Send notification to the assigned person"""
+    try:
+        # Check if there's an assignee
+        if not access_request.assigned_to:
+            print("📧 No assignee found for this request")
+            return
+            
+        print(f"📧 Sending assignee notification to: {access_request.assigned_to.email}")
+        
+        if action == 'approved':
+            subject = f"Access Request {access_request.ticket_number} - APPROVED - Action Required"
+            template = 'assignee_approved_notification.html'
+        else:
+            subject = f"Access Request {access_request.ticket_number} - REJECTED - Action Required"
+            template = 'assignee_rejected_notification.html'
+            
+        context = {
+            'ticket': access_request.ticket_number,
+            'requester': access_request.user.get_full_name() or access_request.user.username,
+            'requester_employee_id': access_request.user.username,
+            'requester_email': access_request.user.email,
+            'resource': access_request.resource.name if access_request.resource else 'N/A',
+            'access_level': access_request.access_level.name if access_request.access_level else 'N/A',
+            'action': action,
+            'status': access_request.get_status_display(),
+            'request_type': access_request.request_type,
+            'justification': access_request.justification,
+            'priority': access_request.get_priority_display(),
+            'assignee': access_request.assigned_to.get_full_name() or access_request.assigned_to.username,
+        }
+        
+        print(f"📧 Attempting to send assignee notification to: {access_request.assigned_to.email}")
+        print(f"📧 Subject: {subject}")
+        print(f"📧 Template: {template}")
+        
+        result = send_email_notification(
+            access_request,
+            subject,
+            template,
+            context,
+            [access_request.assigned_to.email],
+            is_reply=True
+        )
+        
+        if result:
+            print(f"✅ Assignee notification sent to: {access_request.assigned_to.email}")
+        else:
+            print(f"❌ Failed to send assignee notification")
+            
+    except Exception as e:
+        print(f"Error sending assignee notification: {str(e)}")
 
 # Rest of the ViewSets remain the same...
 class ResourceTypeViewSet(viewsets.ModelViewSet):

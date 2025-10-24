@@ -710,7 +710,7 @@ class HSTSSecurityMiddleware:
             "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data: https:; "
-            "font-src 'self' https://fonts.gstatic.com; "
+            "font-src 'self' data: https://fonts.gstatic.com; "
         )
         
         # Additional security headers
