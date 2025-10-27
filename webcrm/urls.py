@@ -17,6 +17,7 @@ from content.views import search_users
 from django.conf import settings
 import dal
 from django.conf.urls.i18n import i18n_patterns
+from resource_management.views import handle_approval
 
 admin.site.site_header = 'Optima Management Hub'
 admin.site.site_title = 'Optima Management Hub'
@@ -37,7 +38,10 @@ urlpatterns = [
         'OAuth-2/authorize/',
         staff_member_required(get_refresh_token), 
         name='get_refresh_token'
-    ),   
+    ),
+    # Direct approve-request URLs (outside i18n patterns)
+    path('456/approve-request/<int:request_id>/<str:token>/<str:action>/', 
+         handle_approval, name='admin_handle_approval'),
 ]
 
 urlpatterns += static(
@@ -56,6 +60,10 @@ urlpatterns += i18n_patterns(
     path(settings.SECRET_ADMIN_PREFIX, admin.site.urls),
     path('resource-management/', include('resource_management.urls')),
     path('onboarding/', include('onboarding.urls')),  # 👈 ADD THIS LINE
+    
+    # Direct approve-request URLs for email links
+    path('approve-request/<int:request_id>/<str:token>/<str:action>/', 
+         handle_approval, name='direct_handle_approval'),
     
     path('contact-form/<uuid:uuid>/', contact_form, name='contact_form'),
     path('api/', include('content.urls')),
