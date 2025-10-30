@@ -44,11 +44,12 @@ class Migration(migrations.Migration):
             name='AssetAssignment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('manager_email', models.CharField(blank=True, max_length=255, null=True, validators=[django.core.validators.RegexValidator(message='Enter a valid email address.', regex='^[a-zA-Z0-9_.+-]+@[a-zA.Z0-9-]+\\.[a-zA.Z0-9-.]+$')])),
+                ('manager_email', models.CharField(blank=True, max_length=255, null=True, validators=[django.core.validators.RegexValidator(message='Enter a valid email address.', regex='^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$')])),
                 ('notes', models.TextField(blank=True)),
                 ('assigned_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('assets', models.ManyToManyField(related_name='assignments', to='assets.asset')),
+                ('asset_types', models.ManyToManyField(blank=True, related_name='assignments', to='assets.assettype')),
                 ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assignments', to=settings.AUTH_USER_MODEL)),
             ],
         ),

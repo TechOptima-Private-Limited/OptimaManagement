@@ -39,7 +39,7 @@ class AssetAssignmentViewSet(viewsets.ModelViewSet):
             return qs.filter(employee=self.request.user)
         if not self.request.user.is_superuser:
             asset_team_emails = AssetType.objects.filter(asset_team_email=self.request.user.email).values_list('id', flat=True)
-            return qs.filter(asset__asset_type__id__in=asset_team_emails)
+            return qs.filter(assets__asset_type__id__in=asset_team_emails)
         return qs
 
 class AssetHistoryViewSet(viewsets.ReadOnlyModelViewSet):

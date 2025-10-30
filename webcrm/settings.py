@@ -504,8 +504,8 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
-DOMAIN_NAME = os.getenv('SITE_URL')
-# DOMAIN_NAME = 'http://127.0.0.1:8000'
+#DOMAIN_NAME = os.getenv('SITE_URL')
+DOMAIN_NAME = 'http://127.0.0.1:8000'
 ADMIN_SITE_HEADER = "Optima CMS"
 ADMIN_SITE_TITLE = "Optima CMS"
 ADMIN_INDEX_TITLE = "Welcome to Optima CMS"

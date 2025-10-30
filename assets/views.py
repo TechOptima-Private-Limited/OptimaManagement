@@ -267,66 +267,6 @@ def return_assets_form(request):
         'assignments': queryset,
         'admin_changelist_url': reverse('admin:assets_assetassignment_changelist'),
     })
-class AssetAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Asset.objects.none()
-
-        qs = Asset.objects.filter(status='AVAILABLE', is_active=True)
-        print(f"AssetAutocomplete queryset: {qs}")
-        if self.q:
-            qs = qs.filter(
-                Q(asset_tag__icontains=self.q) |
-                Q(name__icontains=self.q) |
-                Q(serial_number__icontains=self.q)
-            )
-        return qs
-
-    def get_result_value(self, result):
-        return str(result.id)
-
-    def get_result_label(self, result):
-        return f"{result.name} - {result.asset_tag}"
-
-class EmployeeAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return User.objects.none()
-
-        qs = User.objects.filter(is_active=True)
-        print(f"EmployeeAutocomplete queryset: {qs}")
-        if self.q:
-            qs = qs.filter(
-                Q(email__icontains=self.q) |
-                Q(username__icontains=self.q)
-            )
-        return qs
-
-    def get_result_value(self, result):
-        return str(result.id)
-
-    def get_result_label(self, result):
-        return f"{result.username} ({result.email})"
-
-class ManagerEmailAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return User.objects.none()
-
-        qs = User.objects.filter(is_active=True, is_staff=True)
-        print(f"ManagerEmailAutocomplete queryset: {qs}")
-        if self.q:
-            qs = qs.filter(
-                Q(email__icontains=self.q) |
-                Q(username__icontains=self.q)
-            )
-        return qs
-
-    def get_result_value(self, result):
-        return result.email
-
-    def get_result_label(self, result):
-        return f"{result.username} ({result.email})"
 
 class AssetTypeViewSet(viewsets.ModelViewSet):
     queryset = AssetType.objects.all()
@@ -355,12 +295,70 @@ class AssetAssignmentViewSet(viewsets.ModelViewSet):
     queryset = AssetAssignment.objects.all()
     serializer_class = AssetAssignmentSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'put', 'patch', 'head', 'options']
 
     def get_queryset(self):
         qs = super().get_queryset()
         if not self.request.user.is_superuser:
-            return qs.filter(employee=self.request.user)
-        return qs
+            qs = qs.filter(employee=self.request.user)
+        
+        # Add filtering by employee_id if provided
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+            
+        return qs.prefetch_related('assets', 'asset_types').distinct()
+
+    def perform_create(self, serializer):
+        print("1")
+        # Set the current user as the creator if not provided
+        if 'employee' not in serializer.validated_data:
+            serializer.validated_data['employee'] = self.request.user
+        
+        # Save the assignment
+        assignment = serializer.save()
+        
+        # Log the assignment
+        for asset in assignment.assets.all():
+            AssetHistory.objects.create(
+                asset=asset,
+                action=f"Assigned to {assignment.employee.username}",
+                performed_by=self.request.user,
+                notes=assignment.notes
+            )
+
+    def perform_update(self, serializer):
+        old_instance = self.get_object()
+        old_assets = set(old_instance.assets.all())
+        
+        # Save the updated assignment
+        assignment = serializer.save()
+        new_assets = set(assignment.assets.all())
+        
+        # Handle removed assets
+        removed_assets = old_assets - new_assets
+        for asset in removed_assets:
+            asset.status = 'AVAILABLE'
+            asset.save()
+            AssetHistory.objects.create(
+                asset=asset,
+                action="Removed from assignment",
+                performed_by=self.request.user,
+                notes=f"Removed from assignment to {assignment.employee.username}"
+            )
+        
+        # Handle added assets
+        added_assets = new_assets - old_assets
+        print("2")
+        for asset in added_assets:
+            asset.status = 'ASSIGNED'
+            asset.save()
+            AssetHistory.objects.create(
+                asset=asset,
+                action=f"Assigned to {assignment.employee.username}",
+                performed_by=self.request.user,
+                notes=assignment.notes
+            )
 
 class AssetHistoryViewSet(viewsets.ModelViewSet):
     queryset = AssetHistory.objects.all()
