@@ -239,7 +239,7 @@
 
 # assets/forms.py
 from django import forms
-from dal import autocomplete
+from dal import autocomplete, forward
 from django.contrib.auth.models import User
 from .models import Asset, AssetAssignment, AssetReturn
 from django.db import models
@@ -338,7 +338,6 @@ class HardwareAssetForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'custom_attributes': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
-            'asset_type': forms.Select(attrs={'style': 'pointer-events: none; background-color: #f5f5f5;'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -346,33 +345,40 @@ class HardwareAssetForm(forms.ModelForm):
         
         # Filter asset types to show only hardware
         from .models import AssetType
-        self.fields['asset_type'].queryset = AssetType.objects.filter(category='HARDWARE')
+        self.fields['asset_type'].queryset = AssetType.objects.filter(category='HARDWARE', is_active=True)
         
         # If creating new asset, set default to first hardware type
         if not self.instance.pk:
-            hardware_types = AssetType.objects.filter(category='HARDWARE')
+            hardware_types = AssetType.objects.filter(category='HARDWARE', is_active=True)
             if hardware_types.exists():
                 self.fields['asset_type'].initial = hardware_types.first()
+        else:
+            # Make asset_type read-only for existing assets
+            self.fields['asset_type'].widget.attrs['readonly'] = True
+            self.fields['asset_type'].widget.attrs['style'] = 'pointer-events: none; background-color: #f5f5f5;'
         
         # Handle current assignment display
         if self.instance and self.instance.pk:
-            current_assignment = self.instance.assignments.filter(
-                returns__isnull=True
-            ).first()
-            
-            if current_assignment:
-                employee = current_assignment.employee
-                if employee.first_name and employee.last_name:
-                    full_name = f"{employee.first_name} {employee.last_name}"
-                    assignment_text = f"{full_name} ({employee.username})"
-                elif employee.first_name:
-                    assignment_text = f"{employee.first_name} ({employee.username})"
-                else:
-                    assignment_text = employee.username
+            try:
+                current_assignment = self.instance.assignments.filter(
+                    returns__isnull=True
+                ).first()
                 
-                assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
-                self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
-            else:
+                if current_assignment:
+                    employee = current_assignment.employee
+                    if employee.first_name and employee.last_name:
+                        full_name = f"{employee.first_name} {employee.last_name}"
+                        assignment_text = f"{full_name} ({employee.username})"
+                    elif employee.first_name:
+                        assignment_text = f"{employee.first_name} ({employee.username})"
+                    else:
+                        assignment_text = employee.username
+                    
+                    assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
+                    self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
+                else:
+                    self.fields['currently_assigned_to'].initial = "Not assigned"
+            except Exception as e:
                 self.fields['currently_assigned_to'].initial = "Not assigned"
         else:
             self.fields['currently_assigned_to'].widget = forms.HiddenInput()
@@ -400,7 +406,6 @@ class SoftwareAssetForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'custom_attributes': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
-            'asset_type': forms.Select(attrs={'style': 'pointer-events: none; background-color: #f5f5f5;'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -408,33 +413,40 @@ class SoftwareAssetForm(forms.ModelForm):
         
         # Filter asset types to show only software
         from .models import AssetType
-        self.fields['asset_type'].queryset = AssetType.objects.filter(category='SOFTWARE')
+        self.fields['asset_type'].queryset = AssetType.objects.filter(category='SOFTWARE', is_active=True)
         
         # If creating new asset, set default to first software type
         if not self.instance.pk:
-            software_types = AssetType.objects.filter(category='SOFTWARE')
+            software_types = AssetType.objects.filter(category='SOFTWARE', is_active=True)
             if software_types.exists():
                 self.fields['asset_type'].initial = software_types.first()
+        else:
+            # Make asset_type read-only for existing assets
+            self.fields['asset_type'].widget.attrs['readonly'] = True
+            self.fields['asset_type'].widget.attrs['style'] = 'pointer-events: none; background-color: #f5f5f5;'
         
         # Handle current assignment display
         if self.instance and self.instance.pk:
-            current_assignment = self.instance.assignments.filter(
-                returns__isnull=True
-            ).first()
-            
-            if current_assignment:
-                employee = current_assignment.employee
-                if employee.first_name and employee.last_name:
-                    full_name = f"{employee.first_name} {employee.last_name}"
-                    assignment_text = f"{full_name} ({employee.username})"
-                elif employee.first_name:
-                    assignment_text = f"{employee.first_name} ({employee.username})"
-                else:
-                    assignment_text = employee.username
+            try:
+                current_assignment = self.instance.assignments.filter(
+                    returns__isnull=True
+                ).first()
                 
-                assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
-                self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
-            else:
+                if current_assignment:
+                    employee = current_assignment.employee
+                    if employee.first_name and employee.last_name:
+                        full_name = f"{employee.first_name} {employee.last_name}"
+                        assignment_text = f"{full_name} ({employee.username})"
+                    elif employee.first_name:
+                        assignment_text = f"{employee.first_name} ({employee.username})"
+                    else:
+                        assignment_text = employee.username
+                    
+                    assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
+                    self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
+                else:
+                    self.fields['currently_assigned_to'].initial = "Not assigned"
+            except Exception as e:
                 self.fields['currently_assigned_to'].initial = "Not assigned"
         else:
             self.fields['currently_assigned_to'].widget = forms.HiddenInput()
@@ -460,9 +472,23 @@ class AssetAssignmentForm(forms.ModelForm):
         to_field_name='email',
     )
 
+    available_assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.filter(status='AVAILABLE', is_active=True),
+        required=False,
+        widget=autocomplete.ModelSelect2Multiple(
+            url='assets:available-assets-autocomplete',
+            attrs={
+                'data-placeholder': 'Select available assets',
+                'data-html': True,
+                'data-minimum-input-length': 0,
+            },
+            forward=('asset_types',),  # Forward the selected asset types
+        ),
+    )
+
     class Meta:
         model = AssetAssignment
-        fields = ['employee', 'assets', 'manager_email', 'notes']
+        fields = ['employee', 'asset_types', 'available_assets', 'manager_email', 'notes']
         widgets = {
             'employee': autocomplete.ModelSelect2(
                 url='assets:employee-autocomplete',
@@ -471,18 +497,22 @@ class AssetAssignmentForm(forms.ModelForm):
                     'data-minimum-input-length': 2,
                 },
             ),
-            'assets': autocomplete.ModelSelect2Multiple(
-                url='assets:asset-autocomplete',
+            'asset_types': autocomplete.ModelSelect2Multiple(
+                url='assets:asset-type-autocomplete',
                 attrs={
-                    'data-placeholder': 'Search for assets to assign...',
+                    'data-placeholder': 'Search for asset types to assign...',
                     'data-minimum-input-length': 2,
+                    'class': 'asset-type-select',
                 },
-                forward=['instance_id'],
             ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        from .models import AssetType  # avoid circular imports
+
+        # Initialize manager email
         if self.instance and self.instance.pk and self.instance.manager_email:
             try:
                 manager = User.objects.get(email=self.instance.manager_email)
@@ -491,10 +521,36 @@ class AssetAssignmentForm(forms.ModelForm):
             except User.DoesNotExist:
                 self.fields['manager_email'].initial = None
                 print("Manager email not found in User table.")
+
+        # Asset types setup
+        self.fields['asset_types'].queryset = AssetType.objects.filter(is_active=True)
+        self.fields['asset_types'].label = "Asset Types"
+
+        # Handle initial asset types and available assets
         if self.instance and self.instance.pk:
-            self.fields['assets'].initial = self.instance.assets.all()
-            self.fields['assets'].widget.attrs['data-exclude-assignment'] = self.instance.id
-            print(f"Set assets initial to: {self.fields['assets'].initial}")
+            asset_types = self.instance.asset_types.all()
+            self.fields['asset_types'].initial = asset_types
+            print(f"Set asset_types initial to: {asset_types}")
+
+            self.fields['available_assets'].initial = self.instance.assets.all()
+
+            if asset_types.exists():
+                asset_type_ids = list(asset_types.values_list('id', flat=True))
+
+                # ✅ Fixed: use forward.Const instead of a raw list of IDs
+                self.fields['available_assets'].widget.forward = [
+                    forward.Const(asset_type_ids, 'asset_types')
+                ]
+
+                # ✅ keep filtered queryset
+                self.fields['available_assets'].queryset = Asset.objects.filter(
+                    asset_type_id__in=asset_type_ids,
+                    status='AVAILABLE',
+                    is_active=True
+                )
+        else:
+            # For new forms
+            self.fields['available_assets'].widget.forward = ['asset_types']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -505,6 +561,7 @@ class AssetAssignmentForm(forms.ModelForm):
         else:
             cleaned_data['manager_email'] = None
         print(f"Cleaned data after conversion: {cleaned_data}")
+
         if 'employee' in self.errors:
             cleaned_data['employee'] = None
             self.data = self.data.copy()
@@ -523,46 +580,40 @@ class AssetAssignmentForm(forms.ModelForm):
             raise forms.ValidationError("The manager cannot be the same as the employee.")
         return manager
 
-    def clean_assets(self):
-        assets = self.cleaned_data.get('assets')
-        if not assets:
-            return assets
-        for asset in assets:
-            asset.refresh_from_db()
-            print(f"Asset {asset.asset_tag} status: {asset.status}")
-            exclude_id = self.instance.id if self.instance and self.instance.pk else None
-            active_assignments = AssetAssignment.objects.filter(
-                assets=asset,
-                returns__isnull=True
-            )
-            if exclude_id:
-                active_assignments = active_assignments.exclude(id=exclude_id)
-            print(f"Active assignments for {asset.asset_tag} (excluding {exclude_id}): {active_assignments}")
-            if active_assignments.exists():
-                print(f"Active assignment details: {[(a.id, a.employee.username) for a in active_assignments]}")
-                if asset.status == 'AVAILABLE':
-                    print(f"Data inconsistency detected: Asset {asset.asset_tag} is AVAILABLE but has active assignments. Updating status to ASSIGNED.")
-                    asset.status = 'ASSIGNED'
-                    asset.save()
-                raise forms.ValidationError(f"Asset {asset.asset_tag} is already assigned to another employee.")
-            if asset.status != 'AVAILABLE':
-                print(f"Data inconsistency detected: Asset {asset.asset_tag} status is {asset.status}, but no active assignments found. Updating status to AVAILABLE.")
-                asset.status = 'AVAILABLE'
-                asset.save()
-        return assets
+    def clean_asset_types(self):
+        asset_types = self.cleaned_data.get('asset_types')
+        if not asset_types:
+            return asset_types
+        return asset_types
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+
+        # Handle manager email
         manager_email = self.cleaned_data.get('manager_email')
-        instance.manager_email = manager_email
-        print(f"Saving manager_email to instance: {instance.manager_email}")
+        if manager_email:
+            instance.manager_email = manager_email.email if hasattr(manager_email, 'email') else str(manager_email)
+
         if commit:
             instance.save()
-            print(f"After instance.save(), manager_email: {instance.manager_email}")
             self.save_m2m()
-            print(f"Saved instance with assets: {instance.assets.all()}")
+
+            # Clear and re-add assets
+            instance.assets.clear()
+            available_assets = self.cleaned_data.get('available_assets', [])
+            if available_assets:
+                instance.assets.add(*available_assets)
+
+                # Update asset status
+                for asset in available_assets:
+                    asset.status = 'ASSIGNED'
+                    asset.save()
+
+            self.save_m2m()
+            print(f"Saved instance with asset types: {self.cleaned_data.get('asset_types')}")
             instance.refresh_from_db()
-            print(f"After refresh, manager_email: {instance.manager_email}, assets: {instance.assets.all()}")
+            print(f"After refresh, manager_email: {instance.manager_email}, asset types: {self.cleaned_data.get('asset_types')}")
+
         return instance
 
 class AssetReturnForm(forms.ModelForm):

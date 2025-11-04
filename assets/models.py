@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 email_validator = RegexValidator(
-    regex=r'^[a-zA-Z0-9_.+-]+@[a-zA.Z0-9-]+\.[a-zA.Z0-9-.]+$',
+    regex=r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
     message="Enter a valid email address."
 )
 
@@ -154,6 +154,7 @@ class OffboardingAssetReturn(models.Model):
 class AssetAssignment(models.Model):
     employee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
     assets = models.ManyToManyField(Asset, related_name='assignments')
+    asset_types = models.ManyToManyField('AssetType', related_name='assignments', blank=True)
     manager_email = models.CharField(max_length=255, null=True, blank=True, validators=[email_validator])
     notes = models.TextField(blank=True)
     assigned_at = models.DateTimeField(auto_now_add=True)

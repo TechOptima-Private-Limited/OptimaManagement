@@ -50,7 +50,13 @@
             {% endfor %}
         </tbody>
     </table>
-    <p>Clearance Status: {% if cleared %}Cleared{% else %}Not Cleared (Damaged/Lost Assets Detected){% endif %}</p>
+    <p>Asset Return Status: 
+        {% if cleared %}
+            Assets Verified and Cleared
+        {% else %}
+            Not Cleared (Damaged/Lost Assets Detected)
+        {% endif %}
+    </p>
     <p>Returned by: {{ performed_by }}</p>
     <p>Best regards,<br>The Asset Management Team</p>
 </body>

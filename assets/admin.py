@@ -295,78 +295,76 @@ class AssetTypeAdmin(admin.ModelAdmin):
 class HardwareAssetAdmin(admin.ModelAdmin):
     form = HardwareAssetForm
     list_display = (
-        'asset_tag', 'name', 'asset_type', 'assigned_employee', 'status',
-        'is_active', 'purchased_date', 'previously_used_by', 'laptop_age'
+        'asset_tag', 'name', 'asset_type', 'status',
+        'is_active'
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
-        'asset_tag', 'name', 'serial_number',
-        'assignments__employee__username', 'assignments__employee__first_name',
-        'assignments__employee__last_name', 'assignments__employee__email'
+        'asset_tag', 'name', 'serial_number'
     )
 
     fieldsets = (
         ('Basic Information', {
             'fields': ('asset_type', 'name', 'asset_tag', 'serial_number', 'status', 'is_active')
         }),
-        ('Current Assignment', {
-            'fields': ('currently_assigned_to',),
-            'description': 'Current assignment information (read-only). Use "Asset assignments" menu to assign/reassign assets.',
-            'classes': ('collapse',)
-        }),
-        ('Purchase & Usage History', {
-            'fields': ('purchased_date', 'previously_used_by', 'laptop_age'),
-            'classes': ('collapse',)
-        }),
         ('Additional Details', {
             'fields': ('custom_attributes',),   
             'classes': ('collapse',)
         }),
-        ('Images', {
-            'fields': ('image_before', 'image_after'),
-            'classes': ('collapse',)
-        }),
     )
 
-    inlines = [AssetHistoryInline]
+    # inlines = [AssetHistoryInline]  # Temporarily disabled to debug
     actions = ['mark_as_damaged', 'mark_as_available']
 
     def get_queryset(self, request):
         # Filter to show only hardware assets
         qs = super().get_queryset(request)
-        return qs.filter(asset_type__category='HARDWARE').select_related('asset_type').prefetch_related(
-            'assignments__employee',
-            'assignments__returns'
-        )
+        qs = qs.filter(asset_type__category='HARDWARE')
+        # Only select fields that exist in the database
+        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after').select_related('asset_type')
+        
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'asset_type' in form.base_fields:
+            form.base_fields['asset_type'].queryset = form.base_fields['asset_type'].queryset.filter(category='HARDWARE')
+        return form
 
     def assigned_employee(self, obj):
-        current_assignment = obj.assignments.filter(returns__isnull=True).first()
-        if current_assignment:
-            employee = current_assignment.employee
-            if employee.first_name and employee.last_name:
-                full_name = f"{employee.first_name} {employee.last_name}"
-                return f"{full_name} ({employee.username})"
-            elif employee.first_name:
-                return f"{employee.first_name} ({employee.username})"
-            return self.get_display_name_from_username(employee)
-        return "-"
+        try:
+            current_assignment = obj.assignments.filter(returns__isnull=True).first()
+            if current_assignment:
+                employee = current_assignment.employee
+                if employee.first_name and employee.last_name:
+                    full_name = f"{employee.first_name} {employee.last_name}"
+                    return f"{full_name} ({employee.username})"
+                elif employee.first_name:
+                    return f"{employee.first_name} ({employee.username})"
+                return self.get_display_name_from_username(employee)
+            return "-"
+        except Exception as e:
+            return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
 
     def get_display_name_from_username(self, employee):
-        if employee.email:
-            email_part = employee.email.split('@')[0]
-            for sep in ('.', '_'):
-                if sep in email_part:
-                    parts = email_part.split(sep)
-                    if len(parts) >= 2:
-                        return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
-        for sep in ('.', '_'):
-            if sep in employee.username:
-                parts = employee.username.split(sep)
-                if len(parts) >= 2:
-                    return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
-        return employee.username
+        try:
+            if employee and hasattr(employee, 'email') and employee.email:
+                email_part = employee.email.split('@')[0]
+                for sep in ('.', '_'):
+                    if sep in email_part:
+                        parts = email_part.split(sep)
+                        if len(parts) >= 2:
+                            return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
+            if employee and hasattr(employee, 'username'):
+                for sep in ('.', '_'):
+                    if sep in employee.username:
+                        parts = employee.username.split(sep)
+                        if len(parts) >= 2:
+                            return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
+                return getattr(employee, 'username', str(employee))
+            return ""
+        except Exception as e:
+            return str(employee) if employee else ""
 
     def mark_as_damaged(self, request, queryset):
         for asset in queryset:
@@ -399,24 +397,17 @@ class HardwareAssetAdmin(admin.ModelAdmin):
 class SoftwareAssetAdmin(admin.ModelAdmin):
     form = SoftwareAssetForm
     list_display = (
-        'asset_tag', 'name', 'asset_type', 'assigned_employee', 'status',
+        'asset_tag', 'name', 'asset_type', 'status',
         'is_active'
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
-        'asset_tag', 'name', 'serial_number',
-        'assignments__employee__username', 'assignments__employee__first_name',
-        'assignments__employee__last_name', 'assignments__employee__email'
+        'asset_tag', 'name', 'serial_number'
     )
 
     fieldsets = (
         ('Basic Information', {
             'fields': ('asset_type', 'name', 'asset_tag', 'serial_number', 'status', 'is_active')
-        }),
-        ('Current Assignment', {
-            'fields': ('currently_assigned_to',),
-            'description': 'Current assignment information (read-only). Use "Asset assignments" menu to assign/reassign assets.',
-            'classes': ('collapse',)
         }),
         ('Additional Details', {
             'fields': ('custom_attributes',),   
@@ -424,45 +415,58 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = [AssetHistoryInline]
+    # inlines = [AssetHistoryInline]  # Temporarily disabled to debug
     actions = ['mark_as_damaged', 'mark_as_available']
 
     def get_queryset(self, request):
         # Filter to show only software assets
         qs = super().get_queryset(request)
-        return qs.filter(asset_type__category='SOFTWARE').select_related('asset_type').prefetch_related(
-            'assignments__employee',
-            'assignments__returns'
-        )
+        qs = qs.filter(asset_type__category='SOFTWARE')
+        # Only select fields that exist in the database
+        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after').select_related('asset_type')
+        
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'asset_type' in form.base_fields:
+            form.base_fields['asset_type'].queryset = form.base_fields['asset_type'].queryset.filter(category='SOFTWARE')
+        return form
 
     def assigned_employee(self, obj):
-        current_assignment = obj.assignments.filter(returns__isnull=True).first()
-        if current_assignment:
-            employee = current_assignment.employee
-            if employee.first_name and employee.last_name:
-                full_name = f"{employee.first_name} {employee.last_name}"
-                return f"{full_name} ({employee.username})"
-            elif employee.first_name:
-                return f"{employee.first_name} ({employee.username})"
-            return self.get_display_name_from_username(employee)
-        return "-"
+        try:
+            current_assignment = obj.assignments.filter(returns__isnull=True).first()
+            if current_assignment:
+                employee = current_assignment.employee
+                if employee.first_name and employee.last_name:
+                    full_name = f"{employee.first_name} {employee.last_name}"
+                    return f"{full_name} ({employee.username})"
+                elif employee.first_name:
+                    return f"{employee.first_name} ({employee.username})"
+                return self.get_display_name_from_username(employee)
+            return "-"
+        except Exception as e:
+            return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
 
     def get_display_name_from_username(self, employee):
-        if employee.email:
-            email_part = employee.email.split('@')[0]
-            for sep in ('.', '_'):
-                if sep in email_part:
-                    parts = email_part.split(sep)
-                    if len(parts) >= 2:
-                        return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
-        for sep in ('.', '_'):
-            if sep in employee.username:
-                parts = employee.username.split(sep)
-                if len(parts) >= 2:
-                    return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
-        return employee.username
+        try:
+            if employee and hasattr(employee, 'email') and employee.email:
+                email_part = employee.email.split('@')[0]
+                for sep in ('.', '_'):
+                    if sep in email_part:
+                        parts = email_part.split(sep)
+                        if len(parts) >= 2:
+                            return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
+            if employee and hasattr(employee, 'username'):
+                for sep in ('.', '_'):
+                    if sep in employee.username:
+                        parts = employee.username.split(sep)
+                        if len(parts) >= 2:
+                            return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
+                return getattr(employee, 'username', str(employee))
+            return ""
+        except Exception as e:
+            return str(employee) if employee else ""
 
     def mark_as_damaged(self, request, queryset):
         for asset in queryset:
@@ -499,14 +503,25 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
     inlines = [AssetAssignmentImageInline]
     actions = ['return_assets']
 
+    def get_search_form_class(self):
+        return None
+
     def get_inline_instances(self, request, obj=None):
         if obj is None:
             return []
         return super().get_inline_instances(request, obj)
 
     def asset_count(self, obj):
-        return obj.assets.count()
-    asset_count.short_description = "Number of Assets"
+        try:
+            asset_count = obj.assets.count()
+        except Exception:
+            asset_count = 0
+        try:
+            type_count = obj.asset_types.count()
+        except Exception:
+            type_count = 0
+        return f"{asset_count} assets / {type_count} types"
+    asset_count.short_description = "Assets / Types"
 
     def return_assets(self, request, queryset):
         print("Entering return_assets action")
@@ -580,49 +595,65 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
                     asset.save()
         super().save_formset(request, form, formset, change)
 
+    # ✅ FIXED save_model
     def save_model(self, request, obj, form, change):
         print(f"Saving AssetAssignment {obj.id if obj.id else 'new'}, change={change}")
         super().save_model(request, obj, form, change)
-        selected_assets = form.cleaned_data['assets']
-        print(f"Selected assets: {[asset.asset_tag for asset in selected_assets]}")
-        # Ensure the assets are associated with the assignment
-        if not change:  # On add
-            obj.assets.set(selected_assets)
-        action = "Updated assets for" if change else "Assigned assets to"
-        for asset in selected_assets:
-            AssetHistory.objects.create(
-                asset=asset,
-                action=f"{action} {obj.employee.username}",
-                performed_by=request.user,
-                notes=obj.notes
-            )
+
+        # --- Handle asset types ---
+        asset_types = form.cleaned_data.get('asset_types', [])
+        if asset_types:
+            obj.asset_types.set(asset_types)
+            print(f"✅ Set asset types: {[at.name for at in asset_types]}")
+        else:
+            print("⚠️ No asset types provided — skipping asset_types set.")
+
+        # --- Handle available assets (actual assets to assign) ---
+        available_assets = form.cleaned_data.get('available_assets', [])
+        if available_assets:
+            print(f"🔧 Assigning {len(available_assets)} assets to {obj.employee.username}")
+            obj.assets.set(available_assets)
+
+            for asset in available_assets:
+                asset.status = 'ASSIGNED'
+                asset.save()
+
+                from .models import AssetHistory
+                AssetHistory.objects.create(
+                    asset=asset,
+                    action=f"Assigned to {obj.employee.username}",
+                    performed_by=request.user,
+                    notes=f"Assigned via asset type(s): {', '.join([at.name for at in asset_types])}"
+                )
+                print(f"✅ Asset {asset.asset_tag} marked as ASSIGNED to {obj.employee.username}")
+        else:
+            print("⚠️ No available_assets found — skipping asset assignment.")
+
+        # --- Send assignment email notification ---
+        try:
+            send_asset_assignment_notification(obj)
+            print(f"📧 Notification sent to {obj.employee.username}")
+        except Exception as e:
+            print(f"❌ Failed to send notification: {e}")
 
     def save_related(self, request, form, formsets, change):
         print(f"Saving related objects for AssetAssignment {form.instance.id}, change={change}")
         super().save_related(request, form, formsets, change)
-        # Ensure assets are saved before signals fire
-        if not change:  # On add
-            selected_assets = form.cleaned_data['assets']
-            form.instance.assets.set(selected_assets)
-            print(f"Assets set for AssetAssignment {form.instance.id}: {[asset.asset_tag for asset in selected_assets]}")
-        # Only send the notification after the images are saved on the edit page
-        if change:
+        
+        if 'assetassignmentimage_set' in form.cleaned_data:
+            for image_form in form.cleaned_data['assetassignmentimage_set']:
+                if image_form and 'image' in image_form.cleaned_data and image_form.cleaned_data['image']:
+                    pass
+                    
+        if change and 'asset_types' in form.cleaned_data:
             send_asset_assignment_notification(form.instance)
 
     def get_form(self, request, obj=None, **kwargs):
         form_class = super().get_form(request, obj, **kwargs)
-        if request.method == 'POST':
-            form = form_class(request.POST, request.FILES)
-            if form.is_valid():
-                selected_assets = form.cleaned_data.get('assets', [])
-                self.inlines[0].extra = len(selected_assets)
-            else:
-                self.inlines[0].extra = 0
-        elif obj and obj.assets.exists():
+        if obj and obj.assets.exists():
             self.inlines[0].extra = obj.assets.count()
         else:
             self.inlines[0].extra = 0
-        self.parent_form = form_class
         return form_class
 
     def response_add(self, request, obj, post_url_continue=None):
@@ -785,8 +816,8 @@ from django.contrib.auth.models import User
 
 
 class OffboardingAssetReturnAdmin(admin.ModelAdmin):
-    list_display = ['user_display', 'user_email', 'laptop_status_display', 'assets_status', 'created_at']
-    list_filter = ['laptop_status', 'created_at', 'is_offboarded']
+    list_display = ['user_display', 'user_email', 'assets_status', 'created_at']
+    list_filter = ['created_at', 'is_offboarded']
     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'user__email']
     list_display_links = ['user_display']
     date_hierarchy = 'created_at'
@@ -796,7 +827,7 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('user', 'laptop_status', 'dynamic_asset_checkboxes')
+            'fields': ('user', 'dynamic_asset_checkboxes')
         }),
         ('Damaged Assets & Remarks', {
             'fields': ('damaged_assets_file', 'remarks'),
@@ -835,22 +866,6 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
     user_email.short_description = 'Email'
     user_email.admin_order_field = 'user__email'
 
-    def laptop_status_display(self, obj):
-        status_colors = {
-            'AVAILABLE': 'green',
-            'ASSIGNED': 'blue',
-            'DAMAGED': 'orange',
-            'LOST': 'red'
-        }
-        color = status_colors.get(obj.laptop_status, 'gray')
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">⬤ {}</span>',
-            color,
-            obj.get_laptop_status_display()
-        )
-    laptop_status_display.short_description = 'Return Status'
-    laptop_status_display.admin_order_field = 'laptop_status'
-
     def assets_status(self, obj):
         total = obj.returned_assets.count()
         if total > 0:
@@ -872,7 +887,6 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
         document.addEventListener("DOMContentLoaded", function () {
             const userSelect = document.getElementById("id_user");
             const container = document.getElementById("returned-assets-container");
-            const statusSelect = document.getElementById("id_laptop_status");
 
             function loadAssets(userId) {
                 if (!userId) {
@@ -909,26 +923,6 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
                     });
             }
 
-            // Auto-update status based on selections
-            function updateStatusHint() {
-                const damageFile = document.getElementById("id_damaged_assets_file");
-                if (statusSelect && damageFile) {
-                    if (statusSelect.value === "DAMAGED" || statusSelect.value === "LOST") {
-                        // Show hint to upload documentation
-                        if (!document.getElementById("damage-hint")) {
-                            const hint = document.createElement("div");
-                            hint.id = "damage-hint";
-                            hint.style.cssText = "color: #ff6600; margin-top: 5px; font-size: 12px;";
-                            hint.innerHTML = "⚠ Please upload documentation for damaged/lost assets";
-                            damageFile.parentElement.appendChild(hint);
-                        }
-                    } else {
-                        const hint = document.getElementById("damage-hint");
-                        if (hint) hint.remove();
-                    }
-                }
-            }
-
             if (userSelect) {
                 userSelect.addEventListener("change", () => {
                     loadAssets(userSelect.value);
@@ -937,11 +931,6 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
                 if (userSelect.value) {
                     loadAssets(userSelect.value);
                 }
-            }
-
-            if (statusSelect) {
-                statusSelect.addEventListener("change", updateStatusHint);
-                updateStatusHint();
             }
         });
         </script>
@@ -960,31 +949,6 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
         assets = Asset.objects.filter(id__in=returned_ids)
         obj.returned_assets.set(assets)
 
-        # Update individual asset statuses based on the overall return status
-        if obj.laptop_status in ['DAMAGED', 'LOST']:
-            # If overall status is damaged/lost, update the assets accordingly
-            for asset in assets:
-                asset.status = obj.laptop_status
-                asset.save()
-                # Create history entry
-                AssetHistory.objects.create(
-                    asset=asset,
-                    action=f"Marked as {obj.laptop_status} during offboarding",
-                    performed_by=request.user,
-                    notes=f"Offboarding return for {obj.user.username}"
-                )
-        elif obj.laptop_status == 'AVAILABLE':
-            # If returned in good condition, mark as available
-            for asset in assets:
-                asset.status = 'AVAILABLE'
-                asset.save()
-                AssetHistory.objects.create(
-                    asset=asset,
-                    action="Returned and marked as Available during offboarding",
-                    performed_by=request.user,
-                    notes=f"Offboarding return for {obj.user.username}"
-                )
-
         # Automatically mark as offboarded
         if not obj.is_offboarded and returned_ids:
             obj.is_offboarded = True
@@ -993,8 +957,7 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
             # Send notification if needed
             self.message_user(
                 request, 
-                f"Offboarding asset return recorded for {obj.user.username}. "
-                f"Status: {obj.get_laptop_status_display()}"
+                f"Offboarding asset return recorded for {obj.user.username}."
             )
 
 # Register the admin
