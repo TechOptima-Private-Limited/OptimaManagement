@@ -502,9 +502,9 @@ class AccessRequestAdmin(admin.ModelAdmin):
             'resource_management/js/hide_fields.js',
             'resource_management/js/ckeditor5-csrf-fix.js',
         )
-        css = {
-            'all': ('resource_management/css/custom_admin.css',)
-        }
+        #css = {
+        #   'all': ('resource_management/css/custom_admin.css',)
+        #}
 
     def justification_preview(self, obj):
         """Display a clean text preview of justification in the admin list view"""
