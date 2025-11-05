@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
+from django.utils import timezone
 
 email_validator = RegexValidator(
     regex=r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
@@ -54,6 +55,16 @@ class Asset(models.Model):
         related_name='previous_assets', help_text="Previous user of the asset"
     )
     laptop_age = models.DurationField(blank=True, null=True, help_text="Duration the previous user used the asset")
+
+    def save(self, *args, **kwargs):
+        if self.purchased_date:
+            delta = timezone.now().date() - self.purchased_date
+            if delta.days < 0:
+                delta = timezone.now().date() - timezone.now().date()
+            self.laptop_age = delta
+        else:
+            self.laptop_age = None
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.asset_type.name} - {self.name} ({self.asset_tag})"
@@ -357,14 +368,11 @@ def update_asset_status_on_assignment_change(sender, instance, action, pk_set, *
 #             asset.save(update_fields=['status'])
 
 # Replace the AssetReturn signal in your models.py with this simplified version:
-
 @receiver(post_save, sender=AssetReturn)
 def update_asset_status_on_return(sender, instance, created, **kwargs):
     if created:
         asset = instance.asset
-        
-        # Simply update the asset status to AVAILABLE when returned
         asset.status = 'AVAILABLE'
+        asset.previously_used_by = instance.assignment.employee
         asset.save()
-        
         print(f"Asset {asset.asset_tag} returned and marked as AVAILABLE")

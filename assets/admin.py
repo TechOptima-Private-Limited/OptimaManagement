@@ -294,13 +294,18 @@ class AssetTypeAdmin(admin.ModelAdmin):
 @admin.register(HardwareAsset)
 class HardwareAssetAdmin(admin.ModelAdmin):
     form = HardwareAssetForm
+    readonly_fields = ('laptop_age',)
     list_display = (
-        'asset_tag', 'name', 'asset_type', 'status',
+        'asset_tag', 'name', 'asset_type', 'assigned_employee', 'previously_used_by_employee', 'purchased_date', 'laptop_age_pretty', 'status',
         'is_active'
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
-        'asset_tag', 'name', 'serial_number'
+        'asset_tag', 'name', 'serial_number',
+        'assignments__employee__username', 'assignments__employee__first_name',
+        'assignments__employee__last_name', 'assignments__employee__email',
+        'previously_used_by__username', 'previously_used_by__first_name',
+        'previously_used_by__last_name', 'previously_used_by__email'
     )
 
     fieldsets = (
@@ -310,6 +315,9 @@ class HardwareAssetAdmin(admin.ModelAdmin):
         ('Additional Details', {
             'fields': ('custom_attributes',),   
             'classes': ('collapse',)
+        }),
+        ('Purchase & Usage', {
+            'fields': ('purchased_date', 'laptop_age'),
         }),
     )
 
@@ -321,7 +329,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.filter(asset_type__category='HARDWARE')
         # Only select fields that exist in the database
-        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after').select_related('asset_type')
+        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after', 'previously_used_by_id', 'purchased_date', 'laptop_age').select_related('asset_type', 'previously_used_by').prefetch_related('assignments__employee', 'assignments__returns')
         
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -331,7 +339,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
 
     def assigned_employee(self, obj):
         try:
-            current_assignment = obj.assignments.filter(returns__isnull=True).first()
+            current_assignment = obj.assignments.exclude(returns__asset=obj).first()
             if current_assignment:
                 employee = current_assignment.employee
                 if employee.first_name and employee.last_name:
@@ -345,6 +353,42 @@ class HardwareAssetAdmin(admin.ModelAdmin):
             return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
+
+    def previously_used_by_employee(self, obj):
+        try:
+            employee = obj.previously_used_by
+            if not employee:
+                return "-"
+            if employee.first_name and employee.last_name:
+                full_name = f"{employee.first_name} {employee.last_name}"
+                return f"{full_name} ({employee.username})"
+            elif employee.first_name:
+                return f"{employee.first_name} ({employee.username})"
+            return self.get_display_name_from_username(employee)
+        except Exception:
+            return "-"
+    previously_used_by_employee.short_description = "Previously Used By"
+    previously_used_by_employee.admin_order_field = 'previously_used_by__last_name'
+
+    def laptop_age_pretty(self, obj):
+        delta = getattr(obj, 'laptop_age', None)
+        if not delta:
+            return "-"
+        days_total = delta.days
+        years, rem_days = divmod(days_total, 365)
+        months, days = divmod(rem_days, 30)
+        parts = []
+        if years:
+            parts.append(f"{years}y")
+        if months:
+            parts.append(f"{months}m")
+        if days:
+            parts.append(f"{days}d")
+        if not parts:
+            return "0d"
+        return " ".join(parts)
+    laptop_age_pretty.short_description = "Laptop Age"
+    laptop_age_pretty.admin_order_field = 'laptop_age'
 
     def get_display_name_from_username(self, employee):
         try:
@@ -396,6 +440,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
 @admin.register(SoftwareAsset)
 class SoftwareAssetAdmin(admin.ModelAdmin):
     form = SoftwareAssetForm
+    readonly_fields = ('laptop_age',)
     list_display = (
         'asset_tag', 'name', 'asset_type', 'status',
         'is_active'
@@ -423,7 +468,7 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.filter(asset_type__category='SOFTWARE')
         # Only select fields that exist in the database
-        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after').select_related('asset_type')
+        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after', 'purchased_date', 'laptop_age').select_related('asset_type')
         
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
