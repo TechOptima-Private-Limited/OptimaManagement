@@ -88,7 +88,7 @@ class AvailableAssetsAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Asset.objects.none()
 
-        qs = Asset.objects.filter(status='AVAILABLE', is_active=True)
+        qs = Asset.objects.filter(is_active=True)
 
         # Debug: Print all request data
         print("=" * 80)
@@ -151,8 +151,17 @@ class AvailableAssetsAutocomplete(autocomplete.Select2QuerySetView):
             
             # Debug: Print the categories of the selected asset types
             asset_types = AssetType.objects.filter(id__in=valid_asset_type_ids)
-            categories = asset_types.values_list('category', flat=True).distinct()
-            print(f"Asset type categories: {list(categories)}")
+            categories = list(asset_types.values_list('category', flat=True).distinct())
+            print(f"Asset type categories: {categories}")
+            if 'SOFTWARE' in categories and 'HARDWARE' in categories:
+                qs = qs.filter(
+                    (Q(asset_type__category='SOFTWARE') & ~Q(status__in=['DAMAGED', 'LOST'])) |
+                    (Q(asset_type__category='HARDWARE') & Q(status='AVAILABLE'))
+                )
+            elif 'SOFTWARE' in categories:
+                qs = qs.exclude(status__in=['DAMAGED', 'LOST'])
+            else:
+                qs = qs.filter(status='AVAILABLE')
         else:
             print("No asset types selected, returning no assets")
             return Asset.objects.none()  # Return empty queryset when no asset types are selected
@@ -181,10 +190,10 @@ class AvailableAssetsAutocomplete(autocomplete.Select2QuerySetView):
 
     def get_result_label(self, result):
         asset_type = getattr(result.asset_type, 'name', 'Unknown Type')
+        status_display = dict(Asset.STATUS_CHOICES).get(getattr(result, 'status', 'UNKNOWN'), getattr(result, 'status', 'UNKNOWN'))
         
-        # Build the label parts
         parts = [
-            f"{result.name} [Available]",
+            f"{result.name} [{status_display}]",
             f"Type: {asset_type}"
         ]
         

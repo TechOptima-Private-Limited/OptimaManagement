@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div id="content" class="content">
+  <h1>{{ original.name }} ({{ original.asset_tag }})</h1>
+
+  <div class="module aligned">
+    <fieldset class="module">
+      <h2>{% trans "Asset Details" %}</h2>
+      <div class="form-row">
+        <div><strong>{% trans "Asset Tag" %}:</strong> {{ original.asset_tag }}</div>
+      </div>
+      <div class="form-row">
+        <div><strong>{% trans "Name" %}:</strong> {{ original.name }}</div>
+      </div>
+      <div class="form-row">
+        <div><strong>{% trans "Asset Type" %}:</strong> {{ original.asset_type }}</div>
+      </div>
+      <div class="form-row">
+        <div><strong>{% trans "Status" %}:</strong> {{ original.status }}</div>
+      </div>
+      <div class="form-row">
+        <div><strong>{% trans "Is Active" %}:</strong> {{ original.is_active|yesno:_('Yes,No') }}</div>
+      </div>
+    </fieldset>
+
+    <fieldset class="module">
+      <h2>{% trans "Assigned To" %}</h2>
+      {% if employee_assignments %}
+        <table style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="text-align: left; padding: 8px;">{% trans "Employees" %}</th>
+              <th style="text-align: left; padding: 8px;">{% trans "Assigned On" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for assignment in employee_assignments %}
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #eee;">
+                  {% if assignment.user.get_full_name %}{{ assignment.user.get_full_name }}{% else %}{{ assignment.user.username }}{% endif %}
+                  ({{ assignment.user.username }})
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid #eee;">
+                  {{ assignment.assigned_at|date:"M j, Y" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>-</p>
+      {% endif %}
+    </fieldset>
+  </div>
+
+  <p>
+    <a class="button" href="{% url 'admin:assets_softwareasset_changelist' %}">{% trans "Back to list" %}</a>
+  </p>
+</div>
+{% endblock %}

@@ -241,9 +241,22 @@
 from django import forms
 from dal import autocomplete, forward
 from django.contrib.auth.models import User
-from .models import Asset, AssetAssignment, AssetReturn
+from .models import Asset, AssetAssignment, AssetReturn, AssetImage, AssetAssignmentImage
 from django.db import models
+from django.db.models import Q
 import re
+from django.forms.widgets import ClearableFileInput
+
+class MultiFileInput(ClearableFileInput):
+    allow_multiple_selected = True
+
+class AssetAssignmentImageForm(forms.ModelForm):
+    # ⬇️ THIS is the line you were asking about
+    image = forms.ImageField(required=False, widget=MultiFileInput(attrs={'accept': 'image/*'}))
+
+    class Meta:
+        model = AssetAssignmentImage
+        fields = ['asset', 'image']
 
 def is_valid_email(email):
     return bool(email and re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email))
@@ -323,14 +336,27 @@ class AssetForm(forms.ModelForm):
 # Add these forms to your existing forms.py file:
 
 class HardwareAssetForm(forms.ModelForm):
+    # read-only display field
     currently_assigned_to = forms.CharField(
         label="Currently Assigned To",
         required=False,
         widget=forms.TextInput(attrs={
-            'readonly': 'readonly', 
+            'readonly': 'readonly',
             'style': 'background-color: #f5f5f5; cursor: not-allowed;',
             'title': 'This field is read-only. Use Asset Assignments to assign/reassign assets.'
         })
+    )
+
+    # MULTI-UPLOAD fields (FileField + custom widget)
+    image_before_files = forms.FileField(
+        label="Upload Before Images",
+        required=False,
+        widget=MultiFileInput(attrs={'accept': 'image/*'})
+    )
+    image_after_files = forms.FileField(
+        label="Upload After Images",
+        required=False,
+        widget=MultiFileInput(attrs={'accept': 'image/*'})
     )
 
     class Meta:
@@ -342,52 +368,44 @@ class HardwareAssetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # Filter asset types to show only hardware
+
         from .models import AssetType
         self.fields['asset_type'].queryset = AssetType.objects.filter(category='HARDWARE', is_active=True)
-        
-        # If creating new asset, set default to first hardware type
+
         if not self.instance.pk:
-            hardware_types = AssetType.objects.filter(category='HARDWARE', is_active=True)
-            if hardware_types.exists():
-                self.fields['asset_type'].initial = hardware_types.first()
+            qs = self.fields['asset_type'].queryset
+            if qs.exists():
+                self.fields['asset_type'].initial = qs.first()
         else:
-            # Make asset_type read-only for existing assets
             self.fields['asset_type'].widget.attrs['readonly'] = True
             self.fields['asset_type'].widget.attrs['style'] = 'pointer-events: none; background-color: #f5f5f5;'
-        
-        # Handle current assignment display
+
         if self.instance and self.instance.pk:
             try:
-                current_assignment = self.instance.assignments.filter(
-                    returns__isnull=True
-                ).first()
-                
+                current_assignment = self.instance.assignments.filter(returns__isnull=True).first()
                 if current_assignment:
-                    employee = current_assignment.employee
-                    if employee.first_name and employee.last_name:
-                        full_name = f"{employee.first_name} {employee.last_name}"
-                        assignment_text = f"{full_name} ({employee.username})"
-                    elif employee.first_name:
-                        assignment_text = f"{employee.first_name} ({employee.username})"
+                    u = current_assignment.employee
+                    if u.first_name and u.last_name:
+                        name = f"{u.first_name} {u.last_name} ({u.username})"
+                    elif u.first_name:
+                        name = f"{u.first_name} ({u.username})"
                     else:
-                        assignment_text = employee.username
-                    
-                    assigned_date = current_assignment.assigned_at.strftime("%Y-%m-%d")
-                    self.fields['currently_assigned_to'].initial = f"{assignment_text} - Assigned on {assigned_date}"
+                        name = u.username
+                    self.fields['currently_assigned_to'].initial = f"{name} - Assigned on {current_assignment.assigned_at:%Y-%m-%d}"
                 else:
                     self.fields['currently_assigned_to'].initial = "Not assigned"
-            except Exception as e:
+            except Exception:
                 self.fields['currently_assigned_to'].initial = "Not assigned"
         else:
             self.fields['currently_assigned_to'].widget = forms.HiddenInput()
 
     def clean(self):
-        cleaned_data = super().clean()
-        if 'currently_assigned_to' in cleaned_data:
-            del cleaned_data['currently_assigned_to']
-        return cleaned_data
+        cleaned = super().clean()
+        cleaned.pop('currently_assigned_to', None)  # display-only
+        # We won’t validate image_*_files here; we’ll read request.FILES in admin.save_model
+        return cleaned
+
+
 
 
 class SoftwareAssetForm(forms.ModelForm):
@@ -473,7 +491,7 @@ class AssetAssignmentForm(forms.ModelForm):
     )
 
     available_assets = forms.ModelMultipleChoiceField(
-        queryset=Asset.objects.filter(status='AVAILABLE', is_active=True),
+        queryset=Asset.objects.filter(is_active=True),
         required=False,
         widget=autocomplete.ModelSelect2Multiple(
             url='assets:available-assets-autocomplete',
@@ -542,12 +560,17 @@ class AssetAssignmentForm(forms.ModelForm):
                     forward.Const(asset_type_ids, 'asset_types')
                 ]
 
-                # ✅ keep filtered queryset
-                self.fields['available_assets'].queryset = Asset.objects.filter(
-                    asset_type_id__in=asset_type_ids,
-                    status='AVAILABLE',
-                    is_active=True
-                )
+                categories = list(asset_types.values_list('category', flat=True).distinct())
+                base_qs = Asset.objects.filter(asset_type_id__in=asset_type_ids, is_active=True)
+                if 'SOFTWARE' in categories and 'HARDWARE' in categories:
+                    self.fields['available_assets'].queryset = base_qs.filter(
+                        (Q(asset_type__category='SOFTWARE') & ~Q(status__in=['DAMAGED', 'LOST'])) |
+                        (Q(asset_type__category='HARDWARE') & Q(status='AVAILABLE'))
+                    )
+                elif 'SOFTWARE' in categories:
+                    self.fields['available_assets'].queryset = base_qs.exclude(status__in=['DAMAGED', 'LOST'])
+                else:
+                    self.fields['available_assets'].queryset = base_qs.filter(status='AVAILABLE')
         else:
             # For new forms
             self.fields['available_assets'].widget.forward = ['asset_types']
