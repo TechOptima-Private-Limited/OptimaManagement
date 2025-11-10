@@ -34,13 +34,26 @@ class AssetAssignmentSerializer(serializers.ModelSerializer):
         if not data.get('assets') and not data.get('asset_types'):
             raise serializers.ValidationError("At least one asset or asset type must be provided.")
         
-        # Check if assets are available for assignment
-        if 'assets' in data:
-            for asset in data['assets']:
-                if asset.status != 'AVAILABLE':
-                    raise serializers.ValidationError(
-                        f"Asset {asset.asset_tag} is not available for assignment. Current status: {asset.status}"
-                    )
+        # Category-aware validation
+        if 'assets' in data and data['assets']:
+            # Prefetch categories to minimize queries
+            asset_map = {a.id: a for a in data['assets']}
+            from .models import AssetType
+            type_map = {t.id: t for t in AssetType.objects.filter(id__in=[a.asset_type_id for a in asset_map.values()])}
+
+            for asset in asset_map.values():
+                atype = type_map.get(asset.asset_type_id)
+                category = getattr(atype, 'category', None)
+                if category == 'SOFTWARE':
+                    if asset.status in ['DAMAGED', 'LOST']:
+                        raise serializers.ValidationError(
+                            f"Software asset {asset.asset_tag} cannot be assigned because it is {asset.status}."
+                        )
+                else:
+                    if asset.status != 'AVAILABLE':
+                        raise serializers.ValidationError(
+                            f"Hardware asset {asset.asset_tag} is not available for assignment. Current status: {asset.status}"
+                        )
         return data
 
     def create(self, validated_data):

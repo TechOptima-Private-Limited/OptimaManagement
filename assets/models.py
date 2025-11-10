@@ -190,6 +190,19 @@ class AssetAssignmentImage(models.Model):
     def __str__(self):
         return f"Image for {self.asset.asset_tag} in assignment {self.assignment.id}"
 
+class AssetImage(models.Model):
+    BEFORE = 'BEFORE'
+    AFTER = 'AFTER'
+    KIND_CHOICES = [(BEFORE, 'Before'), (AFTER, 'After')]
+
+    asset = models.ForeignKey(Asset, related_name='images', on_delete=models.CASCADE)
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES)
+    image = models.ImageField(upload_to='assets/photos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.asset.asset_tag} - {self.kind}"
+
 class AssetReturn(models.Model):
     CONDITION_CHOICES = [
         ('GOOD', 'Good'),
@@ -274,12 +287,10 @@ def update_asset_status_on_assignment_change(sender, instance, action, pk_set, *
             assets = Asset.objects.filter(pk__in=pk_set)
             print(f"post_remove: Processing {len(assets)} assets: {[asset.asset_tag for asset in assets]}")
             for asset in assets:
-                active_assignments = AssetAssignment.objects.filter(
-                    assets=asset,
-                    returns__isnull=True
-                ).count()
-                if active_assignments == 0:
-                    print(f"Setting asset {asset.asset_tag} (ID: {asset.id}) to AVAILABLE (no active assignments)")
+                # Only set AVAILABLE if asset is not part of any other assignments
+                still_assigned_elsewhere = AssetAssignment.objects.filter(assets=asset).exists()
+                if not still_assigned_elsewhere:
+                    print(f"Setting asset {asset.asset_tag} (ID: {asset.id}) to AVAILABLE (no other assignments)")
                     asset.status = 'AVAILABLE'
                     asset.save()
                     AssetHistory.objects.create(
@@ -289,7 +300,7 @@ def update_asset_status_on_assignment_change(sender, instance, action, pk_set, *
                     )
                     print(f"Asset {asset.asset_tag} status updated to AVAILABLE")
                 else:
-                    print(f"Asset {asset.asset_tag} (ID: {asset.id}) still has {active_assignments} active assignments")
+                    print(f"Asset {asset.asset_tag} (ID: {asset.id}) remains assigned elsewhere; not setting AVAILABLE")
 
 # @receiver(post_save, sender=AssetReturn)
 # def update_asset_status_on_return(sender, instance, created, **kwargs):
@@ -367,12 +378,29 @@ def update_asset_status_on_assignment_change(sender, instance, action, pk_set, *
 #             asset.status = 'ASSIGNED'
 #             asset.save(update_fields=['status'])
 
-# Replace the AssetReturn signal in your models.py with this simplified version:
 @receiver(post_save, sender=AssetReturn)
 def update_asset_status_on_return(sender, instance, created, **kwargs):
     if created:
         asset = instance.asset
-        asset.status = 'AVAILABLE'
-        asset.previously_used_by = instance.assignment.employee
+        assignment = instance.assignment
+        try:
+            assignment.assets.remove(asset)
+        except Exception as e:
+            print(f"Failed to remove asset {asset.asset_tag} from assignment {assignment.id}: {e}")
+
+        still_assigned_elsewhere = AssetAssignment.objects.filter(assets=asset).exists()
+
+        if still_assigned_elsewhere:
+            new_status = 'ASSIGNED'
+        else:
+            if instance.condition == 'GOOD':
+                new_status = 'AVAILABLE'
+            elif instance.condition in ['DAMAGED', 'LOST']:
+                new_status = instance.condition
+            else:
+                new_status = 'AVAILABLE'
+
+        asset.status = new_status
+        asset.previously_used_by = assignment.employee
         asset.save()
-        print(f"Asset {asset.asset_tag} returned and marked as AVAILABLE")
+        print(f"Asset {asset.asset_tag} returned; status set to {new_status}")

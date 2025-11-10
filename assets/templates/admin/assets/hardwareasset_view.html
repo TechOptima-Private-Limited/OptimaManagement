@@ -1,0 +1,192 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div class="module aligned">
+  <h1>Dashboard Overview</h1>
+  <h2>Hardware Asset: {{ obj.asset_tag }} — {{ obj.name }}</h2>
+
+  <!-- DETAILS -->
+  <fieldset class="module">
+    <h2>Details</h2>
+    <table class="listing" style="width:100%">
+      <tbody>
+        <tr>
+          <th style="width:220px">Type</th>
+          <td>{{ obj.asset_type }}</td>
+        </tr>
+        <tr>
+          <th>Category</th>
+          <td>{{ obj.asset_type.category|default:"—" }}</td>
+        </tr>
+        <tr>
+          <th>Asset Tag</th>
+          <td>{{ obj.asset_tag }}</td>
+        </tr>
+        <tr>
+          <th>Serial Number</th>
+          <td>{{ obj.serial_number|default:"—" }}</td>
+        </tr>
+        <tr>
+          <th>Status</th>
+          <td>{{ obj.get_status_display|default:obj.status }}</td>
+        </tr>
+        <tr>
+          <th>Active</th>
+          <td>{% if obj.is_active %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+          <th>Purchased</th>
+          <td>{{ obj.purchased_date|date:"Y-m-d"|default:"—" }}</td>
+        </tr>
+        <tr>
+          <th>Age</th>
+          <td>
+            {# if laptop_age is a timedelta, show days #}
+            {% if obj.laptop_age %}~{{ obj.laptop_age.days }} days{% else %}—{% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+
+  <!-- CUSTOM ATTRIBUTES -->
+  <fieldset class="module">
+    <h2>Custom Attributes</h2>
+    {% if obj.custom_attributes %}
+      {% if obj.custom_attributes.items %}
+        <table class="listing" style="width:100%">
+          <thead><tr><th>Key</th><th>Value</th></tr></thead>
+          <tbody>
+            {% for k, v in obj.custom_attributes.items %}
+              <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <pre style="white-space:pre-wrap">{{ obj.custom_attributes }}</pre>
+      {% endif %}
+    {% else %}
+      <em>No custom attributes.</em>
+    {% endif %}
+  </fieldset>
+
+  <!-- IMAGES -->
+  <fieldset class="module">
+    <h2>Images</h2>
+    {% if obj.image_before or obj.image_after %}
+      <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap">
+        {% if obj.image_before %}
+          <div>
+            <div><strong>Before</strong></div>
+            <img src="{{ obj.image_before.url }}" style="max-height:180px; max-width:280px; border:1px solid #ddd; padding:4px; background:#fff" />
+          </div>
+        {% endif %}
+        {% if obj.image_after %}
+          <div>
+            <div><strong>After</strong></div>
+            <img src="{{ obj.image_after.url }}" style="max-height:180px; max-width:280px; border:1px solid #ddd; padding:4px; background:#fff" />
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <em>No images.</em>
+    {% endif %}
+  </fieldset>
+
+  <!-- CURRENT ASSIGNMENT -->
+  <fieldset class="module">
+    <h2>Current Assignment</h2>
+    {% if current_assignment %}
+      <div><strong>User:</strong>
+        {% with u=current_assignment.employee %}
+          {{ u.get_full_name|default:u.username }}{% if u.username %} ({{ u.username }}){% endif %}
+        {% endwith %}
+      </div>
+      <div><strong>Assigned At:</strong> {{ current_assignment.assigned_at|date:"Y-m-d H:i" }}</div>
+    {% else %}
+      <em>Not currently assigned.</em>
+    {% endif %}
+  </fieldset>
+
+  <!-- FULL ASSIGNMENT HISTORY -->
+  <fieldset class="module">
+    <h2>Assignment History</h2>
+    {% if assignment_rows %}
+      <table class="listing" style="width:100%">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Assigned At</th>
+            <th>Returned At</th>
+            <th>Condition</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in assignment_rows %}
+            <tr>
+              <td>
+                {% with u=row.user %}
+                  {{ u.get_full_name|default:u.username }}{% if u.username %} ({{ u.username }}){% endif %}
+                {% endwith %}
+              </td>
+              <td>{{ row.assigned_at|date:"Y-m-d H:i"|default:"—" }}</td>
+              <td>{{ row.returned_at|date:"Y-m-d H:i"|default:"—" }}</td>
+              <td>{{ row.condition|default:"—" }}</td>
+              <td>{{ row.notes|default:"" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <em>No assignment history for this asset.</em>
+    {% endif %}
+  </fieldset>
+
+  <!-- SNAPSHOT "PREVIOUSLY USED BY" (if you still keep that FK) -->
+  {% if previously_used_by %}
+    <fieldset class="module">
+      <h2>Last Recorded User (snapshot)</h2>
+      {% with u=previously_used_by %}
+        {{ u.get_full_name|default:u.username }}{% if u.username %} ({{ u.username }}){% endif %}
+      {% endwith %}
+    </fieldset>
+  {% endif %}
+
+  <!-- ASSET HISTORY LOG -->
+  <fieldset class="module">
+    <h2>Asset History</h2>
+    {% if asset_history %}
+      <table class="listing" style="width:100%">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Action</th>
+            <th>By</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in asset_history %}
+            <tr>
+              <td>{{ h.performed_at|date:"Y-m-d H:i" }}</td>
+              <td>{{ h.action }}</td>
+              <td>{{ h.performed_by|default:"—" }}</td>
+              <td>{{ h.notes|default:"" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <em>No history entries.</em>
+    {% endif %}
+  </fieldset>
+
+  <p style="margin-top:1rem">
+    <a class="button" href="{% url 'admin:assets_hardwareasset_change' obj.pk %}">Back to change</a>
+    &nbsp;
+    <a class="button" href="{% url 'admin:assets_hardwareasset_changelist' %}">Back to list</a>
+  </p>
+</div>
+{% endblock %}

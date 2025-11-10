@@ -46,9 +46,9 @@ class AssetAssignmentImageForm(forms.ModelForm):
 class AssetAssignmentImageInline(admin.TabularInline):
     model = AssetAssignmentImage
     form = AssetAssignmentImageForm
-    extra = 0
+    extra = 3
     fields = ('asset_name', 'image')
-    readonly_fields = ()
+    can_delete = True
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
@@ -296,8 +296,9 @@ class HardwareAssetAdmin(admin.ModelAdmin):
     form = HardwareAssetForm
     readonly_fields = ('laptop_age',)
     list_display = (
-        'asset_tag', 'name', 'asset_type', 'assigned_employee', 'previously_used_by_employee', 'purchased_date', 'laptop_age_pretty', 'status',
-        'is_active'
+        'asset_tag', 'name', 'asset_type', 'assigned_employee',
+        'previously_used_by_employee', 'purchased_date', 'laptop_age_pretty',
+        'status', 'is_active', 'actions_column'  # ← added Actions
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
@@ -321,7 +322,6 @@ class HardwareAssetAdmin(admin.ModelAdmin):
         }),
     )
 
-    # inlines = [AssetHistoryInline]  # Temporarily disabled to debug
     actions = ['mark_as_damaged', 'mark_as_available']
 
     def get_queryset(self, request):
@@ -329,17 +329,32 @@ class HardwareAssetAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.filter(asset_type__category='HARDWARE')
         # Only select fields that exist in the database
-        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after', 'previously_used_by_id', 'purchased_date', 'laptop_age').select_related('asset_type', 'previously_used_by').prefetch_related('assignments__employee', 'assignments__returns')
-        
+        return (
+            qs.only(
+                'id', 'asset_tag', 'name', 'asset_type_id',  # keep *_id instead of relation field
+                'status', 'is_active', 'serial_number', 'custom_attributes',
+                'image_before', 'image_after', 'previously_used_by_id',
+                'purchased_date', 'laptop_age'
+            )
+            .select_related('asset_type', 'previously_used_by')
+            .prefetch_related('assignments__employee', 'assignments__returns')
+        )
+
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if 'asset_type' in form.base_fields:
             form.base_fields['asset_type'].queryset = form.base_fields['asset_type'].queryset.filter(category='HARDWARE')
         return form
 
+    # ------- CURRENT ASSIGNEE (make it reliably the latest unreturned) -------
     def assigned_employee(self, obj):
         try:
-            current_assignment = obj.assignments.exclude(returns__asset=obj).first()
+            current_assignment = (
+                obj.assignments
+                  .exclude(returns__asset=obj)
+                  .order_by('-assigned_at')  # ensure latest
+                  .first()
+            )
             if current_assignment:
                 employee = current_assignment.employee
                 if employee.first_name and employee.last_name:
@@ -349,7 +364,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
                     return f"{employee.first_name} ({employee.username})"
                 return self.get_display_name_from_username(employee)
             return "-"
-        except Exception as e:
+        except Exception:
             return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
@@ -407,9 +422,10 @@ class HardwareAssetAdmin(admin.ModelAdmin):
                             return f"{parts[0].title()} {parts[1].title()} ({employee.username})"
                 return getattr(employee, 'username', str(employee))
             return ""
-        except Exception as e:
+        except Exception:
             return str(employee) if employee else ""
 
+    # ------------------- BULK ACTIONS -------------------
     def mark_as_damaged(self, request, queryset):
         for asset in queryset:
             if asset.status != 'DAMAGED':
@@ -436,6 +452,98 @@ class HardwareAssetAdmin(admin.ModelAdmin):
         self.message_user(request, "Selected assets marked as available.")
     mark_as_available.short_description = "Mark selected assets as available"
 
+    # ------------------- ACTIONS COLUMN + VIEW PAGE -------------------
+    def actions_column(self, obj):
+        view_url = reverse('admin:assets_hardwareasset_view', args=[obj.pk])
+        delete_url = reverse('admin:assets_hardwareasset_delete', args=[obj.pk])
+        return format_html(
+            '<a class="button" href="{}">View</a>&nbsp;'
+            '<a class="deletelink" href="{}">Delete</a>',
+            view_url, delete_url
+        )
+    actions_column.short_description = "Actions"
+
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom = [
+            path(
+                '<path:object_id>/view/',
+                self.admin_site.admin_view(self.view_asset),
+                name='assets_hardwareasset_view'
+            ),
+            # optional: named delete URL for symmetry
+            path(
+                '<path:object_id>/delete/',
+                self.admin_site.admin_view(self.delete_view),
+                name='assets_hardwareasset_delete'
+            ),
+        ]
+        return custom + urls
+
+    def view_asset(self, request, object_id):
+        obj = self.get_object(request, object_id)
+        if not obj:
+            from django.http import Http404
+            raise Http404
+        if not self.has_view_permission(request, obj):
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied
+
+        # Current assignment: latest assignment that hasn't returned THIS asset
+        current_assignment = (
+            AssetAssignment.objects
+            .filter(assets=obj)
+            .exclude(returns__asset=obj)
+            .select_related('employee')
+            .order_by('-assigned_at')
+            .first()
+        )
+
+        # Previous assignments: those that have a return record for THIS asset
+        previous_assignments = (
+            AssetAssignment.objects
+            .filter(assets=obj, returns__asset=obj)
+            .select_related('employee')
+            .order_by('-assigned_at')
+            .distinct()
+        )
+
+        # Gather returned_at for each previous assignment for this asset
+        previous_users = []
+        asset_returns = (
+            AssetReturn.objects
+            .filter(asset=obj, assignment__in=previous_assignments)
+            .values('assignment_id', 'returned_at')
+        )
+        # Map for quick lookup
+        returned_map = {}
+        for ar in asset_returns:
+            aid = ar['assignment_id']
+            ra = ar['returned_at']
+            # keep latest return timestamp per assignment
+            if aid not in returned_map or (ra and ra > returned_map[aid]):
+                returned_map[aid] = ra
+
+        for a in previous_assignments:
+            previous_users.append({
+                'user': a.employee,
+                'assigned_at': a.assigned_at,
+                'returned_at': returned_map.get(a.id),
+            })
+
+        context = {
+            **self.admin_site.each_context(request),
+            'opts': self.model._meta,
+            'original': obj,
+            'obj': obj,
+            'title': 'View Hardware Asset',
+            'current_assignment': current_assignment,
+            'previous_users': previous_users,
+            'previously_used_by': getattr(obj, 'previously_used_by', None),
+        }
+        return render(request, 'admin/assets/hardwareasset_view.html', context)
+
 
 @admin.register(SoftwareAsset)
 class SoftwareAssetAdmin(admin.ModelAdmin):
@@ -443,7 +551,7 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
     readonly_fields = ('laptop_age',)
     list_display = (
         'asset_tag', 'name', 'asset_type', 'status',
-        'is_active'
+        'is_active', 'actions_column'
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
@@ -539,6 +647,47 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
         self.message_user(request, "Selected software marked as available.")
     mark_as_available.short_description = "Mark selected software as available"
 
+    def actions_column(self, obj):
+        view_url = reverse('admin:assets_softwareasset_view', args=[obj.pk])
+        delete_url = reverse('admin:assets_softwareasset_delete', args=[obj.pk])
+        return format_html('<a class="button" href="{}">View</a> &nbsp; <a class="deletelink" href="{}">Delete</a>', view_url, delete_url)
+    actions_column.short_description = "Actions"
+
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('<path:object_id>/view/', self.admin_site.admin_view(self.view_asset), name='assets_softwareasset_view'),
+        ]
+        return custom_urls + urls
+
+    def view_asset(self, request, object_id):
+        obj = self.get_object(request, object_id)
+        if not obj:
+            from django.http import Http404
+            raise Http404
+        if not self.has_view_permission(request, obj):
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied
+        assignments = AssetAssignment.objects.filter(assets=obj).exclude(returns__asset=obj).select_related('employee').order_by('assigned_at')
+        employee_assignments = [
+            {
+                'user': a.employee,
+                'assigned_at': a.assigned_at,
+                'assignment_id': a.id
+            }
+            for a in assignments
+        ]
+        context = {
+            **self.admin_site.each_context(request),
+            'opts': self.model._meta,
+            'original': obj,
+            'obj': obj,
+            'employee_assignments': employee_assignments,
+            'title': 'View Software Asset',
+        }
+        return render(request, 'admin/assets/softwareasset_view.html', context)
+
 @admin.register(AssetAssignment)
 class AssetAssignmentAdmin(admin.ModelAdmin):
     form = AssetAssignmentForm
@@ -629,16 +778,24 @@ class AssetAssignmentAdmin(admin.ModelAdmin):
     return_assets.short_description = "Return assets for selected employees"
 
     def save_formset(self, request, form, formset, change):
-        if formset.model == AssetAssignmentImage:
-            selected_assets = list(form.instance.assets.all())
-            for i, form_instance in enumerate(formset):
-                if i < len(selected_assets) and form_instance.cleaned_data.get('image'):
-                    form_instance.instance.asset = selected_assets[i]
-                    form_instance.instance.save()
-                    asset = form_instance.instance.asset
-                    asset.image_before = form_instance.instance.image
-                    asset.save()
-        super().save_formset(request, form, formset, change)
+        if formset.model is AssetAssignmentImage:
+            parent = form.instance
+            for f in formset.forms:
+                if not getattr(f, 'cleaned_data', None) or f.cleaned_data.get('DELETE'):
+                    continue
+                files = f.files.getlist(f.add_prefix('image'))
+                asset = f.cleaned_data.get('asset') or getattr(f.instance, 'asset', None)
+                if files:
+                    for file in files:
+                        AssetAssignmentImage.objects.create(assignment=parent, asset=asset, image=file)
+                elif f.instance.pk:
+                    f.save()
+                for obj in formset.deleted_objects:
+                    obj.delete()
+        else:
+            formset.save()
+
+
 
     # ✅ FIXED save_model
     def save_model(self, request, obj, form, change):

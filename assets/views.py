@@ -338,14 +338,17 @@ class AssetAssignmentViewSet(viewsets.ModelViewSet):
         # Handle removed assets
         removed_assets = old_assets - new_assets
         for asset in removed_assets:
-            asset.status = 'AVAILABLE'
-            asset.save()
-            AssetHistory.objects.create(
-                asset=asset,
-                action="Removed from assignment",
-                performed_by=self.request.user,
-                notes=f"Removed from assignment to {assignment.employee.username}"
-            )
+            # Only set AVAILABLE if asset is not part of any other assignments
+            still_assigned_elsewhere = AssetAssignment.objects.filter(assets=asset).exclude(id=assignment.id).exists()
+            if not still_assigned_elsewhere:
+                asset.status = 'AVAILABLE'
+                asset.save()
+                AssetHistory.objects.create(
+                    asset=asset,
+                    action="Removed from assignment",
+                    performed_by=self.request.user,
+                    notes=f"Removed from assignment to {assignment.employee.username}"
+                )
         
         # Handle added assets
         added_assets = new_assets - old_assets
