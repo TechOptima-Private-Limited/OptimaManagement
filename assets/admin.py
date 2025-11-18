@@ -33,7 +33,7 @@ class AssetAssignmentImageForm(forms.ModelForm):
 
     class Meta:
         model = AssetAssignmentImage
-        fields = ('image',)
+        fields = ('asset', 'image')
 
     def __init__(self, *args, **kwargs):
         asset_name = kwargs.pop('asset_name', None)
@@ -42,12 +42,15 @@ class AssetAssignmentImageForm(forms.ModelForm):
             self.fields['asset_name'].initial = asset_name
         else:
             self.fields['asset_name'].initial = "Not assigned yet"
+        if 'asset' in self.fields:
+            self.fields['asset'].widget = forms.HiddenInput()
+            # Keep required True at model level; form will set initial programmatically
 
 class AssetAssignmentImageInline(admin.TabularInline):
     model = AssetAssignmentImage
     form = AssetAssignmentImageForm
     extra = 3
-    fields = ('asset_name', 'image')
+    fields = ('asset_name', 'asset', 'image')
     can_delete = True
 
     def get_formset(self, request, obj=None, **kwargs):
@@ -64,6 +67,8 @@ class AssetAssignmentImageInline(admin.TabularInline):
                         asset_name = str(selected_assets[i])
                         form.asset_name = asset_name
                         form.fields['asset_name'].initial = asset_name
+                        if 'asset' in form.fields:
+                            form.fields['asset'].initial = selected_assets[i].pk
 
         return DynamicFormset
 
@@ -294,7 +299,7 @@ class AssetTypeAdmin(admin.ModelAdmin):
 @admin.register(HardwareAsset)
 class HardwareAssetAdmin(admin.ModelAdmin):
     form = HardwareAssetForm
-    readonly_fields = ('laptop_age',)
+    readonly_fields = ('age_of_device',)
     list_display = (
         'asset_tag', 'name', 'asset_type', 'assigned_employee',
         'previously_used_by_employee', 'purchased_date', 'laptop_age_pretty',
@@ -318,7 +323,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Purchase & Usage', {
-            'fields': ('purchased_date', 'laptop_age'),
+            'fields': ('purchased_date', 'age_of_device'),
         }),
     )
 
@@ -385,24 +390,21 @@ class HardwareAssetAdmin(admin.ModelAdmin):
     previously_used_by_employee.short_description = "Previously Used By"
     previously_used_by_employee.admin_order_field = 'previously_used_by__last_name'
 
+    def age_of_device(self, obj):
+        delta = getattr(obj, 'laptop_age', None)
+        if not delta:
+            return "-"
+        years = delta.days / 365.0
+        return f"{years:.1f} years"
+    age_of_device.short_description = "Age of Device"
+
     def laptop_age_pretty(self, obj):
         delta = getattr(obj, 'laptop_age', None)
         if not delta:
             return "-"
-        days_total = delta.days
-        years, rem_days = divmod(days_total, 365)
-        months, days = divmod(rem_days, 30)
-        parts = []
-        if years:
-            parts.append(f"{years}y")
-        if months:
-            parts.append(f"{months}m")
-        if days:
-            parts.append(f"{days}d")
-        if not parts:
-            return "0d"
-        return " ".join(parts)
-    laptop_age_pretty.short_description = "Laptop Age"
+        years = delta.days / 365.0
+        return f"{years:.1f} years"
+    laptop_age_pretty.short_description = "Age of Device"
     laptop_age_pretty.admin_order_field = 'laptop_age'
 
     def get_display_name_from_username(self, employee):
@@ -532,6 +534,12 @@ class HardwareAssetAdmin(admin.ModelAdmin):
                 'returned_at': returned_map.get(a.id),
             })
 
+        # Compute age of device in years for display
+        age_years = None
+        delta = getattr(obj, 'laptop_age', None)
+        if delta:
+            age_years = f"{(delta.days / 365.0):.1f} years"
+
         context = {
             **self.admin_site.each_context(request),
             'opts': self.model._meta,
@@ -541,6 +549,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
             'current_assignment': current_assignment,
             'previous_users': previous_users,
             'previously_used_by': getattr(obj, 'previously_used_by', None),
+            'age_years': age_years,
         }
         return render(request, 'admin/assets/hardwareasset_view.html', context)
 
