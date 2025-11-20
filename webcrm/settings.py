@@ -287,7 +287,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 # STATIC_ROOT = BASE_DIR / "staticfiles"  # ✅ use a clean folder name
 
@@ -297,7 +297,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "resource_management/static",
 ]
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 FIXTURE_DIRS = ['tests/fixtures']
