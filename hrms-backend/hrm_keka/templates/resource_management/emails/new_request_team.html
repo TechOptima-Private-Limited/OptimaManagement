@@ -1,0 +1,15 @@
+{% extends "resource_management/emails/base_email.html" %}
+{% block content %}
+<p>New Access Request Received</p>
+<ul>
+    <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+    <li><strong>Requester:</strong> {{ requester }} (Employee ID: {{ user.username }})</li>
+    <li><strong>Resource:</strong> {{ resource }}</li>
+    <li><strong>Access Level:</strong> {{ access_level }}</li>
+    <li><strong>Priority:</strong> {{ priority }}</li>
+    <li><strong>Justification:</strong> {{ justification }}</li>
+    <li><strong>Resource Type:</strong> {{ resource_type }}</li>
+    <li><strong>Duration:</strong> {{ duration }}</li>
+</ul>
+<p><strong>Justification:</strong><br>{{ justification }}</p>
+{% endblock %}

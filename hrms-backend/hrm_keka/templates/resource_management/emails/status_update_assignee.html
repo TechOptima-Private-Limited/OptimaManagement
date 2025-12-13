@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Request Status Update</title>
+</head>
+<body>
+    <h2>Access Request Status Update - Ticket {{ ticket }}</h2>
+    <p>Dear {{ assignee }},</p>
+    <p>The access request you were assigned to has been updated:</p>
+    <ul>
+        <li>An access request you are assigned to has been updated:</li>
+        <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+        <li><strong>Requester:</strong> {{ user_name }} (Employee ID: {{ user.username }})</li>
+        <li><strong>Resource:</strong> {{ resource }}</li>
+        <li><strong>Access Level:</strong> {{ access_level }}</li>
+        <li><strong>Previous Status:</strong> {{ old_status }}</li>
+        <li><strong>New Status:</strong> {{ new_status }}</li>
+        <li><strong>Updated By:</strong> {{ updated_by }}</li>
+        <li><strong>Your Employee ID:</strong> {{ assignee_employee_id }}</li>
+        {% if notes %}
+        <li><strong>Notes:</strong> {{ notes }}</li>
+        {% endif %}
+    </ul>
+    <p>Please take any necessary actions to continue processing the request.</p>
+    <p>Thank you,</p>
+    <p>Access Management Team</p>
+</body>
+</html>

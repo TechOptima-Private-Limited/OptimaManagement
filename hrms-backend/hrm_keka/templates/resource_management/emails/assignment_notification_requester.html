@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Request Assigned</title>
+</head>
+<body>
+    <h2>Access Request Assigned - Ticket {{ ticket }}</h2>
+    <p>Dear {{ user }},</p>
+    <p>Your access request has been assigned to {{ assigned_to }} by {{ assigned_by }}:</p>
+    <ul>
+        <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+        <li><strong>Resource:</strong> {{ resource }}</li>
+        <li><strong>Access Level:</strong> {{ access_level }}</li>
+        <li><strong>Status:</strong> {{ status }}</li>
+    </ul>
+    <p>You will be notified of further updates.</p>
+    <p>Thank you,</p>
+    <p>Access Management Team</p>
+</body>
+</html>

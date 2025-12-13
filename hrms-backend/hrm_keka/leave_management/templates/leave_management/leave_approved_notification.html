@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave Request Approved</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background-color: #d4edda; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .content { background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .approved { background-color: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 15px 0; }
+        .details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="color: #155724; margin: 0;">🎉 Leave Request Approved!</h2>
+        <p style="margin: 5px 0 0 0; color: #155724;">{{ company_name }}</p>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ employee_name }},</p>
+        
+        <div class="approved">
+            <p style="margin: 0;"><strong>✅ Your leave request has been APPROVED!</strong></p>
+        </div>
+        
+        <h3 style="color: #495057;">Leave Details</h3>
+        <div class="details">
+            <p><strong>Leave Type:</strong> {{ leave_type }}</p>
+            <p><strong>Start Date:</strong> {{ start_date }}</p>
+            <p><strong>End Date:</strong> {{ end_date }}</p>
+            <p><strong>Total Days:</strong> {{ days_requested }} days</p>
+            <p><strong>Approved By:</strong> {{ approved_by }}</p>
+            <p><strong>Approved On:</strong> {{ approved_on }}</p>
+        </div>
+        
+        {% if manager_comments %}
+        <h3 style="color: #495057;">Manager Comments</h3>
+        <div class="details">
+            <p>{{ manager_comments }}</p>
+        </div>
+        {% endif %}
+        
+        <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h4 style="color: #856404; margin-top: 0;">Important Reminders:</h4>
+            <ul style="color: #856404; margin-bottom: 0;">
+                <li>Please ensure all your pending work is completed or handed over before your leave starts</li>
+                <li>Inform your team members about your absence</li>
+                <li>Set up out-of-office auto-reply for your email</li>
+                <li>Hand over any urgent tasks to your colleagues</li>
+            </ul>
+        </div>
+        
+        <p>Enjoy your time off!</p>
+    </div>
+    
+    <div class="footer">
+        <p style="margin: 0; color: #6c757d;">Best regards,<br>{{ company_name }} HR Team</p>
+    </div>
+</body>
+</html>

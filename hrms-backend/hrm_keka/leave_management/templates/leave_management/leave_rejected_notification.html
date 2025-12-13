@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave Request Rejected</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background-color: #f8d7da; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .content { background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .rejected { background-color: #f5c6cb; border-left: 4px solid #dc3545; padding: 15px; margin: 15px 0; }
+        .details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="color: #721c24; margin: 0;">Leave Request Rejected</h2>
+        <p style="margin: 5px 0 0 0; color: #721c24;">{{ company_name }}</p>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ employee_name }},</p>
+        
+        <div class="rejected">
+            <p style="margin: 0;"><strong>❌ Your leave request has been rejected.</strong></p>
+        </div>
+        
+        <h3 style="color: #495057;">Leave Details</h3>
+        <div class="details">
+            <p><strong>Leave Type:</strong> {{ leave_type }}</p>
+            <p><strong>Start Date:</strong> {{ start_date }}</p>
+            <p><strong>End Date:</strong> {{ end_date }}</p>
+            <p><strong>Total Days:</strong> {{ days_requested }} days</p>
+            <p><strong>Rejected By:</strong> {{ rejected_by }}</p>
+        </div>
+        
+        <h3 style="color: #495057;">Reason for Rejection</h3>
+        <div class="details">
+            <p>{{ rejection_reason }}</p>
+        </div>
+        
+        <div style="background-color: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="color: #0c5460; margin: 0;"><strong>Next Steps:</strong> You may submit a new leave request or contact HR for further clarification.</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p style="margin: 0; color: #6c757d;">Best regards,<br>{{ company_name }} HR Team</p>
+    </div>
+</body>
+</html>

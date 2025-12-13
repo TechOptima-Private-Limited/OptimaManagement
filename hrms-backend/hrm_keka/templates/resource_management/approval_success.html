@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Access Request {{ action|title }}</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f6f7fb; margin:0; padding:40px; }
+    .card { max-width:600px; margin:0 auto; background:#fff; border:1px solid #e5e7eb; border-radius:12px; box-shadow:0 10px 20px rgba(0,0,0,0.06); overflow:hidden; }
+    .header { padding:20px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; }
+    .badge { font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid; }
+    .badge-success { color:#065f46; background:#ecfdf5; border-color:#a7f3d0; }
+    .badge-error { color:#991b1b; background:#fef2f2; border-color:#fecaca; }
+    .content { padding:24px; color:#111827; }
+    .muted { color:#6b7280; }
+    .footer { padding:16px 24px; border-top:1px solid #f1f5f9; font-size:12px; color:#6b7280; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#f3f4f6; padding:2px 6px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h3 style="margin:0; font-size:18px;">Access Request Confirmation</h3>
+      {% if action == 'approved' %}
+        <span class="badge badge-success">Approved</span>
+      {% elif action == 'rejected' %}
+        <span class="badge badge-error">Rejected</span>
+      {% else %}
+        <span class="badge">Status</span>
+      {% endif %}
+    </div>
+    <div class="content">
+      <p class="muted">Ticket</p>
+      <p style="margin-top:4px; font-weight:600;">{{ ticket }}</p>
+
+      {% if message %}
+        <p style="margin-top:16px;">{{ message }}</p>
+      {% else %}
+        {% if action == 'approved' %}
+          <p style="margin-top:16px;">This access request has been approved. The requester and the responsible team have been notified.</p>
+        {% elif action == 'rejected' %}
+          <p style="margin-top:16px;">This access request has been rejected. The requester and the responsible team have been notified.</p>
+        {% else %}
+          <p style="margin-top:16px;">This request has been processed.</p>
+        {% endif %}
+      {% endif %}
+
+      {% if requester %}
+        <p class="muted" style="margin-top:16px;">Requester</p>
+        <p style="margin-top:4px;">{{ requester }}</p>
+      {% endif %}
+
+      {% if resource or access_level %}
+        <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          {% if resource %}
+            <div>
+              <p class="muted" style="margin:0;">Resource</p>
+              <p style="margin-top:4px;">{{ resource }}</p>
+            </div>
+          {% endif %}
+          {% if access_level %}
+            <div>
+              <p class="muted" style="margin:0;">Access Level</p>
+              <p style="margin-top:4px;">{{ access_level }}</p>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if timestamp %}
+        <p class="muted" style="margin-top:16px;">Timestamp</p>
+        <p class="code" style="margin-top:4px; display:inline-block;">{{ timestamp }}</p>
+      {% endif %}
+    </div>
+    <div class="footer">
+      If you believe this action was not intended, please contact IT Support.
+    </div>
+  </div>
+</body>
+</html>
