@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from .models import Notification
 from employees.models import Employee
+from webpush import send_group_notification, send_user_notification
 import logging
 
 User = get_user_model()
@@ -24,6 +25,20 @@ class NotificationService:
                 action_url=kwargs.get('action_url', ''),
                 action_text=kwargs.get('action_text', ''),
             )
+            
+            # Send Web Push Notification
+            try:
+                payload = {
+                    "head": title,
+                    "body": message,
+                    "icon": "https://hrms.techoptima.in/static/assets/img/logo.png", # Update with real logo path
+                    "url": kwargs.get('action_url', '/')
+                }
+                send_user_notification(user=recipient, payload=payload, ttl=1000)
+                logger.info(f"🚀 Web push notification sent to {recipient.get_full_name()}")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to send web push: {str(e)}")
+
             logger.info(f"✅ Notification created for {recipient.get_full_name()}: {title}")
             return notification
         except Exception as e:
@@ -138,7 +153,7 @@ Your original attendance record remains unchanged. If you have questions, please
             return False
     
     @staticmethod
-    def get_user_notifications(user, limit=50, unread_only=False):
+    def get_user_notifications(user, unread_only=False):
         """Get notifications for a user"""
         try:
             queryset = Notification.objects.filter(recipient=user)
@@ -146,11 +161,11 @@ Your original attendance record remains unchanged. If you have questions, please
             if unread_only:
                 queryset = queryset.filter(is_read=False)
             
-            return queryset[:limit]
+            return queryset.order_by('-created_at')
             
         except Exception as e:
             logger.error(f"❌ Failed to get notifications: {str(e)}")
-            return []
+            return Notification.objects.none()
     
     @staticmethod
     def get_unread_count(user):

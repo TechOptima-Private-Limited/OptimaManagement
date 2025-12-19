@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'dal_select2',
     'django_ckeditor_5',
     'assets',
+    'webpush',
 ]
 
 # CKEditor 5 Configuration
@@ -239,4 +240,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Webpush Settings
+WEBPUSH_SETTINGS = {
+    "VAPID_PUBLIC_KEY": config("VAPID_PUBLIC_KEY", default=""),
+    "VAPID_PRIVATE_KEY": config("VAPID_PRIVATE_KEY", default=""),
+    "VAPID_ADMIN_EMAIL": config("VAPID_ADMIN_EMAIL", default="admin@example.com"),
+}
 

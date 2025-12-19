@@ -91,11 +91,22 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                     except Employee.DoesNotExist:
                         queryset = LeaveRequest.objects.none()
 
-                else:  # EMPLOYEE
-                    # Regular employees can only see their own leave requests
+                else:  # EMPLOYEE, IT_SUPPORTER, ADMIN, etc.
+                    # Regular employees can see their own leave requests + peers (same manager)
                     try:
                         employee = Employee.objects.get(user=user)
-                        queryset = queryset.filter(employee=employee)
+                        # Get peer employees (same manager)
+                        peer_ids = []
+                        if employee.manager:
+                            peers = Employee.objects.filter(
+                                manager=employee.manager,
+                                status='ACTIVE'
+                            ).values_list('id', flat=True)
+                            peer_ids = list(peers)
+                        # Include own ID
+                        allowed_ids = [employee.id] + peer_ids
+                        queryset = queryset.filter(employee_id__in=allowed_ids)
+                        print(f"🔍 Employee/IT_SUPPORTER/ADMIN allowed IDs: {allowed_ids}")
                     except Employee.DoesNotExist:
                         queryset = LeaveRequest.objects.none()
             else:
@@ -207,14 +218,6 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
             
             # Save the leave request
             leave_request = serializer.save(employee=employee)
-            
-            # Send notifications
-            try:
-                LeaveNotificationService.notify_leave_request_submitted(leave_request)
-            except Exception as e:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f"Failed to send notification for leave request {leave_request.id}: {e}")
             
         except Employee.DoesNotExist:
             raise serializers.ValidationError("Employee profile not found")

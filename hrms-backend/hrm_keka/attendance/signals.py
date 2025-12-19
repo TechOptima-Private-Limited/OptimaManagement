@@ -4,6 +4,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from .models import AttendanceRecord
 from employees.models import Employee
+from notifications.services import NotificationService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,25 @@ def send_attendance_notifications(sender, instance, created, **kwargs):
     if not previous_pending and current_pending:
         print(f"🔔 Sending edit approval request email for {instance}")
         send_edit_approval_request_email(instance)
+        
+        # Send Push Notification to HR
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            hr_users = User.objects.filter(profile__role='HR_MANAGER', is_active=True)
+            
+            for hr_user in hr_users:
+                NotificationService.create_notification(
+                    recipient=hr_user,
+                    notification_type='ATTENDANCE_EDIT_REQUEST',
+                    title=f"Attendance Edit ID {instance.id}: {instance.employee.user.get_full_name()}",
+                    message=f"{instance.employee.user.get_full_name()} has requested an attendance edit for {instance.date}.",
+                    sender=instance.employee.user,
+                    action_url='/attendance/pending-edits',
+                    action_text='Review Edit'
+                )
+        except Exception as e:
+            logger.error(f"⚠️ Failed to send attendance edit push: {str(e)}")
 
 # def send_edit_approval_request_email(pending_record):
 #     """Send simple email to HR only with current and requested data"""
@@ -212,6 +232,23 @@ def send_edit_approval_request_email(pending_record):
 def send_approval_result_email(employee_email, employee_name, date, approved, approver_name):
     """Send email to employee about approval/rejection result"""
     try:
+        # Also send push notification
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            recipient = User.objects.get(email=employee_email)
+            
+            NotificationService.create_notification(
+                recipient=recipient,
+                notification_type='ATTENDANCE_EDIT_APPROVED' if approved else 'ATTENDANCE_EDIT_REJECTED',
+                title=f"Attendance Edit {'Approved' if approved else 'Rejected'}",
+                message=f"Your attendance edit for {date} has been {'approved' if approved else 'rejected'}.",
+                action_url='/attendance',
+                action_text='View Attendance'
+            )
+        except Exception as e:
+            print(f"⚠️ Failed to send attendance edit result push: {str(e)}")
+
         if not employee_email:
             print(f"❌ No email found for employee {employee_name}")
             return

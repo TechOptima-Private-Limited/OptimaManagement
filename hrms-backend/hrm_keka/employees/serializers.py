@@ -175,6 +175,7 @@ class ManagerSerializer(serializers.ModelSerializer):
                 'id': obj.user.id,
                 'first_name': obj.user.first_name,
                 'last_name': obj.user.last_name,
+                'email': obj.user.email,
                 'full_name': obj.user.get_full_name()
             }
         return None

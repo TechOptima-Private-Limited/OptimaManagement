@@ -66,7 +66,7 @@
 //       setLoading(true);
 //       const filterParam = filters.status === '' ? null : filters.status;
 //       const response = await workFromHomeAPI.getWFHRequests(filterParam);
-      
+
 //       // Handle different response formats
 //       let requestsData = [];
 //       if (response.results) {
@@ -78,14 +78,14 @@
 //       } else if (response.data && Array.isArray(response.data)) {
 //         requestsData = response.data;
 //       }
-      
+
 //       setRequests(Array.isArray(requestsData) ? requestsData : []);
-      
+
 //       // Set pending approvals count for HR
 //       if (isHRManager() && response.data?.pending_approvals_count !== undefined) {
 //         setPendingApprovalsCount(response.data.pending_approvals_count);
 //       }
-      
+
 //       // Calculate stats
 //       calculateStats(Array.isArray(requestsData) ? requestsData : []);
 //     } catch (error) {
@@ -167,13 +167,13 @@
 //       };
 
 //       await workFromHomeAPI.approveWFHRequest(selectedApproval.id, requestData);
-      
+
 //       toast.success(
 //         approvalData.action === 'approve' 
 //           ? '✅ Work from home request approved successfully!' 
 //           : '❌ Work from home request rejected successfully!'
 //       );
-      
+
 //       setShowApprovalModal(false);
 //       setSelectedApproval(null);
 //       resetApproval();
@@ -196,10 +196,10 @@
 //       reason: request.reason,
 //       action: action
 //     };
-    
+
 //     setSelectedApproval(approval);
 //     setShowApprovalModal(true);
-    
+
 //     resetApproval({
 //       action: action,
 //       rejection_reason: ''
@@ -220,7 +220,7 @@
 //       requests.map(request => 
 //         `${request.formatted_request_date},${request.employee_name},${request.employee_department},"${request.reason}",${request.status},${request.formatted_applied_at},${request.approved_by_name || ''}`
 //       ).join("\n");
-    
+
 //     const encodedUri = encodeURI(csvContent);
 //     const link = document.createElement("a");
 //     link.setAttribute("href", encodedUri);
@@ -300,7 +300,7 @@
 //       render: (name, row) => {
 //         const profileGradient = getProfileGradient(name);
 //         const employeeInitials = getEmployeeInitials(name);
-        
+
 //         return (
 //           <div className="flex items-center">
 //             <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-md mr-3`}>
@@ -428,11 +428,11 @@
 //       {/* Enhanced Page Header */}
 //       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700">
 //         <div className="absolute inset-0 bg-black opacity-10"></div>
-        
+
 //         {/* Decorative elements */}
 //         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
 //         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
-        
+
 //         <div className="relative px-4 py-12 sm:px-6 lg:px-8">
 //           <div className="flex items-center justify-between">
 //             <div className="flex items-center">
@@ -540,7 +540,7 @@
 //               <ClockIcon className="h-6 w-6 mr-2 text-amber-500" />
 //               Your Pending Requests
 //             </h3>
-            
+
 //             {requests.filter(request => request.status === 'PENDING').length > 0 ? (
 //               <div className="space-y-3">
 //                 {requests
@@ -590,7 +590,7 @@
 //                 {requests.filter(r => r.status === 'PENDING').length} Pending
 //               </span>
 //             </div>
-            
+
 //             {requests.filter(r => r.status === 'PENDING').length > 0 ? (
 //               <div className="space-y-4">
 //                 {requests
@@ -598,7 +598,7 @@
 //                   .map((request) => {
 //                     const profileGradient = getProfileGradient(request.employee_name);
 //                     const employeeInitials = getEmployeeInitials(request.employee_name);
-                    
+
 //                     return (
 //                       <div key={request.id} className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
 //                         <div className="flex justify-between items-start mb-3">
@@ -730,7 +730,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           <Table
 //             columns={columns}
 //             data={requests}
@@ -840,7 +840,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setSelectedRequest(null)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className={`bg-gradient-to-r ${theme.primaryGradient} px-6 py-6`}>
@@ -881,7 +881,7 @@
 //                       </div>
 //                     </div>
 //                   )}
-                  
+
 //                   <div className="grid grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-1">Request Date:</label>
@@ -892,21 +892,21 @@
 //                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
 //                     </div>
 //                   </div>
-                  
+
 //                   <div>
 //                     <label className="block text-sm font-semibold text-gray-700 mb-1">Status:</label>
 //                     <div className="mt-1">
 //                       {getStatusBadge(selectedRequest.status)}
 //                     </div>
 //                   </div>
-                  
+
 //                   <div>
 //                     <label className="block text-sm font-semibold text-gray-700 mb-1">Reason:</label>
 //                     <div className="bg-white/70 rounded-lg px-3 py-3">
 //                       <p className="text-sm text-gray-900">{selectedRequest.reason}</p>
 //                     </div>
 //                   </div>
-                  
+
 //                   {selectedRequest.approved_by_name && (
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-1">Approved By:</label>
@@ -1094,7 +1094,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { 
+import {
   HomeIcon,
   CalendarDaysIcon,
   ClockIcon,
@@ -1182,7 +1182,7 @@ const WorkFromHomeRequests = () => {
       setLoading(true);
       const filterParam = filters.status === '' ? null : filters.status;
       const response = await workFromHomeAPI.getWFHRequests(filterParam);
-      
+
       // Handle different response formats
       let requestsData = [];
       if (response.results) {
@@ -1194,14 +1194,14 @@ const WorkFromHomeRequests = () => {
       } else if (response.data && Array.isArray(response.data)) {
         requestsData = response.data;
       }
-      
+
       setRequests(Array.isArray(requestsData) ? requestsData : []);
-      
+
       // Set pending approvals count for HR and Managers
       if (canApprove() && response.data?.pending_approvals_count !== undefined) {
         setPendingApprovalsCount(response.data.pending_approvals_count);
       }
-      
+
       // Calculate stats
       calculateStats(Array.isArray(requestsData) ? requestsData : []);
     } catch (error) {
@@ -1237,7 +1237,10 @@ const WorkFromHomeRequests = () => {
       fetchWFHRequests();
     } catch (error) {
       console.error('Failed to create request:', error);
-      toast.error('Failed to submit request');
+      const errorMsg = error.response?.data?.error ||
+        (error.response?.data ? Object.values(error.response.data)[0] : null) ||
+        'Failed to submit request';
+      toast.error(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -1260,7 +1263,7 @@ const WorkFromHomeRequests = () => {
   const handleReject = async (requestId, rejectionReason = '') => {
     try {
       setProcessingRequest(requestId);
-      await workFromHomeAPI.approveWFHRequest(requestId, { 
+      await workFromHomeAPI.approveWFHRequest(requestId, {
         action: 'reject',
         rejection_reason: rejectionReason || 'Request rejected by ' + (isHRManager() ? 'HR' : 'Manager')
       });
@@ -1283,13 +1286,13 @@ const WorkFromHomeRequests = () => {
       };
 
       await workFromHomeAPI.approveWFHRequest(selectedApproval.id, requestData);
-      
+
       toast.success(
-        approvalData.action === 'approve' 
-          ? '✅ Work from home request approved successfully!' 
+        approvalData.action === 'approve'
+          ? '✅ Work from home request approved successfully!'
           : '❌ Work from home request rejected successfully!'
       );
-      
+
       setShowApprovalModal(false);
       setSelectedApproval(null);
       resetApproval();
@@ -1312,10 +1315,10 @@ const WorkFromHomeRequests = () => {
       reason: request.reason,
       action: action
     };
-    
+
     setSelectedApproval(approval);
     setShowApprovalModal(true);
-    
+
     resetApproval({
       action: action,
       rejection_reason: ''
@@ -1331,12 +1334,12 @@ const WorkFromHomeRequests = () => {
   };
 
   const exportWFHRequests = () => {
-    const csvContent = "data:text/csv;charset=utf-8," + 
+    const csvContent = "data:text/csv;charset=utf-8," +
       "Date,Employee,Department,Reason,Status,Applied On,Approved By\n" +
-      requests.map(request => 
+      requests.map(request =>
         `${request.formatted_request_date},${request.employee_name},${request.employee_department},"${request.reason}",${request.status},${request.formatted_applied_at},${request.approved_by_name || ''}`
       ).join("\n");
-    
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -1371,7 +1374,7 @@ const WorkFromHomeRequests = () => {
   const getProfileGradient = (name) => {
     const gradients = [
       'from-violet-500 to-purple-600',
-      'from-blue-500 to-cyan-600', 
+      'from-blue-500 to-cyan-600',
       'from-emerald-500 to-teal-600',
       'from-amber-500 to-orange-600',
       'from-rose-500 to-pink-600',
@@ -1416,7 +1419,7 @@ const WorkFromHomeRequests = () => {
       render: (name, row) => {
         const profileGradient = getProfileGradient(name);
         const employeeInitials = getEmployeeInitials(name);
-        
+
         return (
           <div className="flex items-center">
             <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-md mr-3`}>
@@ -1442,9 +1445,9 @@ const WorkFromHomeRequests = () => {
             <div className="text-sm font-medium text-gray-900">{date}</div>
             {row.days_until_request >= 0 && (
               <div className="text-xs text-gray-500">
-                {row.days_until_request === 0 ? 'Today' : 
-                 row.days_until_request === 1 ? 'Tomorrow' : 
-                 `In ${row.days_until_request} days`}
+                {row.days_until_request === 0 ? 'Today' :
+                  row.days_until_request === 1 ? 'Tomorrow' :
+                    `In ${row.days_until_request} days`}
               </div>
             )}
           </div>
@@ -1506,11 +1509,11 @@ const WorkFromHomeRequests = () => {
       {/* Enhanced Page Header */}
       <div className={`relative overflow-hidden bg-gradient-to-r ${theme.headerGradient}`}>
         <div className="absolute inset-0 bg-black opacity-10"></div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
-        
+
         <div className="relative px-4 py-12 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -1618,7 +1621,7 @@ const WorkFromHomeRequests = () => {
               <ClockIcon className="h-6 w-6 mr-2 text-amber-500" />
               Your Pending Requests
             </h3>
-            
+
             {requests.filter(request => request.status === 'PENDING').length > 0 ? (
               <div className="space-y-3">
                 {requests
@@ -1671,7 +1674,7 @@ const WorkFromHomeRequests = () => {
                 {requests.filter(r => r.status === 'PENDING').length} Pending
               </span>
             </div>
-            
+
             {requests.filter(r => r.status === 'PENDING').length > 0 ? (
               <div className="space-y-4">
                 {requests
@@ -1679,7 +1682,7 @@ const WorkFromHomeRequests = () => {
                   .map((request) => {
                     const profileGradient = getProfileGradient(request.employee_name);
                     const employeeInitials = getEmployeeInitials(request.employee_name);
-                    
+
                     return (
                       <div key={request.id} className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
                         <div className="flex justify-between items-start mb-3">
@@ -1814,7 +1817,7 @@ const WorkFromHomeRequests = () => {
               </div>
             </div>
           </div>
-          
+
           <Table
             columns={columns}
             data={requests}
@@ -1926,7 +1929,7 @@ const WorkFromHomeRequests = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setSelectedRequest(null)}></div>
-            
+
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6">
@@ -1964,7 +1967,7 @@ const WorkFromHomeRequests = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Request Date:</label>
@@ -1975,21 +1978,21 @@ const WorkFromHomeRequests = () => {
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Status:</label>
                     <div className="mt-1">
                       {getStatusBadge(selectedRequest.status)}
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Reason:</label>
                     <div className="bg-white/70 rounded-lg px-3 py-3">
                       <p className="text-sm text-gray-900">{selectedRequest.reason}</p>
                     </div>
                   </div>
-                  
+
                   {selectedRequest.approved_by_name && (
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Approved By:</label>
@@ -2004,9 +2007,9 @@ const WorkFromHomeRequests = () => {
                         <div>
                           <p className="text-sm font-medium text-blue-800">Time Until Request Date</p>
                           <p className="text-sm text-blue-700">
-                            {selectedRequest.days_until_request === 0 ? 'Today' : 
-                             selectedRequest.days_until_request === 1 ? 'Tomorrow' : 
-                             `In ${selectedRequest.days_until_request} days`}
+                            {selectedRequest.days_until_request === 0 ? 'Today' :
+                              selectedRequest.days_until_request === 1 ? 'Tomorrow' :
+                                `In ${selectedRequest.days_until_request} days`}
                           </p>
                         </div>
                       </div>
@@ -2038,10 +2041,9 @@ const WorkFromHomeRequests = () => {
         }}
         title={
           <div className="flex items-center">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${
-              selectedApproval?.action === 'approve' ? 'bg-emerald-500 bg-opacity-20' : 
-              selectedApproval?.action === 'reject' ? 'bg-rose-500 bg-opacity-20' : 'bg-blue-500 bg-opacity-20'
-            }`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${selectedApproval?.action === 'approve' ? 'bg-emerald-500 bg-opacity-20' :
+                selectedApproval?.action === 'reject' ? 'bg-rose-500 bg-opacity-20' : 'bg-blue-500 bg-opacity-20'
+              }`}>
               {selectedApproval?.action === 'approve' ? (
                 <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
               ) : selectedApproval?.action === 'reject' ? (
@@ -2052,9 +2054,9 @@ const WorkFromHomeRequests = () => {
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900">
-                {selectedApproval?.action === 'approve' ? 'Approve Work From Home Request' : 
-                 selectedApproval?.action === 'reject' ? 'Reject Work From Home Request' : 
-                 'Work From Home Request Details'}
+                {selectedApproval?.action === 'approve' ? 'Approve Work From Home Request' :
+                  selectedApproval?.action === 'reject' ? 'Reject Work From Home Request' :
+                    'Work From Home Request Details'}
               </h3>
               <p className="text-sm text-gray-600">
                 {selectedApproval?.employee_name} - {selectedApproval?.formatted_request_date}
@@ -2103,11 +2105,10 @@ const WorkFromHomeRequests = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`flex-1 px-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 transform hover:scale-105 transition-all duration-200 ${
-                    selectedApproval.action === 'approve'
+                  className={`flex-1 px-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 transform hover:scale-105 transition-all duration-200 ${selectedApproval.action === 'approve'
                       ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
                       : 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
-                  }`}
+                    }`}
                 >
                   {submitting ? (
                     <div className="flex items-center justify-center">

@@ -11,4 +11,7 @@ urlpatterns = [
     
     # Admin/HR only
     path('system/create/', views.create_system_notification, name='create_system_notification'),
+    
+    # Webpush
+    path('save-webpush/', views.save_webpush_info, name='save_webpush_info'),
 ]

@@ -2919,6 +2919,7 @@ def send_email_notification(obj, subject, template_name, context, recipients=Non
         return False
 
 
+from notifications.services import NotificationService
 from resource_management.models import ResourceType, Resource
 
 def send_request_notification(access_request):
@@ -2982,6 +2983,14 @@ def send_request_notification(access_request):
                 
                 if result:
                     print(f"USER EMAIL SUCCESS with template: {template}")
+                    # Notify user via App/Push
+                    NotificationService.create_notification(
+                        recipient=access_request.user,
+                        notification_type='RESOURCE_REQUEST',
+                        title="IT Support Request Submitted",
+                        message=f"Your IT support request {access_request.ticket_number} has been submitted.",
+                        action_url=f"/resource-management/requests"
+                    )
                     break
                 else:
                     print(f"USER EMAIL FAILED with template: {template}")
@@ -3021,6 +3030,22 @@ def send_request_notification(access_request):
                 
                 if result:
                     print(f"TEAM EMAIL SUCCESS with template: {template}")
+                    # Notify admins via App/Push
+                    for admin_email in admin_recipients:
+                        try:
+                            from django.contrib.auth import get_user_model
+                            User = get_user_model()
+                            admin_user = User.objects.filter(email=admin_email).first()
+                            if admin_user:
+                                NotificationService.create_notification(
+                                    recipient=admin_user,
+                                    notification_type='RESOURCE_REQUEST',
+                                    title="New IT Support Request",
+                                    message=f"New IT support request {access_request.ticket_number} from {access_request.user.get_full_name()}",
+                                    action_url=f"/resource-management/requests"
+                                )
+                        except Exception as ne:
+                            print(f"Failed to send app notification to admin {admin_email}: {str(ne)}")
                     break
                 else:
                     print(f"TEAM EMAIL FAILED with template: {template}")
@@ -3053,6 +3078,14 @@ def send_request_notification(access_request):
             
             if user_result:
                 print("Regular access request user email sent")
+                # Notify user via App/Push
+                NotificationService.create_notification(
+                    recipient=access_request.user,
+                    notification_type='RESOURCE_REQUEST',
+                    title="Access Request Submitted",
+                    message=f"Your access request {access_request.ticket_number} for {access_request.resource.name if access_request.resource else 'a resource'} has been submitted.",
+                    action_url=f"/resource-management/requests"
+                )
             else:
                 print("Regular access request user email failed")
 
@@ -3085,6 +3118,22 @@ def send_request_notification(access_request):
                 
                 if team_result:
                     print(f"Regular access request team email sent to: {', '.join(admin_recipients)}")
+                    # Notify team via App/Push
+                    for admin_email in admin_recipients:
+                        try:
+                            from django.contrib.auth import get_user_model
+                            User = get_user_model()
+                            admin_user = User.objects.filter(email=admin_email).first()
+                            if admin_user:
+                                NotificationService.create_notification(
+                                    recipient=admin_user,
+                                    notification_type='RESOURCE_REQUEST',
+                                    title="New Access Request",
+                                    message=f"New access request {access_request.ticket_number} from {access_request.user.get_full_name()}",
+                                    action_url=f"/resource-management/requests"
+                                )
+                        except Exception as ne:
+                            print(f"Failed to send app notification to admin {admin_email}: {str(ne)}")
                 else:
                     print(f"Regular access request team email failed")
 
@@ -3209,6 +3258,23 @@ def send_approval_request_notification(obj, notes):
         
         if result:
             print(f"✅ Approval email sent successfully to: {obj.approver_email}")
+            
+            # Notify approver via App/Push if they are a user in the system
+            try:
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                approver_user = User.objects.filter(email=obj.approver_email).first()
+                if approver_user:
+                    NotificationService.create_notification(
+                        recipient=approver_user,
+                        notification_type='RESOURCE_APPROVAL_REQUIRED',
+                        title="Approval Required",
+                        message=f"Your approval is required for access request {obj.ticket_number} from {obj.user.get_full_name()}",
+                        action_url=f"/resource-management/approvals"
+                    )
+            except Exception as ne:
+                print(f"Failed to send app notification to approver: {str(ne)}")
+                
             return True
         else:
             print(f"❌ Failed to send approval email to: {obj.approver_email}")
@@ -3260,6 +3326,20 @@ def send_status_notification(obj, old_status, notes=''):
         [obj.user.email],
         is_reply=True
     )
+    
+    # Notify requester via App/Push
+    n_type = 'RESOURCE_REQUEST'
+    if obj.status == 'APPROVED': n_type = 'RESOURCE_APPROVED'
+    elif obj.status == 'REJECTED': n_type = 'RESOURCE_REJECTED'
+    elif obj.status == 'APPROVAL_REQUIRED': n_type = 'RESOURCE_APPROVAL_REQUIRED'
+    
+    NotificationService.create_notification(
+        recipient=obj.user,
+        notification_type=n_type,
+        title=f"Access Request {obj.get_status_display()}",
+        message=f"Your access request {obj.ticket_number} has been {obj.get_status_display().lower()}.",
+        action_url=f"/resource-management/requests"
+    )
 
     # Notify the resource team (only skip for APPROVER_APPROVED and APPROVER_REJECTED)
     if obj.status not in ['APPROVER_APPROVED', 'APPROVER_REJECTED']:
@@ -3296,6 +3376,15 @@ def send_status_notification(obj, old_status, notes=''):
             assignee_context,
             [obj.assigned_to.email],
             is_reply=True
+        )
+        
+        # Notify assignee via App/Push
+        NotificationService.create_notification(
+            recipient=obj.assigned_to,
+            notification_type='RESOURCE_ASSIGNED',
+            title="Access Request Assigned",
+            message=f"Access request {obj.ticket_number} has been assigned to you.",
+            action_url=f"/resource-management/requests"
         )
 
     # REMOVED: Don't send approval request here - it's handled separately

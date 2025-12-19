@@ -14,6 +14,14 @@ class Notification(models.Model):
         ('LEAVE_REJECTED', 'Leave Rejected'),
         ('SYSTEM', 'System Notification'),
         ('REMINDER', 'Reminder'),
+        ('WFH_REQUEST', 'Work From Home Request'),
+        ('WFH_APPROVED', 'Work From Home Approved'),
+        ('WFH_REJECTED', 'Work From Home Rejected'),
+        ('RESOURCE_REQUEST', 'Resource Request'),
+        ('RESOURCE_APPROVED', 'Resource Approved'),
+        ('RESOURCE_REJECTED', 'Resource Rejected'),
+        ('RESOURCE_ASSIGNED', 'Resource Assigned'),
+        ('RESOURCE_APPROVAL_REQUIRED', 'Resource Approval Required'),
     ]
     
     PRIORITY_CHOICES = [
@@ -91,6 +99,14 @@ class Notification(models.Model):
             'LEAVE_REJECTED': '❌',
             'SYSTEM': '🔔',
             'REMINDER': '⏰',
+            'WFH_REQUEST': '🏠',
+            'WFH_APPROVED': '✅',
+            'WFH_REJECTED': '❌',
+            'RESOURCE_REQUEST': '📦',
+            'RESOURCE_APPROVED': '✅',
+            'RESOURCE_REJECTED': '❌',
+            'RESOURCE_ASSIGNED': '👤',
+            'RESOURCE_APPROVAL_REQUIRED': '⏳',
         }
         return icon_map.get(self.notification_type, '🔔')
     
@@ -104,5 +120,13 @@ class Notification(models.Model):
             'LEAVE_REJECTED': 'bg-red-50 border-red-200 text-red-800',
             'SYSTEM': 'bg-gray-50 border-gray-200 text-gray-800',
             'REMINDER': 'bg-yellow-50 border-yellow-200 text-yellow-800',
+            'WFH_REQUEST': 'bg-indigo-50 border-indigo-200 text-indigo-800',
+            'WFH_APPROVED': 'bg-green-50 border-green-200 text-green-800',
+            'WFH_REJECTED': 'bg-red-50 border-red-200 text-red-800',
+            'RESOURCE_REQUEST': 'bg-orange-50 border-orange-200 text-orange-800',
+            'RESOURCE_APPROVED': 'bg-green-50 border-green-200 text-green-800',
+            'RESOURCE_REJECTED': 'bg-red-50 border-red-200 text-red-800',
+            'RESOURCE_ASSIGNED': 'bg-blue-50 border-blue-200 text-blue-800',
+            'RESOURCE_APPROVAL_REQUIRED': 'bg-yellow-50 border-yellow-200 text-yellow-800',
         }
         return color_map.get(self.notification_type, 'bg-gray-50 border-gray-200 text-gray-800')

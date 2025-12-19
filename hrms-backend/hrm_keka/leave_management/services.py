@@ -691,31 +691,28 @@ from decimal import Decimal
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+from notifications.services import NotificationService
+
 class LeaveNotificationService:
     @staticmethod
     def create_notification(recipient, sender, notification_type, title, message, related_object_id=None, related_object_type=None):
-        """Create a notification record"""
-        try:
-            # Ensure recipient and sender are User objects
-            if not isinstance(recipient, User):
-                logger.error(f"❌ Invalid recipient type: {type(recipient)}")
-                return None
-                
-            notification = Notification.objects.create(
-                recipient=recipient,
-                sender=sender,
-                notification_type=notification_type,
-                title=title,
-                message=message,
-                related_object_id=related_object_id,
-                related_object_type=related_object_type
-            )
-            logger.info(f"✅ Notification created: {title} for {recipient.get_full_name()}")
-            return notification
-        except Exception as e:
-            logger.error(f"❌ Failed to create notification: {e}")
-            logger.exception("Full error traceback:")
-            return None
+        """Create a notification record using central service"""
+        kwargs = {
+            'sender': sender,
+            'priority': 'MEDIUM'
+        }
+        if related_object_type == 'leave_request':
+            kwargs['leave_request_id'] = related_object_id
+            kwargs['action_url'] = '/leave'
+            kwargs['action_text'] = 'View Leave'
+            
+        return NotificationService.create_notification(
+            recipient=recipient,
+            notification_type=notification_type,
+            title=title,
+            message=message,
+            **kwargs
+        )
 
     @staticmethod
     def notify_leave_request_submitted(leave_request):

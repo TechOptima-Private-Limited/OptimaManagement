@@ -9,6 +9,7 @@ from django.utils import timezone
 from .models import Notification
 from .services import NotificationService
 from .serializers import NotificationSerializer
+from webpush.models import PushInformation, SubscriptionInfo
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,26 +21,30 @@ class NotificationListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         unread_only = self.request.query_params.get('unread_only', 'false').lower() == 'true'
-        limit = int(self.request.query_params.get('limit', 50))
         
         return NotificationService.get_user_notifications(
             user=user,
-            limit=limit,
             unread_only=unread_only
         )
     
     def list(self, request, *args, **kwargs):
-        """Override to include unread count"""
+        """Override to include unread count without double-nesting results"""
         response = super().list(request, *args, **kwargs)
         
-        # Add unread count to response
         unread_count = NotificationService.get_unread_count(request.user)
+        total_count = Notification.objects.filter(recipient=request.user).count()
         
-        response.data = {
-            'results': response.data,
-            'unread_count': unread_count,
-            'total_count': Notification.objects.filter(recipient=request.user).count()
-        }
+        if isinstance(response.data, dict) and 'results' in response.data:
+            # Response is already paginated, just add extra fields
+            response.data['unread_count'] = unread_count
+            response.data['total_count'] = total_count
+        else:
+            # Response is a simple list, wrap it
+            response.data = {
+                'results': response.data,
+                'unread_count': unread_count,
+                'total_count': total_count
+            }
         
         return response
 
@@ -132,3 +137,69 @@ def create_system_notification(request):
     except Exception as e:
         logger.error(f"❌ Error creating system notification: {str(e)}")
         return Response({'error': 'Failed to create system notification'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_webpush_info(request):
+    """Custom endpoint to save webpush subscription using JWT authentication"""
+    try:
+        user = request.user
+        subscription_data = request.data.get('subscription')
+        
+        if not subscription_data:
+            return Response({'error': 'Subscription data is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Log for debugging
+        logger.info(f"💾 Saving push subscription for user {user.email}")
+        
+        endpoint = subscription_data.get('endpoint')
+        keys = subscription_data.get('keys', {})
+        auth = keys.get('auth')
+        p256dh = keys.get('p256dh')
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        
+        if not all([endpoint, auth, p256dh]):
+            return Response({'error': 'Incomplete subscription data'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 🟢 PREVENTION: Prune old subscriptions for this user on the same browser/device
+        # This prevents duplicate notifications if the user clicks "Enable" multiple times
+        # or if the browser generates a new endpoint.
+        old_subscriptions = PushInformation.objects.filter(
+            user=user,
+            subscription__user_agent=user_agent
+        ).exclude(subscription__endpoint=endpoint)
+        
+        if old_subscriptions.exists():
+            logger.info(f"🧹 Pruning {old_subscriptions.count()} old subscriptions for {user.email}")
+            for old_pi in old_subscriptions:
+                old_sub = old_pi.subscription
+                old_pi.delete()
+                # Also delete the SubscriptionInfo if not shared
+                if not PushInformation.objects.filter(subscription=old_sub).exists():
+                    old_sub.delete()
+
+        # 1. Get or create SubscriptionInfo
+        sub_info, created = SubscriptionInfo.objects.get_or_create(
+            endpoint=endpoint,
+            defaults={
+                'auth': auth, 
+                'p256dh': p256dh,
+                'user_agent': user_agent
+            }
+        )
+        if not created:
+            sub_info.auth = auth
+            sub_info.p256dh = p256dh
+            sub_info.user_agent = user_agent
+            sub_info.save()
+            
+        # 2. Get or create PushInformation for this user and subscription
+        PushInformation.objects.get_or_create(
+            user=user,
+            subscription=sub_info
+        )
+        
+        return Response({'message': 'Push subscription saved successfully'}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        logger.error(f"❌ Error saving push info: {str(e)}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

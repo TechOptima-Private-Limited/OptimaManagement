@@ -37,7 +37,7 @@ const MyTeam = () => {
   const fetchTeamData = async () => {
     try {
       setLoading(true);
-      
+
       // First fetch user profile to get role
       const profileResponse = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
         headers: {
@@ -49,9 +49,9 @@ const MyTeam = () => {
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
         setProfile(profileData);
-        
+
         const userRole = profileData.profile?.role;
-        
+
         // Fetch team data based on role
         if (userRole === 'HR_MANAGER') {
           await fetchAllManagersWithTeams();
@@ -75,13 +75,13 @@ const MyTeam = () => {
   const fetchTeamAttendanceData = async (teamMembers = null) => {
     try {
       const today = toLocalDate(new Date());
-      
+
       // Use provided team members or fall back to state
       const membersToProcess = teamMembers || team;
-      
+
       // Get team member IDs
       const teamMemberIds = membersToProcess.map(member => member.id);
-      
+
       if (teamMemberIds.length === 0) {
         setAttendanceStats({
           onTime: [],
@@ -101,7 +101,7 @@ const MyTeam = () => {
       });
 
       const attendanceRecords = attendanceResponse.data.results || attendanceResponse.data || [];
-      
+
       // Filter records for team members only - handle both number and string IDs
       const teamMemberIdsSet = new Set(teamMemberIds.map(id => String(id)));
       const teamAttendanceRecords = attendanceRecords.filter(record => {
@@ -128,8 +128,8 @@ const MyTeam = () => {
           wfhRequests = allWFH.filter(wfh => {
             const requestDate = wfh.request_date;
             // Handle both date string and full datetime formats
-            const dateStr = typeof requestDate === 'string' 
-              ? requestDate.split('T')[0] 
+            const dateStr = typeof requestDate === 'string'
+              ? requestDate.split('T')[0]
               : requestDate;
             return dateStr === today;
           });
@@ -145,6 +145,45 @@ const MyTeam = () => {
         return wfh.status === 'APPROVED' && wfhEmployeeId && teamMemberIdsSet.has(String(wfhEmployeeId));
       });
 
+      // Fetch leave requests for today
+      let leaveRequests = [];
+      try {
+        const leaveResponse = await fetch('http://127.0.0.1:8000/api/leave/requests/', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (leaveResponse.ok) {
+          const leaveData = await leaveResponse.json();
+          const allLeaves = Array.isArray(leaveData) ? leaveData : (leaveData.results || []);
+          // Filter for today's approved leave requests
+          leaveRequests = allLeaves.filter(leave => {
+            if (leave.status !== 'APPROVED') return false;
+
+            const startDate = typeof leave.start_date === 'string'
+              ? leave.start_date.split('T')[0]
+              : leave.start_date;
+            const endDate = typeof leave.end_date === 'string'
+              ? leave.end_date.split('T')[0]
+              : leave.end_date;
+
+            // Check if today falls within the leave period
+            return today >= startDate && today <= endDate;
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching leave requests:', error);
+        // Continue without leave data
+      }
+
+      // Separate approved leave requests for team members
+      const approvedLeaves = leaveRequests.filter(leave => {
+        const leaveEmployeeId = leave.employee?.id || leave.employee;
+        return leaveEmployeeId && teamMemberIdsSet.has(String(leaveEmployeeId));
+      });
+
       // Calculate stats
       const onTime = [];
       const late = [];
@@ -155,22 +194,34 @@ const MyTeam = () => {
       membersToProcess.forEach(member => {
         const memberIdStr = String(member.id);
         const memberName = member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim();
-        
+
         // Try multiple ways to match attendance record
         const attendanceRecord = teamAttendanceRecords.find(ar => {
           const arEmployeeId = ar.employee?.id || ar.employee_id || ar.employee;
           return arEmployeeId && String(arEmployeeId) === memberIdStr;
         });
-        
-        
+
+
         const hasWFH = approvedWFH.some(wfh => {
           const wfhEmployeeId = wfh.employee?.id || wfh.employee;
           return wfhEmployeeId && String(wfhEmployeeId) === memberIdStr;
         });
 
+        // Check if employee has approved leave for today
+        const hasLeave = approvedLeaves.some(leave => {
+          const leaveEmployeeId = leave.employee?.id || leave.employee;
+          return leaveEmployeeId && String(leaveEmployeeId) === memberIdStr;
+        });
+
+        // If employee has approved leave, add to onLeave and skip other checks
+        if (hasLeave) {
+          onLeave.push(member);
+          return;
+        }
+
         // Check if they have checked in (has check_in_time)
         const hasCheckedIn = attendanceRecord && attendanceRecord.check_in_time;
-        
+
         if (hasWFH && hasCheckedIn) {
           // Work from home and checked in - count as checked in and show in WFH category
           workFromHome.push(member);
@@ -184,11 +235,11 @@ const MyTeam = () => {
           const notes = (attendanceRecord.notes || '').toLowerCase();
           const isRemoteNote = notes.includes('remote') || notes.includes('wfh') || notes.includes('work from home');
           const isOfficeNote = notes.includes('office');
-          
+
           // Consider it remote if notes indicate remote/WFH (and not explicitly office)
           // If notes say "Office", it's definitely office check-in
           const isRemoteLogin = isRemoteNote && !isOfficeNote;
-          
+
           if (isRemoteLogin) {
             // Remote login - show in remote login category but still count as checked in
             remoteLogin.push(member);
@@ -210,10 +261,10 @@ const MyTeam = () => {
       });
 
       // Remove duplicates from remoteLogin (in case someone is in both WFH and remoteLogin)
-      const uniqueRemoteLogin = [...new Set(remoteLogin.map(m => m.id))].map(id => 
+      const uniqueRemoteLogin = [...new Set(remoteLogin.map(m => m.id))].map(id =>
         remoteLogin.find(m => m.id === id)
       );
-      
+
       setAttendanceStats({
         onTime,
         late,
@@ -241,8 +292,14 @@ const MyTeam = () => {
         setEmployee(data.employee);
         // For employees, peers are colleagues (same manager), not direct reports
         // But for display purposes, we can show peers or empty array if they don't manage anyone
-        setTeam(data.peers || []);
+        const teamData = data.peers || [];
+        setTeam(teamData);
         setManager(data.manager);
+
+        // Fetch attendance after team data is loaded
+        if (teamData.length > 0) {
+          await fetchTeamAttendanceData(teamData);
+        }
       }
     } catch (error) {
       console.error('Error fetching employee profile data:', error);
@@ -266,7 +323,7 @@ const MyTeam = () => {
         const teamData = data.peers || [];
         setTeam(teamData);
         setManager(data.manager);
-        
+
         // Fetch attendance after team data is loaded
         if (teamData.length > 0) {
           await fetchTeamAttendanceData(teamData);
@@ -281,8 +338,9 @@ const MyTeam = () => {
   const fetchAllManagersWithTeams = async () => {
     try {
       // For HR Manager, we still need to show their own team
+      // fetchEmployeeProfileData will handle fetching attendance data
       await fetchEmployeeProfileData();
-      
+
       // Optionally fetch all managers for HR view
       const response = await fetch('http://127.0.0.1:8000/api/employees/managers-with-teams/', {
         headers: {
@@ -344,13 +402,13 @@ const MyTeam = () => {
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">My Team</h1>
         <p className="mt-1 text-sm text-gray-500">
-          {userRole === 'MANAGER' 
+          {userRole === 'MANAGER'
             ? `Overview of your team's attendance today and calendar. You have ${teamSize} team ${teamSize === 1 ? 'member' : 'members'}.`
             : userRole === 'EMPLOYEE' || userRole === 'IT_SUPPORTER' || userRole === 'ADMIN'
-            ? teamSize > 0 
-              ? `You have ${teamSize} colleague${teamSize === 1 ? '' : 's'} on your team.`
-              : 'You don\'t have any team members assigned.'
-            : `Overview of your team's attendance today and calendar.`
+              ? teamSize > 0
+                ? `You have ${teamSize} colleague${teamSize === 1 ? '' : 's'} on your team.`
+                : 'You don\'t have any team members assigned.'
+              : `Overview of your team's attendance today and calendar.`
           }
         </p>
       </div>
@@ -363,8 +421,8 @@ const MyTeam = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {team.map((member) => (
-              <div 
-                key={member.id} 
+              <div
+                key={member.id}
                 className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-300"
               >
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
@@ -376,6 +434,7 @@ const MyTeam = () => {
                   </h4>
                   <p className="text-xs text-gray-600 truncate">{member.position || 'Position not specified'}</p>
                   <p className="text-xs text-gray-500 truncate">ID: {member.employee_id}</p>
+                  <p className="text-xs text-gray-500 truncate">{member.user_info?.email}</p>
                   {member.department && (
                     <p className="text-xs text-gray-500 truncate">{member.department.name}</p>
                   )}
@@ -391,7 +450,7 @@ const MyTeam = () => {
           <UserGroupIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500 text-lg font-medium">No team members found</p>
           <p className="text-sm text-gray-400 mt-2">
-            {userRole === 'MANAGER' 
+            {userRole === 'MANAGER'
               ? 'You don\'t have any direct reports assigned to you.'
               : 'You don\'t have any team members assigned.'}
           </p>
@@ -428,7 +487,7 @@ const MyTeam = () => {
                   ...attendanceStats.remoteLogin.map(m => m.id)
                 ]);
                 const notArrived = team.filter(member => !checkedInIds.has(member.id) && !attendanceStats.onLeave.find(m => m.id === member.id));
-                
+
                 return notArrived.length > 0 ? (
                   <div className="space-y-1">
                     {notArrived.map(member => (
@@ -578,6 +637,7 @@ const MyTeam = () => {
                           {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
                         </p>
                         <p className="text-xs text-gray-500">{member.position || 'Position not specified'}</p>
+                        <p className="text-xs text-gray-400">{member.user_info?.email}</p>
                       </div>
                     </div>
                   ))}

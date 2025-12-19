@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from datetime import datetime, date
 from .models import AttendanceRecord, BiometricDevice, WorkFromHomeRequest, AttendanceLocationPing
 from .serializers import (
@@ -18,6 +19,9 @@ from .serializers import (
 )
 from employees.models import Employee
 from utils.permissions import IsEmployee, IsHRManager
+from notifications.services import NotificationService
+
+User = get_user_model()
 
 # Helper function to get manager's team employees (same as leave management)
 def get_manager_team_employees(user):
@@ -504,33 +508,62 @@ def apply_work_from_home(request):
         employee = Employee.objects.get(user=request.user)
         serializer = WorkFromHomeApplySerializer(data=request.data)
         
-        if serializer.is_valid():
-            # Check if already applied for this date
-            existing_request = WorkFromHomeRequest.objects.filter(
-                employee=employee,
-                request_date=serializer.validated_data['request_date']
-            ).first()
+        if not serializer.is_valid():
+            print(f"❌ WFH Serializer Errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-            if existing_request:
-                return Response({
-                    'error': f'You have already applied for WFH on {existing_request.request_date}. Status: {existing_request.status}'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Create WFH request
-            wfh_request = WorkFromHomeRequest.objects.create(
-                employee=employee,
-                **serializer.validated_data
-            )
-            
-            # Send email to HR and managers
-            send_wfh_request_email(wfh_request)
-            
-            return Response({
-                'message': 'Work from home request submitted successfully!',
-                'request_id': wfh_request.id
-            }, status=status.HTTP_201_CREATED)
+        # Check if already applied for this date
+        print(f"🔍 Checking if WFH exists for {employee.user} on {serializer.validated_data['request_date']}")
+        existing_request = WorkFromHomeRequest.objects.filter(
+            employee=employee,
+            request_date=serializer.validated_data['request_date']
+        ).first()
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if existing_request:
+            msg = f"Already applied for WFH on {existing_request.request_date}. Status: {existing_request.status}"
+            print(f"⚠️ {msg}")
+            return Response({
+                'error': msg
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Create WFH request
+        wfh_request = WorkFromHomeRequest.objects.create(
+            employee=employee,
+            **serializer.validated_data
+        )
+        
+        # Send email to HR and managers
+        send_wfh_request_email(wfh_request)
+        
+        # Send Notification to manager and HR
+        try:
+            recipients = []
+            if employee.manager:
+                recipients.append(employee.manager.user)
+            
+            hr_users = User.objects.filter(profile__role='HR_MANAGER', is_active=True)
+            recipients.extend(list(hr_users))
+            
+            # Deduplicate
+            recipients = list(set(recipients))
+            
+            for recipient in recipients:
+                NotificationService.create_notification(
+                    recipient=recipient,
+                    notification_type='WFH_REQUEST',
+                    title=f"New WFH Request: {employee.user.get_full_name()}",
+                    message=f"{employee.user.get_full_name()} has requested WFH for {wfh_request.request_date}. Reason: {wfh_request.reason[:50]}...",
+                    sender=request.user,
+                    action_url='/attendance/wfh-requests',
+                    action_text='Review Request'
+                )
+        except Exception as e:
+            print(f"⚠️ Failed to send WFH push notification: {str(e)}")
+        
+        return Response({
+            'message': 'Work from home request submitted successfully!',
+            'request_id': wfh_request.id
+        }, status=status.HTTP_201_CREATED)
     
     except Employee.DoesNotExist:
         return Response({
@@ -711,6 +744,20 @@ def approve_wfh_request(request, request_id):
             # Send approval email
             send_wfh_approval_email(wfh_request, approved=True)
             
+            # Send Notification to employee
+            try:
+                NotificationService.create_notification(
+                    recipient=wfh_request.employee.user,
+                    notification_type='WFH_APPROVED',
+                    title="WFH Request Approved",
+                    message=f"Your WFH request for {wfh_request.request_date} has been approved.",
+                    sender=request.user,
+                    action_url='/attendance',
+                    action_text='View Attendance'
+                )
+            except Exception as e:
+                print(f"⚠️ Failed to send WFH approval push: {str(e)}")
+            
             return Response({'message': 'Work from home request approved!'})
         
         elif action == 'reject':
@@ -723,6 +770,20 @@ def approve_wfh_request(request, request_id):
             # Send rejection email
             send_wfh_approval_email(wfh_request, approved=False)
             
+            # Send Notification to employee
+            try:
+                NotificationService.create_notification(
+                    recipient=wfh_request.employee.user,
+                    notification_type='WFH_REJECTED',
+                    title="WFH Request Rejected",
+                    message=f"Your WFH request for {wfh_request.request_date} has been rejected. Reason: {wfh_request.rejection_reason}",
+                    sender=request.user,
+                    action_url='/attendance',
+                    action_text='View Attendance'
+                )
+            except Exception as e:
+                print(f"⚠️ Failed to send WFH rejection push: {str(e)}")
+            
             return Response({'message': 'Work from home request rejected!'})
         
         else:
@@ -732,7 +793,7 @@ def approve_wfh_request(request, request_id):
         return Response({'error': 'Request not found or already processed'}, status=status.HTTP_404_NOT_FOUND)
 
 # Email functions updated to include managers
-import authentication.models as User
+# def send_wfh_request_email(wfh_request):
 from django.core.mail import EmailMessage
 
 def send_wfh_request_email(wfh_request):
