@@ -33,7 +33,7 @@ class AssetReturnInline(admin.TabularInline):
 class AssetRepairAdmin(admin.ModelAdmin):
     list_display = (
         'asset', 'status', 'vendor', 'ticket_reference', 'case_id',
-        'started_at', 'completed_at', 'created_at', 'updated_at'
+        'started_at', 'completed_at', 'total_repair_cost', 'repair_done_under_warranty', 'created_at', 'updated_at'
     )
     list_filter = ('status', 'created_at', 'updated_at')
     search_fields = (
@@ -50,6 +50,8 @@ class AssetRepairAdmin(admin.ModelAdmin):
         'case_id',
         'started_at',
         'completed_at',
+        'total_repair_cost',
+        'repair_done_under_warranty',
         'notes',
         'created_by',
     )

@@ -236,6 +236,8 @@ class AssetRepair(models.Model):
     case_id = models.CharField(max_length=100, blank=True)
     started_at = models.DateField(blank=True, null=True)
     completed_at = models.DateField(blank=True, null=True)
+    total_repair_cost = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    repair_done_under_warranty = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
