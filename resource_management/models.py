@@ -384,16 +384,12 @@ class AccessRequest(models.Model):
     REQUEST_TYPE_CHOICES = [
         ('NEW', 'New Access'),
         ('IT', 'IT Support'),
+        ('ASSET_REPAIR', 'Asset Repair'),
     ]
-
-    request_type = models.CharField(
-        max_length=20,
-        choices=REQUEST_TYPE_CHOICES,
-        default='NEW',
-    )
 
     ticket_number = models.CharField(max_length=20, unique=True, default='ACC000000001', verbose_name="Ticket Number")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='access_requests', verbose_name="Requester")
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, null=True, blank=True, verbose_name="Asset")
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE, null=True,blank=True,verbose_name="Resource")
     access_level = models.ForeignKey(AccessLevel, on_delete=models.CASCADE, null=True,blank=True,verbose_name="Access Level")
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM', verbose_name="Priority")

@@ -220,6 +220,40 @@ class AssetReturn(models.Model):
     def __str__(self):
         return f"Return of {self.asset.asset_tag} at {self.returned_at}"
 
+class AssetRepair(models.Model):
+    STATUS_CHOICES = [
+        ('REPORTED', 'Reported'),
+        ('IN_REPAIR', 'In Repair'),
+        ('COMPLETED', 'Completed'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='repairs')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='REPORTED')
+    issue_description = models.TextField(blank=True)
+    vendor = models.CharField(max_length=255, blank=True)
+    ticket_reference = models.CharField(max_length=100, blank=True)
+    case_id = models.CharField(max_length=100, blank=True)
+    started_at = models.DateField(blank=True, null=True)
+    completed_at = models.DateField(blank=True, null=True)
+    notes = models.TextField(blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = '7. Asset Repair'
+        verbose_name_plural = '7. Asset Repairs'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['asset']),
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.asset.asset_tag} - {self.get_status_display()}"
+
 class AssetHistory(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='history')
     action = models.CharField(max_length=100)
