@@ -19,6 +19,7 @@ urlpatterns = [
     
     # Regular views
     path('summary/', views.asset_summary, name='summary'),
+    path('export-all-excel/', views.export_all_assets_excel, name='export_all_excel'),
     path('return-assets/', views.return_assets_form, name='return_assets_form'),
     path('asset-autocomplete/', autocomplete.AssetAutocomplete.as_view(), name='asset-autocomplete'),
     path('available-assets-autocomplete/', autocomplete.AvailableAssetsAutocomplete.as_view(), name='available-assets-autocomplete'),

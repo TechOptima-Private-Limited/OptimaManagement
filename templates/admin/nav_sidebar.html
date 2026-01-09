@@ -26,6 +26,17 @@
           {% empty %}
             <tr><td>{% translate 'No items' %}</td></tr>
           {% endfor %}
+          {% if app.app_label == 'assets' %}
+            {% url 'assets:export_all_excel' as assets_export_all_excel_url %}
+            {% if assets_export_all_excel_url %}
+              <tr class="model-assets-export-all-excel">
+                <th scope="row" id="{{ app.app_label }}-export-all-excel">
+                  <a href="{{ assets_export_all_excel_url }}" class="model-link"{% if assets_export_all_excel_url == request.path %} aria-current="page"{% endif %}>Export All (Excel)</a>
+                </th>
+                <td></td>
+              </tr>
+            {% endif %}
+          {% endif %}
         </table>
       </div>
     </div>
