@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import *
 from . import views
-from .autocomplete import UserAutocomplete, ResourceAutocomplete,ResourceTypeAutocomplete
+from .autocomplete import UserAutocomplete, ResourceAutocomplete, ResourceTypeAutocomplete, AssetAutocomplete
 
 router = DefaultRouter()
 router.register(r'resource-types', ResourceTypeViewSet)
@@ -22,4 +22,5 @@ urlpatterns = [
      path('user-autocomplete/', UserAutocomplete.as_view(), name='user-autocomplete'),
      path('resource-autocomplete/', ResourceAutocomplete.as_view(), name='resource-autocomplete'),
      path('resourcetype-autocomplete/', ResourceTypeAutocomplete.as_view(), name='resourcetype-autocomplete'),
+     path('asset-autocomplete/', AssetAutocomplete.as_view(), name='asset-autocomplete'),
 ]

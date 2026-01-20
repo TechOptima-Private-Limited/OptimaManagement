@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django import forms
-from .models import AssetType, Asset, AssetAssignment, AssetAssignmentImage, AssetReturn, AssetHistory, EmployeeStatus, OffboardingAssetReturn
+from .models import AssetType, Asset, AssetAssignment, AssetAssignmentImage, AssetReturn, AssetHistory, EmployeeStatus, OffboardingAssetReturn, AssetRepair
 from .forms import AssetForm, AssetAssignmentForm, AssetReturnForm
 from .utils import send_asset_assignment_notification, send_asset_return_report
 from .models import HardwareAsset, SoftwareAsset
@@ -27,6 +27,34 @@ class AssetReturnInline(admin.TabularInline):
             return format_html('<img src="{}" style="max-height: 100px;" />', obj.return_image.url)
         return "No Image"
     return_image_thumbnail.short_description = "Return Image"
+
+
+@admin.register(AssetRepair)
+class AssetRepairAdmin(admin.ModelAdmin):
+    list_display = (
+        'asset', 'status', 'vendor', 'ticket_reference', 'case_id',
+        'started_at', 'completed_at', 'total_repair_cost', 'repair_done_under_warranty', 'created_at', 'updated_at'
+    )
+    list_filter = ('status', 'created_at', 'updated_at')
+    search_fields = (
+        'asset__asset_tag', 'asset__name', 'asset__serial_number',
+        'vendor', 'ticket_reference', 'case_id'
+    )
+
+    fields = (
+        'asset',
+        'status',
+        'issue_description',
+        'vendor',
+        'ticket_reference',
+        'case_id',
+        'started_at',
+        'completed_at',
+        'total_repair_cost',
+        'repair_done_under_warranty',
+        'notes',
+        'created_by',
+    )
 
 class AssetAssignmentImageForm(forms.ModelForm):
     asset_name = forms.CharField(label="Asset", required=False, disabled=True)
@@ -303,7 +331,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
     list_display = (
         'asset_tag', 'name', 'asset_type', 'assigned_employee',
         'previously_used_by_employee', 'purchased_date', 'laptop_age_pretty',
-        'status', 'is_active', 'actions_column'  # ← added Actions
+        'repair_status', 'status', 'is_active', 'actions_column'  # ← added Actions
     )
     list_filter = ('asset_type', 'status', 'is_active')
     search_fields = (
@@ -342,7 +370,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
                 'purchased_date', 'laptop_age'
             )
             .select_related('asset_type', 'previously_used_by')
-            .prefetch_related('assignments__employee', 'assignments__returns')
+            .prefetch_related('assignments__employee', 'assignments__returns', 'repairs')
         )
 
     def get_form(self, request, obj=None, **kwargs):
@@ -373,6 +401,17 @@ class HardwareAssetAdmin(admin.ModelAdmin):
             return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
+
+    def repair_status(self, obj):
+        try:
+            repairs = list(obj.repairs.all())
+            if not repairs:
+                return '-'
+            repairs.sort(key=lambda r: r.created_at, reverse=True)
+            return repairs[0].get_status_display()
+        except Exception:
+            return '-'
+    repair_status.short_description = "Repair Status"
 
     def previously_used_by_employee(self, obj):
         try:
@@ -559,7 +598,7 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
     form = SoftwareAssetForm
     readonly_fields = ('laptop_age',)
     list_display = (
-        'asset_tag', 'name', 'asset_type', 'status',
+        'asset_tag', 'name', 'asset_type', 'repair_status', 'status',
         'is_active', 'actions_column'
     )
     list_filter = ('asset_type', 'status', 'is_active')
@@ -585,7 +624,7 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.filter(asset_type__category='SOFTWARE')
         # Only select fields that exist in the database
-        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after', 'purchased_date', 'laptop_age').select_related('asset_type')
+        return qs.only('id', 'asset_tag', 'name', 'asset_type_id', 'asset_type', 'status', 'is_active', 'serial_number', 'custom_attributes', 'image_before', 'image_after', 'purchased_date', 'laptop_age').select_related('asset_type').prefetch_related('repairs')
         
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -609,6 +648,17 @@ class SoftwareAssetAdmin(admin.ModelAdmin):
             return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
+
+    def repair_status(self, obj):
+        try:
+            repairs = list(obj.repairs.all())
+            if not repairs:
+                return '-'
+            repairs.sort(key=lambda r: r.created_at, reverse=True)
+            return repairs[0].get_status_display()
+        except Exception:
+            return '-'
+    repair_status.short_description = "Repair Status"
 
     def get_display_name_from_username(self, employee):
         try:

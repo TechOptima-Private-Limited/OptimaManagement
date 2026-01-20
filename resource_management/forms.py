@@ -1,6 +1,5 @@
 
 
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -9,7 +8,7 @@ from dal import autocomplete
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 from django_ckeditor_5.widgets import CKEditor5Widget  # Corrected import
-
+from assets.models import Asset
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text="Required. Enter a valid email address.")
@@ -44,10 +43,26 @@ class AccessRequestForm(forms.ModelForm):
         choices=[
             ('NEW', 'New Access'),
             ('IT', 'IT Support'),
+            ('ASSET_REPAIR', 'Asset Repair'),
         ],
         initial='NEW',
         label="Request Type",
         widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    asset = forms.ModelChoiceField(
+        queryset=Asset.objects.all(),
+        required=False,
+        label="Asset",
+        widget=autocomplete.ModelSelect2(
+            url='asset-autocomplete',
+            forward=['user'],
+            attrs={
+                'data-placeholder': 'Search for an asset...',
+                'data-minimum-input-length': '0',
+                'data-autocomplete-light-minimum-characters': '0',
+            }
+        )
     )
     # Add resource_type field as searchable (made not required to handle IT requests)
     resource_type = forms.ModelChoiceField(
@@ -96,7 +111,7 @@ class AccessRequestForm(forms.ModelForm):
     class Meta:
         model = AccessRequest
         fields = [
-            'user', 'request_type', 'resource_type', 'resource', 'access_level', 'priority', 'justification',
+            'user', 'request_type', 'asset', 'resource_type', 'resource', 'access_level', 'priority', 'justification',
             'assigned_to', 'status', 'requires_approval', 'notes',
             'approver_email', 'approved_by', 'approved_at', 'expires_at',
             'approval_token', 'approval_token_expiry'
@@ -175,31 +190,29 @@ class AccessRequestForm(forms.ModelForm):
             is_it_request = True
             print("🔧 FORM INIT: Detected IT request from instance")
 
-        print(f"🔧 FORM INIT: is_it_request: {is_it_request}")
+        is_asset_repair_request = False
+        if self.data and self.data.get('request_type') == 'ASSET_REPAIR':
+            is_asset_repair_request = True
+            print("🔧 FORM INIT: Detected ASSET_REPAIR request from form data")
+        elif self.instance and self.instance.request_type == 'ASSET_REPAIR':
+            is_asset_repair_request = True
+            print("🔧 FORM INIT: Detected ASSET_REPAIR request from instance")
 
-        if is_it_request:
-            print("Removing resource-related fields for IT request")
-            # Remove these fields for IT requests regardless of user type
-            resource_fields = ['resource_type', 'resource', 'access_level']
-            for field_name in resource_fields:
-                if field_name in self.fields:
-                    self.fields.pop(field_name)
-                    print(f"  Removed IT-restricted field: {field_name}")
-                else:
-                    print(f"  Field {field_name} not found in fields")
-        else:
-            print("🔧 FORM INIT: Not an IT request, keeping resource fields")
-            # Only for non-IT requests, set up resource filtering
-            if self.fields.get('resource'):
-                if 'request_type' in self.data and 'resource_type' in self.data:
-                    request_type = self.data.get('request_type')
-                    resource_type_id = self.data.get('resource_type')
-                    self.fields['resource'].queryset = self.get_filtered_resources(request_type, resource_type_id)
-                elif self.instance and self.instance.request_type and self.instance.resource_id and self.instance.resource.resource_type_id:
-                    self.fields['resource'].queryset = self.get_filtered_resources(
-                        self.instance.request_type,
-                        self.instance.resource.resource_type_id
-                    )
+        print(f"🔧 FORM INIT: is_it_request: {is_it_request}")
+        print(f"🔧 FORM INIT: is_asset_repair_request: {is_asset_repair_request}")
+
+        # Keep fields in the form (do not pop) so admin JS can dynamically show/hide them.
+        # Only adjust querysets for filtering.
+        if self.fields.get('resource'):
+            if 'request_type' in self.data and 'resource_type' in self.data:
+                request_type = self.data.get('request_type')
+                resource_type_id = self.data.get('resource_type')
+                self.fields['resource'].queryset = self.get_filtered_resources(request_type, resource_type_id)
+            elif self.instance and self.instance.request_type and self.instance.resource_id and self.instance.resource.resource_type_id:
+                self.fields['resource'].queryset = self.get_filtered_resources(
+                    self.instance.request_type,
+                    self.instance.resource.resource_type_id
+                )
         
         print(f"🔧 FORM INIT: Final fields: {list(self.fields.keys())}")
         
@@ -252,6 +265,30 @@ class AccessRequestForm(forms.ModelForm):
             return base_qs.filter(is_active=True)
         elif request_type == 'IT':
             return base_qs.none()
+        elif request_type == 'ASSET_REPAIR':
+            return base_qs.none()
         return base_qs.all()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        request_type = cleaned_data.get('request_type')
+
+        if request_type == 'ASSET_REPAIR':
+            if not cleaned_data.get('asset'):
+                self.add_error('asset', 'Asset is required for Asset Repair requests.')
+            cleaned_data['resource'] = None
+            cleaned_data['access_level'] = None
+        elif request_type == 'IT':
+            cleaned_data['asset'] = None
+            cleaned_data['resource'] = None
+            cleaned_data['access_level'] = None
+        else:
+            cleaned_data['asset'] = None
+            if not cleaned_data.get('resource'):
+                self.add_error('resource', 'Resource is required for New Access requests.')
+            if not cleaned_data.get('access_level'):
+                self.add_error('access_level', 'Access level is required for New Access requests.')
+
+        return cleaned_data
 
 

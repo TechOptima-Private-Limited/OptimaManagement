@@ -291,11 +291,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 # STATIC_ROOT = BASE_DIR / "staticfiles"  # ✅ use a clean folder name
 
-STATICFILES_DIRS = [
-    BASE_DIR / "assets/static",
-    BASE_DIR / "resource_requests/static",
-    BASE_DIR / "resource_management/static",
-]
+STATICFILES_DIRS = []
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -510,7 +506,10 @@ ADMIN_SITE_HEADER = "Optima CMS"
 ADMIN_SITE_TITLE = "Optima CMS"
 ADMIN_INDEX_TITLE = "Welcome to Optima CMS"
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 

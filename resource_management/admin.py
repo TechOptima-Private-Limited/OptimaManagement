@@ -491,9 +491,9 @@ class AccessHistoryInline(admin.TabularInline):
 class AccessRequestAdmin(admin.ModelAdmin):
     form = AccessRequestForm
     # Updated list_display to include delete button
-    list_display = ('ticket_number', 'user', 'request_type','resource', 'access_level','justification_preview', 'priority', 'status', 'requested_at', 'expires_at', 'assigned_to', 'delete_button')
-    list_filter = ('status', 'priority', 'request_type','resource__resource_type', 'access_level', 'assigned_to')
-    search_fields = ('ticket_number', 'user__username', 'resource__name', 'assigned_to__username')
+    list_display = ('ticket_number', 'user', 'request_type', 'asset', 'resource', 'access_level', 'justification_preview', 'priority', 'status', 'requested_at', 'expires_at', 'assigned_to', 'delete_button')
+    list_filter = ('status', 'priority', 'request_type', 'resource__resource_type', 'access_level', 'assigned_to')
+    search_fields = ('ticket_number', 'user__username', 'resource__name', 'asset__asset_tag', 'asset__name', 'assigned_to__username')
     readonly_fields = ('ticket_number', 'requested_at')
     inlines = [AccessHistoryInline]
 
@@ -595,24 +595,15 @@ class AccessRequestAdmin(admin.ModelAdmin):
         return Form
 
     def get_fields(self, request, obj=None):
-        is_employee = not request.user.is_superuser and request.user.email not in Resource.objects.values_list('resource_team_email', flat=True) and (not obj or obj.assigned_to != request.user)
-        is_it_request = obj and obj.request_type == 'IT'
-        
-        if is_employee:
-            base_fields = ['request_type', 'priority', 'justification', 'duration']
-            if not is_it_request:
-                base_fields.insert(1, 'resource_type')
-                base_fields.insert(2, 'resource')
-                base_fields.insert(3, 'access_level')
-            return base_fields
-        
         fields = list(super().get_fields(request, obj))
-        if is_it_request:
-            fields_to_remove = ['resource_type', 'resource', 'access_level']
-            for field in fields_to_remove:
-                if field in fields:
-                    fields.remove(field)
-        
+
+        if 'asset' not in fields:
+            try:
+                idx = fields.index('request_type')
+                fields.insert(idx + 1, 'asset')
+            except ValueError:
+                fields.append('asset')
+
         return fields
 
     def has_change_permission(self, request, obj=None):
