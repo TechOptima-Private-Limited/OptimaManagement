@@ -151,6 +151,12 @@ class OffboardingAssetReturn(models.Model):
     # Add timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    return_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Return Date",
+        help_text="Date when assets were returned by the user"
+    )
     
     class Meta:
         verbose_name = '5. Offboarding Asset Return'
