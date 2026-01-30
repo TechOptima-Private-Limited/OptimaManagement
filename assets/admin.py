@@ -412,7 +412,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
             )
             if not current_assignment or not current_assignment.assigned_at:
                 return "-"
-            return timezone.localtime(current_assignment.assigned_at).strftime('%Y-%m-%d %H:%M')
+            return timezone.localtime(current_assignment.assigned_at).strftime('%b. %d, %Y')
         except Exception:
             return "-"
     issued_date.short_description = "Issued Date"
@@ -1093,7 +1093,7 @@ from django.contrib.auth.models import User
 
 
 class OffboardingAssetReturnAdmin(admin.ModelAdmin):
-    list_display = ['user_display', 'user_email', 'assets_status', 'return_date', 'created_at']
+    list_display = ['user_display', 'user_email', 'assets_status', 'return_date', 'created_at_display']
     list_filter = ['created_at', 'is_offboarded', 'return_date']
     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'user__email']
     list_display_links = ['user_display']
@@ -1162,10 +1162,15 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
 
     def return_date(self, obj):
         if obj.return_date:
-            return obj.return_date.strftime('%Y-%m-%d %H:%M')
+            return obj.return_date.strftime('%b. %d, %Y')
         return '—'
     return_date.short_description = 'Return Date'
     return_date.admin_order_field = 'return_date'
+
+    def created_at_display(self, obj):
+        return obj.created_at.strftime('%b. %d, %Y')
+    created_at_display.short_description = 'Created At'
+    created_at_display.admin_order_field = 'created_at'
 
     def dynamic_asset_checkboxes(self, obj):
         return mark_safe("""

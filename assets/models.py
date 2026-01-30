@@ -151,7 +151,7 @@ class OffboardingAssetReturn(models.Model):
     # Add timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    return_date = models.DateTimeField(
+    return_date = models.DateField(
         null=True,
         blank=True,
         verbose_name="Return Date",
