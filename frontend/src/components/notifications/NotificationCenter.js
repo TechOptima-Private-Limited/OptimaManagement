@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BellIcon,
   XMarkIcon,
@@ -13,6 +14,7 @@ import { registerServiceWorker, subscribeUser } from '../../utils/pushNotificati
 import api from '../../services/api';
 
 const NotificationCenter = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -128,7 +130,11 @@ const NotificationCenter = () => {
 
     // Navigate to action URL if available
     if (notification.action_url) {
-      window.location.href = notification.action_url;
+      if (notification.action_url.startsWith('/')) {
+        navigate(notification.action_url);
+      } else {
+        window.location.href = notification.action_url;
+      }
     }
 
     // Close dropdown
@@ -143,7 +149,14 @@ const NotificationCenter = () => {
         return;
       }
 
-      const subscription = await subscribeUser(registration);
+      let subscription;
+      try {
+        subscription = await subscribeUser(registration);
+      } catch (subError) {
+        toast.error(subError.message || 'Failed to subscribe to push notifications');
+        return;
+      }
+
       if (!subscription) {
         toast.error('Failed to subscribe to push notifications. Check browser permissions.');
         return;
@@ -429,7 +442,7 @@ const NotificationCenter = () => {
                   onClick={() => {
                     setShowDropdown(false);
                     // Navigate to attendance page to see all requests
-                    window.location.href = '/attendance';
+                    navigate('/attendance');
                   }}
                   className="w-full text-center text-xs text-blue-600 hover:text-blue-800"
                 >

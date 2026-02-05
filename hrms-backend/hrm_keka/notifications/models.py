@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from employees.models import Employee
 
 User = get_user_model()
@@ -22,6 +23,7 @@ class Notification(models.Model):
         ('RESOURCE_REJECTED', 'Resource Rejected'),
         ('RESOURCE_ASSIGNED', 'Resource Assigned'),
         ('RESOURCE_APPROVAL_REQUIRED', 'Resource Approval Required'),
+        ('ASSET_REPAIR_REQUESTED', 'Asset Repair Requested'),
     ]
     
     PRIORITY_CHOICES = [
@@ -68,7 +70,7 @@ class Notification(models.Model):
     def mark_as_read(self):
         if not self.is_read:
             self.is_read = True
-            self.read_at = models.DateTimeField(auto_now=True)
+            self.read_at = timezone.now()
             self.save(update_fields=['is_read', 'read_at'])
     
     def get_time_since(self):
@@ -107,6 +109,7 @@ class Notification(models.Model):
             'RESOURCE_REJECTED': '❌',
             'RESOURCE_ASSIGNED': '👤',
             'RESOURCE_APPROVAL_REQUIRED': '⏳',
+            'ASSET_REPAIR_REQUESTED': '🔧',
         }
         return icon_map.get(self.notification_type, '🔔')
     
@@ -128,5 +131,6 @@ class Notification(models.Model):
             'RESOURCE_REJECTED': 'bg-red-50 border-red-200 text-red-800',
             'RESOURCE_ASSIGNED': 'bg-blue-50 border-blue-200 text-blue-800',
             'RESOURCE_APPROVAL_REQUIRED': 'bg-yellow-50 border-yellow-200 text-yellow-800',
+            'ASSET_REPAIR_REQUESTED': 'bg-orange-50 border-orange-200 text-orange-800',
         }
         return color_map.get(self.notification_type, 'bg-gray-50 border-gray-200 text-gray-800')

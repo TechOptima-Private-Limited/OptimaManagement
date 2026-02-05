@@ -15,6 +15,8 @@ router.register(r'asset-history', views.AssetHistoryViewSet, basename='assethist
 router.register(r'offboarding-returns', views.OffboardingAssetReturnViewSet, basename='offboardingreturn')
 router.register(r'asset-returns', views.AssetReturnViewSet, basename='assetreturn')
 router.register(r'employee-statuses', views.EmployeeStatusViewSet, basename='employeestatus')
+router.register(r'asset-repairs', views.AssetRepairViewSet, basename='assetrepair')
+
 
 urlpatterns = [
     # API endpoints
@@ -22,6 +24,7 @@ urlpatterns = [
     
     # Regular views
     path('summary/', views.asset_summary, name='summary'),
+    path('export/excel/', views.export_assets_excel, name='export_assets_excel'),
     path('return-assets/', views.return_assets_form, name='return_assets_form'),
     path('asset-autocomplete/', autocomplete.AssetAutocomplete.as_view(), name='asset-autocomplete'),
     path('available-assets-autocomplete/', autocomplete.AvailableAssetsAutocomplete.as_view(), name='available-assets-autocomplete'),

@@ -50,7 +50,7 @@ const Login = () => {
               </label>
               <div className="mt-1">
                 <input
-                  {...register('email', { 
+                  {...register('email', {
                     required: 'Email is required',
                     pattern: {
                       value: /^\S+@\S+$/i,

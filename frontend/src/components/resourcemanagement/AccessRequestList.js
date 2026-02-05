@@ -103,11 +103,11 @@ const AccessRequestList = () => {
 
   const filteredRequests = requests.filter(request => {
     const matchesStatus = statusFilter === 'ALL' || request.status === statusFilter;
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       request.ticket_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.resource_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.justification?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesStatus && matchesSearch;
   });
 
@@ -213,7 +213,7 @@ const AccessRequestList = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="p-6 space-y-6">
             {/* Request Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -227,31 +227,31 @@ const AccessRequestList = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                   <span className={getPriorityBadge(request.priority)}>
                     {request.priority_display || request.priority}
                   </span>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Request Type</label>
                   <p className="text-gray-900">{request.request_type === 'IT' ? 'IT Support' : 'New Access'}</p>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Requested At</label>
                   <p className="text-gray-900">{formatDate(request.requested_at)}</p>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
                   <p className="text-gray-900">{request.duration} days</p>
                 </div>
-                
+
                 {request.expires_at && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Expires At</label>
@@ -270,7 +270,7 @@ const AccessRequestList = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Resource</label>
                     <p className="text-gray-900">{request.resource_name || 'N/A'}</p>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Access Level</label>
                     <p className="text-gray-900">{request.access_level_name || 'N/A'}</p>
@@ -282,7 +282,7 @@ const AccessRequestList = () => {
             {/* Justification */}
             <div className="border-t pt-6">
               <label className="block text-lg font-medium text-gray-900 mb-4">Justification</label>
-              <div 
+              <div
                 className="prose max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
                 dangerouslySetInnerHTML={{ __html: request.justification || 'No justification provided.' }}
               />
@@ -305,7 +305,7 @@ const AccessRequestList = () => {
                       <p className="text-gray-900">{request.approved_by_name || request.approved_by}</p>
                     </div>
                   )}
-                  
+
                   {request.approved_at && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Approved At</label>
@@ -521,7 +521,7 @@ const AccessRequestList = () => {
           <ClockIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No requests found</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== 'ALL' 
+            {searchTerm || statusFilter !== 'ALL'
               ? 'Try adjusting your filters or search term.'
               : 'You haven\'t submitted any access requests yet.'
             }
@@ -546,7 +546,7 @@ const AccessRequestList = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <span className={getPriorityBadge(request.priority)}>
                     {request.priority_display || request.priority}
@@ -569,12 +569,12 @@ const AccessRequestList = () => {
                   <span className="text-gray-500">Requested:</span>
                   <span className="ml-2 text-gray-900">{formatDate(request.requested_at)}</span>
                 </div>
-                
+
                 <div>
                   <span className="text-gray-500">Duration:</span>
                   <span className="ml-2 text-gray-900">{request.duration} days</span>
                 </div>
-                
+
                 {request.expires_at && (
                   <div>
                     <span className="text-gray-500">Expires:</span>
@@ -596,9 +596,9 @@ const AccessRequestList = () => {
       )}
 
       {/* Request Detail Modal */}
-      <RequestDetailModal 
-        request={selectedRequest} 
-        onClose={() => setSelectedRequest(null)} 
+      <RequestDetailModal
+        request={selectedRequest}
+        onClose={() => setSelectedRequest(null)}
       />
     </div>
   );

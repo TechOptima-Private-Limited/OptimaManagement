@@ -70,8 +70,8 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                 user_role = user.profile.role
                 print(f"🔍 User role: {user_role}")
 
-                if user_role == 'HR_MANAGER':
-                    # HR Manager can see all leave requests
+                if user_role in ['HR_MANAGER', 'ADMIN']:
+                    # HR Manager and Admin can see all leave requests
                     pass  # queryset remains all records
 
                 elif user_role == 'MANAGER':
@@ -83,16 +83,16 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                             manager=manager_employee,
                             status='ACTIVE'
                         ).values_list('id', flat=True)
-                        print(f"🔍 Team employee IDs: {team_employee_ids}")
+                        print(f"🔍 Manager team employee IDs: {team_employee_ids}")
                         # Include manager's own leave requests too
                         allowed_employee_ids = list(team_employee_ids) + [manager_employee.id]
                         queryset = queryset.filter(employee_id__in=allowed_employee_ids)
-                        print(f"🔍 Filtered queryset: {queryset}")
+                        print(f"🔍 Manager filtered queryset: {queryset}")
                     except Employee.DoesNotExist:
                         queryset = LeaveRequest.objects.none()
 
-                else:  # EMPLOYEE, IT_SUPPORTER, ADMIN, etc.
-                    # Regular employees can see their own leave requests + peers (same manager)
+                else:  # EMPLOYEE, IT_SUPPORTER, etc.
+                    # Regular employees and IT Support can see their own leave requests + peers (same manager)
                     try:
                         employee = Employee.objects.get(user=user)
                         # Get peer employees (same manager)
@@ -103,10 +103,11 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                                 status='ACTIVE'
                             ).values_list('id', flat=True)
                             peer_ids = list(peers)
-                        # Include own ID
+                        
+                        # Include own ID but NO manager ID
                         allowed_ids = [employee.id] + peer_ids
                         queryset = queryset.filter(employee_id__in=allowed_ids)
-                        print(f"🔍 Employee/IT_SUPPORTER/ADMIN allowed IDs: {allowed_ids}")
+                        print(f"🔍 {user_role} filtered queryset (peers only): {allowed_ids}")
                     except Employee.DoesNotExist:
                         queryset = LeaveRequest.objects.none()
             else:

@@ -55,6 +55,10 @@ class Asset(models.Model):
         related_name='previous_assets', help_text="Previous user of the asset"
     )
     laptop_age = models.DurationField(blank=True, null=True, help_text="Duration the previous user used the asset")
+    
+    # Repair tracking fields
+    is_under_repair = models.BooleanField(default=False, help_text="Is this asset currently under repair")
+    current_repair = models.ForeignKey('AssetRepair', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_asset', help_text="Current active repair")
 
     def save(self, *args, **kwargs):
         if self.purchased_date:
@@ -230,12 +234,59 @@ class AssetHistory(models.Model):
     def __str__(self):
         return f"{self.action} on {self.asset.asset_tag} at {self.performed_at}"
 
+class AssetRepair(models.Model):
+    REPAIR_STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('PICKED_UP', 'Picked Up'),
+        ('AT_VENDOR', 'At Vendor'),
+        ('IN_PROGRESS', 'In Progress'),
+        ('COMPLETED', 'Completed'),
+        ('FAILED', 'Failed'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+    
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='repairs')
+    reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='reported_repairs')
+    issue_description = models.TextField(help_text="Description of the issue/problem")
+    repair_notes = models.TextField(blank=True, help_text="Notes about the repair process")
+    repair_vendor = models.CharField(max_length=200, blank=True, help_text="Repair shop or vendor name")
+    repair_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Cost of repair")
+    status = models.CharField(max_length=20, choices=REPAIR_STATUS_CHOICES, default='PENDING')
+    
+    # Timestamps
+    reported_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True, help_text="When repair work started")
+    completed_at = models.DateTimeField(null=True, blank=True, help_text="When repair was finalized (Completed/Failed/Cancelled)")
+    estimated_completion = models.DateField(null=True, blank=True, help_text="Estimated completion date")
+    
+    class Meta:
+        verbose_name = '7. Asset Repair'
+        verbose_name_plural = '7. Asset Repairs'
+        ordering = ['-reported_at']
+        indexes = [
+            models.Index(fields=['asset', 'status']),
+            models.Index(fields=['status']),
+            models.Index(fields=['reported_at']),
+        ]
+    
+    def __str__(self):
+        return f"Repair for {self.asset.asset_tag} - {self.get_status_display()}"
+    
+    def save(self, *args, **kwargs):
+        # Auto-set timestamps based on status changes
+        from django.utils import timezone
+        if self.status == 'IN_PROGRESS' and not self.started_at:
+            self.started_at = timezone.now()
+        elif self.status == 'COMPLETED' and not self.completed_at:
+            self.completed_at = timezone.now()
+        super().save(*args, **kwargs)
+
 class EmployeeStatus(models.Model):
     employee = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     class Meta:
-        verbose_name = '6. Employee Status'
-        verbose_name_plural = '6. Employee Statuses'
+        verbose_name = '8. Employee Status'
+        verbose_name_plural = '8. Employee Statuses'
 
     def __str__(self):
         return f"{self.employee.username} - {'Active' if self.is_active else 'Inactive'}"

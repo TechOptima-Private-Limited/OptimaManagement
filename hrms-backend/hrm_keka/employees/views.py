@@ -227,9 +227,22 @@ def get_employee_profile_data(request):
         #     status='ACTIVE'
         # )
         
-        # Get peer colleagues (employees who report to the same manager as current employee)
+        # Get peer colleagues or all employees for HR/Admin
         peer_colleagues = []
-        if current_employee.manager:
+        user_role = getattr(getattr(user, 'profile', None), 'role', None)
+        
+        if user_role in ['HR_MANAGER', 'ADMIN']:
+            # For HR/Admin, "peers" will be all active employees except self
+            peer_colleagues = Employee.objects.select_related(
+                'user', 'department'
+            ).filter(
+                status='ACTIVE'
+            ).exclude(
+                id=current_employee.id
+            )
+            print(f"👑 {user_role} - fetching all employees as peers")
+        elif current_employee.manager:
+            # Regular peer logic
             peer_colleagues = Employee.objects.select_related(
                 'user', 'department'
             ).filter(

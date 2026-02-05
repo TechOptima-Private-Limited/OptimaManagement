@@ -28,7 +28,7 @@
 
 // const Dashboard = () => {
 //   const { user } = useAuth();
-  
+
 //   // Dashboard data state
 //   const [dashboardData, setDashboardData] = useState({
 //     leaveBalances: [],
@@ -38,7 +38,7 @@
 //     currentTime: new Date(),
 //     loading: true
 //   });
-  
+
 //   // Attendance state with localStorage persistence
 //   const [attendanceState, setAttendanceState] = useState(() => {
 //     const saved = localStorage.getItem(`attendance_${user?.id}`);
@@ -63,7 +63,7 @@
 //       pendingSubmission: false
 //     };
 //   });
-  
+
 //   const [submittingAttendance, setSubmittingAttendance] = useState(false);
 
 //   // WFH related state
@@ -93,7 +93,7 @@
 //   // ===================
 //   // EFFECTS & LIFECYCLE
 //   // ===================
-  
+
 //   // Save attendance state to localStorage
 //   useEffect(() => {
 //     if (user?.id) {
@@ -113,7 +113,7 @@
 //     checkTodayAttendance();
 //     checkPendingSubmissions();
 //     checkWFHStatus();
-    
+
 //     const timer = setInterval(() => {
 //       setDashboardData(prev => ({ ...prev, currentTime: new Date() }));
 //       updateWorkingTime();
@@ -131,21 +131,21 @@
 //     try {
 //       const apiUrl = 'http://127.0.0.1:8000/api/employees/birthday-festival/';
 //       console.log('🔍 Calling API:', apiUrl);
-      
+
 //       const response = await fetch(apiUrl, {
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 //           'Content-Type': 'application/json'
 //         }
 //       });
-      
+
 //       console.log('📡 Response status:', response.status);
-      
+
 //       if (response.ok) {
 //         const data = await response.json();
 //         console.log('✅ Birthday/Festival data received:', data);
 //         setBirthdayFestivalData(data);
-        
+
 //         // Show birthday toast messages
 //         if (data.birthdays.has_birthdays_today) {
 //           data.birthdays.todays_birthdays.forEach(birthday => {
@@ -199,7 +199,7 @@
 //     try {
 //       const promises = [];
 //       promises.push(leaveAPI.getLeaveSummary());
-      
+
 //       if (isHRManager()) {
 //         promises.push(
 //           employeeAPI.getEmployees({ limit: 10 }),
@@ -241,16 +241,16 @@
 //         start_date: today, 
 //         end_date: today 
 //       });
-      
+
 //       const todayRecord = response.data.results?.[0] || response.data?.[0];
-      
+
 //       if (todayRecord) {
 //         setAttendanceState(prev => ({
 //           ...prev,
 //           todayAttendance: todayRecord,
 //           pendingSubmission: false
 //         }));
-        
+
 //         if (user?.id) {
 //           localStorage.removeItem(`attendance_${user.id}`);
 //         }
@@ -276,7 +276,7 @@
 //       const today = new Date().toISOString().split('T')[0];
 //       const response = await workFromHomeAPI.getWFHRequests();
 //       console.log('📡 WFH API response:', response);
-      
+
 //       let requestsData = [];
 //       if (response.results) {
 //         requestsData = response.results;
@@ -330,7 +330,7 @@
 //       const now = new Date();
 //       const checkInTime = new Date(attendanceState.checkInTime);
 //       const hoursDiff = (now - checkInTime) / (1000 * 60 * 60);
-      
+
 //       if (hoursDiff >= 24) {
 //         submitPendingAttendance(false);
 //       }
@@ -342,7 +342,7 @@
 //       const now = new Date();
 //       const checkInTime = new Date(attendanceState.checkInTime);
 //       const hoursDiff = (now - checkInTime) / (1000 * 60 * 60);
-      
+
 //       if (hoursDiff >= 24 && !attendanceState.pendingSubmission) {
 //         toast.info('Auto-submitting attendance after 24 hours...');
 //         submitPendingAttendance(false);
@@ -358,7 +358,7 @@
 //       const hours = Math.floor(diffMs / (1000 * 60 * 60));
 //       const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 //       const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-      
+
 //       setAttendanceState(prev => ({
 //         ...prev,
 //         workingHours: hours,
@@ -389,7 +389,7 @@
 //         return;
 //       }
 //     }
-    
+
 //     const now = new Date();
 //     setAttendanceState(prev => ({
 //       ...prev,
@@ -412,12 +412,12 @@
 //     }
 
 //     setSubmittingAttendance(true);
-    
+
 //     try {
 //       await submitPendingAttendance(true);
-      
+
 //       const totalWorkedHours = `${attendanceState.workingHours}h ${attendanceState.workingMinutes}m`;
-      
+
 //       setAttendanceState(prev => ({
 //         ...prev,
 //         isCheckedIn: false,
@@ -447,7 +447,7 @@
 
 //     const now = new Date();
 //     const checkInTime = new Date(attendanceState.checkInTime);
-    
+
 //     const attendanceData = {
 //       date: checkInTime.toISOString().split('T')[0],
 //       check_in_time: checkInTime.toTimeString().slice(0, 8),
@@ -587,7 +587,7 @@
 //         </div>
 //       );
 //     }
-    
+
 //     return null;
 //   };
 
@@ -712,7 +712,7 @@
 //                 </div>
 //               </div>
 //             </div>
-            
+
 //             <div className="text-right">
 //               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
 //                 <div className="text-2xl font-black text-white drop-shadow-md">
@@ -770,7 +770,7 @@
 //               </div>
 //               <div className="absolute -top-1 -right-1 text-2xl animate-bounce">🎉</div>
 //             </div>
-            
+
 //             <div className="flex-1">
 //               <h3 className="text-xl font-bold text-white drop-shadow-md mb-1">{birthday.employee_name}</h3>
 //               <div className="text-white/80 text-sm mb-2">{birthday.employee_department}</div>
@@ -932,7 +932,7 @@
 //       <div className="max-w-7xl mx-auto px-6 py-6">
 //         {/* Birthday Banner */}
 //         <BirthdayBanner />
-        
+
 //         {/* Festival Banner */}
 //         <FestivalBanner />
 
@@ -996,7 +996,7 @@
 //                           : 'Check In (Office)'
 //                         }
 //                       </button>
-                      
+
 //                       {renderWFHButton()}
 //                     </div>
 //                   ) : (
@@ -1125,7 +1125,7 @@
 //                 <div className="relative">
 //                   <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white via-white to-transparent z-10 pointer-events-none"></div>
 //                   <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white to-transparent z-10 pointer-events-none"></div>
-                  
+
 //                   <div className="overflow-x-auto pb-4 scrollbar-hide">
 //                     <div className="flex space-x-6 px-2" style={{ width: 'max-content' }}>
 //                       {birthdayFestivalData.festivals.upcoming_festivals.map((festival) => (
@@ -1151,7 +1151,7 @@
 //                 <div className="relative">
 //                   <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white via-white to-transparent z-10 pointer-events-none"></div>
 //                   <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white to-transparent z-10 pointer-events-none"></div>
-                  
+
 //                   <div className="overflow-x-auto pb-4 scrollbar-hide">
 //                     <div className="flex space-x-6 px-2" style={{ width: 'max-content' }}>
 //                       {birthdayFestivalData.birthdays.upcoming_birthdays.map((birthday) => (
@@ -1313,7 +1313,7 @@
 //                     })}
 //                   </span>
 //                 </div>
-                
+
 //                 <div className="grid grid-cols-1 gap-3">
 //                   <Link
 //                     to="/attendance"
@@ -1322,7 +1322,7 @@
 //                     <span className="text-sm font-semibold">View Attendance Records</span>
 //                     <ChartBarIcon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors duration-300" />
 //                   </Link>
-                  
+
 //                   <Link
 //                     to="/leave"
 //                     className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl text-blue-700 hover:from-blue-100 hover:to-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md"
@@ -1391,13 +1391,13 @@
 //         .scrollbar-hide::-webkit-scrollbar {
 //           display: none;
 //         }
-        
+
 //         /* Enhanced hover effects */
 //         .festival-card:hover {
 //           transform: translateY(-8px) scale(1.02);
 //           box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
 //         }
-        
+
 //         .birthday-card:hover {
 //           transform: translateY(-8px) scale(1.02);
 //           box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
@@ -1413,7 +1413,7 @@
 //           0%, 100% { transform: translateY(0px); }
 //           50% { transform: translateY(-10px); }
 //         }
-        
+
 //         @keyframes glow {
 //           0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
 //           50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
@@ -1432,7 +1432,7 @@
 //         .animate-float {
 //           animation: float 3s ease-in-out infinite;
 //         }
-        
+
 //         .animate-glow {
 //           animation: glow 2s ease-in-out infinite;
 //         }
@@ -1606,7 +1606,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { 
+import {
   CalendarDaysIcon,
   ClockIcon,
   UserGroupIcon,
@@ -1638,7 +1638,7 @@ const Dashboard = () => {
   const isManagerOnly = isManager() && !isHRManager();
   const isManagerOrAbove = isManager() || isHRManager();
   const { theme } = useTheme();
-  
+
   // Dashboard data state
   const [dashboardData, setDashboardData] = useState({
     leaveBalances: [],
@@ -1648,11 +1648,11 @@ const Dashboard = () => {
     currentTime: new Date(),
     loading: true
   });
-  
+
   // Attendance state with localStorage persistence (only for employees and HR managers)
   const [attendanceState, setAttendanceState] = useState(() => {
     if (isManagerOnly) return null; // Regular managers don't need attendance state
-    
+
     const saved = localStorage.getItem(`attendance_${user?.id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -1675,7 +1675,7 @@ const Dashboard = () => {
       pendingSubmission: false
     };
   });
-  
+
   const [submittingAttendance, setSubmittingAttendance] = useState(false);
 
   // WFH related state (only for employees and HR managers)
@@ -1705,7 +1705,7 @@ const Dashboard = () => {
   // ===================
   // EFFECTS & LIFECYCLE
   // ===================
-  
+
   // Save attendance state to localStorage (only for employees and HR managers)
   useEffect(() => {
     if (!isManagerOnly && user?.id && attendanceState) {
@@ -1722,14 +1722,14 @@ const Dashboard = () => {
   useEffect(() => {
     fetchDashboardData();
     fetchBirthdayFestivalData();
-    
+
     // Only setup attendance-related functionality for employees and HR managers
     if (!isManagerOnly) {
       checkTodayAttendance();
       checkPendingSubmissions();
       checkWFHStatus();
     }
-    
+
     const timer = setInterval(() => {
       setDashboardData(prev => ({ ...prev, currentTime: new Date() }));
       if (!isManagerOnly) {
@@ -1749,28 +1749,28 @@ const Dashboard = () => {
     try {
       const apiUrl = 'http://127.0.0.1:8000/api/employees/birthday-festival/';
       console.log('🔍 Calling API:', apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       console.log('📡 Response status:', response.status);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('✅ Birthday/Festival data received:', data);
         setBirthdayFestivalData(data);
-        
+
         // Show birthday toast messages
         if (data.birthdays.has_birthdays_today) {
           data.birthdays.todays_birthdays.forEach(birthday => {
             toast.success(
               `🎉 It's ${birthday.employee_name}'s birthday today! 🎂 
                Wishing them a wonderful ${birthday.age_today}th birthday! 🎈`,
-              { 
+              {
                 duration: 8000,
                 style: {
                   background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
@@ -1786,7 +1786,7 @@ const Dashboard = () => {
           data.festivals.todays_festivals.forEach(festival => {
             toast.info(
               `${festival.emoji} Happy ${festival.name}! ${festival.emoji}`,
-              { 
+              {
                 duration: 6000,
                 style: {
                   background: 'linear-gradient(90deg, #ff7e5f 0%, #feb47b 100%)',
@@ -1816,7 +1816,7 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const promises = [];
-      
+
       if (isManagerOrAbove) {
         // For managers and HR: fetch team data
         promises.push(
@@ -1867,49 +1867,20 @@ const Dashboard = () => {
   // Employee and HR Manager only functions
   const checkTodayAttendance = async () => {
     if (isManagerOnly) return;
-    
+
     try {
       const today = toLocalDate(new Date());
-      const response = await attendanceAPI.getAttendanceRecords({ 
-        start_date: today, 
-        end_date: today 
+      const response = await attendanceAPI.getAttendanceRecords({
+        start_date: today,
+        end_date: today
       });
-      
+
       const allRecords = response.data?.results || response.data || [];
-      
-      // Filter to get only the current user's attendance record
-      // First try to match by user ID from employee.user_info.id (most reliable)
-      let todayRecord = allRecords.find(record => {
-        const recordUserId = record.employee?.user_info?.id || record.employee?.user?.id || record.employee?.user;
-        return recordUserId && String(recordUserId) === String(user?.id);
-      });
-      
-      // If not found by user ID, try to find by employee ID (fallback)
-      // This handles cases where the employee object structure might be different
-      if (!todayRecord && allRecords.length > 0) {
-        // Try to get current user's employee ID from profile data
-        try {
-          const profileResponse = await fetch('http://127.0.0.1:8000/api/employees/profile-data/', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          if (profileResponse.ok) {
-            const profileData = await profileResponse.json();
-            const currentEmployeeId = profileData.employee?.id;
-            if (currentEmployeeId) {
-              todayRecord = allRecords.find(record => {
-                const recordEmployeeId = record.employee?.id || record.employee_id;
-                return recordEmployeeId && String(recordEmployeeId) === String(currentEmployeeId);
-              });
-            }
-          }
-        } catch (err) {
-          console.error('Failed to fetch employee profile for attendance matching:', err);
-        }
-      }
-      
+
+      // Backend now properly filters records, so we can trust it returns only our data
+      // Just take the first record for today (there should only be one per employee per day)
+      const todayRecord = allRecords.length > 0 ? allRecords[0] : null;
+
       if (todayRecord) {
         const hasCheckIn = Boolean(todayRecord.check_in_time);
         const hasCheckOut = Boolean(todayRecord.check_out_time);
@@ -1925,7 +1896,7 @@ const Dashboard = () => {
           todayAttendance: todayRecord,
           pendingSubmission: hasCheckIn && !hasCheckOut
         }));
-        
+
         // Only clear persisted state after a completed checkout
         if (hasCheckOut && user?.id) {
           localStorage.removeItem(`attendance_${user.id}`);
@@ -1947,7 +1918,7 @@ const Dashboard = () => {
 
   const checkWFHStatus = async () => {
     if (isManagerOnly) return;
-    
+
     try {
       if (isHRManager()) {
         setWFHStatus({
@@ -1962,7 +1933,7 @@ const Dashboard = () => {
       const today = new Date().toISOString().split('T')[0];
       const response = await workFromHomeAPI.getWFHRequests();
       console.log('📡 WFH API response:', response);
-      
+
       let requestsData = [];
       if (response.results) {
         requestsData = response.results;
@@ -1974,7 +1945,7 @@ const Dashboard = () => {
         requestsData = response.data;
       }
 
-      const todayWFHRequest = requestsData.find(request => 
+      const todayWFHRequest = requestsData.find(request =>
         request.request_date === today || request.formatted_request_date === today
       );
 
@@ -2010,12 +1981,12 @@ const Dashboard = () => {
   // Employee and HR Manager only attendance functions
   const checkPendingSubmissions = () => {
     if (isManagerOnly || !attendanceState) return;
-    
+
     if (attendanceState.isCheckedIn && attendanceState.checkInTime) {
       const now = new Date();
       const checkInTime = new Date(attendanceState.checkInTime);
       const hoursDiff = (now - checkInTime) / (1000 * 60 * 60);
-      
+
       if (hoursDiff >= 24) {
         submitPendingAttendance(false);
       }
@@ -2024,12 +1995,12 @@ const Dashboard = () => {
 
   const checkAutoSubmit = () => {
     if (isManagerOnly || !attendanceState) return;
-    
+
     if (attendanceState.isCheckedIn && attendanceState.checkInTime) {
       const now = new Date();
       const checkInTime = new Date(attendanceState.checkInTime);
       const hoursDiff = (now - checkInTime) / (1000 * 60 * 60);
-      
+
       if (hoursDiff >= 24 && !attendanceState.pendingSubmission) {
         toast.info('Auto-submitting attendance after 24 hours...');
         submitPendingAttendance(false);
@@ -2039,7 +2010,7 @@ const Dashboard = () => {
 
   const updateWorkingTime = () => {
     if (isManagerOnly || !attendanceState) return;
-    
+
     if (attendanceState.isCheckedIn && attendanceState.checkInTime) {
       const now = new Date();
       const checkInTime = new Date(attendanceState.checkInTime);
@@ -2047,7 +2018,7 @@ const Dashboard = () => {
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
       const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-      
+
       setAttendanceState(prev => ({
         ...prev,
         workingHours: hours,
@@ -2059,7 +2030,7 @@ const Dashboard = () => {
 
   const handleCheckIn = async (workFromHome = false) => {
     if (isManagerOnly) return;
-    
+
     if (workFromHome) {
       if (isHRManager() || wfhStatus.hasApprovedRequest) {
         const now = new Date();
@@ -2099,7 +2070,7 @@ const Dashboard = () => {
         return;
       }
     }
-    
+
     const now = new Date();
     setAttendanceState(prev => ({
       ...prev,
@@ -2136,19 +2107,19 @@ const Dashboard = () => {
 
   const handleCheckOut = async () => {
     if (isManagerOnly || !attendanceState) return;
-    
+
     if (!attendanceState.isCheckedIn || !attendanceState.checkInTime) {
       toast.error('You need to check in first!');
       return;
     }
 
     setSubmittingAttendance(true);
-    
+
     try {
       await submitPendingAttendance(true);
-      
+
       const totalWorkedHours = `${attendanceState.workingHours}h ${attendanceState.workingMinutes}m`;
-      
+
       setAttendanceState(prev => ({
         ...prev,
         isCheckedIn: false,
@@ -2178,7 +2149,7 @@ const Dashboard = () => {
 
     const now = new Date();
     const checkInTime = new Date(attendanceState.checkInTime);
-    
+
     const attendanceData = {
       date: toLocalDate(checkInTime),
       check_in_time: checkInTime.toTimeString().slice(0, 8),
@@ -2224,7 +2195,7 @@ const Dashboard = () => {
 
   const formatWorkingTime = () => {
     if (isManagerOnly || !attendanceState) return '00:00:00';
-    
+
     const { workingHours, workingMinutes, workingSeconds } = attendanceState;
     if (workingHours === 0 && workingMinutes === 0 && workingSeconds === 0) {
       return '00:00:00';
@@ -2321,50 +2292,50 @@ const Dashboard = () => {
   //     </div>
   //   );
   // };
-const BirthdayBanner = () => {
-  if (!birthdayFestivalData.birthdays.has_birthdays_today) return null;
+  const BirthdayBanner = () => {
+    if (!birthdayFestivalData.birthdays.has_birthdays_today) return null;
 
-  return (
-    <div className="mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-2 left-10 text-6xl animate-bounce">🎂</div>
-        <div className="absolute top-8 right-20 text-4xl animate-pulse">🎈</div>
-        <div className="absolute bottom-4 left-1/4 text-5xl animate-bounce" style={{ animationDelay: '0.5s' }}>🎉</div>
-        <div className="absolute top-1/2 right-10 text-3xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
-        <div className="absolute bottom-8 right-1/3 text-4xl animate-bounce" style={{ animationDelay: '1.5s' }}>🎁</div>
-      </div>
+    return (
+      <div className="mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-2 left-10 text-6xl animate-bounce">🎂</div>
+          <div className="absolute top-8 right-20 text-4xl animate-pulse">🎈</div>
+          <div className="absolute bottom-4 left-1/4 text-5xl animate-bounce" style={{ animationDelay: '0.5s' }}>🎉</div>
+          <div className="absolute top-1/2 right-10 text-3xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
+          <div className="absolute bottom-8 right-1/3 text-4xl animate-bounce" style={{ animationDelay: '1.5s' }}>🎁</div>
+        </div>
 
-      <div className="relative z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-2 flex items-center">
-              <CakeIcon className="w-8 h-8 mr-3" />
-              🎉 Birthday Celebration! 🎉
-            </h2>
-            <div className="space-y-2">
-              {birthdayFestivalData.birthdays.todays_birthdays.map((birthday) => (
-                <div key={birthday.id} className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-white/30">
-                    {birthday.avatar_initials}
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold mb-2 flex items-center">
+                <CakeIcon className="w-8 h-8 mr-3" />
+                🎉 Birthday Celebration! 🎉
+              </h2>
+              <div className="space-y-2">
+                {birthdayFestivalData.birthdays.todays_birthdays.map((birthday) => (
+                  <div key={birthday.id} className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-white/30">
+                      {birthday.avatar_initials}
+                    </div>
+                    <div>
+                      <p className="text-xl font-semibold">
+                        Happy {birthday.age_today}th Birthday, {birthday.employee_name}! 🎂
+                      </p>
+                      <p className="text-white/90 text-sm">
+                        {birthday.employee_department} • Wishing you joy, success, and happiness! 🌟
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xl font-semibold">
-                      Happy {birthday.age_today}th Birthday, {birthday.employee_name}! 🎂
-                    </p>
-                    <p className="text-white/90 text-sm">
-                      {birthday.employee_department} • Wishing you joy, success, and happiness! 🌟
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+            <div className="text-6xl animate-pulse">🎊</div>
           </div>
-          <div className="text-6xl animate-pulse">🎊</div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
   // const FestivalBanner = () => {
   //   if (!birthdayFestivalData.festivals.has_festivals_today) return null;
 
@@ -2395,35 +2366,35 @@ const BirthdayBanner = () => {
   //     </div>
   //   );
   // };
-const   FestivalBanner = () => {
-  if (!birthdayFestivalData.festivals.has_festivals_today) return null;
+  const FestivalBanner = () => {
+    if (!birthdayFestivalData.festivals.has_festivals_today) return null;
 
-  return (
-    <div className="mb-6 bg-gradient-to-r from-orange-300 via-red-400 to-pink-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
-      <div className="relative z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-2 flex items-center">
-              <SparklesIcon className="w-8 h-8 mr-3" />
-              Festival Celebration!
-            </h2>
-            <div className="space-y-2">
-              {birthdayFestivalData.festivals.todays_festivals.map((festival) => (
-                <div key={festival.id} className="flex items-center space-x-3">
-                  <div className="text-4xl">{festival.emoji}</div>
-                  <div>
-                    <p className="text-xl font-semibold">Happy {festival.name}!</p>
-                    <p className="text-white/90 text-sm">{festival.description}</p>
+    return (
+      <div className="mb-6 bg-gradient-to-r from-orange-300 via-red-400 to-pink-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold mb-2 flex items-center">
+                <SparklesIcon className="w-8 h-8 mr-3" />
+                Festival Celebration!
+              </h2>
+              <div className="space-y-2">
+                {birthdayFestivalData.festivals.todays_festivals.map((festival) => (
+                  <div key={festival.id} className="flex items-center space-x-3">
+                    <div className="text-4xl">{festival.emoji}</div>
+                    <div>
+                      <p className="text-xl font-semibold">Happy {festival.name}!</p>
+                      <p className="text-white/90 text-sm">{festival.description}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
   // ===================
   // CARD COMPONENTS
   // ===================
@@ -2439,14 +2410,14 @@ const   FestivalBanner = () => {
     //   }
     // };
     const getGradientClass = (type) => {
-  switch (type?.toLowerCase()) {
-    case 'religious': return 'from-amber-300 via-orange-400 to-red-400';
-    case 'national': return 'from-blue-300 via-purple-400 to-pink-400';
-    case 'cultural': return 'from-green-300 via-blue-400 to-purple-400';
-    case 'international': return 'from-pink-300 via-purple-400 to-indigo-400';
-    default: return 'from-purple-300 via-pink-400 to-red-400';
-  }
-};
+      switch (type?.toLowerCase()) {
+        case 'religious': return 'from-amber-300 via-orange-400 to-red-400';
+        case 'national': return 'from-blue-300 via-purple-400 to-pink-400';
+        case 'cultural': return 'from-green-300 via-blue-400 to-purple-400';
+        case 'international': return 'from-pink-300 via-purple-400 to-indigo-400';
+        default: return 'from-purple-300 via-pink-400 to-red-400';
+      }
+    };
 
     return (
       <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClass(festival.festival_type)} p-1 shadow-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-3xl group min-w-[380px] max-w-[380px]`}>
@@ -2475,13 +2446,13 @@ const   FestivalBanner = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="text-right">
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
                 <div className="text-2xl font-black text-white drop-shadow-md">
-                  {festival.days_until_festival === 0 ? 'TODAY!' : 
-                   festival.days_until_festival === 1 ? 'Tomorrow' : 
-                   `${festival.days_until_festival} days`}
+                  {festival.days_until_festival === 0 ? 'TODAY!' :
+                    festival.days_until_festival === 1 ? 'Tomorrow' :
+                      `${festival.days_until_festival} days`}
                 </div>
                 <div className="text-xs text-white/80 font-medium">
                   {festival.days_until_festival === 0 ? '🎉' : 'to go'}
@@ -2514,26 +2485,26 @@ const   FestivalBanner = () => {
     );
   };
 
-    const BirthdayCard = ({ birthday }) => {
-      return (
-        // <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 p-1 shadow-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-3xl group min-w-[380px] max-w-[380px]">
-        //   <div className="absolute inset-0 opacity-20">
-        //     <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
-        //     <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
-        //     <div className="absolute bottom-6 left-8 text-2xl animate-bounce" style={{ animationDelay: '1s' }}>🎉</div>
-        //     <div className="absolute bottom-3 right-6 text-3xl animate-pulse" style={{ animationDelay: '1.5s' }}>🎁</div>
-        //     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
-        //   </div>
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-300 via-purple-400 to-indigo-500 p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group min-w-[380px] max-w-[380px]">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
-            <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
-            <div className="absolute bottom-6 left-8 text-2xl animate-bounce" style={{ animationDelay: '1s' }}>🎉</div>
-            <div className="absolute bottom-3 right-6 text-3xl animate-pulse" style={{ animationDelay: '1.5s' }}>🎁</div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
-          </div>
+  const BirthdayCard = ({ birthday }) => {
+    return (
+      // <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 p-1 shadow-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-3xl group min-w-[380px] max-w-[380px]">
+      //   <div className="absolute inset-0 opacity-20">
+      //     <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
+      //     <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
+      //     <div className="absolute bottom-6 left-8 text-2xl animate-bounce" style={{ animationDelay: '1s' }}>🎉</div>
+      //     <div className="absolute bottom-3 right-6 text-3xl animate-pulse" style={{ animationDelay: '1.5s' }}>🎁</div>
+      //     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
+      //   </div>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-300 via-purple-400 to-indigo-500 p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group min-w-[380px] max-w-[380px]">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
+          <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
+          <div className="absolute bottom-6 left-8 text-2xl animate-bounce" style={{ animationDelay: '1s' }}>🎉</div>
+          <div className="absolute bottom-3 right-6 text-3xl animate-pulse" style={{ animationDelay: '1.5s' }}>🎁</div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
+        </div>
 
-          <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full border border-white/20">
+        <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full border border-white/20">
           <div className="flex items-start space-x-4 mb-4">
             <div className="relative">
               <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-white/30">
@@ -2541,7 +2512,7 @@ const   FestivalBanner = () => {
               </div>
               <div className="absolute -top-1 -right-1 text-2xl animate-bounce">🎉</div>
             </div>
-            
+
             <div className="flex-1">
               <h3 className="text-xl font-bold text-white drop-shadow-md mb-1">{birthday.employee_name}</h3>
               <div className="text-white/80 text-sm mb-2">{birthday.employee_department}</div>
@@ -2591,12 +2562,12 @@ const   FestivalBanner = () => {
   //     {children}
   //   </div>
   // );
-const QuickAccessCard = ({ title, children, className = "", gradient = false }) => (
-  <div className={`${gradient ? 'bg-gradient-to-br from-white to-blue-50/30' : 'bg-white/90 backdrop-blur-sm'} rounded-xl shadow-md border border-white/20 p-6 hover:shadow-lg transition-all duration-300 ${className}`}>
-    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">{title}</h3>
-    {children}
-  </div>
-);
+  const QuickAccessCard = ({ title, children, className = "", gradient = false }) => (
+    <div className={`${gradient ? 'bg-gradient-to-br from-white to-blue-50/30' : 'bg-white/90 backdrop-blur-sm'} rounded-xl shadow-md border border-white/20 p-6 hover:shadow-lg transition-all duration-300 ${className}`}>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">{title}</h3>
+      {children}
+    </div>
+  );
   const LeaveBalanceCircle = ({ balance }) => {
     const used = balance.used_days;
     const total = balance.total_days;
@@ -2652,64 +2623,63 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
       {/* Enhanced Header with Role-based Greeting */}
       {/* <div className={`bg-gradient-to-r ${theme.headerGradient} text-white border-b border-white/20 px-6 py-6 shadow-xl`}> */}
       <div className={`bg-gradient-to-r ${theme.headerGradient} text-white border-b border-white/20 px-6 py-6 shadow-lg`}>
-  <div className="flex items-center justify-between">
-    <div>
-      <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-        Welcome, {user?.first_name}! 👋
-      </h1>
-      <p className="text-blue-100 mt-1 font-medium">
-        {new Date().toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })}
-      </p>
-      <div className="mt-2">
-        <span className="px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">
-          {userRole === 'MANAGER' ? '👨‍💼 Manager' : 
-           userRole === 'HR_MANAGER' ? '👩‍💼 HR Manager' : 
-           userRole === 'ADMIN' ? '🔑 Admin' : '👤 Employee'}
-        </span>
-      </div>
-    </div>
-    <div className="flex items-center space-x-6">
-      {/* Role-based Status Display */}
-      {!isManagerOnly && attendanceState && (
-        <div className="text-right">
-          <div className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/20 ${
-            attendanceState.isCheckedIn 
-              ? attendanceState.isWorkFromHome 
-                ? 'bg-purple-500/80 text-white' 
-                : 'bg-green-500/80 text-white'
-              : 'bg-white/20 text-white'
-          }`}>
-            {attendanceState.isCheckedIn 
-              ? attendanceState.isWorkFromHome ? '🏠 Working from Home' : '🏢 Checked In'
-              : '⏸️ Not Checked In'
-            }
-          </div>
-          {attendanceState.isCheckedIn && (
-            <div className="text-blue-100 text-sm mt-1 font-medium">
-              Working: {formatWorkingTime()}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+              Welcome, {user?.first_name}! 👋
+            </h1>
+            <p className="text-blue-100 mt-1 font-medium">
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+            <div className="mt-2">
+              <span className="px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">
+                {userRole === 'MANAGER' ? '👨‍💼 Manager' :
+                  userRole === 'HR_MANAGER' ? '👩‍💼 HR Manager' :
+                    userRole === 'ADMIN' ? '🔑 Admin' : '👤 Employee'}
+              </span>
             </div>
-          )}
+          </div>
+          <div className="flex items-center space-x-6">
+            {/* Role-based Status Display */}
+            {!isManagerOnly && attendanceState && (
+              <div className="text-right">
+                <div className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/20 ${attendanceState.isCheckedIn
+                  ? attendanceState.isWorkFromHome
+                    ? 'bg-purple-500/80 text-white'
+                    : 'bg-green-500/80 text-white'
+                  : 'bg-white/20 text-white'
+                  }`}>
+                  {attendanceState.isCheckedIn
+                    ? attendanceState.isWorkFromHome ? '🏠 Working from Home' : '🏢 Checked In'
+                    : '⏸️ Not Checked In'
+                  }
+                </div>
+                {attendanceState.isCheckedIn && (
+                  <div className="text-blue-100 text-sm mt-1 font-medium">
+                    Working: {formatWorkingTime()}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="text-right">
+              <div className="text-3xl font-bold text-white drop-shadow-lg">
+                {dashboardData.currentTime.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true,
+                })}
+              </div>
+              <div className="text-blue-100 font-medium">Current Time</div>
+            </div>
+          </div>
         </div>
-      )}
-      <div className="text-right">
-        <div className="text-3xl font-bold text-white drop-shadow-lg">
-          {dashboardData.currentTime.toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true,
-          })}
-        </div>
-        <div className="text-blue-100 font-medium">Current Time</div>
       </div>
-    </div>
-  </div>
-</div>
       {/* <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white border-b border-white/20 px-6 py-6 shadow-lg">
         <div className="flex items-center justify-between">
           <div>
@@ -2772,7 +2742,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Birthday Banner */}
         <BirthdayBanner />
-        
+
         {/* Festival Banner */}
         <FestivalBanner />
 
@@ -2877,117 +2847,116 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                 </div>
               </QuickAccessCard>
             )} */}
-             {!isManagerOnly && attendanceState && (
-  <QuickAccessCard title="Today's Attendance" gradient={true}>
-    <div className="bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-800 rounded-xl p-6 text-white shadow-lg border border-white/10">
-      {/* Shift Info */}
-      <div className="text-sm text-blue-200 mb-4 flex items-center">
-        <span className="bg-blue-800/50 px-3 py-1 rounded-full text-xs mr-3 font-semibold backdrop-blur-sm border border-blue-600/30">SHIFT TODAY</span>
-        <span className="font-medium">
-          {new Date().toLocaleDateString('en-US', { 
-            weekday: 'long',
-            day: '2-digit',
-            month: 'short'
-          })} • GENERAL (10:00 AM - 07:00 PM)
-        </span>
-      </div>
+            {!isManagerOnly && attendanceState && (
+              <QuickAccessCard title="Today's Attendance" gradient={true}>
+                <div className="bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-800 rounded-xl p-6 text-white shadow-lg border border-white/10">
+                  {/* Shift Info */}
+                  <div className="text-sm text-blue-200 mb-4 flex items-center">
+                    <span className="bg-blue-800/50 px-3 py-1 rounded-full text-xs mr-3 font-semibold backdrop-blur-sm border border-blue-600/30">SHIFT TODAY</span>
+                    <span className="font-medium">
+                      {new Date().toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'short'
+                      })} • GENERAL (10:00 AM - 07:00 PM)
+                    </span>
+                  </div>
 
-      {/* Date and Status */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="text-2xl font-bold text-white drop-shadow-md">
-            {new Date().getDate()} {new Date().toLocaleDateString('en-US', { month: 'short' })} {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-          </div>
-          <div className="text-blue-200 text-sm font-medium">
-            {attendanceState.isCheckedIn ? 'Working' : 'Not started'} • {attendanceState.workingHours}h / 9h
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="text-4xl font-mono font-bold text-white drop-shadow-lg">
-            {formatWorkingTime()}
-          </div>
-          <div className="text-blue-200 text-xs font-medium">
-            {attendanceState.checkInTime 
-              ? `Started ${attendanceState.checkInTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`
-              : 'Not started'
-            }
-          </div>
-        </div>
-      </div>
+                  {/* Date and Status */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <div className="text-2xl font-bold text-white drop-shadow-md">
+                        {new Date().getDate()} {new Date().toLocaleDateString('en-US', { month: 'short' })} {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+                      </div>
+                      <div className="text-blue-200 text-sm font-medium">
+                        {attendanceState.isCheckedIn ? 'Working' : 'Not started'} • {attendanceState.workingHours}h / 9h
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-4xl font-mono font-bold text-white drop-shadow-lg">
+                        {formatWorkingTime()}
+                      </div>
+                      <div className="text-blue-200 text-xs font-medium">
+                        {attendanceState.checkInTime
+                          ? `Started ${attendanceState.checkInTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`
+                          : 'Not started'
+                        }
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Check-in/Check-out Buttons */}
-      <div className="space-y-3">
-        {!attendanceState.isCheckedIn ? (
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => handleCheckIn(false)}
-              disabled={
-                submittingAttendance || (
-                  !!attendanceState?.isCheckedIn && !!attendanceState?.isWorkFromHome && !isHRManager()
-                )
-              }
-              className={`flex items-center justify-center py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md ${
-                (attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager())
-                  ? 'bg-gray-400/50 text-gray-300 cursor-not-allowed opacity-50'
-                  : 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white transform hover:scale-105'
-              }`}
-            >
-              <PlayIcon className="w-5 h-5 mr-2" />
-              {(attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager()) ? 'Office (Disabled)' : 'Check In (Office)'}
-            </button>
-            
-            <button
-              onClick={() => (isHRManager() || wfhStatus.hasApprovedRequest) ? handleCheckIn(true) : setShowWFHPopup(true)}
-              disabled={submittingAttendance}
-              className="flex items-center justify-center py-4 px-6 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 rounded-xl font-semibold transition-all duration-300 shadow-md text-white transform hover:scale-105"
-            >
-              <HomeIcon className="w-5 h-5 mr-2" />
-              {(isHRManager() || wfhStatus.hasApprovedRequest) ? 'Work From Home' : 'Apply WFH'}
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={handleCheckOut}
-            disabled={submittingAttendance}
-            className="w-full flex items-center justify-center py-4 px-6 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 rounded-xl font-semibold transition-all duration-300 text-white shadow-md transform hover:scale-105 disabled:opacity-50"
-          >
-            {submittingAttendance ? (
-              <>
-                <LoadingSpinner size="small" />
-                <span className="ml-2">Checking Out...</span>
-              </>
-            ) : (
-              <>
-                <StopIcon className="w-5 h-5 mr-2" />
-                Check Out
-              </>
+                  {/* Check-in/Check-out Buttons */}
+                  <div className="space-y-3">
+                    {!attendanceState.isCheckedIn ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          onClick={() => handleCheckIn(false)}
+                          disabled={
+                            submittingAttendance || (
+                              !!attendanceState?.isCheckedIn && !!attendanceState?.isWorkFromHome && !isHRManager()
+                            )
+                          }
+                          className={`flex items-center justify-center py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md ${(attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager())
+                            ? 'bg-gray00/50 text-gray-300 cursor-not-allowed opacity-50'
+                            : 'bg-gradnt-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white transform hover:scale-105'
+                            }`}
+                        >
+                          <PlayIcon className="w-5 h-5 mr-2" />
+                          {(attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager()) ? 'Office (Disabled)' : 'Check In (Office)'}
+                        </button>
+
+                        <button
+                          onClick={() => (isHRManager() || wfhStatus.hasApprovedRequest) ? handleCheckIn(true) : setShowWFHPopup(true)}
+                          disabled={submittingAttendance}
+                          className="flex items-center justify-center py-4 px-6 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 rounded-xl font-semibold transition-all duration-300 shadow-md text-white transform hover:scale-105"
+                        >
+                          <HomeIcon className="w-5 h-5 mr-2" />
+                          {(isHRManager() || wfhStatus.hasApprovedRequest) ? 'Work From Home' : 'Apply WFH'}
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleCheckOut}
+                        disabled={submittingAttendance}
+                        className="w-full flex items-center justify-center py-4 px-6 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 rounded-xl font-semibold transition-all duration-300 text-white shadow-md transform hover:scale-105 disabled:opacity-50"
+                      >
+                        {submittingAttendance ? (
+                          <>
+                            <LoadingSpinner size="small" />
+                            <span className="ml-2">Checking Out...</span>
+                          </>
+                        ) : (
+                          <>
+                            <StopIcon className="w-5 h-5 mr-2" />
+                            Check Out
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Progress Bar for Employees */}
+                  <div className="mt-4">
+                    <div className="flex justify-between text-xs text-blue-200 mb-2 font-medium">
+                      <span>Progress</span>
+                      <span>{Math.min(Math.round((attendanceState.workingHours / 9) * 100), 100)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-700/50 rounded-full h-3 backdrop-blur-sm border border-slate-600/30">
+                      <div
+                        className="bg-gradient-to-r from-blue-400 to-purple-500 h-3 rounded-full transition-all duration-500 shadow-sm"
+                        style={{ width: `${Math.min((attendanceState.workingHours / 9) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </QuickAccessCard>
             )}
-          </button>
-        )}
-      </div>
-
-      {/* Progress Bar for Employees */}
-      <div className="mt-4">
-        <div className="flex justify-between text-xs text-blue-200 mb-2 font-medium">
-          <span>Progress</span>
-          <span>{Math.min(Math.round((attendanceState.workingHours / 9) * 100), 100)}%</span>
-        </div>
-        <div className="w-full bg-slate-700/50 rounded-full h-3 backdrop-blur-sm border border-slate-600/30">
-          <div 
-            className="bg-gradient-to-r from-blue-400 to-purple-500 h-3 rounded-full transition-all duration-500 shadow-sm" 
-            style={{ width: `${Math.min((attendanceState.workingHours / 9) * 100, 100)}%` }}
-          ></div>
-        </div>
-      </div>
-    </div>
-  </QuickAccessCard>
-)}
             {/* Manager/HR Quick Access */}
             <QuickAccessCard title="🚀 Quick Access" gradient={true}>
               <div className="grid grid-cols-2 gap-4">
                 {/* Leave Management for Managers */}
                 {isManagerOrAbove && (
-                  <Link 
+                  <Link
                     to="/leave"
                     className="group flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
                   >
@@ -2999,26 +2968,26 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                     </div>
                   </Link>
                 )}
-          
+
                 {/* {isHRManager() && ( */}
-                  <>
-                    <Link 
-                      to="/attendance"
-                      className="group flex items-center justify-center p-6 bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
-                    >
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                          <ClockIcon className="h-6 w-6 text-white" />
-                        </div>
-                        <span className="text-sm font-semibold text-green-900">View Attendance</span>
+                <>
+                  <Link
+                    to="/attendance"
+                    className="group flex items-center justify-center p-6 bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <ClockIcon className="h-6 w-6 text-white" />
                       </div>
-                    </Link>
-                  </>
+                      <span className="text-sm font-semibold text-green-900">View Attendance</span>
+                    </div>
+                  </Link>
+                </>
                 {/* )} */}
                 {/* Employee and HR Manager Quick Access */}
                 {!isManagerOrAbove && (
                   <>
-                    <Link 
+                    <Link
                       to="/leave"
                       className="group flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
                     >
@@ -3029,7 +2998,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                         <span className="text-sm font-semibold text-blue-900">Apply Leave</span>
                       </div>
                     </Link>
-  
+
                   </>
                 )}
               </div>
@@ -3072,9 +3041,9 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
               ) : birthdayFestivalData.festivals.upcoming_festivals.length === 1 ? (
                 // SINGLE CARD - CENTER IT
                 <div className="flex justify-center">
-                  <FestivalCard 
-                    key={birthdayFestivalData.festivals.upcoming_festivals[0].id} 
-                    festival={birthdayFestivalData.festivals.upcoming_festivals[0]} 
+                  <FestivalCard
+                    key={birthdayFestivalData.festivals.upcoming_festivals[0].id}
+                    festival={birthdayFestivalData.festivals.upcoming_festivals[0]}
                   />
                 </div>
               ) : (
@@ -3082,7 +3051,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                 <div className="relative">
                   <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white via-white to-transparent z-10 pointer-events-none"></div>
                   <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white to-transparent z-10 pointer-events-none"></div>
-                  
+
                   <div className="overflow-x-auto pb-4 scrollbar-hide">
                     <div className="flex space-x-6 px-2" style={{ width: 'max-content' }}>
                       {birthdayFestivalData.festivals.upcoming_festivals.map((festival) => (
@@ -3107,7 +3076,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                 <div className="relative">
                   <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white via-white to-transparent z-10 pointer-events-none"></div>
                   <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white to-transparent z-10 pointer-events-none"></div>
-                  
+
                   <div className="overflow-x-auto pb-4 scrollbar-hide">
                     <div className="flex space-x-6 px-2" style={{ width: 'max-content' }}>
                       {birthdayFestivalData.birthdays.upcoming_birthdays.map((birthday) => (
@@ -3137,7 +3106,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                       <div className="text-sm text-green-800 font-medium">Approved Leaves</div>
                     </div>
                   </div>
-                  
+
                   <div className="pt-4 border-t border-gray-200">
                     <Link
                       to="/employees"
@@ -3266,14 +3235,14 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                     Current Time
                   </span>
                   <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {dashboardData.currentTime.toLocaleTimeString([], { 
-                      hour: '2-digit', 
+                    {dashboardData.currentTime.toLocaleTimeString([], {
+                      hour: '2-digit',
                       minute: '2-digit',
                       hour12: true,
                     })}
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-3">
                   {/* Manager Quick Actions */}
                   {isManagerOrAbove ? (
@@ -3312,7 +3281,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
                         <span className="text-sm font-semibold">View Attendance Records</span>
                         <ChartBarIcon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors duration-300" />
                       </Link>
-                      
+
                       <Link
                         to="/leave"
                         className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl text-blue-700 hover:from-blue-100 hover:to-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md"
@@ -3409,7 +3378,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
 
       {/* Work From Home Popup - Only show for employees and HR managers */}
       {!isManagerOnly && (
-        <WorkFromHomePopup 
+        <WorkFromHomePopup
           isOpen={showWFHPopup}
           onClose={() => setShowWFHPopup(false)}
           onSuccess={handleWFHSuccess}
@@ -3417,7 +3386,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false }) 
       )}
 
       {/* Enhanced Custom CSS */}
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;

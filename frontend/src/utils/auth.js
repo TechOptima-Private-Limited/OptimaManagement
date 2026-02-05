@@ -150,7 +150,8 @@ export const getUserRole = () => {
 
 export const isHROrManager = () => {
   const user = getCurrentUser();
-  return user?.profile?.role === 'HR_MANAGER' || user?.profile?.role === 'MANAGER';
+  const role = user?.profile?.role;
+  return role === 'HR_MANAGER' || role === 'MANAGER';
 };
 
 // NEW: Check if user can manage resources (Admin, HR Manager, or IT Supporter)

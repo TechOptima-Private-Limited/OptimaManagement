@@ -12,17 +12,23 @@ if (!VAPID_PUBLIC_KEY) {
  * Register the service worker
  */
 export const registerServiceWorker = async () => {
-    if ('serviceWorker' in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.register('/service-worker.js');
-            console.log('Service Worker registered with scope:', registration.scope);
-            return registration;
-        } catch (error) {
-            console.error('Service Worker registration failed:', error);
-            return null;
-        }
+    if (!('serviceWorker' in navigator)) {
+        console.warn('Service workers are not supported by this browser');
+        return null;
     }
-    return null;
+
+    try {
+        // First register the service worker
+        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        console.log('Service Worker registered with scope:', registration.scope);
+
+        // Wait for it to be ready
+        const readyRegistration = await navigator.serviceWorker.ready;
+        return readyRegistration;
+    } catch (error) {
+        console.error('Service Worker registration failed:', error);
+        return null;
+    }
 };
 
 /**
@@ -34,18 +40,25 @@ export const subscribeUser = async (registration) => {
             throw new Error('VAPID_PUBLIC_KEY is missing');
         }
 
-        console.log('Using VAPID Public Key:', VAPID_PUBLIC_KEY);
-        const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
-        console.log('Converted applicationServerKey (bytes):', applicationServerKey);
-
-        // Clear existing subscription if any to avoid stale state
-        const existingSubscription = await registration.pushManager.getSubscription();
-        if (existingSubscription) {
-            console.log('Unsubscribing from existing subscription...');
-            await existingSubscription.unsubscribe();
+        if (!registration.pushManager) {
+            throw new Error('Push Manager not supported by your browser');
         }
 
-        const subscription = await registration.pushManager.subscribe({
+        console.log('Using VAPID Public Key:', VAPID_PUBLIC_KEY);
+        const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+
+        // Check for existing subscription
+        let subscription = await registration.pushManager.getSubscription();
+
+        if (subscription) {
+            // Check if the applicationServerKey matches (roughly, by comparing vs provided one)
+            // If it doesn't match or is old, we should unsubscribe and re-subscribe
+            console.log('Existing subscription found');
+            return subscription;
+        }
+
+        console.log('Subscribing user...');
+        subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: applicationServerKey
         });
@@ -55,9 +68,11 @@ export const subscribeUser = async (registration) => {
     } catch (error) {
         console.error('Failed to subscribe the user:', error);
         if (error.name === 'AbortError') {
-            console.error('AbortError: This often means a network issue or the push service is blocked by a VPN/Proxy.');
+            const details = 'This often means a network issue, the push service is blocked by a VPN/Proxy, or you are in an Incognito/Private window where Push may be disabled.';
+            console.error(`AbortError: ${details}`);
+            throw new Error(`Push registration failed: ${details}`);
         }
-        return null;
+        throw error;
     }
 };
 

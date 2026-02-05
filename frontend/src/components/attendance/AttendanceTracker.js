@@ -30,6 +30,7 @@ const AttendanceTracker = () => {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
+  const [userPendingRequests, setUserPendingRequests] = useState([]);
   const [stats, setStats] = useState({
     totalDays: 0,
     presentDays: 0,
@@ -65,6 +66,7 @@ const AttendanceTracker = () => {
 
   useEffect(() => {
     fetchAttendanceRecords();
+    fetchUserPendingRequests();
   }, [filters]);
 
   useEffect(() => {
@@ -113,6 +115,15 @@ const AttendanceTracker = () => {
       setAttendanceRecords([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserPendingRequests = async () => {
+    try {
+      const response = await attendanceAPI.getPendingEdits();
+      setUserPendingRequests(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Failed to fetch user pending requests:', error);
     }
   };
 
@@ -175,10 +186,12 @@ const AttendanceTracker = () => {
         }
       }
       
-      await attendanceAPI.markManualAttendance(data);
+      const response = await attendanceAPI.markManualAttendance(data);
       
-      if (existingRecord) {
-        toast.success('🎉 Edit request submitted! HR and managers have been notified for approval.');
+      const isPending = response.data?.requires_approval || response.data?.is_pending_approval;
+      
+      if (isPending) {
+        toast.success(response.data?.message || '🎉 Edit request submitted! HR and managers have been notified for approval.');
       } else {
         toast.success('✅ Attendance marked successfully!');
       }
@@ -188,6 +201,7 @@ const AttendanceTracker = () => {
         status: 'PRESENT'
       });
       fetchAttendanceRecords();
+      fetchUserPendingRequests();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to process request');
     } finally {
@@ -291,8 +305,10 @@ const AttendanceTracker = () => {
     document.body.removeChild(link);
   };
 
-  const hasExistingRecord = attendanceRecords.some(record => record.date === selectedDate);
   const todayStr = new Date().toISOString().split('T')[0];
+  const isPastDate = selectedDate && selectedDate < todayStr;
+  const hasExistingRecord = attendanceRecords.some(record => record.date === selectedDate);
+  const showEditReason = (hasExistingRecord || isPastDate) && !isHRManager();
   const todayRecord = attendanceRecords.find(r => r.date === todayStr);
   const computeDurationMinutes = (checkIn, checkOut) => {
     if (!checkIn) return 0;
@@ -668,18 +684,17 @@ const AttendanceTracker = () => {
           />
         </div>
 
-        {/* Employee Pending Edit Requests Section - Only for regular employees */}
-        {!isManagementRole && (
+        {/* Pending Edit Requests Section - Always show if requests exist, or for regular employees always */}
+        {(!isManagementRole || userPendingRequests.length > 0) && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
             <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
               <ClockIcon className="h-6 w-6 mr-2 text-amber-500" />
               Your Pending Edit Requests
             </h3>
             
-            {attendanceRecords.filter(record => record.is_pending_approval).length > 0 ? (
+            {userPendingRequests.length > 0 ? (
               <div className="space-y-4">
-                {attendanceRecords
-                  .filter(record => record.is_pending_approval)
+                {userPendingRequests
                   .map((record) => (
                     <div key={record.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
                       <div className="flex items-center space-x-4">
@@ -907,15 +922,15 @@ const AttendanceTracker = () => {
                 </div>
               </div>
 
-              {/* Edit Reason Field - Only show if editing existing record */}
-              {hasExistingRecord && (
+              {/* Edit Reason Field - Only show if editing existing record OR past date */}
+              {showEditReason && (
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
                   <label className="block text-sm font-semibold text-amber-800 mb-2">
                     Reason for Edit <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     {...register('edit_reason', { 
-                      required: hasExistingRecord ? 'Reason is required for editing attendance' : false 
+                      required: showEditReason ? 'Reason is required for editing or adding past attendance' : false 
                     })}
                     rows={3}
                     placeholder="Please explain why you need to edit this attendance record..."

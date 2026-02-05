@@ -217,7 +217,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
             'id', 'user', 'user_data', 'profile_data', 'user_info', 
-            'employee_id', 'department_id', 'department',
+            'employee_id', 'department_id', 'department', 'sub_department', 'location',
             'position', 'hire_date', 'manager_id', 'manager', 
             'status', 'subordinates_count', 'created_at', 'updated_at'
         ]

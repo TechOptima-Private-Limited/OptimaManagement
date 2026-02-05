@@ -35,6 +35,8 @@ class Employee(models.Model):
         blank=True,
         related_name='subordinates'  # This creates the reverse relationship
     )
+    sub_department = models.CharField(max_length=100, null=True, blank=True, default='Not Available')
+    location = models.CharField(max_length=100, null=True, blank=True, default='Hyderabad')
     status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='ACTIVE')  # ADD THIS FIELD
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

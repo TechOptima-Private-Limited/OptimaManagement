@@ -1,10 +1,10 @@
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 
-const Table = ({ 
-  columns, 
-  data, 
-  loading = false, 
+const Table = ({
+  columns,
+  data,
+  loading = false,
   emptyMessage = 'No data found',
   onRowClick
 }) => {
@@ -37,7 +37,7 @@ const Table = ({
             </tr>
           ) : (
             data.map((row, rowIndex) => (
-              <tr 
+              <tr
                 key={rowIndex}
                 className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick && onRowClick(row)}

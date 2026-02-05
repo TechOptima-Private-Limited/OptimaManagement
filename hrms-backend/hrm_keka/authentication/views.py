@@ -151,7 +151,12 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 @permission_classes([IsAuthenticated])
 def admin_user_list(request):
     """List all users for admin/HR management"""
-    if not request.user.has_perm('auth.view_user'):
+    # Allow access if user has auth.view_user permission OR is HR/Admin (for offboarding etc.)
+    user_profile = getattr(request.user, 'profile', None)
+    user_role = getattr(user_profile, 'role', None) if user_profile else None
+    is_hr_or_admin = user_role in ['ADMIN', 'HR_MANAGER']
+    
+    if not request.user.has_perm('auth.view_user') and not is_hr_or_admin:
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     users = User.objects.select_related('profile').all().order_by('email')
     serializer = AdminUserSerializer(users, many=True)

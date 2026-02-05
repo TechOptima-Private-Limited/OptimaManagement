@@ -264,25 +264,25 @@ const EmployeeRegistration = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
-    
+
     if (!formData.password_confirm) {
       newErrors.password_confirm = 'Please confirm your password';
     } else if (formData.password !== formData.password_confirm) {
       newErrors.password_confirm = 'Passwords do not match';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -309,7 +309,7 @@ const EmployeeRegistration = () => {
         // Store tokens
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        
+
         // Redirect to dashboard
         setTimeout(() => {
           window.location.href = '/dashboard';
@@ -362,14 +362,14 @@ const EmployeeRegistration = () => {
             Set up your password using the email address provided by HR
           </p>
         </div>
-        
+
         <div className="mt-8 space-y-6">
           {errors.general && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
               {errors.general}
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -382,9 +382,8 @@ const EmployeeRegistration = () => {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${errors.email ? 'border-red-300' : 'border-gray-300'
+                  } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Enter your work email address"
               />
               {errors.email && (
@@ -403,9 +402,8 @@ const EmployeeRegistration = () => {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'
+                  } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Create a secure password"
               />
               {errors.password && (
@@ -424,9 +422,8 @@ const EmployeeRegistration = () => {
                 required
                 value={formData.password_confirm}
                 onChange={handleInputChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  errors.password_confirm ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${errors.password_confirm ? 'border-red-300' : 'border-gray-300'
+                  } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Confirm your password"
               />
               {errors.password_confirm && (

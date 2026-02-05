@@ -54,28 +54,19 @@ class AttendanceRecordListView(generics.ListAPIView):
                 user_role = user.profile.role
                 print(f"🔍 User role: {user_role}")
 
-                if user_role == 'HR_MANAGER':
-                    pass  # HR Manager can see all records
+                if user_role in ['HR_MANAGER', 'ADMIN']:
+                    pass  # HR Manager and Admin can see all records
                 elif user_role == 'MANAGER':
                     allowed_employee_ids = get_manager_team_employees(user)
                     queryset = queryset.filter(employee_id__in=allowed_employee_ids)
                     print(f"🔍 Manager filtered queryset: {queryset}")
                 else:
-                    # For EMPLOYEE, IT_SUPPORTER, ADMIN: allow viewing own + peers (same manager)
+                    # For EMPLOYEE and IT_SUPPORTER: only show OWN records (no peers)
+                    # This ensures data privacy - employees should not see their peers' attendance
                     try:
                         employee = Employee.objects.get(user=user)
-                        # Get peer employees (same manager)
-                        peer_ids = []
-                        if employee.manager:
-                            peers = Employee.objects.filter(
-                                manager=employee.manager,
-                                status='ACTIVE'
-                            ).values_list('id', flat=True)
-                            peer_ids = list(peers)
-                        # Include own ID
-                        allowed_ids = [employee.id] + peer_ids
-                        queryset = queryset.filter(employee_id__in=allowed_ids)
-                        print(f"🔍 Employee/IT_SUPPORTER/ADMIN filtered queryset: {allowed_ids}")
+                        queryset = queryset.filter(employee=employee)
+                        print(f"🔍 Employee/IT_SUPPORTER filtered queryset (own only): {employee.id}")
                     except Employee.DoesNotExist:
                         queryset = AttendanceRecord.objects.none()
             else:
@@ -137,32 +128,37 @@ def manual_attendance(request):
         serializer = AttendanceCreateSerializer(data=request.data)
         
         if serializer.is_valid():
+            entry_date = serializer.validated_data['date']
+            today = timezone.now().date()
+            is_past_date = entry_date < today
+            
             # Check if record already exists for this date
             existing_record = AttendanceRecord.objects.filter(
                 employee=employee,
-                date=serializer.validated_data['date']
+                date=entry_date
             ).first()
             
+            new_check_in = serializer.validated_data.get('check_in_time')
+            new_check_out = serializer.validated_data.get('check_out_time')
+            new_status = serializer.validated_data.get('status')
+            new_notes = serializer.validated_data.get('notes', '')
+            new_ci_lat = serializer.validated_data.get('check_in_lat')
+            new_ci_lng = serializer.validated_data.get('check_in_lng')
+            new_co_lat = serializer.validated_data.get('check_out_lat')
+            new_co_lng = serializer.validated_data.get('check_out_lng')
+            
+            user_role = getattr(getattr(request.user, 'profile', None), 'role', None)
+            is_hr_manager = user_role == 'HR_MANAGER'
+
             if existing_record:
-                # Determine if this is a simple same-day checkout update
-                new_check_in = serializer.validated_data.get('check_in_time')
-                new_check_out = serializer.validated_data.get('check_out_time')
-                new_status = serializer.validated_data.get('status')
-                new_notes = serializer.validated_data.get('notes', '')
-                new_ci_lat = serializer.validated_data.get('check_in_lat')
-                new_ci_lng = serializer.validated_data.get('check_in_lng')
-                new_co_lat = serializer.validated_data.get('check_out_lat')
-                new_co_lng = serializer.validated_data.get('check_out_lng')
-
-                user_role = getattr(getattr(request.user, 'profile', None), 'role', None)
-                is_hr_manager = user_role == 'HR_MANAGER'
-
-                # Allow direct checkout update if:
+                # Allow direct checkout update ONLY if:
+                # - It is for TODAY (not a past date)
                 # - existing record belongs to same date/employee (already ensured)
                 # - new payload only adds/updates check_out_time
                 # - and does not modify check_in_time (or leaves it empty)
                 # - and record is not already pending approval
                 if (
+                    not is_past_date and
                     not existing_record.is_pending_approval and
                     new_check_out is not None and
                     (new_check_in is None or new_check_in == existing_record.check_in_time)
@@ -172,10 +168,8 @@ def manual_attendance(request):
                         existing_record.check_out_lat = new_co_lat
                     if new_co_lng is not None:
                         existing_record.check_out_lng = new_co_lng
-                    # Set status to PRESENT if provided, else keep existing
                     if new_status:
                         existing_record.status = new_status
-                    # Append/overwrite notes as simple message
                     existing_record.notes = new_notes or existing_record.notes
                     existing_record.attendance_type = existing_record.attendance_type or 'MANUAL'
                     existing_record.save(update_fields=['check_out_time', 'check_out_lat', 'check_out_lng', 'status', 'notes', 'attendance_type', 'updated_at'])
@@ -257,17 +251,37 @@ def manual_attendance(request):
                     'record_id': existing_record.id
                 }, status=status.HTTP_200_OK)
             else:
-                # New record - create normally
-                attendance_record = AttendanceRecord.objects.create(
-                    employee=employee,
-                    **serializer.validated_data
-                )
-                
-                print(f"✅ New attendance record created for {employee.user}")
-                return Response(
-                    AttendanceRecordSerializer(attendance_record).data,
-                    status=status.HTTP_201_CREATED
-                )
+                # New record
+                if is_past_date and not is_hr_manager:
+                    # New record for past date requires approval
+                    attendance_record = AttendanceRecord.objects.create(
+                        employee=employee,
+                        is_pending_approval=True,
+                        edit_reason=request.data.get('edit_reason', 'Forgot to mark attendance'),
+                        **serializer.validated_data
+                    )
+                    
+                    # Store requested data for email signals (even for new records)
+                    attendance_record._requested_data = serializer.validated_data
+                    attendance_record.save() # Triggers signal
+                    
+                    return Response({
+                        'message': 'Attendance request for past date submitted! HR and managers have been notified for approval.',
+                        'requires_approval': True,
+                        'is_pending_approval': True,
+                        'record_id': attendance_record.id
+                    }, status=status.HTTP_200_OK)
+                else:
+                    # New record for today or created by HR - create normally
+                    attendance_record = AttendanceRecord.objects.create(
+                        employee=employee,
+                        **serializer.validated_data
+                    )
+                    print(f"✅ New attendance record created for {employee.user}")
+                    return Response(
+                        AttendanceRecordSerializer(attendance_record).data,
+                        status=status.HTTP_201_CREATED
+                    )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -283,21 +297,25 @@ def get_pending_edits(request):
     """Get records with pending approval flag - Updated for manager permissions"""
     user = request.user
     
-    # Allow via Django perms or role
-    if user.has_perm('attendance.view_attendancerecord'):
+    # Updated permissions: Allow all authenticated users to see relevant pending records
+    if user.has_perm('attendance.view_attendancerecord') or (hasattr(user, 'profile') and user.profile.role == 'HR_MANAGER'):
         pending_records = AttendanceRecord.objects.filter(is_pending_approval=True)
+    elif hasattr(user, 'profile') and user.profile.role == 'MANAGER':
+        allowed_employee_ids = get_manager_team_employees(user)
+        pending_records = AttendanceRecord.objects.filter(
+            is_pending_approval=True,
+            employee_id__in=allowed_employee_ids
+        )
     else:
-        if not (hasattr(user, 'profile') and user.profile.role in ['HR_MANAGER', 'MANAGER']):
-            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
-        # Filter pending records based on role
-        if user.profile.role == 'HR_MANAGER':
-            pending_records = AttendanceRecord.objects.filter(is_pending_approval=True)
-        elif user.profile.role == 'MANAGER':
-            allowed_employee_ids = get_manager_team_employees(user)
+        # Regular employees/IT Supporters can only see their own pending records
+        try:
+            employee = Employee.objects.get(user=user)
             pending_records = AttendanceRecord.objects.filter(
-                is_pending_approval=True,
-                employee_id__in=allowed_employee_ids
+                employee=employee,
+                is_pending_approval=True
             )
+        except Employee.DoesNotExist:
+            pending_records = AttendanceRecord.objects.none()
     
     data = []
     for record in pending_records:
@@ -631,12 +649,12 @@ def get_wfh_requests(request):
         if hasattr(user, 'profile'):
             user_role = user.profile.role
             
-            if user_role == 'HR_MANAGER':
-                # HR sees all requests
+            if user_role in ['HR_MANAGER', 'ADMIN']:
+                # HR and Admin see all requests
                 requests = WorkFromHomeRequest.objects.all().select_related(
                     'employee', 'employee__user', 'employee__department', 'approved_by', 'approved_by__user'
                 ).order_by('-applied_at')
-                print(f"👑 HR Manager - fetching all requests")
+                print(f"👑 {user_role} - fetching all requests")
                 
             elif user_role == 'MANAGER':
                 # Manager sees team requests + their own
@@ -649,12 +667,26 @@ def get_wfh_requests(request):
                 print(f"👨‍💼 Manager - fetching team requests")
                 
             else:
-                # Employee sees only their own
-                employee = Employee.objects.get(user=user)
-                requests = WorkFromHomeRequest.objects.filter(employee=employee).select_related(
-                    'employee', 'employee__user', 'employee__department', 'approved_by', 'approved_by__user'
-                ).order_by('-applied_at')
-                print(f"👨‍💼 Employee {employee.employee_id} - fetching own requests")
+                # Employee and IT_SUPPORTER see only their own + peers
+                try:
+                    employee = Employee.objects.get(user=user)
+                    peer_ids = []
+                    if employee.manager:
+                        peers = Employee.objects.filter(
+                            manager=employee.manager,
+                            status='ACTIVE'
+                        ).values_list('id', flat=True)
+                        peer_ids = list(peers)
+                    
+                    allowed_ids = [employee.id] + peer_ids
+                    requests = WorkFromHomeRequest.objects.filter(
+                        employee_id__in=allowed_ids
+                    ).select_related(
+                        'employee', 'employee__user', 'employee__department', 'approved_by', 'approved_by__user'
+                    ).order_by('-applied_at')
+                    print(f"👨‍💼 {user_role} {employee.employee_id} - fetching own+peers requests")
+                except Employee.DoesNotExist:
+                    requests = WorkFromHomeRequest.objects.none()
         else:
             # No profile - employee only
             employee = Employee.objects.get(user=user)

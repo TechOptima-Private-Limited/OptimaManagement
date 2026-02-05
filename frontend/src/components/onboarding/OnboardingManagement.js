@@ -61,7 +61,7 @@
 // //           'Content-Type': 'application/json',
 // //         },
 // //       });
-      
+
 // //       if (response.ok) {
 // //         const data = await response.json();
 // //         setEmployees(data.results || data);
@@ -145,10 +145,10 @@
 
 // //   const uploadDocuments = async () => {
 // //     if (!uploadingEmployee) return;
-    
+
 // //     try {
 // //       const formData = new FormData();
-      
+
 // //       fileInputs.forEach(fileInput => {
 // //         if (fileInput.file) {
 // //           formData.append(`document_${fileInput.docType}`, fileInput.file);
@@ -166,20 +166,20 @@
 // //       if (response.ok) {
 // //         const result = await response.json();
 // //         toast.success(`Documents uploaded successfully! ${result.files_uploaded?.length || 0} files processed.`);
-        
+
 // //         // Close upload modal
 // //         setShowUploadModal(false);
 // //         setUploadingEmployee(null);
 // //         setFileInputs([{ id: 1, docType: 'Aadhar and PAN Card', file: null }]);
-        
+
 // //         // Refresh employees list
 // //         fetchEmployees();
-        
+
 // //         // Automatically open document status modal to show updated status and allow more uploads
 // //         setTimeout(() => {
 // //           fetchDocumentStatus(uploadingEmployee.id);
 // //         }, 500); // Small delay to ensure the upload modal is closed first
-        
+
 // //       } else {
 // //         const error = await response.json();
 // //         toast.error(error.message || 'Failed to upload documents');
@@ -198,7 +198,7 @@
 // //           'Content-Type': 'application/json',
 // //         },
 // //       });
-      
+
 // //       if (response.ok) {
 // //         const data = await response.json();
 // //         setDocumentsList(data);
@@ -214,12 +214,12 @@
 
 // //   const downloadDocument = (employeeId, docType, fileName) => {
 // //     const url = `http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/download_document/?doc_type=${encodeURIComponent(docType)}`;
-    
+
 // //     // Create a temporary link and click it to download
 // //     const link = document.createElement('a');
 // //     link.href = url;
 // //     link.download = fileName || 'document';
-    
+
 // //     // Add authorization header by opening in new tab
 // //     window.open(url, '_blank');
 // //   };
@@ -237,7 +237,7 @@
 // //           'Content-Type': 'application/json',
 // //         },
 // //       });
-      
+
 // //       if (response.ok) {
 // //         const data = await response.json();
 // //         setDocumentStatus(data);
@@ -253,7 +253,7 @@
 
 // //   const updateEmployee = async () => {
 // //     if (!editingEmployee) return;
-    
+
 // //     try {
 // //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${editingEmployee.id}/`, {
 // //         method: 'PUT',
@@ -281,7 +281,7 @@
 
 // //   const deleteEmployee = async () => {
 // //     if (!deletingEmployee) return;
-    
+
 // //     try {
 // //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${deletingEmployee.id}/`, {
 // //         method: 'DELETE',
@@ -336,7 +336,7 @@
 // //           'Content-Type': 'application/json',
 // //         },
 // //       });
-      
+
 // //       if (response.ok) {
 // //         const data = await response.json();
 // //         return data.is_complete;
@@ -996,7 +996,7 @@
 
 // //                       return allRequiredDocs.map((docType, index) => {
 // //                         const isUploaded = documentStatus.required_documents.uploaded.some(doc => doc.doc_type === docType);
-                        
+
 // //                         return (
 // //                           <div key={index} className={`flex items-center justify-between p-3 border rounded-md ${
 // //                             isUploaded 
@@ -1013,7 +1013,7 @@
 // //                                 {docType}
 // //                               </span>
 // //                             </div>
-                            
+
 // //                             <div className="flex items-center space-x-2">
 // //                               {isUploaded ? (
 // //                                 <>
@@ -1161,7 +1161,7 @@
 // //                               <p><strong>Uploaded:</strong> {new Date(doc.uploaded_at).toLocaleString()}</p>
 // //                             </div>
 // //                           </div>
-                          
+
 // //                           <div className="flex items-center space-x-2 ml-4">
 // //                             {doc.has_file_data ? (
 // //                               <>
@@ -1225,7 +1225,7 @@
 // //                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
 // //                   Upload Documents - {uploadingEmployee.name}
 // //                 </h3>
-                
+
 // //                 <div className="mb-4 p-3 bg-blue-50 rounded-md">
 // //                   <div className="flex items-center">
 // //                     <div className="flex-shrink-0">
@@ -1251,7 +1251,7 @@
 // //                       Add Document
 // //                     </button>
 // //                   </div>
-                  
+
 // //                   {fileInputs.map((fileInput, index) => (
 // //                     <div key={fileInput.id} className="flex items-center space-x-3 mb-3 p-3 bg-gray-50 rounded-lg border">
 // //                       <div className="flex-1">
@@ -1294,7 +1294,7 @@
 // //                       )}
 // //                     </div>
 // //                   ))}
-                  
+
 // //                   <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
 // //                     <div className="flex">
 // //                       <div className="flex-shrink-0">
@@ -1469,7 +1469,7 @@
 //           'Content-Type': 'application/json',
 //         },
 //       });
-      
+
 //       if (response.ok) {
 //         const data = await response.json();
 //         setEmployees(data.results || data);
@@ -1553,10 +1553,10 @@
 
 //   const uploadDocuments = async () => {
 //     if (!uploadingEmployee) return;
-    
+
 //     try {
 //       const formData = new FormData();
-      
+
 //       fileInputs.forEach(fileInput => {
 //         if (fileInput.file) {
 //           formData.append(`document_${fileInput.docType}`, fileInput.file);
@@ -1574,17 +1574,17 @@
 //       if (response.ok) {
 //         const result = await response.json();
 //         toast.success(`Documents uploaded successfully! ${result.files_uploaded?.length || 0} files processed.`);
-        
+
 //         setShowUploadModal(false);
 //         setUploadingEmployee(null);
 //         setFileInputs([{ id: 1, docType: 'Aadhar and PAN Card', file: null }]);
-        
+
 //         fetchEmployees();
-        
+
 //         setTimeout(() => {
 //           fetchDocumentStatus(uploadingEmployee.id);
 //         }, 500);
-        
+
 //       } else {
 //         const error = await response.json();
 //         toast.error(error.message || 'Failed to upload documents');
@@ -1603,7 +1603,7 @@
 //           'Content-Type': 'application/json',
 //         },
 //       });
-      
+
 //       if (response.ok) {
 //         const data = await response.json();
 //         setDocumentStatus(data);
@@ -1619,7 +1619,7 @@
 
 //   const updateEmployee = async () => {
 //     if (!editingEmployee) return;
-    
+
 //     try {
 //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${editingEmployee.id}/`, {
 //         method: 'PUT',
@@ -1647,7 +1647,7 @@
 
 //   const deleteEmployee = async () => {
 //     if (!deletingEmployee) return;
-    
+
 //     try {
 //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${deletingEmployee.id}/`, {
 //         method: 'DELETE',
@@ -1701,7 +1701,7 @@
 //           'Content-Type': 'application/json',
 //         },
 //       });
-      
+
 //       if (response.ok) {
 //         const data = await response.json();
 //         return data.is_complete;
@@ -1786,11 +1786,11 @@
 //       {/* Enhanced Header Section */}
 //       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
 //         <div className="absolute inset-0 bg-black opacity-10"></div>
-        
+
 //         {/* Decorative elements */}
 //         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
 //         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
-        
+
 //         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 //           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
 //             <div className="flex-1">
@@ -1800,14 +1800,14 @@
 //                 </div>
 //                 <Star className="h-6 w-6 text-yellow-300 animate-pulse" />
 //               </div>
-              
+
 //               <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
 //                 Onboarding Management
 //               </h1>
 //               <p className="text-xl text-blue-100 mb-6">
 //                 Streamline your employee onboarding process with document verification and status tracking
 //               </p>
-              
+
 //               <div className="flex items-center space-x-6 text-blue-100">
 //                 <div className="flex items-center space-x-2">
 //                   <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
@@ -1819,7 +1819,7 @@
 //                 </div>
 //               </div>
 //             </div>
-            
+
 //             <div className="mt-8 lg:mt-0">
 //               <button
 //                 onClick={() => setShowCreateModal(true)}
@@ -1932,7 +1932,7 @@
 //                   style={{ animationDelay: `${index * 100}ms` }}
 //                 >
 //                   <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
+
 //                   <div className="relative p-6">
 //                     <div className="flex items-center justify-between">
 //                       <div className="flex items-center space-x-4">
@@ -1946,7 +1946,7 @@
 //                             <div className="w-2 h-2 bg-white rounded-full"></div>
 //                           </div>
 //                         </div>
-                        
+
 //                         <div className="flex-1">
 //                           <div className="flex items-center space-x-3 mb-2">
 //                             <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">
@@ -2030,13 +2030,13 @@
 
 //       {/* All the existing modals with enhanced styling would go here */}
 //       {/* For brevity, I'm including just the create modal as an example */}
-      
+
 //       {/* Enhanced Create Employee Modal */}
 //       {showCreateModal && (
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowCreateModal(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100">
 //               {/* Header with gradient */}
 //               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
@@ -2187,7 +2187,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDocumentStatusModal(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
@@ -2251,7 +2251,7 @@
 
 //                       return allRequiredDocs.map((docType, index) => {
 //                         const isUploaded = documentStatus.required_documents.uploaded.some(doc => doc.doc_type === docType);
-                        
+
 //                         return (
 //                           <div key={index} className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
 //                             isUploaded 
@@ -2268,7 +2268,7 @@
 //                                 {docType}
 //                               </span>
 //                             </div>
-                            
+
 //                             <div className="flex items-center space-x-2">
 //                               {isUploaded ? (
 //                                 <>
@@ -2352,7 +2352,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDetailsModal(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6">
@@ -2385,14 +2385,14 @@
 //                       </span>
 //                     </div>
 //                   </div>
-                  
+
 //                   <div>
 //                     <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
 //                     <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(selectedEmployee.status)}`}>
 //                       {selectedEmployee.status}
 //                     </span>
 //                   </div>
-                  
+
 //                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-1">Position</label>
@@ -2403,7 +2403,7 @@
 //                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.salary_lpa ? `₹${selectedEmployee.salary_lpa}` : 'Not specified'}</p>
 //                     </div>
 //                   </div>
-                  
+
 //                   <div>
 //                     <label className="block text-sm font-semibold text-gray-700 mb-1">Joining Date</label>
 //                     <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.joining_date ? new Date(selectedEmployee.joining_date).toLocaleDateString() : 'Not specified'}</p>
@@ -2429,7 +2429,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowEditModal(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6">
@@ -2538,7 +2538,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDeleteConfirm(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
 //               <div className="bg-gradient-to-br from-gray-50 to-red-50/30 px-6 py-6">
 //                 <div className="sm:flex sm:items-start">
@@ -2585,7 +2585,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowUploadModal(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-6">
@@ -2630,7 +2630,7 @@
 //                       Add Document
 //                     </button>
 //                   </div>
-                  
+
 //                   {fileInputs.map((fileInput, index) => (
 //                     <div key={fileInput.id} className="bg-white/70 rounded-xl border-2 border-gray-200 p-4">
 //                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2677,7 +2677,7 @@
 //                       </div>
 //                     </div>
 //                   ))}
-                  
+
 //                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
 //                     <div className="flex">
 //                       <div className="flex-shrink-0">
@@ -2725,7 +2725,7 @@
 //         <div className="fixed inset-0 z-50 overflow-y-auto">
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDocumentListModal(false)}></div>
-            
+
 //             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-6">
@@ -2773,7 +2773,7 @@
 //                               </div>
 //                             </div>
 //                           </div>
-                          
+
 //                           <div className="flex items-center space-x-2 ml-6">
 //                             {doc.has_file_data ? (
 //                               <>
@@ -2899,7 +2899,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
-import { 
+import {
   Plus,
   UserPlus,
   FileText,
@@ -2982,7 +2982,7 @@ const OnboardingManagement = () => {
     try {
       setLoading(true);
       let queryParams = '';
-      
+
       if (filter === 'pending') {
         queryParams = '?status=pending';
       } else if (filter === 'accepted') {
@@ -2993,7 +2993,7 @@ const OnboardingManagement = () => {
         queryParams = '?deleted_only=true';
       }
       // 'all' doesn't need params - it will show active employees by default
-      
+
       const { data } = await api.get(`/onboarding/employees/${queryParams}`);
       setEmployees(data.results || data);
     } catch (error) {
@@ -3011,18 +3011,18 @@ const OnboardingManagement = () => {
   const createEmployee = async () => {
     try {
       // Normalize and validate input
-      const deptChoices = ['hr','it','finance','marketing','sales','operations','development','design','qa','support'];
+      const deptChoices = ['hr', 'it', 'finance', 'marketing', 'sales', 'operations', 'development', 'design', 'qa', 'support'];
       const positionChoices = [
-        'hr_manager','hr_executive','hr_intern',
-        'it_manager','system_admin','network_engineer','it_support',
-        'senior_developer','junior_developer','full_stack_developer','frontend_developer','backend_developer','devops_engineer','tech_lead',
-        'ui_designer','ux_designer','graphic_designer',
-        'qa_engineer','test_lead',
-        'finance_manager','accountant','finance_executive',
-        'marketing_manager','sales_manager','sales_executive','digital_marketer',
-        'customer_support','team_lead',
-        'project_manager','operations_manager',
-        'intern','trainee'
+        'hr_manager', 'hr_executive', 'hr_intern',
+        'it_manager', 'system_admin', 'network_engineer', 'it_support',
+        'senior_developer', 'junior_developer', 'full_stack_developer', 'frontend_developer', 'backend_developer', 'devops_engineer', 'tech_lead',
+        'ui_designer', 'ux_designer', 'graphic_designer',
+        'qa_engineer', 'test_lead',
+        'finance_manager', 'accountant', 'finance_executive',
+        'marketing_manager', 'sales_manager', 'sales_executive', 'digital_marketer',
+        'customer_support', 'team_lead',
+        'project_manager', 'operations_manager',
+        'intern', 'trainee'
       ];
 
       const mapEmployeeType = (val) => {
@@ -3088,7 +3088,7 @@ const OnboardingManagement = () => {
           msg = Object.entries(data)
             .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
             .join(' | ');
-        } catch (_) {}
+        } catch (_) { }
       }
       toast.error(msg || 'Failed to create employee');
     }
@@ -3096,20 +3096,20 @@ const OnboardingManagement = () => {
 
   const updateEmployee = async () => {
     if (!editingEmployee) return;
-    
+
     try {
-      const deptChoices = ['hr','it','finance','marketing','sales','operations','development','design','qa','support'];
+      const deptChoices = ['hr', 'it', 'finance', 'marketing', 'sales', 'operations', 'development', 'design', 'qa', 'support'];
       const positionChoices = [
-        'hr_manager','hr_executive','hr_intern',
-        'it_manager','system_admin','network_engineer','it_support',
-        'senior_developer','junior_developer','full_stack_developer','frontend_developer','backend_developer','devops_engineer','tech_lead',
-        'ui_designer','ux_designer','graphic_designer',
-        'qa_engineer','test_lead',
-        'finance_manager','accountant','finance_executive',
-        'marketing_manager','sales_manager','sales_executive','digital_marketer',
-        'customer_support','team_lead',
-        'project_manager','operations_manager',
-        'intern','trainee'
+        'hr_manager', 'hr_executive', 'hr_intern',
+        'it_manager', 'system_admin', 'network_engineer', 'it_support',
+        'senior_developer', 'junior_developer', 'full_stack_developer', 'frontend_developer', 'backend_developer', 'devops_engineer', 'tech_lead',
+        'ui_designer', 'ux_designer', 'graphic_designer',
+        'qa_engineer', 'test_lead',
+        'finance_manager', 'accountant', 'finance_executive',
+        'marketing_manager', 'sales_manager', 'sales_executive', 'digital_marketer',
+        'customer_support', 'team_lead',
+        'project_manager', 'operations_manager',
+        'intern', 'trainee'
       ];
 
       const mapEmployeeType = (val) => {
@@ -3158,7 +3158,7 @@ const OnboardingManagement = () => {
           errorMsg = error?.detail || Object.entries(error || {})
             .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
             .join(' | ') || errorMsg;
-        } catch {}
+        } catch { }
         toast.error(errorMsg);
       }
     } catch (error) {
@@ -3223,7 +3223,7 @@ const OnboardingManagement = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setDocumentStatus(data);
@@ -3273,10 +3273,10 @@ const OnboardingManagement = () => {
 
   const uploadDocuments = async () => {
     if (!uploadingEmployee) return;
-    
+
     try {
       const formData = new FormData();
-      
+
       fileInputs.forEach(fileInput => {
         if (fileInput.file) {
           formData.append(`document_${fileInput.docType}`, fileInput.file);
@@ -3294,17 +3294,17 @@ const OnboardingManagement = () => {
       if (response.ok) {
         const result = await response.json();
         toast.success(`Documents uploaded successfully! ${result.files_uploaded?.length || 0} files processed.`);
-        
+
         setShowUploadModal(false);
         setUploadingEmployee(null);
         setFileInputs([{ id: 1, docType: 'Aadhar and PAN Card', file: null }]);
-        
+
         fetchEmployees();
-        
+
         setTimeout(() => {
           fetchDocumentStatus(uploadingEmployee.id);
         }, 500);
-        
+
       } else {
         const error = await response.json();
         toast.error(error.message || 'Failed to upload documents');
@@ -3323,7 +3323,7 @@ const OnboardingManagement = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         return data.is_complete;
@@ -3356,13 +3356,13 @@ const OnboardingManagement = () => {
   };
 
   const handleFileChange = (id, file) => {
-    setFileInputs(fileInputs.map(f => 
+    setFileInputs(fileInputs.map(f =>
       f.id === id ? { ...f, file } : f
     ));
   };
 
   const handleDocTypeChange = (id, docType) => {
-    setFileInputs(fileInputs.map(f => 
+    setFileInputs(fileInputs.map(f =>
       f.id === id ? { ...f, docType } : f
     ));
   };
@@ -3401,7 +3401,7 @@ const OnboardingManagement = () => {
   const getProfileGradient = (employee) => {
     const gradients = [
       'from-violet-500 to-purple-600',
-      'from-blue-500 to-cyan-600', 
+      'from-blue-500 to-cyan-600',
       'from-emerald-500 to-teal-600',
       'from-amber-500 to-orange-600',
       'from-rose-500 to-pink-600',
@@ -3423,7 +3423,7 @@ const OnboardingManagement = () => {
 
     // Apply search logic
     const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       (emp.first_name || '').toLowerCase().includes(searchLower) ||
       (emp.last_name || '').toLowerCase().includes(searchLower) ||
       (emp.email || '').toLowerCase().includes(searchLower) ||
@@ -3461,11 +3461,11 @@ const OnboardingManagement = () => {
       {/* Enhanced Header Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
         <div className="absolute inset-0 bg-black opacity-10"></div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex-1">
@@ -3475,14 +3475,14 @@ const OnboardingManagement = () => {
                 </div>
                 <Star className="h-6 w-6 text-yellow-300 animate-pulse" />
               </div>
-              
+
               <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
                 Onboarding Management
               </h1>
               <p className="text-xl text-blue-100 mb-6">
                 Streamline your employee onboarding process with document verification and status tracking
               </p>
-              
+
               <div className="flex items-center space-x-6 text-blue-100">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
@@ -3494,7 +3494,7 @@ const OnboardingManagement = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-8 lg:mt-0 flex flex-col lg:flex-row gap-4">
               {/* Generate Link Button */}
               <Link
@@ -3561,11 +3561,10 @@ const OnboardingManagement = () => {
                 <button
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
-                  className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                    filter === tab.key
+                  className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
                       ? 'bg-indigo-600 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {tab.label} ({tab.count})
                 </button>
@@ -3598,7 +3597,7 @@ const OnboardingManagement = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">No candidates found</h3>
               <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                {employees.length === 0 
+                {employees.length === 0
                   ? "Get started by adding your first candidate to the onboarding process."
                   : "No candidates match your current filter and search criteria."
                 }
@@ -3619,22 +3618,20 @@ const OnboardingManagement = () => {
               const profileGradient = getProfileGradient(employee);
 
               return (
-                <div 
-                  key={employee.id} 
-                  className={`group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/50 overflow-hidden transform hover:-translate-y-1 ${
-                    employee.is_deleted ? 'opacity-75' : ''
-                  }`}
+                <div
+                  key={employee.id}
+                  className={`group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/50 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
+                    }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
+
                   <div className="relative p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
-                          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 ${
-                            employee.is_deleted ? 'grayscale' : ''
-                          }`}>
+                          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 ${employee.is_deleted ? 'grayscale' : ''
+                            }`}>
                             <span className="text-white font-bold text-lg">
                               {employeeInitials}
                             </span>
@@ -3649,22 +3646,21 @@ const OnboardingManagement = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <h3 className={`text-xl font-bold group-hover:text-indigo-600 transition-colors duration-300 ${
-                              employee.is_deleted ? 'line-through text-gray-500' : 'text-gray-900'
-                            }`}>
+                            <h3 className={`text-xl font-bold group-hover:text-indigo-600 transition-colors duration-300 ${employee.is_deleted ? 'line-through text-gray-500' : 'text-gray-900'
+                              }`}>
                               {employee.first_name} {employee.last_name}
                               {employee.is_deleted && <span className="text-rose-500 ml-2">[DELETED]</span>}
                             </h3>
-                            
+
                             {!employee.is_deleted && employee.status && (
                               <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(employee.status)}`}>
                                 {employee.status}
                               </span>
                             )}
-                            
+
                             {employee.employee_type && (
                               <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border ${getEmployeeTypeColor(employee.employee_type)}`}>
                                 {employee.employee_type}
@@ -3684,7 +3680,7 @@ const OnboardingManagement = () => {
                             {employee.position && <span>• {employee.position}</span>}
                             {employee.joining_date && <span>• Joining: {new Date(employee.joining_date).toLocaleDateString()}</span>}
                           </div>
-                          
+
                           {/* Submission Info */}
                           {employee.is_self_submitted && employee.submitted_at && (
                             <div className="mt-2 text-xs text-gray-500">
@@ -3724,7 +3720,7 @@ const OnboardingManagement = () => {
                           <>
                             <button
                               onClick={() => {
-                                setEditingEmployee({...employee});
+                                setEditingEmployee({ ...employee });
                                 setShowEditModal(true);
                               }}
                               className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 opacity-0 group-hover:opacity-100"
@@ -3756,8 +3752,8 @@ const OnboardingManagement = () => {
                             </button>
 
                             {employee.status === 'pending' && (
-                              <PendingEmployeeActions 
-                                employee={employee} 
+                              <PendingEmployeeActions
+                                employee={employee}
                                 onStatusUpdate={updateEmployeeStatus}
                                 checkDocumentStatus={checkDocumentCompletionStatus}
                               />
@@ -3827,7 +3823,7 @@ const OnboardingManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowCreateModal(false)}></div>
-            
+
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100">
               {/* Header with gradient */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
@@ -3855,7 +3851,7 @@ const OnboardingManagement = () => {
                     <input
                       type="text"
                       value={newEmployee.first_name}
-                      onChange={(e) => setNewEmployee({...newEmployee, first_name: e.target.value})}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, first_name: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                       placeholder="Enter first name"
                     />
@@ -3868,7 +3864,7 @@ const OnboardingManagement = () => {
                     <input
                       type="text"
                       value={newEmployee.last_name}
-                      onChange={(e) => setNewEmployee({...newEmployee, last_name: e.target.value})}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, last_name: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                       placeholder="Enter last name"
                     />
@@ -3881,7 +3877,7 @@ const OnboardingManagement = () => {
                     <input
                       type="email"
                       value={newEmployee.email}
-                      onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                       placeholder="candidate@company.com"
                     />
@@ -3894,7 +3890,7 @@ const OnboardingManagement = () => {
                     <input
                       type="tel"
                       value={newEmployee.phone_number}
-                      onChange={(e) => setNewEmployee({...newEmployee, phone_number: e.target.value})}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, phone_number: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                       placeholder="+91 9876543210"
                     />
@@ -3906,7 +3902,7 @@ const OnboardingManagement = () => {
                     </label>
                     <select
                       value={newEmployee.employee_type}
-                      onChange={(e) => setNewEmployee({...newEmployee, employee_type: e.target.value})}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, employee_type: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     >
                       <option value="fresher">🎓 Fresher</option>
@@ -3921,7 +3917,7 @@ const OnboardingManagement = () => {
                     <input
                       type="date"
                       value={newEmployee.joining_date}
-                      onChange={(e) => setNewEmployee({...newEmployee, joining_date: e.target.value})}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, joining_date: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     />
                   </div>
@@ -3953,7 +3949,7 @@ const OnboardingManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowEditModal(false)}></div>
-            
+
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100">
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6">
@@ -3979,7 +3975,7 @@ const OnboardingManagement = () => {
                     <input
                       type="text"
                       value={editingEmployee.first_name}
-                      onChange={(e) => setEditingEmployee({...editingEmployee, first_name: e.target.value})}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, first_name: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     />
                   </div>
@@ -3989,7 +3985,7 @@ const OnboardingManagement = () => {
                     <input
                       type="text"
                       value={editingEmployee.last_name}
-                      onChange={(e) => setEditingEmployee({...editingEmployee, last_name: e.target.value})}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, last_name: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     />
                   </div>
@@ -3999,7 +3995,7 @@ const OnboardingManagement = () => {
                     <input
                       type="email"
                       value={editingEmployee.email}
-                      onChange={(e) => setEditingEmployee({...editingEmployee, email: e.target.value})}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, email: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     />
                   </div>
@@ -4009,7 +4005,7 @@ const OnboardingManagement = () => {
                     <input
                       type="tel"
                       value={editingEmployee.phone_number || ''}
-                      onChange={(e) => setEditingEmployee({...editingEmployee, phone_number: e.target.value})}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, phone_number: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     />
                   </div>
@@ -4018,7 +4014,7 @@ const OnboardingManagement = () => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Department</label>
                     <select
                       value={editingEmployee.department || ''}
-                      onChange={(e) => setEditingEmployee({...editingEmployee, department: e.target.value})}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, department: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     >
                       <option value="">Select Department</option>
@@ -4035,7 +4031,7 @@ const OnboardingManagement = () => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Position</label>
                     <select
                       value={editingEmployee.position || ''}
-                      onChange={(e) => setEditingEmployee({...editingEmployee, position: e.target.value})}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, position: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
                     >
                       <option value="">Select Position</option>
@@ -4074,7 +4070,7 @@ const OnboardingManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDeleteConfirm(false)}></div>
-            
+
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
               <div className="bg-gradient-to-br from-gray-50 to-red-50/30 px-6 py-6">
                 <div className="sm:flex sm:items-start">
@@ -4087,7 +4083,7 @@ const OnboardingManagement = () => {
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to delete <strong className="text-gray-900">{deletingEmployee.first_name} {deletingEmployee.last_name}</strong>? 
+                        Are you sure you want to delete <strong className="text-gray-900">{deletingEmployee.first_name} {deletingEmployee.last_name}</strong>?
                         This will soft delete the employee record. You can restore it later if needed.
                       </p>
                     </div>
@@ -4119,7 +4115,7 @@ const OnboardingManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowRestoreConfirm(false)}></div>
-            
+
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
               <div className="bg-gradient-to-br from-gray-50 to-green-50/30 px-6 py-6">
                 <div className="sm:flex sm:items-start">
@@ -4132,7 +4128,7 @@ const OnboardingManagement = () => {
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to restore <strong className="text-gray-900">{deletingEmployee.first_name} {deletingEmployee.last_name}</strong>? 
+                        Are you sure you want to restore <strong className="text-gray-900">{deletingEmployee.first_name} {deletingEmployee.last_name}</strong>?
                         This will reactivate the employee record and make it visible in the active employees list.
                       </p>
                     </div>
@@ -4164,7 +4160,7 @@ const OnboardingManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDetailsModal(false)}></div>
-            
+
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-gray-100">
               {/* Header */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
@@ -4189,24 +4185,24 @@ const OnboardingManagement = () => {
                   {/* Basic Information */}
                   <div className="space-y-4">
                     <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2">Basic Information</h4>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">
                         {selectedEmployee.first_name} {selectedEmployee.last_name}
                       </p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.email}</p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.phone_number || 'Not provided'}</p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Employee Type</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.employee_type || 'Not specified'}</p>
@@ -4216,17 +4212,17 @@ const OnboardingManagement = () => {
                   {/* Employment Details */}
                   <div className="space-y-4">
                     <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2">Employment Details</h4>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Department</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.department || 'Not assigned'}</p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Position</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.position || 'Not assigned'}</p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Joining Date</label>
                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">
@@ -4239,7 +4235,7 @@ const OnboardingManagement = () => {
                 {/* Status Information */}
                 <div className="mt-6 space-y-4">
                   <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2">Status Information</h4>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white/70 rounded-lg p-4">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Submission Status</label>
@@ -4301,7 +4297,7 @@ const OnboardingManagement = () => {
                 {/* Document Status */}
                 <div className="mt-6">
                   <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Document Status</h4>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
                       { key: 'aadhar_pan', label: 'Aadhar & PAN Card' },
@@ -4313,7 +4309,7 @@ const OnboardingManagement = () => {
                     ].map((doc) => {
                       const collected = selectedEmployee[`${doc.key}_collected`];
                       const file = selectedEmployee[`${doc.key}_file`];
-                      
+
                       return (
                         <div key={doc.key} className="bg-white/70 rounded-lg p-3">
                           <div className="flex items-center justify-between">

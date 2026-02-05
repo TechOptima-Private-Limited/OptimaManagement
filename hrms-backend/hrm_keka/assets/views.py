@@ -4,10 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from utils.permissions import AssetModelPermissions
-from .models import AssetType, Asset, AssetAssignment, AssetHistory, AssetReturn, OffboardingAssetReturn, EmployeeStatus
+from .models import AssetType, Asset, AssetAssignment, AssetHistory, AssetReturn, OffboardingAssetReturn, EmployeeStatus, AssetRepair
 from .serializers import (
     AssetTypeSerializer,
     AssetSerializer,
@@ -16,10 +17,13 @@ from .serializers import (
     AssetReturnSerializer,
     OffboardingAssetReturnSerializer,
     EmployeeStatusSerializer,
+    AssetRepairSerializer,
 )
 from .utils import send_asset_return_report
+from .export_utils import generate_asset_export_excel
 from dal import autocomplete
 from django.contrib.auth.models import User
+from notifications.services import NotificationService
 
 @login_required
 def asset_summary(request):
@@ -33,6 +37,41 @@ def asset_summary(request):
         'by_employee': by_employee,
     }
     return render(request, 'assets/summary.html', context)
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def export_assets_excel(request):
+    """
+    Export all asset management data to Excel file
+    """
+    from django.utils import timezone
+    from io import BytesIO
+    
+    # Generate the Excel workbook
+    wb = generate_asset_export_excel(request.user)
+    
+    # Save to BytesIO
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    # Create response
+    response = HttpResponse(
+        output.read(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    
+    # Set filename with timestamp
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'asset_management_export_{timestamp}.xlsx'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
 
 # @login_required
 # def return_assets_form(request):
@@ -310,9 +349,21 @@ class AssetViewSet(viewsets.ModelViewSet):
             or user.groups.filter(name__in=admin_groups).exists()
             or user.has_perm('assets.view_asset')
         ):
+            # Admins see everything unless they explicitly ask for 'mine'
+            if self.request.query_params.get('mine') == 'true':
+                return qs.filter(assignments__employee=user, status='ASSIGNED').distinct()
             return qs
+        
+        # Non-admin users: If ?mine=true, show only their assigned assets
+        if self.request.query_params.get('mine') == 'true':
+            return qs.filter(assignments__employee=user, status='ASSIGNED').distinct()
+
+        # Otherwise, they see assets of types they manage OR assets assigned to them
         asset_type_ids = AssetType.objects.filter(asset_team_email=user.email).values_list('id', flat=True)
-        return qs.filter(asset_type__id__in=asset_type_ids)
+        return qs.filter(
+            models.Q(asset_type__id__in=asset_type_ids) | 
+            models.Q(assignments__employee=user)
+        ).distinct()
 
 class AssetAssignmentViewSet(viewsets.ModelViewSet):
     queryset = AssetAssignment.objects.all()
@@ -454,3 +505,59 @@ class EmployeeStatusViewSet(viewsets.ModelViewSet):
         ):
             return qs
         return qs.filter(employee=user)
+
+class AssetRepairViewSet(viewsets.ModelViewSet):
+    queryset = AssetRepair.objects.all()
+    serializer_class = AssetRepairSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Admins and asset team members see all repairs
+        if self.request.user.is_superuser:
+            return qs
+        if self.request.user.email in AssetType.objects.values_list('asset_team_email', flat=True):
+            return qs
+        # Regular users see only repairs for their assigned assets
+        return qs.filter(asset__assignments__employee=self.request.user).distinct()
+    
+    def perform_create(self, serializer):
+        # Auto-set reported_by to current user
+        repair = serializer.save(reported_by=self.request.user)
+        
+        # Update asset repair status
+        asset = repair.asset
+        asset.is_under_repair = True
+        asset.current_repair = repair
+        asset.save()
+        
+        # Log the repair in asset history
+        AssetHistory.objects.create(
+            asset=asset,
+            action=f"Repair reported: {repair.issue_description[:50]}",
+            performed_by=self.request.user,
+            notes=f"Status: {repair.get_status_display()}"
+        )
+        
+        # Notify Admins and IT Support
+        NotificationService.notify_asset_repair_request(repair)
+    
+    def perform_update(self, serializer):
+        old_status = serializer.instance.status
+        repair = serializer.save()
+        new_status = repair.status
+        
+        # If status changed to completed or failed, update asset
+        if old_status != new_status and new_status in ['COMPLETED', 'FAILED']:
+            asset = repair.asset
+            asset.is_under_repair = False
+            asset.current_repair = None
+            asset.save()
+            
+            # Log the completion
+            AssetHistory.objects.create(
+                asset=asset,
+                action=f"Repair {new_status.lower()}: {repair.issue_description[:50]}",
+                performed_by=self.request.user,
+                notes=f"Vendor: {repair.repair_vendor or 'N/A'}, Cost: {repair.repair_cost or 'N/A'}"
+            )

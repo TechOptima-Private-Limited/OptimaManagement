@@ -78,7 +78,33 @@ def employee_create(request):
 def employee_list_documents(request, employee_id):
     """List uploaded documents for an employee with absolute URLs"""
     try:
-        employee = get_object_or_404(Employee.objects, id=employee_id)
+        # First try to find the onboarding employee directly
+        employee = Employee.objects.filter(id=employee_id).first()
+        
+        # If not found, try to find by core employee's email
+        if not employee:
+            core_emp = CoreEmployee.objects.filter(id=employee_id).select_related('user').first()
+            if core_emp and core_emp.user:
+                # Try to find onboarding record by email
+                email = getattr(core_emp.user, 'email', None)
+                if email:
+                    employee = Employee.objects.filter(email__iexact=email).first()
+        
+        # If still no onboarding employee found, return empty documents
+        if not employee:
+            # Get basic info from core employee for the response
+            core_emp = CoreEmployee.objects.filter(id=employee_id).select_related('user').first()
+            employee_name = 'Unknown'
+            if core_emp and core_emp.user:
+                employee_name = f"{core_emp.user.first_name or ''} {core_emp.user.last_name or ''}".strip() or core_emp.user.email
+            
+            return Response({
+                'employee_id': employee_id,
+                'employee_name': employee_name,
+                'total_documents': 0,
+                'documents': [],
+                'message': 'No onboarding documents available for this employee'
+            })
 
         doc_mappings = [
             ('Aadhar and PAN Card', 'aadhar_pan_file'),

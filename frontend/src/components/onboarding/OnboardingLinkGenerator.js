@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { 
+import {
   Link2,
   Copy,
   CheckCircle,
@@ -20,20 +20,20 @@ const OnboardingLinkGenerator = () => {
 
   const generateNewLink = () => {
     setIsGenerating(true);
-    
+
     // Simulate brief loading for better UX
     setTimeout(() => {
       const timestamp = Math.floor(Date.now() / 1000);
       const data = `GENERIC_${timestamp}`;
       const encoded = btoa(data);
-      
+
       // Get the current origin or use a default
       const baseUrl = window.location.origin || 'http://localhost:3000';
       const link = `${baseUrl}/onboarding/form/${encoded}`;
-      
+
       const createdDate = new Date(timestamp * 1000);
       const expiryDate = new Date(createdDate.getTime() + (7 * 24 * 60 * 60 * 1000));
-      
+
       setGeneratedLink(link);
       setLinkInfo({
         created: createdDate,
@@ -41,7 +41,7 @@ const OnboardingLinkGenerator = () => {
         timestamp: timestamp,
         encoded: encoded
       });
-      
+
       setCopyStatus('');
       setIsGenerating(false);
     }, 800);
@@ -59,7 +59,7 @@ const OnboardingLinkGenerator = () => {
       document.body.appendChild(textArea);
       textArea.select();
       document.body.removeChild(textArea);
-      
+
       try {
         document.execCommand('copy');
         setCopyStatus('success');
@@ -73,13 +73,13 @@ const OnboardingLinkGenerator = () => {
 
   const getRemainingTime = () => {
     if (!linkInfo) return null;
-    
+
     const now = new Date();
     const remaining = linkInfo.expires - now;
     const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
     const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (remaining <= 0) {
       return { text: 'Expired', color: 'text-red-600', bgColor: 'bg-red-100' };
     } else if (days > 1) {
@@ -98,11 +98,11 @@ const OnboardingLinkGenerator = () => {
       {/* Enhanced Header Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
         <div className="absolute inset-0 bg-black opacity-10"></div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
-        
+
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-6">
@@ -111,14 +111,14 @@ const OnboardingLinkGenerator = () => {
               </div>
               <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
             </div>
-            
+
             <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
               Onboarding Link Generator
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
               Generate secure, timestamped onboarding links for employees to complete their registration process
             </p>
-            
+
             <div className="flex items-center justify-center space-x-6 text-blue-100">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-5 h-5" />
@@ -141,10 +141,10 @@ const OnboardingLinkGenerator = () => {
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
                 <Link2 className="w-10 h-10 text-white" />
               </div>
-              
+
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Generate Onboarding Link</h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Create a secure onboarding link that employees can use to submit their information. 
+                Create a secure onboarding link that employees can use to submit their information.
                 Each link is valid for 7 days from the time of generation.
               </p>
             </div>
@@ -154,11 +154,10 @@ const OnboardingLinkGenerator = () => {
               <button
                 onClick={generateNewLink}
                 disabled={isGenerating}
-                className={`inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform ${
-                  isGenerating
+                className={`inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform ${isGenerating
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-105 hover:shadow-indigo-500/25'
-                } text-white`}
+                  } text-white`}
               >
                 {isGenerating ? (
                   <>
@@ -238,16 +237,15 @@ const OnboardingLinkGenerator = () => {
                       <ExternalLink className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
-                  
+
                   {/* Copy Button */}
                   <div className="mt-4 flex items-center justify-between">
                     <button
                       onClick={copyToClipboard}
-                      className={`inline-flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
-                        copyStatus === 'success'
+                      className={`inline-flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${copyStatus === 'success'
                           ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white'
                           : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
-                      } shadow-lg`}
+                        } shadow-lg`}
                     >
                       {copyStatus === 'success' ? (
                         <>
@@ -360,7 +358,7 @@ const OnboardingLinkGenerator = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

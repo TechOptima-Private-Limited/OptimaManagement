@@ -182,12 +182,12 @@ Your original attendance record remains unchanged. If you have questions, please
         try:
             notification = Notification.objects.get(id=notification_id, recipient=user)
             notification.mark_as_read()
-            return True
+            return True, "Success"
         except Notification.DoesNotExist:
-            return False
+            return False, "Not Found"
         except Exception as e:
             logger.error(f"❌ Failed to mark notification as read: {str(e)}")
-            return False
+            return False, str(e)
     
     @staticmethod
     def mark_all_read(user):
@@ -222,3 +222,43 @@ Your original attendance record remains unchanged. If you have questions, please
         except Exception as e:
             logger.error(f"❌ Failed to create system notifications: {str(e)}")
             return 0
+
+    @staticmethod
+    def notify_asset_repair_request(repair):
+        """Notify Admins and IT Support about a new asset repair request"""
+        try:
+            # Get IT Support and Admin users
+            admin_groups = ['Admin', 'IT Support', 'Asset Team']
+            recipients = User.objects.filter(
+                groups__name__in=admin_groups,
+                is_active=True
+            ).distinct()
+            
+            asset = repair.asset
+            reporter = repair.reported_by
+            reporter_name = reporter.get_full_name() if reporter else "Unknown"
+            
+            title = f"🔧 New Asset Repair Request: {asset.asset_tag}"
+            message = f"""
+Asset: {asset.name} ({asset.asset_tag})
+Reported by: {reporter_name}
+Issue: {repair.issue_description}
+Status: {repair.get_status_display()}
+            """.strip()
+            
+            for recipient in recipients:
+                NotificationService.create_notification(
+                    recipient=recipient,
+                    notification_type='ASSET_REPAIR_REQUESTED',
+                    title=title,
+                    message=message,
+                    sender=reporter,
+                    priority='HIGH',
+                    action_url=f"/assets/repairs/{repair.id}",
+                    action_text='View Repair'
+                )
+            
+            return True
+        except Exception as e:
+            logger.error(f"❌ Failed to create asset repair notifications: {str(e)}")
+            return False

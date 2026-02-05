@@ -35,9 +35,12 @@ class IsHRManager(permissions.BasePermission):
 class IsManager(permissions.BasePermission):
     """Custom permission for Manager role"""
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and \
-               hasattr(request.user, 'profile') and \
-               request.user.profile.role == 'MANAGER'
+        return (
+            request.user and 
+            request.user.is_authenticated and 
+            hasattr(request.user, 'profile') and 
+            request.user.profile.role == 'MANAGER'
+        )
 
 class IsEmployee(permissions.BasePermission):
     """Custom permission for Employee role"""

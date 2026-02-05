@@ -47,7 +47,7 @@ def send_attendance_notifications(sender, instance, created, **kwargs):
                     title=f"Attendance Edit ID {instance.id}: {instance.employee.user.get_full_name()}",
                     message=f"{instance.employee.user.get_full_name()} has requested an attendance edit for {instance.date}.",
                     sender=instance.employee.user,
-                    action_url='/attendance/pending-edits',
+                    action_url='/attendance',
                     action_text='Review Edit'
                 )
         except Exception as e:

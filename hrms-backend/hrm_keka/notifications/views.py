@@ -53,12 +53,14 @@ class NotificationListView(generics.ListAPIView):
 def mark_notification_read(request, notification_id):
     """Mark a specific notification as read"""
     try:
-        success = NotificationService.mark_notification_read(notification_id, request.user)
+        success, message = NotificationService.mark_notification_read(notification_id, request.user)
         
         if success:
             return Response({'message': 'Notification marked as read'}, status=status.HTTP_200_OK)
-        else:
+        elif message == "Not Found":
             return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
     except Exception as e:
         logger.error(f"❌ Error marking notification as read: {str(e)}")

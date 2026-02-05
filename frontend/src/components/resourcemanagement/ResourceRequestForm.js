@@ -93,7 +93,7 @@
 
 //   const handleImageUpload = async (e) => {
 //     const files = Array.from(e.target.files);
-    
+
 //     for (const file of files) {
 //       if (file.size > 5 * 1024 * 1024) { // 5MB limit
 //         toast.error('Image size should be less than 5MB');
@@ -125,7 +125,7 @@
 //         image: image.preview,
 //         filename: image.file.name
 //       };
-      
+
 //       const response = await api.post('http://127.0.0.1:8000/api/resource-management/access-requests/upload_image/', uploadData);
 //       return response.data.url;
 //     } catch (error) {
@@ -469,7 +469,8 @@ import {
   ExclamationTriangleIcon,
   PaperClipIcon,
   Cog6ToothIcon,
-  PhotoIcon
+  PhotoIcon,
+  WrenchScrewdriverIcon
 } from '@heroicons/react/24/outline';
 import { getCurrentUser } from '../../utils/auth';
 import api from '../../services/api';
@@ -480,6 +481,7 @@ const ResourceRequestForm = () => {
     resource_type: '',
     resource: '',
     access_level: '',
+    asset: '', // For Asset Repair
     priority: 'MEDIUM',
     justification: '',
     duration: 365
@@ -490,10 +492,10 @@ const ResourceRequestForm = () => {
   const user = getCurrentUser();
 
   // Fetch resource types with better error handling
-  const { 
-    data: resourceTypesData, 
-    isLoading: resourceTypesLoading, 
-    error: resourceTypesError 
+  const {
+    data: resourceTypesData,
+    isLoading: resourceTypesLoading,
+    error: resourceTypesError
   } = useQuery(
     'resource-types',
     () => api.get('/resource-management/resource-types/').then(res => res.data),
@@ -508,31 +510,31 @@ const ResourceRequestForm = () => {
   // Safely extract resourceTypes array
   const resourceTypes = React.useMemo(() => {
     if (!resourceTypesData) return [];
-    
+
     // Handle different response formats
     if (Array.isArray(resourceTypesData)) {
       return resourceTypesData;
     }
-    
+
     if (resourceTypesData.results && Array.isArray(resourceTypesData.results)) {
       return resourceTypesData.results;
     }
-    
+
     if (resourceTypesData.data && Array.isArray(resourceTypesData.data)) {
       return resourceTypesData.data;
     }
-    
+
     console.warn('Unexpected resourceTypes data format:', resourceTypesData);
     return [];
   }, [resourceTypesData]);
 
   // Fetch resources based on selected resource type
-  const { 
-    data: resourcesData, 
-    isLoading: resourcesLoading 
+  const {
+    data: resourcesData,
+    isLoading: resourcesLoading
   } = useQuery(
     ['resources', formData.resource_type],
-    () => formData.resource_type 
+    () => formData.resource_type
       ? api.get(`/resource-management/resources/?resource_type=${formData.resource_type}`).then(res => res.data)
       : Promise.resolve([]),
     {
@@ -547,26 +549,26 @@ const ResourceRequestForm = () => {
   // Safely extract resources array
   const resources = React.useMemo(() => {
     if (!resourcesData) return [];
-    
+
     if (Array.isArray(resourcesData)) {
       return resourcesData;
     }
-    
+
     if (resourcesData.results && Array.isArray(resourcesData.results)) {
       return resourcesData.results;
     }
-    
+
     if (resourcesData.data && Array.isArray(resourcesData.data)) {
       return resourcesData.data;
     }
-    
+
     return [];
   }, [resourcesData]);
 
   // Fetch access levels
-  const { 
-    data: accessLevelsData, 
-    isLoading: accessLevelsLoading 
+  const {
+    data: accessLevelsData,
+    isLoading: accessLevelsLoading
   } = useQuery(
     'access-levels',
     () => api.get('/resource-management/access-levels/').then(res => res.data),
@@ -579,22 +581,46 @@ const ResourceRequestForm = () => {
     }
   );
 
+  // Fetch my assets for repair requests
+  const {
+    data: myAssetsData,
+    isLoading: myAssetsLoading
+  } = useQuery(
+    'my-assets',
+    () => api.get('/assets/assets/?mine=true').then(res => res.data),
+    {
+      enabled: formData.request_type === 'REPAIR',
+      onError: (error) => {
+        console.error('Error fetching my assets:', error);
+        toast.error('Failed to load your assigned assets');
+      }
+    }
+  );
+
+  // Safely extract my assets array
+  const myAssets = React.useMemo(() => {
+    if (!myAssetsData) return [];
+    if (Array.isArray(myAssetsData)) return myAssetsData;
+    if (myAssetsData.results && Array.isArray(myAssetsData.results)) return myAssetsData.results;
+    return [];
+  }, [myAssetsData]);
+
   // Safely extract access levels with fallback
   const accessLevels = React.useMemo(() => {
     if (accessLevelsData) {
       if (Array.isArray(accessLevelsData)) {
         return accessLevelsData;
       }
-      
+
       if (accessLevelsData.results && Array.isArray(accessLevelsData.results)) {
         return accessLevelsData.results;
       }
-      
+
       if (accessLevelsData.data && Array.isArray(accessLevelsData.data)) {
         return accessLevelsData.data;
       }
     }
-    
+
     // Fallback data
     return [
       { id: 1, name: 'Read', description: 'Read-only access' },
@@ -648,14 +674,16 @@ const ResourceRequestForm = () => {
       ...prev,
       [name]: value,
       // Reset dependent fields
-      ...(name === 'request_type' && value === 'IT' ? { resource_type: '', resource: '', access_level: '' } : {}),
+      ...(name === 'request_type' && value === 'IT' ? { resource_type: '', resource: '', access_level: '', asset: '' } : {}),
+      ...(name === 'request_type' && value === 'REPAIR' ? { resource_type: '', resource: '', access_level: '', asset: '' } : {}),
+      ...(name === 'request_type' && value === 'NEW' ? { asset: '' } : {}),
       ...(name === 'resource_type' ? { resource: '' } : {})
     }));
   };
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    
+
     for (const file of files) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
         toast.error('Image size should be less than 5MB');
@@ -687,7 +715,7 @@ const ResourceRequestForm = () => {
         image: image.preview,
         filename: image.file.name
       };
-      
+
       const response = await api.post('/resource-management/access-requests/upload_image/', uploadData);
       return response.data.url;
     } catch (error) {
@@ -750,25 +778,49 @@ const ResourceRequestForm = () => {
         return;
       }
 
-      // Build payload only with fields accepted by backend serializer
-      let requestData = {
-        request_type: formData.request_type,
-        priority: formData.priority,
-        justification: finalJustification,
-        duration: Number(formData.duration),
-      };
-
-      if (formData.request_type === 'NEW') {
-        requestData = {
-          ...requestData,
-          resource: Number(formData.resource),
-          ...(accessLevelsFromApi && formData.access_level
-            ? { access_level: Number(formData.access_level) }
-            : {}),
+      // Handle submission based on request type
+      if (formData.request_type === 'REPAIR') {
+        const repairPayload = {
+          asset: parseInt(formData.asset),
+          issue_description: finalJustification,
+          status: 'PENDING'
         };
+        await api.post('/assets/asset-repairs/', repairPayload);
+        toast.success('Asset repair request submitted successfully!');
+        queryClient.invalidateQueries('asset-repairs');
+      } else {
+        // Build payload only with fields accepted by backend serializer
+        let requestData = {
+          request_type: formData.request_type,
+          priority: formData.priority,
+          justification: finalJustification,
+          duration: Number(formData.duration),
+        };
+
+        if (formData.request_type === 'NEW') {
+          requestData = {
+            ...requestData,
+            resource: Number(formData.resource),
+            ...(accessLevelsFromApi && formData.access_level
+              ? { access_level: Number(formData.access_level) }
+              : {}),
+          };
+        }
+        await createRequestMutation.mutateAsync(requestData);
       }
 
-      await createRequestMutation.mutateAsync(requestData);
+      // Common reset
+      setFormData({
+        request_type: 'NEW',
+        resource_type: '',
+        resource: '',
+        access_level: '',
+        asset: '',
+        priority: 'MEDIUM',
+        justification: '',
+        duration: 365
+      });
+      setJustificationImages([]);
     } catch (error) {
       console.error('Error submitting request:', error);
     } finally {
@@ -852,8 +904,8 @@ const ResourceRequestForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className={`
                 relative flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
-                ${formData.request_type === 'NEW' 
-                  ? 'border-blue-500 bg-blue-50 shadow-md' 
+                ${formData.request_type === 'NEW'
+                  ? 'border-blue-500 bg-blue-50 shadow-md'
                   : 'border-gray-200 bg-white hover:border-gray-300'
                 }
               `}>
@@ -874,8 +926,8 @@ const ResourceRequestForm = () => {
 
               <label className={`
                 relative flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
-                ${formData.request_type === 'IT' 
-                  ? 'border-purple-500 bg-purple-50 shadow-md' 
+                ${formData.request_type === 'IT'
+                  ? 'border-purple-500 bg-purple-50 shadow-md'
                   : 'border-gray-200 bg-white hover:border-gray-300'
                 }
               `}>
@@ -893,89 +945,146 @@ const ResourceRequestForm = () => {
                   <div className="text-sm text-gray-500">Request IT assistance</div>
                 </div>
               </label>
+
+              <label className={`
+                relative flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
+                ${formData.request_type === 'REPAIR'
+                  ? 'border-orange-500 bg-orange-50 shadow-md'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
+                }
+              `}>
+                <input
+                  type="radio"
+                  name="request_type"
+                  value="REPAIR"
+                  checked={formData.request_type === 'REPAIR'}
+                  onChange={handleInputChange}
+                  className="sr-only"
+                />
+                <WrenchScrewdriverIcon className="h-6 w-6 text-orange-600 mr-3" />
+                <div>
+                  <div className="font-medium text-gray-900">Asset Repair</div>
+                  <div className="text-sm text-gray-500">Report issue with your equipment</div>
+                </div>
+              </label>
             </div>
           </div>
 
           {/* Resource Selection (only for NEW requests) */}
-          {formData.request_type === 'NEW' && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Resource Type *
-                  </label>
-                  <select
-                    name="resource_type"
-                    value={formData.resource_type}
-                    onChange={handleInputChange}
-                    required
-                    disabled={resourceTypesLoading}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100"
-                  >
-                    <option value="">
-                      {resourceTypesLoading ? 'Loading...' : 'Select a resource type'}
-                    </option>
-                    {resourceTypes.map(type => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
+          {
+            formData.request_type === 'NEW' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Resource Type *
+                    </label>
+                    <select
+                      name="resource_type"
+                      value={formData.resource_type}
+                      onChange={handleInputChange}
+                      required
+                      disabled={resourceTypesLoading}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100"
+                    >
+                      <option value="">
+                        {resourceTypesLoading ? 'Loading...' : 'Select a resource type'}
                       </option>
-                    ))}
-                  </select>
-                  {resourceTypes.length === 0 && !resourceTypesLoading && (
-                    <p className="mt-1 text-sm text-red-500">
-                      No resource types available. Please contact your administrator.
-                    </p>
-                  )}
+                      {resourceTypes.map(type => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
+                    {resourceTypes.length === 0 && !resourceTypesLoading && (
+                      <p className="mt-1 text-sm text-red-500">
+                        No resource types available. Please contact your administrator.
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Resource *
+                    </label>
+                    <select
+                      name="resource"
+                      value={formData.resource}
+                      onChange={handleInputChange}
+                      required
+                      disabled={!formData.resource_type || resourcesLoading}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100"
+                    >
+                      <option value="">
+                        {resourcesLoading ? 'Loading...' : 'Select a resource'}
+                      </option>
+                      {resources.map(resource => (
+                        <option key={resource.id} value={resource.id}>
+                          {resource.name} ({resource.environment})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Resource *
+                    Access Level *
                   </label>
                   <select
-                    name="resource"
-                    value={formData.resource}
+                    name="access_level"
+                    value={formData.access_level}
                     onChange={handleInputChange}
                     required
-                    disabled={!formData.resource_type || resourcesLoading}
+                    disabled={accessLevelsLoading}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100"
                   >
                     <option value="">
-                      {resourcesLoading ? 'Loading...' : 'Select a resource'}
+                      {accessLevelsLoading ? 'Loading...' : 'Select access level'}
                     </option>
-                    {resources.map(resource => (
-                      <option key={resource.id} value={resource.id}>
-                        {resource.name} ({resource.environment})
+                    {accessLevels.map(level => (
+                      <option key={level.id} value={level.id}>
+                        {level.name} - {level.description}
                       </option>
                     ))}
                   </select>
                 </div>
-              </div>
+              </>
+            )
+          }
 
+          {/* Asset Selection (only for REPAIR requests) */}
+          {
+            formData.request_type === 'REPAIR' && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Access Level *
+                  Select Asset *
                 </label>
                 <select
-                  name="access_level"
-                  value={formData.access_level}
+                  name="asset"
+                  value={formData.asset}
                   onChange={handleInputChange}
                   required
-                  disabled={accessLevelsLoading}
+                  disabled={myAssetsLoading}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100"
                 >
                   <option value="">
-                    {accessLevelsLoading ? 'Loading...' : 'Select access level'}
+                    {myAssetsLoading ? 'Loading assets...' : 'Select an asset'}
                   </option>
-                  {accessLevels.map(level => (
-                    <option key={level.id} value={level.id}>
-                      {level.name} - {level.description}
+                  {myAssets.map(asset => (
+                    <option key={asset.id} value={asset.id} disabled={asset.is_under_repair}>
+                      {asset.asset_tag} - {asset.name} {asset.is_under_repair ? '(Under Repair)' : ''}
                     </option>
                   ))}
                 </select>
+                {myAssets.length === 0 && !myAssetsLoading && (
+                  <p className="mt-1 text-sm text-red-500">
+                    No assigned assets found.
+                  </p>
+                )}
               </div>
-            </>
-          )}
+            )
+          }
 
           {/* Priority and Duration */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,6 +1,6 @@
 # assets/serializers.py
 from rest_framework import serializers
-from .models import AssetType, Asset, AssetAssignment, AssetHistory, OffboardingAssetReturn, AssetReturn, EmployeeStatus
+from .models import AssetType, Asset, AssetAssignment, AssetHistory, OffboardingAssetReturn, AssetReturn, EmployeeStatus, AssetRepair
 
 class AssetTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,6 +11,8 @@ class AssetSerializer(serializers.ModelSerializer):
     current_employee = serializers.SerializerMethodField()
     previously_used_by_info = serializers.SerializerMethodField(read_only=True)
     laptop_age_pretty = serializers.SerializerMethodField(read_only=True)
+    is_under_repair = serializers.BooleanField(read_only=True)
+    current_repair_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Asset
@@ -66,6 +68,21 @@ class AssetSerializer(serializers.ModelSerializer):
             if days:
                 parts.append(f"{days}d")
             return " ".join(parts) if parts else "0d"
+        except Exception:
+            return None
+    
+    def get_current_repair_info(self, obj):
+        try:
+            repair = obj.current_repair
+            if not repair:
+                return None
+            return {
+                'id': repair.id,
+                'status': repair.status,
+                'status_display': repair.get_status_display(),
+                'issue_description': repair.issue_description,
+                'reported_at': repair.reported_at,
+            }
         except Exception:
             return None
 
@@ -157,6 +174,57 @@ class AssetHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetHistory
         fields = '__all__'
+
+class AssetRepairSerializer(serializers.ModelSerializer):
+    asset_info = serializers.SerializerMethodField(read_only=True)
+    reported_by_info = serializers.SerializerMethodField(read_only=True)
+    repair_duration_days = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = AssetRepair
+        fields = '__all__'
+        read_only_fields = ['reported_at', 'started_at', 'completed_at']
+    
+    def get_asset_info(self, obj):
+        try:
+            asset = obj.asset
+            return {
+                'id': asset.id,
+                'asset_tag': asset.asset_tag,
+                'name': asset.name,
+                'asset_type': asset.asset_type.name if asset.asset_type else None,
+            }
+        except Exception:
+            return None
+    
+    def get_reported_by_info(self, obj):
+        try:
+            user = obj.reported_by
+            if not user:
+                return None
+            full_name = (getattr(user, 'get_full_name', lambda: '')() or '').strip()
+            name = full_name or getattr(user, 'username', '') or getattr(user, 'email', '')
+            return {
+                'id': getattr(user, 'id', None),
+                'username': getattr(user, 'username', ''),
+                'email': getattr(user, 'email', ''),
+                'name': name,
+            }
+        except Exception:
+            return None
+    
+    def get_repair_duration_days(self, obj):
+        try:
+            if obj.completed_at and obj.started_at:
+                delta = obj.completed_at - obj.started_at
+                return delta.days
+            elif obj.started_at:
+                from django.utils import timezone
+                delta = timezone.now() - obj.started_at
+                return delta.days
+            return None
+        except Exception:
+            return None
 
 class OffboardingAssetReturnSerializer(serializers.ModelSerializer):
     user_info = serializers.SerializerMethodField(read_only=True)

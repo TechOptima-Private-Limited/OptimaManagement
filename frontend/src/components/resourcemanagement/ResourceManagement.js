@@ -61,7 +61,7 @@
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
 //       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
 //         {/* Header */}
 //         <div className="mb-8">
 //           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
@@ -90,7 +90,7 @@
 //               {tabs.map((tab) => {
 //                 const Icon = tab.icon;
 //                 const isActive = currentTab.name === tab.name;
-                
+
 //                 return (
 //                   <Link
 //                     key={tab.name}
@@ -217,7 +217,7 @@
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
 //       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
 //         {/* Header */}
 //         <div className="mb-8">
 //           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
@@ -255,7 +255,7 @@
 //                 const Icon = tab.icon;
 //                 const isActive = currentTab.name === tab.name;
 //                 const isAdminTab = tab.name === 'Admin Forms';
-                
+
 //                 return (
 //                   <Link
 //                     key={tab.name}
@@ -353,10 +353,10 @@ const ResourceManagement = () => {
   const hasAdminAccess = () => {
     if (!user) return false;
     const userRole = user.role?.toLowerCase() || user.profile?.role?.toLowerCase();
-    const byRole = userRole === 'admin' || 
-                   userRole === 'hr_manager' || 
-                   userRole === 'hr_admin' ||
-                   userRole === 'it_supporter';
+    const byRole = userRole === 'admin' ||
+      userRole === 'hr_manager' ||
+      userRole === 'hr_admin' ||
+      userRole === 'it_supporter';
     const byPerm = (
       hasPerm('resource_management.add_resource') ||
       hasPerm('resource_management.change_resource') ||
@@ -424,12 +424,12 @@ const ResourceManagement = () => {
     ? baseTabs
     : baseTabs.filter(t => t.name !== 'Resources');
 
-  const tabs = hasAdminAccess() 
+  const tabs = hasAdminAccess()
     ? [effectiveBaseTabs[0], adminTab, ...effectiveBaseTabs.slice(1)] // Insert admin tab after dashboard
     : effectiveBaseTabs;
 
-  const currentTab = tabs.find(tab => 
-    location.pathname === tab.href || 
+  const currentTab = tabs.find(tab =>
+    location.pathname === tab.href ||
     (tab.href === '/resource-management' && location.pathname === '/resource-management')
   ) || tabs[0];
 
@@ -459,7 +459,7 @@ const ResourceManagement = () => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Header */}
         <div className="mb-8">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
@@ -500,7 +500,7 @@ const ResourceManagement = () => {
                 const Icon = tab.icon;
                 const isActive = currentTab.name === tab.name;
                 const isAdminTab = tab.name === 'Admin Forms';
-                
+
                 return (
                   <Link
                     key={tab.name}
@@ -518,8 +518,8 @@ const ResourceManagement = () => {
                     <span>{tab.name}</span>
                     {isAdminTab && (
                       <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium
-                        ${isActive 
-                          ? 'bg-white/20 text-white border border-white/30' 
+                        ${isActive
+                          ? 'bg-white/20 text-white border border-white/30'
                           : 'bg-purple-100 text-purple-700 border border-purple-200'
                         }`}>
                         Admin
@@ -539,13 +539,13 @@ const ResourceManagement = () => {
             <Route path="/request" element={<ResourceRequestForm />} />
             <Route path="/requests" element={<AccessRequestList />} />
             <Route path="/resources" element={<ResourceList />} />
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedAdminRoute>
                   <AdminForms />
                 </ProtectedAdminRoute>
-              } 
+              }
             />
           </Routes>
         </div>

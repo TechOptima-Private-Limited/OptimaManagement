@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bars3Icon,
   BellIcon,
@@ -10,11 +10,104 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import NotificationCenter from '../notifications/NotificationCenter';
+import { employeeAPI } from '../../services/api';
+import {
+  UserIcon,
+  CalendarIcon,
+  UsersIcon,
+  BriefcaseIcon,
+  ComputerDesktopIcon,
+  Cog6ToothIcon
+} from '@heroicons/react/24/outline';
 
 const Navbar = ({ onMenuToggle }) => {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { theme, themes, themeId, setThemeId } = useTheme();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({ employees: [], links: [] });
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchRef = useRef(null);
+
+  const quickLinks = [
+    { name: 'Attendance', path: '/attendance', icon: CalendarIcon, keywords: ['clock', 'time', 'attendance'] },
+    { name: 'My Team', path: '/my-team', icon: UsersIcon, keywords: ['team', 'reports', 'directory', 'colleagues'] },
+    { name: 'Leave', path: '/leave', icon: BriefcaseIcon, keywords: ['vacation', 'off', 'leave', 'holiday'] },
+    { name: 'Work From Home', path: '/work-from-home', icon: ComputerDesktopIcon, keywords: ['wfh', 'home', 'remote'] },
+    { name: 'My Profile', path: '/profile', icon: UserIcon, keywords: ['me', 'profile', 'personal'] },
+    { name: 'My Assets', path: '/my-assets', icon: ComputerDesktopIcon, keywords: ['laptop', 'assets', 'it'] },
+    { name: 'Settings', path: '/settings', icon: Cog6ToothIcon, keywords: ['settings', 'config', 'password'] },
+  ];
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!searchQuery.trim()) {
+        setSearchResults({ employees: [], links: [] });
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        // Filter quick links
+        const query = searchQuery.toLowerCase();
+        const matchedLinks = quickLinks.filter(link =>
+          link.name.toLowerCase().includes(query) ||
+          link.keywords.some(k => k.includes(query))
+        );
+
+        // Fetch employees
+        const response = await employeeAPI.getEmployees({ search: searchQuery });
+        const employees = response.data.results || response.data || [];
+
+        setSearchResults({
+          links: matchedLinks,
+          employees: employees.slice(0, 5) // Limit to top 5
+        });
+        setShowDropdown(true);
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchResults, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      if (q.includes('attendance')) navigate('/attendance');
+      else if (q.includes('team')) navigate('/my-team');
+      else if (q.includes('leave')) navigate('/leave');
+      else if (q.includes('profile')) navigate('/profile');
+      else if (q.includes('asset')) navigate('/my-assets');
+      else if (q.includes('wfh') || q.includes('home')) navigate('/work-from-home');
+      else if (q.includes('setting')) navigate('/settings');
+      setShowDropdown(false);
+      setSearchQuery('');
+    }
+  };
+
+  const handleResultClick = (path) => {
+    navigate(path);
+    setShowDropdown(false);
+    setSearchQuery('');
+  };
 
   const handleLogout = () => {
     logout();
@@ -57,19 +150,85 @@ const Navbar = ({ onMenuToggle }) => {
             </button>
           </div>
 
-          {/* Center - Search (hidden on mobile) */}
-          <div className="hidden md:flex flex-1 justify-center px-6 py-2">
-            <div className="w-full max-w-lg">
+          <div className="hidden md:flex flex-1 justify-center px-6 py-2" ref={searchRef}>
+            <div className="w-full max-w-lg relative">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  {isSearching ? (
+                    <div className="h-4 w-4 border-2 border-white/30 border-t-white/80 rounded-full animate-spin"></div>
+                  ) : (
+                    <MagnifyingGlassIcon className="h-5 w-5 text-white/50" />
+                  )}
                 </div>
                 <input
                   type="text"
                   placeholder="Search employees, requests..."
-                  className="block w-full pl-10 pr-3 py-2.5 border border-white/30 rounded-xl leading-5 bg-white/20 backdrop-blur-sm placeholder-white/70 text-white focus:outline-none focus:placeholder-white/50 focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-all duration-300"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery.trim() && setShowDropdown(true)}
+                  onKeyDown={handleSearch}
+                  className="block w-full pl-11 pr-4 py-2.5 border border-white/20 rounded-2xl leading-5 bg-white/10 backdrop-blur-md placeholder-white/50 text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20 transition-all duration-300 shadow-inner"
                 />
               </div>
+
+              {/* Dropdown Results */}
+              {showDropdown && (searchQuery.trim()) && (
+                <div className="absolute mt-2 w-full bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="max-h-[min(80vh,500px)] overflow-y-auto custom-scrollbar px-3 py-3">
+                    {/* Quick Links Section */}
+                    {searchResults.links.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="px-3 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quick Jump</h3>
+                        {searchResults.links.map((link) => (
+                          <button
+                            key={link.path}
+                            onClick={() => handleResultClick(link.path)}
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition-all group"
+                          >
+                            <div className="p-2 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
+                              <link.icon className="h-4 w-4 text-indigo-500" />
+                            </div>
+                            <span className="text-sm font-medium">{link.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Employees Section */}
+                    {searchResults.employees.length > 0 && (
+                      <div>
+                        <h3 className="px-3 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Employees</h3>
+                        {searchResults.employees.map((emp) => (
+                          <button
+                            key={emp.id}
+                            onClick={() => handleResultClick(`/employees/${emp.id}`)}
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all group"
+                          >
+                            <div className="h-9 w-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md border border-white/20">
+                              {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
+                            </div>
+                            <div className="text-left overflow-hidden">
+                              <p className="text-sm font-semibold truncate">
+                                {emp.user_info?.full_name || `${emp.user_info?.first_name} ${emp.user_info?.last_name}`}
+                              </p>
+                              <p className="text-[11px] text-gray-500 truncate">{emp.position || emp.department?.name || 'Employee'}</p>
+                            </div>
+                            <div className="ml-auto text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600">
+                              {emp.employee_id}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {searchResults.links.length === 0 && searchResults.employees.length === 0 && !isSearching && (
+                      <div className="py-8 text-center">
+                        <p className="text-sm text-gray-500">No results found for "{searchQuery}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -197,7 +356,7 @@ const Navbar = ({ onMenuToggle }) => {
       </div>
 
       {/* Mobile search */}
-      <div className="md:hidden px-4 pb-4">
+      <div className="md:hidden px-4 pb-4 overflow-visible">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
@@ -205,8 +364,37 @@ const Navbar = ({ onMenuToggle }) => {
           <input
             type="text"
             placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => searchQuery.trim() && setShowDropdown(true)}
+            onKeyDown={handleSearch}
             className="block w-full pl-10 pr-3 py-2.5 border border-white/30 rounded-xl leading-5 bg-white/20 backdrop-blur-sm placeholder-white/70 text-white focus:outline-none focus:placeholder-white/50 focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-all duration-300"
           />
+
+          {/* Mobile Search Dropdown */}
+          {showDropdown && (searchQuery.trim()) && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+              <div className="max-h-64 overflow-y-auto p-2">
+                {searchResults.links.map(link => (
+                  <button key={link.path} onClick={() => handleResultClick(link.path)} className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg text-gray-700">
+                    <link.icon className="h-5 w-5 text-indigo-500" />
+                    <span className="text-sm font-medium">{link.name}</span>
+                  </button>
+                ))}
+                {searchResults.employees.map(emp => (
+                  <button key={emp.id} onClick={() => handleResultClick(`/employees/${emp.id}`)} className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg text-gray-700">
+                    <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white/20">
+                      {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold">{emp.user_info?.full_name || `${emp.user_info?.first_name} ${emp.user_info?.last_name}`}</p>
+                      <p className="text-[10px] text-gray-500">{emp.position}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

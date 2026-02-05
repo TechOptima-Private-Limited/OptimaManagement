@@ -266,6 +266,22 @@ function App() {
                 } 
               />
               <Route 
+                path="/assets/repairs" 
+                element={
+                  <ProtectedRoute>
+                    <AssetManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/assets/repairs/:id" 
+                element={
+                  <ProtectedRoute>
+                    <AssetManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/onboarding/offboarding" 
                 element={
                   <ProtectedRoute>
