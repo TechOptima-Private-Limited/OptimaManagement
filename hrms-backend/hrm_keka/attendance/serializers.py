@@ -125,3 +125,101 @@ class WorkFromHomeApplySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Cannot apply more than 30 days in advance")
         
         return value
+    
+
+from rest_framework import serializers
+from .models import AttendanceRecord, BiometricDevice, BiometricAttendanceLog, WorkFromHomeRequest
+from employees.serializers import EmployeeSerializer
+
+class AttendanceRecordSerializer(serializers.ModelSerializer):
+    employee = EmployeeSerializer(read_only=True)
+    employee_id = serializers.CharField(source='employee.employee_id', read_only=True, allow_null=True)
+    
+    # ✅ NEW: Add display name for biometric-only records
+    display_name = serializers.SerializerMethodField()
+    display_id = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AttendanceRecord
+        fields = [
+            'id', 'employee', 'employee_id', 'date', 'check_in_time', 'check_out_time',
+            'status', 'attendance_type', 'biometric_device_id', 'notes',
+            'check_in_lat', 'check_in_lng', 'check_out_lat', 'check_out_lng',
+            'created_at', 'updated_at', 'is_pending_approval', 'edit_reason',
+            'original_check_in_time', 'original_check_out_time', 
+            'original_status', 'original_notes',
+            'approved_by', 'approval_date',
+            # ✅ NEW FIELDS
+            'biometric_user_id', 'biometric_user_name',
+            'display_name', 'display_id'
+        ]
+    
+    def get_display_name(self, obj):
+        """Get display name - employee name or biometric name"""
+        if obj.employee:
+            return obj.employee.user.get_full_name()
+        else:
+            return obj.biometric_user_name or obj.biometric_user_id or "Unknown"
+    
+    def get_display_id(self, obj):
+        """Get display ID - employee ID or biometric ID"""
+        if obj.employee:
+            return obj.employee.employee_id
+        else:
+            return obj.biometric_user_id or "N/A"
+
+
+class BiometricAttendanceLogSerializer(serializers.ModelSerializer):
+    """Serializer for raw biometric logs"""
+    employee_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = BiometricAttendanceLog
+        fields = [
+            'id', 'biometric_user_id', 'biometric_user_name', 
+            'device_id', 'timestamp', 'date', 'time',
+            'employee', 'employee_name', 'attendance_record', 'synced_at'
+        ]
+    
+    def get_employee_name(self, obj):
+        if obj.employee:
+            return obj.employee.user.get_full_name()
+        return obj.biometric_user_name or "Unknown"
+
+
+class BiometricDeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiometricDevice
+        fields = ['id', 'device_id', 'device_name', 'location', 'ip_address', 
+                  'is_active', 'last_sync', 'created_at']
+
+
+class AttendanceCreateSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    check_in_time = serializers.TimeField(required=False, allow_null=True)
+    check_out_time = serializers.TimeField(required=False, allow_null=True)
+    status = serializers.ChoiceField(choices=AttendanceRecord.STATUS_CHOICES)
+    notes = serializers.CharField(required=False, allow_blank=True)
+    check_in_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    check_in_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    check_out_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    check_out_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    edit_reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class WorkFromHomeRequestSerializer(serializers.ModelSerializer):
+    employee = EmployeeSerializer(read_only=True)
+    approved_by = EmployeeSerializer(read_only=True)
+    employee_name = serializers.CharField(source='employee.user.get_full_name', read_only=True)
+    
+    class Meta:
+        model = WorkFromHomeRequest
+        fields = [
+            'id', 'employee', 'employee_name', 'request_date', 'reason', 
+            'status', 'applied_at', 'approved_by', 'approved_at', 'rejection_reason'
+        ]
+
+
+class WorkFromHomeApplySerializer(serializers.Serializer):
+    request_date = serializers.DateField()
+    reason = serializers.CharField()

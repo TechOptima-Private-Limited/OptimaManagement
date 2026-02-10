@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'resource_management',
     'dal',
     'dal_select2',
-    'django_ckeditor_5',
+    # 'django_ckeditor_5',
     'assets',
     'webpush',
 ]

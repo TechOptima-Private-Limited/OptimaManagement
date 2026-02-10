@@ -74,18 +74,43 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_emergency_contact(self, obj):
         return obj.get_decrypted_emergency_contact()
 
+# class UserSerializer(serializers.ModelSerializer):
+#     profile = UserProfileSerializer(read_only=True)
+#     groups = serializers.SerializerMethodField()
+    
+#     class Meta:
+#         model = User
+#         fields = ['id', 'username', 'email', 'first_name','role', 'last_name', 'is_superuser', 'profile', 'groups']
+    
+#     def get_groups(self, obj):
+#         """Return group names for the user so frontend can derive effective role."""
+#         return list(obj.groups.values_list('name', flat=True))
+
+
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     groups = serializers.SerializerMethodField()
-    
+    role = serializers.SerializerMethodField()  # ✅ ADD THIS
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_superuser', 'profile', 'groups']
-    
+        fields = [
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'is_superuser',
+            'role',       # ✅ now valid
+            'profile',
+            'groups'
+        ]
+
     def get_groups(self, obj):
-        """Return group names for the user so frontend can derive effective role."""
         return list(obj.groups.values_list('name', flat=True))
 
+    def get_role(self, obj):
+        return getattr(getattr(obj, 'profile', None), 'role', None)
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):

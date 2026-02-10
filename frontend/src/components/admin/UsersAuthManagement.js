@@ -619,6 +619,9 @@ const UsersAuthManagement = () => {
                     <option value="IT_SUPPORTER">IT Supporter</option>
                     <option value="MANAGER">Manager</option>
                     <option value="ADMIN">Admin</option>
+                    <option value="CEO">CEO</option>
+                    <option value="CTO">CTO</option>
+                    <option value="TEAM_LEAD">Team Lead</option>
                   </select>
                 </div>
 

@@ -22,6 +22,275 @@ from utils.permissions import IsEmployee, IsHRManager
 from notifications.services import NotificationService
 
 User = get_user_model()
+import logging
+
+logger = logging.getLogger(__name__)
+# Biometric Integration
+try:
+    from zk import ZK
+    BIOMETRIC_AVAILABLE = True
+except ImportError:
+    BIOMETRIC_AVAILABLE = False
+    logger.warning("ZK library not available. Biometric features disabled.")
+
+
+# ===========================
+# BIOMETRIC DEVICE MANAGEMENT
+# ===========================
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def sync_biometric_logs(request):
+    """
+    ✅ NEW VERSION: Sync biometric logs and create attendance records
+    - Stores ALL biometric data, even if employee doesn't exist
+    - Creates attendance records from biometric logs
+    - Returns data for frontend display
+    """
+    if not BIOMETRIC_AVAILABLE:
+        return Response({
+            'error': 'Biometric library not available. Install pyzk: pip install pyzk'
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    
+    device_ip = request.data.get('device_ip')
+    sync_date_str = request.data.get('sync_date')
+    
+    if not device_ip:
+        return Response({'error': 'device_ip is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Parse sync date or use today
+    if sync_date_str:
+        try:
+            sync_date = datetime.strptime(sync_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return Response({'error': 'Invalid date format. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        sync_date = date.today()
+    
+    # Check permissions: non-HR/Manager can only sync today
+    is_hr_or_manager = hasattr(request.user, 'profile') and request.user.profile.role in ['HR_MANAGER', 'MANAGER']
+    if not is_hr_or_manager and sync_date != date.today():
+        return Response({'error': 'Only HR and Managers can sync historical data'}, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # 🔍 DEBUG: Log sync attempt
+        logger.info(f"🔄 Starting biometric sync for device {device_ip}, date {sync_date}")
+        
+        # Connect to biometric device
+        zk = ZK(device_ip, port=4370, timeout=5)
+        conn = zk.connect()
+        conn.disable_device()
+        
+        # Get all users from device (for names)
+        users = conn.get_users()
+        user_names = {str(user.user_id): user.name for user in users}
+        logger.info(f"📋 Found {len(user_names)} users in device")
+        
+        # Fetch all attendance logs
+        logs = conn.get_attendance()
+        logger.info(f"📊 Fetched {len(logs)} total logs from device")
+        
+        # Filter logs for the specified date
+        filtered_logs = [log for log in logs if log.timestamp.date() == sync_date]
+        logger.info(f"📅 Filtered to {len(filtered_logs)} logs for date {sync_date}")
+        
+        conn.enable_device()
+        conn.disconnect()
+        
+        # Process and store ALL logs
+        synced_count = 0
+        attendance_records_created = []
+        
+        for log in filtered_logs:
+            try:
+                biometric_user_id = str(log.user_id)
+                biometric_user_name = user_names.get(biometric_user_id, '')
+                attendance_date = log.timestamp.date()
+                attendance_time = log.timestamp.time()
+                
+                logger.info(f"🔍 Processing: {biometric_user_id} ({biometric_user_name}) at {log.timestamp}")
+                
+                # Try to find employee (optional)
+                employee = Employee.objects.filter(employee_id=biometric_user_id).first()
+                if employee:
+                    logger.info(f"✅ Matched employee: {employee.employee_id}")
+                else:
+                    logger.info(f"ℹ️ No employee match - will store as biometric-only record")
+                
+                # # ✅ STORE RAW BIOMETRIC LOG (always)
+                # from .models import BiometricAttendanceLog
+                # BiometricAttendanceLog.objects.create(
+                    # biometric_user_id=biometric_user_id,
+                    # biometric_user_name=biometric_user_name,
+                #     device_id=device_ip,
+                #     timestamp=log.timestamp,
+                #     date=attendance_date,
+                #     time=attendance_time,
+                #     employee=employee
+                # )
+                
+                # ✅ CREATE/UPDATE ATTENDANCE RECORD
+                # Find existing record by date and biometric_user_id OR employee
+                if employee:
+                    record = AttendanceRecord.objects.filter(
+                        employee=employee,
+                        date=attendance_date
+                    ).first()
+                else:
+                    record = AttendanceRecord.objects.filter(
+                        biometric_user_id=biometric_user_id,
+                        date=attendance_date,
+                        employee__isnull=True
+                    ).first()
+                
+                if not record:
+                    # Create new record
+                    record = AttendanceRecord.objects.create(
+                        employee=employee,
+                        biometric_user_id=biometric_user_id,
+                        biometric_user_name=biometric_user_name,
+                        date=attendance_date,
+                        check_in_time=attendance_time,
+                        status='PRESENT',
+                        attendance_type='BIOMETRIC',
+                        biometric_device_id=device_ip
+                    )
+                    logger.info(f"✨ Created NEW attendance record for {biometric_user_id}")
+                    attendance_records_created.append(record.id)
+                else:
+                    # Update existing record
+                    if not record.check_in_time:
+                        record.check_in_time = attendance_time
+                        logger.info(f"   → Set check_in: {attendance_time}")
+                    elif not record.check_out_time and attendance_time > record.check_in_time:
+                        record.check_out_time = attendance_time
+                        logger.info(f"   → Set check_out: {attendance_time}")
+                    elif attendance_time > record.check_in_time:
+                        record.check_out_time = attendance_time
+                        logger.info(f"   → Updated check_out to latest: {attendance_time}")
+                    
+                    # Update biometric info if it was linked to employee later
+                    if employee and not record.employee:
+                        record.employee = employee
+                        logger.info(f"   → Linked to employee: {employee.employee_id}")
+                    
+                    record.attendance_type = 'BIOMETRIC'
+                    record.biometric_device_id = device_ip
+                    record.biometric_user_id = biometric_user_id
+                    record.biometric_user_name = biometric_user_name
+                    record.save()
+                    logger.info(f"📝 Updated attendance record for {biometric_user_id}")
+                
+                synced_count += 1
+                
+            except Exception as e:
+                logger.error(f"❌ Error processing log for {log.user_id}: {str(e)}", exc_info=True)
+        
+        # Update device last sync time
+        device, device_created = BiometricDevice.objects.get_or_create(
+            ip_address=device_ip,
+            defaults={
+                'device_id': f'DEVICE_{device_ip.replace(".", "_")}',
+                'device_name': f'Biometric Device {device_ip}',
+                'location': 'Office',
+                'is_active': True
+            }
+        )
+        device.last_sync = timezone.now()
+        device.save()
+        
+        # 🔍 DEBUG: Final summary
+        logger.info(f"✅ Sync complete: {synced_count}/{len(filtered_logs)} records processed")
+        logger.info(f"✅ Created {len(attendance_records_created)} new attendance records")
+        
+        return Response({
+            'success': True,
+            'synced_count': synced_count,
+            'total_logs': len(filtered_logs),
+            'sync_date': sync_date.isoformat(),
+            'device_ip': device_ip,
+            'attendance_records_created': len(attendance_records_created),
+            'debug_info': {
+                'total_logs_on_device': len(logs),
+                'logs_for_date': len(filtered_logs),
+                'successfully_synced': synced_count,
+                'users_in_device': len(user_names)
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        error_msg = f'Failed to connect to biometric device: {str(e)}'
+        logger.error(f"❌ {error_msg}", exc_info=True)
+        return Response({'error': error_msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def fetch_biometric_logs(request):
+    """
+    Fetch raw biometric logs without storing them
+    Useful for preview before syncing
+    """
+    if not BIOMETRIC_AVAILABLE:
+        return Response({
+            'error': 'Biometric library not available'
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    
+    device_ip = request.data.get('device_ip')
+    fetch_date_str = request.data.get('fetch_date')
+    
+    if not device_ip:
+        return Response({'error': 'device_ip is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Parse fetch date or use today
+    if fetch_date_str:
+        try:
+            fetch_date = datetime.strptime(fetch_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return Response({'error': 'Invalid date format. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        fetch_date = date.today()
+    
+    try:
+        zk = ZK(device_ip, port=4370, timeout=5)
+        conn = zk.connect()
+        conn.disable_device()
+        
+        logs = conn.get_attendance()
+        filtered_logs = [log for log in logs if log.timestamp.date() == fetch_date]
+        print(f"🔍 Fetched {len(logs)} total logs, {len(filtered_logs)} for date {fetch_date}")
+        conn.enable_device()
+        conn.disconnect()
+        
+        # Format logs for response
+        formatted_logs = []
+        for log in filtered_logs:
+            employee = Employee.objects.filter(employee_id=log.user_id).first()
+            formatted_logs.append({
+                'biometric_user_id': log.user_id,
+                'employee_name': employee.user.get_full_name() if employee else 'Unknown',
+                'employee_id': employee.employee_id if employee else None,
+                'timestamp': log.timestamp.isoformat(),
+                'date': log.timestamp.date().isoformat(),
+                'time': log.timestamp.time().isoformat(),
+                'employee_found': employee is not None
+            })
+        
+        return Response({
+            'success': True,
+            'total_logs': len(formatted_logs),
+            'fetch_date': fetch_date.isoformat(),
+            'logs': formatted_logs
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch biometric logs: {str(e)}")
+        return Response({
+            'error': f'Failed to fetch logs: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
 
 # Helper function to get manager's team employees (same as leave management)
 def get_manager_team_employees(user):
@@ -928,3 +1197,704 @@ def send_wfh_approval_email(wfh_request, approved=True):
         
     except Exception as e:
         print(f"❌ Failed to send WFH approval email: {str(e)}")
+
+
+
+
+# from django.shortcuts import render
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.response import Response
+# from rest_framework import status, generics
+# from django.db.models import Q
+# from datetime import datetime, date, timedelta
+# from .models import AttendanceRecord, BiometricDevice, AttendanceLocationPing, WorkFromHomeRequest
+# from .serializers import (
+#     AttendanceRecordSerializer, BiometricDeviceSerializer, 
+#     AttendanceCreateSerializer, WorkFromHomeRequestSerializer,
+#     WorkFromHomeApplySerializer
+# )
+# from employees.models import Employee
+# # from users.permissions import IsHRManager, IsManager
+# from utils.permissions import IsEmployee, IsHRManager
+
+# from django.utils import timezone
+# from .signals import send_approval_result_email
+# import logging
+
+# logger = logging.getLogger(__name__)
+
+# # Biometric Integration
+# try:
+#     from zk import ZK
+#     BIOMETRIC_AVAILABLE = True
+# except ImportError:
+#     BIOMETRIC_AVAILABLE = False
+#     logger.warning("ZK library not available. Biometric features disabled.")
+
+
+# # ===========================
+# # BIOMETRIC DEVICE MANAGEMENT
+# # ===========================
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def sync_biometric_logs(request):
+#     """
+#     Sync biometric logs from device for a specific date
+#     Accepts: device_ip, sync_date (optional, defaults to today)
+#     HR/Managers can sync for any date, employees for today only
+#     """
+#     if not BIOMETRIC_AVAILABLE:
+#         return Response({
+#             'error': 'Biometric library not available. Install pyzk: pip install pyzk'
+#         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    
+#     device_ip = request.data.get('device_ip')
+#     sync_date_str = request.data.get('sync_date')
+    
+#     if not device_ip:
+#         return Response({'error': 'device_ip is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     # Parse sync date or use today
+#     if sync_date_str:
+#         try:
+#             sync_date = datetime.strptime(sync_date_str, '%Y-%m-%d').date()
+#         except ValueError:
+#             return Response({'error': 'Invalid date format. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+#     else:
+#         sync_date = date.today()
+    
+#     # Check permissions: non-HR/Manager can only sync today
+#     is_hr_or_manager = hasattr(request.user, 'profile') and request.user.profile.role in ['HR_MANAGER', 'MANAGER']
+#     if not is_hr_or_manager and sync_date != date.today():
+#         return Response({'error': 'Only HR and Managers can sync historical data'}, status=status.HTTP_403_FORBIDDEN)
+    
+#     try:
+#         # Connect to biometric device
+#         zk = ZK(device_ip, port=4370, timeout=5)
+#         conn = zk.connect()
+#         conn.disable_device()
+        
+#         # Fetch all attendance logs
+#         logs = conn.get_attendance()
+        
+#         # Filter logs for the specified date
+#         filtered_logs = [log for log in logs if log.timestamp.date() == sync_date]
+        
+#         conn.enable_device()
+#         conn.disconnect()
+        
+#         # Process and store logs
+#         synced_count = 0
+#         errors = []
+        
+#         for log in filtered_logs:
+#             try:
+#                 # Find employee by biometric user_id (stored in employee_id field)
+#                 employee = Employee.objects.filter(employee_id=log.user_id).first()
+                
+#                 if not employee:
+#                     errors.append(f"Employee not found for biometric ID: {log.user_id}")
+#                     continue
+                
+#                 # Determine if this is check-in or check-out
+#                 attendance_date = log.timestamp.date()
+#                 attendance_time = log.timestamp.time()
+                
+#                 # Get or create attendance record for this date
+#                 record, created = AttendanceRecord.objects.get_or_create(
+#                     employee=employee,
+#                     date=attendance_date,
+#                     defaults={
+#                         'check_in_time': attendance_time,
+#                         'status': 'PRESENT',
+#                         'attendance_type': 'BIOMETRIC',
+#                         'biometric_device_id': device_ip
+#                     }
+#                 )
+                
+#                 if not created:
+#                     # Update existing record
+#                     if not record.check_in_time:
+#                         record.check_in_time = attendance_time
+#                     elif not record.check_out_time and attendance_time > record.check_in_time:
+#                         record.check_out_time = attendance_time
+#                     elif attendance_time > record.check_in_time:
+#                         # Update check-out time if this is later
+#                         record.check_out_time = attendance_time
+                    
+#                     record.attendance_type = 'BIOMETRIC'
+#                     record.biometric_device_id = device_ip
+#                     record.save()
+                
+#                 synced_count += 1
+                
+#             except Exception as e:
+#                 errors.append(f"Error processing log for user {log.user_id}: {str(e)}")
+#                 logger.error(f"Error syncing log: {str(e)}")
+        
+#         # Update device last sync time
+#         device, _ = BiometricDevice.objects.get_or_create(
+#             ip_address=device_ip,
+#             defaults={
+#                 'device_id': f'DEVICE_{device_ip.replace(".", "_")}',
+#                 'device_name': f'Biometric Device {device_ip}',
+#                 'location': 'Office',
+#                 'is_active': True
+#             }
+#         )
+#         device.last_sync = timezone.now()
+#         device.save()
+        
+#         return Response({
+#             'success': True,
+#             'synced_count': synced_count,
+#             'total_logs': len(filtered_logs),
+#             'sync_date': sync_date.isoformat(),
+#             'errors': errors if errors else None
+#         }, status=status.HTTP_200_OK)
+        
+#     except Exception as e:
+#         logger.error(f"Biometric sync failed: {str(e)}")
+#         return Response({
+#             'error': f'Failed to sync biometric logs: {str(e)}'
+#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def fetch_biometric_logs(request):
+#     """
+#     Fetch raw biometric logs without storing them
+#     Useful for preview before syncing
+#     """
+#     if not BIOMETRIC_AVAILABLE:
+#         return Response({
+#             'error': 'Biometric library not available'
+#         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    
+#     device_ip = request.data.get('device_ip')
+#     fetch_date_str = request.data.get('fetch_date')
+    
+#     if not device_ip:
+#         return Response({'error': 'device_ip is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     # Parse fetch date or use today
+#     if fetch_date_str:
+#         try:
+#             fetch_date = datetime.strptime(fetch_date_str, '%Y-%m-%d').date()
+#         except ValueError:
+#             return Response({'error': 'Invalid date format. Use YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+#     else:
+#         fetch_date = date.today()
+    
+#     try:
+#         zk = ZK(device_ip, port=4370, timeout=5)
+#         conn = zk.connect()
+#         conn.disable_device()
+        
+#         logs = conn.get_attendance()
+#         filtered_logs = [log for log in logs if log.timestamp.date() == fetch_date]
+        
+#         conn.enable_device()
+#         conn.disconnect()
+        
+#         # Format logs for response
+#         formatted_logs = []
+#         for log in filtered_logs:
+#             employee = Employee.objects.filter(employee_id=log.user_id).first()
+#             formatted_logs.append({
+#                 'biometric_user_id': log.user_id,
+#                 'employee_name': employee.user.get_full_name() if employee else 'Unknown',
+#                 'employee_id': employee.employee_id if employee else None,
+#                 'timestamp': log.timestamp.isoformat(),
+#                 'date': log.timestamp.date().isoformat(),
+#                 'time': log.timestamp.time().isoformat(),
+#                 'employee_found': employee is not None
+#             })
+        
+#         return Response({
+#             'success': True,
+#             'total_logs': len(formatted_logs),
+#             'fetch_date': fetch_date.isoformat(),
+#             'logs': formatted_logs
+#         }, status=status.HTTP_200_OK)
+        
+#     except Exception as e:
+#         logger.error(f"Failed to fetch biometric logs: {str(e)}")
+#         return Response({
+#             'error': f'Failed to fetch logs: {str(e)}'
+#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# class BiometricDeviceListView(generics.ListCreateAPIView):
+#     """List and create biometric devices"""
+#     queryset = BiometricDevice.objects.all()
+#     serializer_class = BiometricDeviceSerializer
+#     permission_classes = [IsAuthenticated, DjangoModelPermissions]
+
+
+# # ===========================
+# # ATTENDANCE RECORDS
+# # ===========================
+
+# class AttendanceRecordListView(generics.ListAPIView):
+#     """
+#     List attendance records with filtering
+#     - Regular employees: see only their own records
+#     - HR Managers: see all records
+#     - Managers: see their team's records
+#     """
+#     serializer_class = AttendanceRecordSerializer
+#     permission_classes = [IsAuthenticated]
+    
+#     def get_queryset(self):
+#         user = self.request.user
+#         queryset = AttendanceRecord.objects.select_related('employee__user', 'employee__department').all()
+        
+#         # Role-based filtering
+#         if hasattr(user, 'profile'):
+#             if user.profile.role == 'HR_MANAGER':
+#                 # HR sees all records
+#                 pass
+#             elif user.profile.role == 'MANAGER':
+#                 # Managers see their team's records
+#                 try:
+#                     manager_employee = Employee.objects.get(user=user)
+#                     queryset = queryset.filter(
+#                         Q(employee__department=manager_employee.department) |
+#                         Q(employee=manager_employee)
+#                     )
+#                 except Employee.DoesNotExist:
+#                     queryset = queryset.filter(employee__user=user)
+#             else:
+#                 # Regular employees see only their records
+#                 queryset = queryset.filter(employee__user=user)
+#         else:
+#             # Fallback: user without profile sees only their records
+#             queryset = queryset.filter(employee__user=user)
+        
+#         # Date filtering
+#         start_date = self.request.query_params.get('start_date')
+#         end_date = self.request.query_params.get('end_date')
+        
+#         if start_date:
+#             queryset = queryset.filter(date__gte=start_date)
+#         if end_date:
+#             queryset = queryset.filter(date__lte=end_date)
+        
+#         # Status filtering
+#         status_filter = self.request.query_params.get('status')
+#         if status_filter:
+#             queryset = queryset.filter(status=status_filter)
+        
+#         # Employee filtering (for HR/Managers)
+#         employee_id = self.request.query_params.get('employee_id')
+#         if employee_id and hasattr(user, 'profile') and user.profile.role in ['HR_MANAGER', 'MANAGER']:
+#             queryset = queryset.filter(employee__employee_id=employee_id)
+        
+#         return queryset.order_by('-date', '-check_in_time')
+    
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         serializer = self.get_serializer(queryset, many=True)
+        
+#         # Add pending approvals count for HR/Managers
+#         pending_count = 0
+#         if hasattr(request.user, 'profile') and request.user.profile.role in ['HR_MANAGER', 'MANAGER']:
+#             if request.user.profile.role == 'HR_MANAGER':
+#                 pending_count = AttendanceRecord.objects.filter(is_pending_approval=True).count()
+#             else:
+#                 # Manager sees only their team's pending approvals
+#                 try:
+#                     manager_employee = Employee.objects.get(user=request.user)
+#                     pending_count = AttendanceRecord.objects.filter(
+#                         is_pending_approval=True,
+#                         employee__department=manager_employee.department
+#                     ).exclude(employee=manager_employee).count()
+#                 except Employee.DoesNotExist:
+#                     pending_count = 0
+        
+#         return Response({
+#             'results': serializer.data,
+#             'pending_approvals_count': pending_count
+#         })
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def manual_attendance(request):
+#     """Mark or edit manual attendance"""
+#     try:
+#         employee = Employee.objects.get(user=request.user)
+#     except Employee.DoesNotExist:
+#         return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     serializer = AttendanceCreateSerializer(data=request.data)
+#     if not serializer.is_valid():
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#     attendance_date = serializer.validated_data['date']
+    
+#     # Check if record exists
+#     try:
+#         existing_record = AttendanceRecord.objects.get(employee=employee, date=attendance_date)
+#         is_edit = True
+#     except AttendanceRecord.DoesNotExist:
+#         existing_record = None
+#         is_edit = False
+    
+#     # Check if HR Manager
+#     is_hr_manager = hasattr(request.user, 'profile') and request.user.profile.role == 'HR_MANAGER'
+    
+#     if is_edit:
+#         # Editing existing record
+#         if not is_hr_manager:
+#             # Regular employees need approval for edits
+#             edit_reason = serializer.validated_data.get('edit_reason', '').strip()
+#             if not edit_reason:
+#                 return Response({
+#                     'error': 'Edit reason is required when modifying existing attendance'
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+            
+#             # Store original values
+#             existing_record.original_check_in_time = existing_record.check_in_time
+#             existing_record.original_check_out_time = existing_record.check_out_time
+#             existing_record.original_status = existing_record.status
+#             existing_record.original_notes = existing_record.notes
+            
+#             # Update with new requested values
+#             existing_record.check_in_time = serializer.validated_data.get('check_in_time')
+#             existing_record.check_out_time = serializer.validated_data.get('check_out_time')
+#             existing_record.status = serializer.validated_data['status']
+#             existing_record.notes = serializer.validated_data.get('notes', '')
+#             existing_record.edit_reason = edit_reason
+#             existing_record.is_pending_approval = True
+#             existing_record.save()
+            
+#             return Response({
+#                 'message': 'Edit request submitted for approval',
+#                 'requires_approval': True,
+#                 'is_pending_approval': True,
+#                 'record': AttendanceRecordSerializer(existing_record).data
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             # HR can edit directly
+#             existing_record.check_in_time = serializer.validated_data.get('check_in_time')
+#             existing_record.check_out_time = serializer.validated_data.get('check_out_time')
+#             existing_record.status = serializer.validated_data['status']
+#             existing_record.notes = serializer.validated_data.get('notes', '')
+#             existing_record.is_pending_approval = False
+#             existing_record.save()
+            
+#             return Response({
+#                 'message': 'Attendance updated successfully',
+#                 'record': AttendanceRecordSerializer(existing_record).data
+#             }, status=status.HTTP_200_OK)
+#     else:
+#         # Creating new record
+#         record = AttendanceRecord.objects.create(
+#             employee=employee,
+#             date=attendance_date,
+#             check_in_time=serializer.validated_data.get('check_in_time'),
+#             check_out_time=serializer.validated_data.get('check_out_time'),
+#             status=serializer.validated_data['status'],
+#             attendance_type='MANUAL',
+#             notes=serializer.validated_data.get('notes', ''),
+#             check_in_lat=serializer.validated_data.get('check_in_lat'),
+#             check_in_lng=serializer.validated_data.get('check_in_lng'),
+#             check_out_lat=serializer.validated_data.get('check_out_lat'),
+#             check_out_lng=serializer.validated_data.get('check_out_lng'),
+#             is_pending_approval=False
+#         )
+        
+#         return Response({
+#             'message': 'Attendance marked successfully',
+#             'record': AttendanceRecordSerializer(record).data
+#         }, status=status.HTTP_201_CREATED)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def ping_location(request):
+#     """Store hourly location ping"""
+#     try:
+#         employee = Employee.objects.get(user=request.user)
+#     except Employee.DoesNotExist:
+#         return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     latitude = request.data.get('latitude')
+#     longitude = request.data.get('longitude')
+    
+#     if not latitude or not longitude:
+#         return Response({'error': 'Latitude and longitude required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     # Find today's attendance record
+#     today = date.today()
+#     try:
+#         attendance_record = AttendanceRecord.objects.get(employee=employee, date=today)
+#     except AttendanceRecord.DoesNotExist:
+#         attendance_record = None
+    
+#     # Create location ping
+#     ping = AttendanceLocationPing.objects.create(
+#         employee=employee,
+#         attendance_record=attendance_record,
+#         latitude=latitude,
+#         longitude=longitude,
+#         source=request.data.get('source', 'BROWSER')
+#     )
+    
+#     return Response({'message': 'Location ping recorded'}, status=status.HTTP_201_CREATED)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def biometric_sync(request):
+#     """Legacy endpoint - redirects to new sync endpoint"""
+#     return sync_biometric_logs(request)
+
+
+# # ===========================
+# # APPROVAL WORKFLOW
+# # ===========================
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_pending_edits(request):
+#     """Get pending edit requests for current user"""
+#     try:
+#         employee = Employee.objects.get(user=request.user)
+#     except Employee.DoesNotExist:
+#         return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     pending_records = AttendanceRecord.objects.filter(
+#         employee=employee,
+#         is_pending_approval=True
+#     ).order_by('-date')
+    
+#     serializer = AttendanceRecordSerializer(pending_records, many=True)
+#     return Response(serializer.data)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def approve_edit(request, record_id):
+#     """Approve or reject attendance edit request"""
+#     # Check if user is HR Manager or Manager
+#     is_hr_manager = hasattr(request.user, 'profile') and request.user.profile.role == 'HR_MANAGER'
+#     is_manager = hasattr(request.user, 'profile') and request.user.profile.role == 'MANAGER'
+    
+#     if not (is_hr_manager or is_manager):
+#         return Response({'error': 'Only HR Managers and Managers can approve edits'}, status=status.HTTP_403_FORBIDDEN)
+    
+#     try:
+#         record = AttendanceRecord.objects.get(id=record_id, is_pending_approval=True)
+#     except AttendanceRecord.DoesNotExist:
+#         return Response({'error': 'Pending record not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     # If manager, check if this is their team member
+#     if is_manager and not is_hr_manager:
+#         try:
+#             manager_employee = Employee.objects.get(user=request.user)
+#             if record.employee.department != manager_employee.department:
+#                 return Response({'error': 'You can only approve your team members'}, status=status.HTTP_403_FORBIDDEN)
+#         except Employee.DoesNotExist:
+#             return Response({'error': 'Manager profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     action = request.data.get('action')  # 'approve' or 'reject'
+    
+#     if action == 'approve':
+#         # Get new data from request or keep employee's requested values
+#         new_data = request.data.get('new_data', {})
+        
+#         # Update with approved values (or keep employee's requested values)
+#         if new_data:
+#             record.check_in_time = new_data.get('check_in_time', record.check_in_time)
+#             record.check_out_time = new_data.get('check_out_time', record.check_out_time)
+#             record.status = new_data.get('status', record.status)
+#             record.notes = new_data.get('notes', record.notes)
+        
+#         record.is_pending_approval = False
+#         record.approved_by = Employee.objects.get(user=request.user)
+#         record.approval_date = timezone.now()
+#         record.save()
+        
+#         # Clear original values
+#         record.clear_original_values()
+        
+#         # Send approval email
+#         send_approval_result_email(
+#             employee_email=record.employee.user.email,
+#             employee_name=record.employee.user.get_full_name(),
+#             date=record.date,
+#             approved=True,
+#             approver_name=request.user.get_full_name()
+#         )
+        
+#         return Response({
+#             'message': 'Edit request approved',
+#             'record': AttendanceRecordSerializer(record).data
+#         })
+        
+#     elif action == 'reject':
+#         # Restore original values
+#         if record.original_check_in_time or record.original_check_out_time:
+#             record.check_in_time = record.original_check_in_time
+#             record.check_out_time = record.original_check_out_time
+#             record.status = record.original_status or record.status
+#             record.notes = record.original_notes or record.notes
+        
+#         record.is_pending_approval = False
+#         record.edit_reason = ''
+#         record.save()
+        
+#         # Clear original values
+#         record.clear_original_values()
+        
+#         # Send rejection email
+#         send_approval_result_email(
+#             employee_email=record.employee.user.email,
+#             employee_name=record.employee.user.get_full_name(),
+#             date=record.date,
+#             approved=False,
+#             approver_name=request.user.get_full_name()
+#         )
+        
+#         return Response({
+#             'message': 'Edit request rejected',
+#             'record': AttendanceRecordSerializer(record).data
+#         })
+    
+#     else:
+#         return Response({'error': 'Invalid action. Use "approve" or "reject"'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# # ===========================
+# # WORK FROM HOME
+# # ===========================
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def apply_work_from_home(request):
+#     """Apply for work from home"""
+#     try:
+#         employee = Employee.objects.get(user=request.user)
+#     except Employee.DoesNotExist:
+#         return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     serializer = WorkFromHomeApplySerializer(data=request.data)
+#     if not serializer.is_valid():
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#     request_date = serializer.validated_data['request_date']
+#     reason = serializer.validated_data['reason']
+    
+#     # Check for duplicate
+#     if WorkFromHomeRequest.objects.filter(employee=employee, request_date=request_date).exists():
+#         return Response({'error': 'WFH request already exists for this date'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     wfh_request = WorkFromHomeRequest.objects.create(
+#         employee=employee,
+#         request_date=request_date,
+#         reason=reason,
+#         status='PENDING'
+#     )
+    
+#     return Response({
+#         'message': 'WFH request submitted successfully',
+#         'request': WorkFromHomeRequestSerializer(wfh_request).data
+#     }, status=status.HTTP_201_CREATED)
+
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def check_wfh_status(request):
+#     """Check WFH status for a specific date"""
+#     try:
+#         employee = Employee.objects.get(user=request.user)
+#     except Employee.DoesNotExist:
+#         return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     check_date = request.query_params.get('date', date.today().isoformat())
+    
+#     try:
+#         check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
+#     except ValueError:
+#         return Response({'error': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     try:
+#         wfh_request = WorkFromHomeRequest.objects.get(employee=employee, request_date=check_date)
+#         return Response({
+#             'has_wfh_request': True,
+#             'status': wfh_request.status,
+#             'request': WorkFromHomeRequestSerializer(wfh_request).data
+#         })
+#     except WorkFromHomeRequest.DoesNotExist:
+#         return Response({
+#             'has_wfh_request': False,
+#             'status': None
+#         })
+
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_wfh_requests(request):
+#     """Get WFH requests - HR sees all, employees see their own"""
+#     is_hr = hasattr(request.user, 'profile') and request.user.profile.role == 'HR_MANAGER'
+    
+#     if is_hr:
+#         requests = WorkFromHomeRequest.objects.all()
+#     else:
+#         try:
+#             employee = Employee.objects.get(user=request.user)
+#             requests = WorkFromHomeRequest.objects.filter(employee=employee)
+#         except Employee.DoesNotExist:
+#             return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     # Filter by status if provided
+#     status_filter = request.query_params.get('status')
+#     if status_filter:
+#         requests = requests.filter(status=status_filter)
+    
+#     requests = requests.order_by('-applied_at')
+#     serializer = WorkFromHomeRequestSerializer(requests, many=True)
+    
+#     return Response(serializer.data)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated, IsHRManager])
+# def approve_wfh_request(request, request_id):
+#     """Approve or reject WFH request"""
+#     try:
+#         wfh_request = WorkFromHomeRequest.objects.get(id=request_id)
+#     except WorkFromHomeRequest.DoesNotExist:
+#         return Response({'error': 'WFH request not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     action = request.data.get('action')  # 'approve' or 'reject'
+    
+#     if action == 'approve':
+#         wfh_request.status = 'APPROVED'
+#         wfh_request.approved_by = Employee.objects.get(user=request.user)
+#         wfh_request.approved_at = timezone.now()
+#         wfh_request.save()
+        
+#         return Response({
+#             'message': 'WFH request approved',
+#             'request': WorkFromHomeRequestSerializer(wfh_request).data
+#         })
+        
+#     elif action == 'reject':
+#         wfh_request.status = 'REJECTED'
+#         wfh_request.rejection_reason = request.data.get('rejection_reason', '')
+#         wfh_request.save()
+        
+#         return Response({
+#             'message': 'WFH request rejected',
+#             'request': WorkFromHomeRequestSerializer(wfh_request).data
+#         })
+    
+#     else:
+#         return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
