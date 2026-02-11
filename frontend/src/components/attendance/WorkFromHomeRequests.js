@@ -1182,7 +1182,7 @@ const WorkFromHomeRequests = () => {
       setLoading(true);
       const filterParam = filters.status === '' ? null : filters.status;
       const response = await workFromHomeAPI.getWFHRequests(filterParam);
-
+      console.log('API response for WFH requests:', response);
       // Handle different response formats
       let requestsData = [];
       if (response.results) {
@@ -1194,7 +1194,7 @@ const WorkFromHomeRequests = () => {
       } else if (response.data && Array.isArray(response.data)) {
         requestsData = response.data;
       }
-
+      console.log('Fetched WFH requests:', requestsData);
       setRequests(Array.isArray(requestsData) ? requestsData : []);
 
       // Set pending approvals count for HR and Managers
@@ -1696,9 +1696,19 @@ const WorkFromHomeRequests = () => {
                               <h4 className="text-md font-medium text-gray-900">
                                 {request.employee_name}
                               </h4>
-                              <p className="text-sm text-gray-600">Employee ID: {request.employee_id}</p>
-                              <p className="text-sm text-gray-600">Department: {request.employee_department}</p>
-                              <p className="text-sm text-gray-600">Request Date: {request.formatted_request_date}</p>
+
+                              <p className="text-sm text-gray-600">
+                                Employee ID: {request.employee?.employee_id || '—'}
+                              </p>
+
+                              <p className="text-sm text-gray-600">
+                                Department: {request.employee?.department || request.employee?.sub_department || '—'}
+                              </p>
+
+                              <p className="text-sm text-gray-600">
+                                Request Date: {formatDate(request.request_date)}
+                              </p>
+
                               <p className="text-sm text-gray-700 mt-1">
                                 <span className="font-medium">Reason:</span> {request.reason}
                               </p>

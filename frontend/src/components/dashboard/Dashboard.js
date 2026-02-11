@@ -48,15 +48,32 @@ const Dashboard = () => {
   const [attendanceState, setAttendanceState] = useState(() => {
     if (isManagerOnly) return null; // Regular managers don't need attendance state
 
+    // const saved = localStorage.getItem(`attendance_${user?.id}`);
+    // if (saved) {
+    //   const parsed = JSON.parse(saved);
+    //   return {
+    //     ...parsed,
+    //     checkInTime: parsed.checkInTime ? new Date(parsed.checkInTime) : null,
+    //     workingHours: 0,
+    //     workingMinutes: 0,
+    //     workingSeconds: 0
+    //   };
+    // }
     const saved = localStorage.getItem(`attendance_${user?.id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
+
+      // ❗ DO NOT auto-check-in from storage
       return {
-        ...parsed,
-        checkInTime: parsed.checkInTime ? new Date(parsed.checkInTime) : null,
+        isCheckedIn: false,
+        checkInTime: null,
         workingHours: 0,
         workingMinutes: 0,
-        workingSeconds: 0
+        workingSeconds: 0,
+        isWorkFromHome: false,
+        todayAttendance: null,
+        pendingSubmission: false,
+        _restored: true // marker only
       };
     }
     return {
@@ -271,41 +288,41 @@ const Dashboard = () => {
       });
 
       const allRecords = response.data?.results || response.data || [];
-
+      console.log('📡 Today attendance records:', allRecords);
       // Backend now properly filters records, so we can trust it returns only our data
       // Just take the first record for today (there should only be one per employee per day)
       const todayRecord = allRecords.length > 0 ? allRecords[0] : null;
 
-      if (todayRecord) {
-        const hasCheckIn = Boolean(todayRecord.check_in_time);
-        const hasCheckOut = Boolean(todayRecord.check_out_time);
-        let reconstructedCheckIn = null;
-        if (hasCheckIn) {
-          reconstructedCheckIn = new Date(`${todayRecord.date || today}T${todayRecord.check_in_time}`);
-        }
-        setAttendanceState(prev => ({
-          ...(prev || {}),
-          isCheckedIn: hasCheckIn && !hasCheckOut,
-          checkInTime: hasCheckIn && !hasCheckOut ? reconstructedCheckIn : null,
-          isWorkFromHome: prev?.isWorkFromHome || false,
-          todayAttendance: todayRecord,
-          pendingSubmission: hasCheckIn && !hasCheckOut
-        }));
+      if (todayRecord && todayRecord.check_in_time && !todayRecord.check_out_time) {
+      const reconstructedCheckIn = new Date(
+        `${todayRecord.date}T${todayRecord.check_in_time}`
+      );
 
-        // Only clear persisted state after a completed checkout
-        if (hasCheckOut && user?.id) {
-          localStorage.removeItem(`attendance_${user.id}`);
-        }
-      } else {
-        // No attendance record found for today - reset state
+      // ✅ Only restore state if this session created it
+      const wasThisSession = localStorage.getItem(`attendance_${user?.id}`);
+      
+      if (wasThisSession) {
+        // User checked in during this browser session - restore the UI state
         setAttendanceState(prev => ({
           ...(prev || {}),
           isCheckedIn: false,
+          checkInTime: reconstructedCheckIn,
+          isWorkFromHome: todayRecord.notes?.includes('Work from Home') || false,
+          todayAttendance: todayRecord,
+          pendingSubmission: true
+        }));
+      } else {
+        // User checked in from another device/session - DON'T auto-check-in here
+        setAttendanceState(prev => ({
+          ...(prev || {}),
+          isCheckedIn: false,  // ✅ Don't show as checked in
           checkInTime: null,
-          todayAttendance: null,
+          isWorkFromHome: false,
+          todayAttendance: todayRecord,
           pendingSubmission: false
         }));
       }
+    }
     } catch (error) {
       console.error('Failed to check today attendance/WFH:', error);
     }
@@ -425,7 +442,15 @@ const Dashboard = () => {
 
   const handleCheckIn = async (workFromHome = false) => {
     if (isManagerOnly) return;
-
+    // ✅ NEW: When clicking Office button without WFH approval, show popup
+    if (!workFromHome && !isHRManager() && !wfhStatus.hasApprovedRequest) {
+      console.log('💡 Showing WFH popup before office check-in');
+      toast.info('💡 Would you like to work from home instead? Apply for WFH approval.', {
+        duration: 4000
+      });
+      setShowWFHPopup(true);
+      return;  // Stop here - don't check in yet
+    }
     if (workFromHome) {
       if (isHRManager() || wfhStatus.hasApprovedRequest) {
         const now = new Date();

@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { adminUserAPI } from '../../services/api';
 import { isAdmin } from '../../utils/auth';
 import { toast } from 'react-toastify';
-
+import { getAllRoleOptions } from '../../utils/roleOptions';
+import { getRoleDisplayName } from '../../utils/roleConfig';
 const UsersAuthManagement = () => {
   const location = useLocation();
   const [users, setUsers] = useState([]);
@@ -25,6 +26,7 @@ const UsersAuthManagement = () => {
   const [originalExtraPermissionIds, setOriginalExtraPermissionIds] = useState([]);
   const [accessFilterAvailable, setAccessFilterAvailable] = useState('');
   const [accessFilterGranted, setAccessFilterGranted] = useState('');
+  const roleOptions = getAllRoleOptions();
 
   const loadUsers = async () => {
     try {
@@ -270,7 +272,7 @@ const UsersAuthManagement = () => {
               address: selectedUser.profile.address || '',
               date_of_birth: selectedUser.profile.date_of_birth || null,
               emergency_contact: selectedUser.profile.emergency_contact || '',
-              role: selectedUser.profile.role || 'EMPLOYEE',
+              role: selectedUser.profile.role ,
             }
           : undefined,
       };
@@ -457,14 +459,29 @@ const UsersAuthManagement = () => {
                       isActive ? 'bg-indigo-50 border-l-4 border-indigo-500' : ''
                     }`}
                   >
-                    <div>
+                    {/* <div>
                       <div className="text-sm font-medium text-gray-900">{user.email}</div>
                       <div className="text-xs text-gray-500">
                         {user.first_name || user.last_name
                           ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
                           : 'No name set'}
                       </div>
-                    </div>
+                    </div> */}
+                    {/* <div>
+  <div className="text-sm font-medium text-gray-900">{user.email}</div>
+
+  <div className="text-xs text-gray-500">
+    {user.first_name || user.last_name
+      ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+      : 'No name set'}
+  </div>
+
+  <div className="text-[11px] text-indigo-600 font-medium mt-0.5">
+    {user.profile?.role
+      ? getRoleDisplayName(user.profile.role)
+      : '—'}
+  </div>
+</div> */}
                   </button>
                 );
               })}
@@ -592,38 +609,56 @@ const UsersAuthManagement = () => {
                 </div>
 
                 {/* Role selector */}
-                <div className="flex items-center space-x-3">
-                  <label className="text-xs text-gray-700 min-w-[60px]">Role</label>
-                  <select
-                    className="px-2 py-1.5 rounded-md border border-gray-300 text-sm bg-white"
-                    value={selectedUser?.profile?.role || 'EMPLOYEE'}
-                    onChange={async (e) => {
-                      const newRole = e.target.value;
-                      // Update local state for role immediately
-                      handleProfileFieldChange('role', newRole);
-                      // Live preview: refresh access lists for the selected role without persisting yet
-                      if (selectedUserId) {
-                        try {
-                          const { data: preview } = await adminUserAPI.getUserRoleAccess(selectedUserId, newRole);
-                          setRoleAccess(preview);
-                          setExtraPermissionIds(Array.isArray(preview.extra_permission_ids) ? preview.extra_permission_ids : []);
-                          setOriginalExtraPermissionIds(Array.isArray(preview.extra_permission_ids) ? preview.extra_permission_ids : []);
-                        } catch (err) {
-                          console.error('Failed to preview access for role', newRole, err);
-                        }
-                      }
-                    }}
-                  >
-                    <option value="EMPLOYEE">Employee</option>
-                    <option value="HR_MANAGER">HR Manager</option>
-                    <option value="IT_SUPPORTER">IT Supporter</option>
-                    <option value="MANAGER">Manager</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="CEO">CEO</option>
-                    <option value="CTO">CTO</option>
-                    <option value="TEAM_LEAD">Team Lead</option>
-                  </select>
-                </div>
+<div className="flex items-center space-x-3">
+  <label className="text-xs text-gray-700 min-w-[60px]">Role</label>
+
+  <select
+    className="px-2 py-1.5 rounded-md border border-gray-300 text-sm bg-white"
+    value={selectedUser?.profile?.role || 'INTERN'}
+    onChange={async (e) => {
+      const newRole = e.target.value;
+
+      handleProfileFieldChange('role', newRole);
+
+      if (selectedUserId) {
+        try {
+          const { data: preview } =
+            await adminUserAPI.getUserRoleAccess(selectedUserId, newRole);
+
+          setRoleAccess(preview);
+          setExtraPermissionIds(
+            Array.isArray(preview.extra_permission_ids)
+              ? preview.extra_permission_ids
+              : []
+          );
+          setOriginalExtraPermissionIds(
+            Array.isArray(preview.extra_permission_ids)
+              ? preview.extra_permission_ids
+              : []
+          );
+        } catch (err) {
+          console.error('Failed to preview access for role', newRole, err);
+        }
+      }
+    }}
+  >
+    {Object.entries(
+      roleOptions.reduce((acc, role) => {
+        acc[role.category] = acc[role.category] || [];
+        acc[role.category].push(role);
+        return acc;
+      }, {})
+    ).map(([category, roles]) => (
+      <optgroup key={category} label={category.replace(/_/g, ' ')}>
+        {roles.map(role => (
+          <option key={role.value} value={role.value}>
+            {role.label}
+          </option>
+        ))}
+      </optgroup>
+    ))}
+  </select>
+</div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>

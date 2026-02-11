@@ -19,6 +19,11 @@ import {
   ComputerDesktopIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
+import {
+  getRoleDisplayName,
+  getRoleIcon,
+  getRoleBadgeColor
+} from '../../utils/roleConfig';
 
 const Navbar = ({ onMenuToggle }) => {
   const { user, logout } = useAuth();
@@ -119,20 +124,24 @@ const Navbar = ({ onMenuToggle }) => {
   };
 
   const getRoleBadge = (role) => {
-    const roleConfig = {
-      'ADMIN': { color: 'from-red-500 to-pink-600', icon: '👑', label: 'Administrator' },
-      'HR_MANAGER': { color: 'from-blue-500 to-indigo-600', icon: '🏢', label: 'HR Manager' },
-      'EMPLOYEE': { color: 'from-green-500 to-emerald-600', icon: '👤', label: 'Employee' }
-    };
-
-    const config = roleConfig[role] || roleConfig['EMPLOYEE'];
+  if (!role) {
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${config.color} shadow-lg`}>
-        <span className="mr-1">{config.icon}</span>
-        {config.label}
+      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r from-gray-400 to-gray-500 shadow">
+        —
       </span>
     );
-  };
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white shadow
+        ${getRoleBadgeColor(role)}`}
+    >
+      <span className="mr-1">{getRoleIcon(role)}</span>
+      {getRoleDisplayName(role)}
+    </span>
+  );
+};
 
   return (
     <nav className={`bg-gradient-to-r ${theme.navbarGradient} shadow-xl border-b border-white/20 sticky top-0 z-40 backdrop-blur-sm`}>
