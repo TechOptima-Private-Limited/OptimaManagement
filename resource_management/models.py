@@ -608,7 +608,7 @@ class AccessRequest(models.Model):
 
 class AccessHistory(models.Model):
     access_request = models.ForeignKey(AccessRequest, on_delete=models.CASCADE, related_name='history')
-    action = models.CharField(max_length=50)
+    action = models.TextField()
     performed_by = models.ForeignKey(
         User, 
         on_delete=models.SET_NULL, 

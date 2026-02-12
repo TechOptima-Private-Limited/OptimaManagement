@@ -2454,6 +2454,9 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from .models import Resource, EmailThread
 
+def plain_text(value):
+    return strip_tags(value or "").strip()
+
 def extract_images_from_html(html_content):
     """
     Extract all image sources from HTML content
@@ -2761,12 +2764,8 @@ def generate_approval_token(access_request):
 def get_approval_urls(request_id, token, for_resource_owner=False):
     """Generate approval and rejection URLs"""
     base_url = settings.SITE_URL.rstrip('/')
-    if for_resource_owner:
-        approve_url = f"{base_url}/api/resource-owner-approve/{request_id}/{token}/approve/"
-        reject_url = f"{base_url}/api/resource-owner-approve/{request_id}/{token}/reject/"
-    else:
-        approve_url = f"{base_url}/456/approve-request/{request_id}/{token}/approve/"
-        reject_url = f"{base_url}/456/approve-request/{request_id}/{token}/reject/"
+    approve_url = f"{base_url}/api/approve-request/{request_id}/{token}/approve/"
+    reject_url = f"{base_url}/api/approve-request/{request_id}/{token}/reject/"
     print(f"Generated Approve URL: {approve_url}")
     print(f"Generated Reject URL: {reject_url}")
     return approve_url, reject_url
@@ -2931,7 +2930,7 @@ def send_request_notification(access_request):
     else:
         print(f"DEBUG: No resource found for this request")
         
-        # CRITICAL FIX: Auto-assign IT Support resource if missing
+        # Auto-assign IT Support resource if missing
         if access_request.request_type == 'IT':
             try:
                 print("Attempting to auto-assign IT Support resource...")
@@ -2944,31 +2943,27 @@ def send_request_notification(access_request):
                 if it_resource:
                     access_request.resource = it_resource
                     access_request.save()
-                    print(f"AUTO-ASSIGNED IT resource: {it_resource.name} with email: {it_resource.resource_team_email}")
+                    print(f"AUTO-ASSIGNED IT resource: {it_resource.name}")
                 else:
-                    print("No active IT Support resource found in database")
+                    print("No active IT Support resource found")
             except ResourceType.DoesNotExist:
-                print("IT Support resource type not found in database")
+                print("IT Support resource type not found")
 
     try:
+        # ---------------- IT REQUEST ----------------
         if access_request.request_type == 'IT':
-            # IT support-specific context
             it_support_context = {
                 'ticket': access_request.ticket_number,
                 'user': access_request.user,
                 'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
                 'priority': access_request.get_priority_display(),
-                'justification': access_request.justification,
+                'justification': plain_text(access_request.justification),  # ✅ FIX
                 'duration': access_request.duration,
             }
-            print(f"Preparing to send IT support emails with context: {list(it_support_context.keys())}")
-            
-            # Send email to user (try multiple templates as fallback)
-            print("Attempting to send user email...")
-            user_templates = ['it_support_user.html', 'new_request_user.html']
 
+            # Send email to user
+            user_templates = ['it_support_user.html', 'new_request_user.html']
             for template in user_templates:
-                print(f"Trying user template: {template}")
                 result = send_email_notification(
                     access_request,
                     f"New IT Support Ticket - ID {access_request.ticket_number}",
@@ -2977,34 +2972,22 @@ def send_request_notification(access_request):
                     [access_request.user.email],
                     is_reply=False
                 )
-                
                 if result:
-                    print(f"USER EMAIL SUCCESS with template: {template}")
                     break
-                else:
-                    print(f"USER EMAIL FAILED with template: {template}")
-            
+
             # Send email to IT team
-            team_email = None
-            if access_request.resource and access_request.resource.resource_team_email:
-                team_email = access_request.resource.resource_team_email
-            else:
-                # Use your specific email as fallback
-                team_email = access_request.user.email  # Your email
-                print(f"Using fallback email: {team_email}")
-            
-            print(f"Preparing to send IT team email to: {team_email}")
-            
+            team_email = (
+                access_request.resource.resource_team_email
+                if access_request.resource and access_request.resource.resource_team_email
+                else access_request.user.email
+            )
+
             team_context = it_support_context.copy()
             team_context['requester'] = team_context['user_name']
             team_context['requester_employee_id'] = access_request.user.username
-            
-            # Try multiple team templates as fallback
-            print("Attempting to send team email...")
-            team_templates = ['it_support_team.html', 'new_request_team.html']
 
+            team_templates = ['it_support_team.html', 'new_request_team.html']
             for template in team_templates:
-                print(f"Trying team template: {template}")
                 result = send_email_notification(
                     access_request,
                     f"Access Request {access_request.ticket_number}",
@@ -3013,31 +2996,26 @@ def send_request_notification(access_request):
                     [team_email],
                     is_reply=True
                 )
-                
                 if result:
-                    print(f"TEAM EMAIL SUCCESS with template: {template}")
                     break
-                else:
-                    print(f"TEAM EMAIL FAILED with template: {template}")
-            
+
+        # ---------------- REGULAR REQUEST ----------------
         else:
-            # Regular access request (non-IT)
-            print("Processing regular access request...")
             user_context = {
                 'ticket': access_request.ticket_number,
                 'user': access_request.user,
                 'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
-                'resource': getattr(access_request.resource, 'name', 'N/A') if access_request.resource else "N/A",
-                'access_level': getattr(access_request.access_level, 'name', 'N/A') if access_request.access_level else "N/A",
+                'resource': access_request.resource.name if access_request.resource else "N/A",
+                'access_level': access_request.access_level.name if access_request.access_level else "N/A",
                 'priority': access_request.get_priority_display(),
-                'justification': access_request.justification,
-                'resource_type': getattr(access_request.resource.resource_type, 'name', 'N/A') if access_request.resource and access_request.resource.resource_type else "N/A",
+                'justification': plain_text(access_request.justification),  # ✅ FIX
+                'resource_type': access_request.resource.resource_type.name if access_request.resource and access_request.resource.resource_type else "N/A",
                 'duration': access_request.duration,
                 'approval_token_expiry': access_request.approval_token_expiry,
             }
-            
+
             # Send to user
-            user_result = send_email_notification(
+            send_email_notification(
                 access_request,
                 f"Access Request {access_request.ticket_number}",
                 'new_request_user.html',
@@ -3045,17 +3023,13 @@ def send_request_notification(access_request):
                 [access_request.user.email],
                 is_reply=False
             )
-            
-            if user_result:
-                print("Regular access request user email sent")
-            else:
-                print("Regular access request user email failed")
 
             # Send to team
             if access_request.resource and access_request.resource.resource_team_email:
                 team_context = user_context.copy()
                 team_context['requester'] = user_context['user_name']
-                team_result = send_email_notification(
+
+                send_email_notification(
                     access_request,
                     f"Access Request {access_request.ticket_number}",
                     'new_request_team.html',
@@ -3063,13 +3037,6 @@ def send_request_notification(access_request):
                     [access_request.resource.resource_team_email],
                     is_reply=True
                 )
-                
-                if team_result:
-                    print(f"Regular access request team email sent to: {access_request.resource.resource_team_email}")
-                else:
-                    print(f"Regular access request team email failed")
-            else:
-                print("No resource team email found for regular access request")
 
     except Exception as e:
         print(f"CRITICAL ERROR in send_request_notification: {str(e)}")
@@ -3171,7 +3138,7 @@ def send_approval_request_notification(obj, notes):
             'requester_employee_id': obj.user.username,
             'resource': obj.resource.name if obj.resource else 'N/A',
             'access_level': obj.access_level.name if obj.access_level else 'N/A',
-            'justification': obj.justification,
+            'justification': strip_tags(obj.justification or ""),
             'notes': notes,
             'approve_url': approve_url,
             'reject_url': reject_url,

@@ -329,7 +329,7 @@ class HardwareAssetAdmin(admin.ModelAdmin):
     form = HardwareAssetForm
     readonly_fields = ('age_of_device',)
     list_display = (
-        'asset_tag', 'name', 'asset_type', 'assigned_employee',
+        'asset_tag', 'name', 'asset_type', 'assigned_employee', 'issued_date',
         'previously_used_by_employee', 'purchased_date', 'laptop_age_pretty',
         'repair_status', 'status', 'is_active', 'actions_column'  # ← added Actions
     )
@@ -401,6 +401,22 @@ class HardwareAssetAdmin(admin.ModelAdmin):
             return "-"
     assigned_employee.short_description = "Assigned To"
     assigned_employee.admin_order_field = 'assignments__employee__last_name'
+
+    def issued_date(self, obj):
+        try:
+            current_assignment = (
+                obj.assignments
+                  .exclude(returns__asset=obj)
+                  .order_by('-assigned_at')
+                  .first()
+            )
+            if not current_assignment or not current_assignment.assigned_at:
+                return "-"
+            return timezone.localtime(current_assignment.assigned_at).strftime('%b. %d, %Y')
+        except Exception:
+            return "-"
+    issued_date.short_description = "Issued Date"
+    issued_date.admin_order_field = 'assignments__assigned_at'
 
     def repair_status(self, obj):
         try:
@@ -1077,8 +1093,8 @@ from django.contrib.auth.models import User
 
 
 class OffboardingAssetReturnAdmin(admin.ModelAdmin):
-    list_display = ['user_display', 'user_email', 'assets_status', 'created_at']
-    list_filter = ['created_at', 'is_offboarded']
+    list_display = ['user_display', 'user_email', 'assets_status', 'return_date', 'created_at_display']
+    list_filter = ['created_at', 'is_offboarded', 'return_date']
     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'user__email']
     list_display_links = ['user_display']
     date_hierarchy = 'created_at'
@@ -1089,6 +1105,9 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Basic Information', {
             'fields': ('user', 'dynamic_asset_checkboxes')
+        }),
+        ('Return Information', {
+            'fields': ('return_date',),
         }),
         ('Damaged Assets & Remarks', {
             'fields': ('damaged_assets_file', 'remarks'),
@@ -1140,6 +1159,18 @@ class OffboardingAssetReturnAdmin(admin.ModelAdmin):
             return format_html('<span style="color: green;">✓ {} Returned</span>', total)
         return format_html('<span style="color: red;">✗ None Returned</span>')
     assets_status.short_description = 'Returned Assets'
+
+    def return_date(self, obj):
+        if obj.return_date:
+            return obj.return_date.strftime('%b. %d, %Y')
+        return '—'
+    return_date.short_description = 'Return Date'
+    return_date.admin_order_field = 'return_date'
+
+    def created_at_display(self, obj):
+        return obj.created_at.strftime('%b. %d, %Y')
+    created_at_display.short_description = 'Created At'
+    created_at_display.admin_order_field = 'created_at'
 
     def dynamic_asset_checkboxes(self, obj):
         return mark_safe("""

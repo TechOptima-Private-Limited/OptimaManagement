@@ -81,7 +81,7 @@ ADMINS = [("<Admin1>", "<admin1_box@example.com>")]   # specify admin
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-FORMS_URLFIELD_ASSUME_HTTPS = True
+FORMS_URLFIELD_ASSUME_HTTPS = True        
 
 LOGGING = {
     'version': 1,
