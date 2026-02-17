@@ -5,7 +5,6 @@ from .models import Employee, Offboarding, ITSupporter
 from django.template.loader import render_to_string
 from resource_management.utils import send_email_notification
 from io import BytesIO
-from xhtml2pdf import pisa
 from django.core.mail import EmailMessage
 from django.conf import settings
 

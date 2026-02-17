@@ -130,15 +130,32 @@ const Dashboard = () => {
   const [attendanceState, setAttendanceState] = useState(() => {
     if (isManagerOnly) return null; // Regular managers don't need attendance state
 
+    // const saved = localStorage.getItem(`attendance_${user?.id}`);
+    // if (saved) {
+    //   const parsed = JSON.parse(saved);
+    //   return {
+    //     ...parsed,
+    //     checkInTime: parsed.checkInTime ? new Date(parsed.checkInTime) : null,
+    //     workingHours: 0,
+    //     workingMinutes: 0,
+    //     workingSeconds: 0
+    //   };
+    // }
     const saved = localStorage.getItem(`attendance_${user?.id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
+
+      // ❗ DO NOT auto-check-in from storage
       return {
-        ...parsed,
-        checkInTime: parsed.checkInTime ? new Date(parsed.checkInTime) : null,
+        isCheckedIn: false,
+        checkInTime: null,
         workingHours: 0,
         workingMinutes: 0,
-        workingSeconds: 0
+        workingSeconds: 0,
+        isWorkFromHome: false,
+        todayAttendance: null,
+        pendingSubmission: false,
+        _restored: true // marker only
       };
     }
     return {
@@ -363,51 +380,41 @@ const Dashboard = () => {
       });
 
       const allRecords = response.data?.results || response.data || [];
+      console.log('📡 Today attendance records:', allRecords);
+      // Backend now properly filters records, so we can trust it returns only our data
+      // Just take the first record for today (there should only be one per employee per day)
       const todayRecord = allRecords.length > 0 ? allRecords[0] : null;
 
-      if (todayRecord) {
-        // Parse check-in time components to create a valid Date object for the timer
-        let checkInDate = null;
-        if (todayRecord.check_in_time) {
-          const [hours, minutes, seconds] = todayRecord.check_in_time.split(':').map(Number);
-          checkInDate = new Date();
-          checkInDate.setHours(hours, minutes, seconds || 0, 0);
-        }
+      if (todayRecord && todayRecord.check_in_time && !todayRecord.check_out_time) {
+      const reconstructedCheckIn = new Date(
+        `${todayRecord.date}T${todayRecord.check_in_time}`
+      );
 
-        const isCheckedIn = !!todayRecord.check_in_time && !todayRecord.check_out_time;
-        const isWFH = todayRecord.notes && todayRecord.notes.includes('Work from Home');
-
-        setAttendanceState(prev => ({
-          ...(prev || {}),
-          isCheckedIn: isCheckedIn,
-          checkInTime: checkInDate,
-          isWorkFromHome: isWFH,
-          todayAttendance: todayRecord,
-          pendingSubmission: isCheckedIn
-        }));
-
-        // Only clear persisted state after a completed checkout
-        if (!isCheckedIn && user?.id) {
-          localStorage.removeItem(`attendance_${user.id}`);
-        } else if (isCheckedIn && user?.id) {
-          // Ensure local storage is in sync if they are checked in
-          localStorage.setItem(`attendance_${user.id}`, JSON.stringify({
-            isCheckedIn: isCheckedIn,
-            checkInTime: checkInDate,
-            isWorkFromHome: isWFH,
-            pendingSubmission: isCheckedIn
-          }));
-        }
-      } else {
-        // No attendance record found for today - reset state
+      // ✅ Only restore state if this session created it
+      const wasThisSession = localStorage.getItem(`attendance_${user?.id}`);
+      
+      if (wasThisSession) {
+        // User checked in during this browser session - restore the UI state
         setAttendanceState(prev => ({
           ...(prev || {}),
           isCheckedIn: false,
+          checkInTime: reconstructedCheckIn,
+          isWorkFromHome: todayRecord.notes?.includes('Work from Home') || false,
+          todayAttendance: todayRecord,
+          pendingSubmission: true
+        }));
+      } else {
+        // User checked in from another device/session - DON'T auto-check-in here
+        setAttendanceState(prev => ({
+          ...(prev || {}),
+          isCheckedIn: false,  // ✅ Don't show as checked in
           checkInTime: null,
-          todayAttendance: null,
+          isWorkFromHome: false,
+          todayAttendance: todayRecord,
           pendingSubmission: false
         }));
       }
+    }
     } catch (error) {
       console.error('Failed to check today attendance/WFH:', error);
     }
@@ -529,7 +536,15 @@ const Dashboard = () => {
 
   const handleCheckIn = async (workFromHome = false) => {
     if (isManagerOnly) return;
-
+    // ✅ NEW: When clicking Office button without WFH approval, show popup
+    if (!workFromHome && !isHRManager() && !wfhStatus.hasApprovedRequest) {
+      console.log('💡 Showing WFH popup before office check-in');
+      toast.info('💡 Would you like to work from home instead? Apply for WFH approval.', {
+        duration: 4000
+      });
+      setShowWFHPopup(true);
+      return;  // Stop here - don't check in yet
+    }
     if (workFromHome) {
       if (isHRManager() || wfhStatus.hasApprovedRequest) {
         const now = new Date();
@@ -734,55 +749,7 @@ const Dashboard = () => {
     return () => clearInterval(id);
   }, [attendanceState?.isCheckedIn, isManagerOnly]);
 
-  // ===================
-  // BANNER COMPONENTS
-  // ===================
-
-  // const BirthdayBanner = () => {
-  //   if (!birthdayFestivalData.birthdays.has_birthdays_today) return null;
-
-  //   return (
-  //     // <div className="mb-6 bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-500 rounded-xl p-6 text-white relative overflow-hidden shadow-2xl">
-  //     <div className="mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
-  //       <div className="absolute inset-0 opacity-20">
-  //         <div className="absolute top-2 left-10 text-6xl animate-bounce">🎂</div>
-  //         <div className="absolute top-8 right-20 text-4xl animate-pulse">🎈</div>
-  //         <div className="absolute bottom-4 left-1/4 text-5xl animate-bounce" style={{ animationDelay: '0.5s' }}>🎉</div>
-  //         <div className="absolute top-1/2 right-10 text-3xl animate-pulse" style={{ animationDelay: '1s' }}>✨</div>
-  //         <div className="absolute bottom-8 right-1/3 text-4xl animate-bounce" style={{ animationDelay: '1.5s' }}>🎁</div>
-  //       </div>
-
-  //       <div className="relative z-10">
-  //         <div className="flex items-center justify-between">
-  //           <div>
-  //             <h2 className="text-2xl font-bold mb-2 flex items-center">
-  //               <CakeIcon className="w-8 h-8 mr-3" />
-  //               🎉 Birthday Celebration! 🎉
-  //             </h2>
-  //             <div className="space-y-2">
-  //               {birthdayFestivalData.birthdays.todays_birthdays.map((birthday) => (
-  //                 <div key={birthday.id} className="flex items-center space-x-3">
-  //                   <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-white/30">
-  //                     {birthday.avatar_initials}
-  //                   </div>
-  //                   <div>
-  //                     <p className="text-xl font-semibold">
-  //                       Happy {birthday.age_today}th Birthday, {birthday.employee_name}! 🎂
-  //                     </p>
-  //                     <p className="text-white/90 text-sm">
-  //                       {birthday.employee_department} • Wishing you joy, success, and happiness! 🌟
-  //                     </p>
-  //                   </div>
-  //                 </div>
-  //               ))}
-  //             </div>
-  //           </div>
-  //           <div className="text-6xl animate-pulse">🎊</div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
+ 
   const BirthdayBanner = () => {
     if (!birthdayFestivalData.birthdays.has_birthdays_today) return null;
 
@@ -827,36 +794,7 @@ const Dashboard = () => {
       </div>
     );
   };
-  // const FestivalBanner = () => {
-  //   if (!birthdayFestivalData.festivals.has_festivals_today) return null;
-
-  //   return (
-  //     // <div className="mb-6 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 rounded-xl p-6 text-white relative overflow-hidden shadow-2xl">
-  //     <div className="mb-6 bg-gradient-to-r from-orange-300 via-red-400 to-pink-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
-  //       <div className="relative z-10">
-  //         <div className="flex items-center justify-between">
-  //           <div>
-  //             <h2 className="text-2xl font-bold mb-2 flex items-center">
-  //               <SparklesIcon className="w-8 h-8 mr-3" />
-  //               Festival Celebration!
-  //             </h2>
-  //             <div className="space-y-2">
-  //               {birthdayFestivalData.festivals.todays_festivals.map((festival) => (
-  //                 <div key={festival.id} className="flex items-center space-x-3">
-  //                   <div className="text-4xl">{festival.emoji}</div>
-  //                   <div>
-  //                     <p className="text-xl font-semibold">Happy {festival.name}!</p>
-  //                     <p className="text-white/90 text-sm">{festival.description}</p>
-  //                   </div>
-  //                 </div>
-  //               ))}
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
+  
   const FestivalBanner = () => {
     if (!birthdayFestivalData.festivals.has_festivals_today) return null;
 
@@ -891,15 +829,7 @@ const Dashboard = () => {
   // ===================
 
   const FestivalCard = ({ festival }) => {
-    // const getGradientClass = (type) => {
-    //   switch (type?.toLowerCase()) {
-    //     case 'religious': return 'from-amber-400 via-orange-500 to-red-500';
-    //     case 'national': return 'from-blue-400 via-purple-500 to-pink-500';
-    //     case 'cultural': return 'from-green-400 via-blue-500 to-purple-500';
-    //     case 'international': return 'from-pink-400 via-purple-500 to-indigo-500';
-    //     default: return 'from-purple-400 via-pink-500 to-red-500';
-    //   }
-    // };
+    
     const getGradientClass = (type) => {
       switch (type?.toLowerCase()) {
         case 'religious': return 'from-amber-300 via-orange-400 to-red-400';
@@ -978,14 +908,7 @@ const Dashboard = () => {
 
   const BirthdayCard = ({ birthday }) => {
     return (
-      // <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 p-1 shadow-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-3xl group min-w-[380px] max-w-[380px]">
-      //   <div className="absolute inset-0 opacity-20">
-      //     <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
-      //     <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
-      //     <div className="absolute bottom-6 left-8 text-2xl animate-bounce" style={{ animationDelay: '1s' }}>🎉</div>
-      //     <div className="absolute bottom-3 right-6 text-3xl animate-pulse" style={{ animationDelay: '1.5s' }}>🎁</div>
-      //     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
-      //   </div>
+     
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-300 via-purple-400 to-indigo-500 p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group min-w-[380px] max-w-[380px]">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
@@ -1171,64 +1094,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {/* <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white border-b border-white/20 px-6 py-6 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-              Welcome, {user?.first_name}! 👋
-            </h1>
-            <p className="text-blue-100 mt-1 font-medium">
-              {new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </p>
-            <div className="mt-2">
-              <span className="px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">
-                {userRole === 'MANAGER' ? '👨‍💼 Manager' : 
-                 userRole === 'HR_MANAGER' ? '👩‍💼 HR Manager' : 
-                 userRole === 'ADMIN' ? '🔑 Admin' : '👤 Employee'}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center space-x-6">
-            {!isManagerOnly && attendanceState && (
-              <div className="text-right">
-                <div className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/20 ${
-                  attendanceState.isCheckedIn 
-                    ? attendanceState.isWorkFromHome 
-                      ? 'bg-purple-500/80 text-white' 
-                      : 'bg-green-500/80 text-white'
-                    : 'bg-white/20 text-white'
-                }`}>
-                  {attendanceState.isCheckedIn 
-                    ? attendanceState.isWorkFromHome ? '🏠 Working from Home' : '🏢 Checked In'
-                    : '⏸️ Not Checked In'
-                  }
-                </div>
-                {attendanceState.isCheckedIn && (
-                  <div className="text-blue-100 text-sm mt-1 font-medium">
-                    Working: {formatWorkingTime()}
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="text-right">
-              <div className="text-3xl font-bold text-white drop-shadow-lg">
-                {dashboardData.currentTime.toLocaleTimeString([], { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: true,
-                })}
-              </div>
-              <div className="text-blue-100 font-medium">Current Time</div>
-            </div>
-          </div>
-        </div>
-      </div> */}
+      
 
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Birthday Banner */}
@@ -1240,104 +1106,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Employee and HR Manager Attendance Card */}
-            {/* {!isManagerOnly && attendanceState && (
-              <QuickAccessCard title="Today's Attendance" gradient={true}>
-                <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 rounded-xl p-6 text-white shadow-2xl border border-white/10">
-                  <div className="text-sm text-blue-200 mb-4 flex items-center">
-                    <span className="bg-blue-800/50 px-3 py-1 rounded-full text-xs mr-3 font-semibold backdrop-blur-sm border border-blue-600/30">SHIFT TODAY</span>
-                    <span className="font-medium">
-                      {new Date().toLocaleDateString('en-US', { 
-                        weekday: 'long',
-                        day: '2-digit',
-                        month: 'short'
-                      })} • GENERAL (10:00 AM - 07:00 PM)
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <div className="text-2xl font-bold text-white drop-shadow-md">
-                        {new Date().getDate()} {new Date().toLocaleDateString('en-US', { month: 'short' })} {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-                      </div>
-                      <div className="text-blue-200 text-sm font-medium">
-                        {attendanceState.isCheckedIn ? 'Working' : 'Not started'} • {attendanceState.workingHours}h / 9h
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-4xl font-mono font-bold text-white drop-shadow-lg">
-                        {formatWorkingTime()}
-                      </div>
-                      <div className="text-blue-200 text-xs font-medium">
-                        {attendanceState.checkInTime 
-                          ? `Started ${attendanceState.checkInTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`
-                          : 'Not started'
-                        }
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    {!attendanceState.isCheckedIn ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          onClick={() => handleCheckIn(false)}
-                          disabled={submittingAttendance || (wfhStatus.hasApprovedRequest && !isHRManager())}
-                          className={`flex items-center justify-center py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
-                            (wfhStatus.hasApprovedRequest && !isHRManager())
-                              ? 'bg-gray-400/50 text-gray-300 cursor-not-allowed opacity-50'
-                              : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white transform hover:scale-105'
-                          }`}
-                        >
-                          <PlayIcon className="w-5 h-5 mr-2" />
-                          {(wfhStatus.hasApprovedRequest && !isHRManager()) ? 'Office (Disabled)' : 'Check In (Office)'}
-                        </button>
-                        
-                        <button
-                          onClick={() => (isHRManager() || wfhStatus.hasApprovedRequest) ? handleCheckIn(true) : setShowWFHPopup(true)}
-                          disabled={submittingAttendance}
-                          className="flex items-center justify-center py-4 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl font-semibold transition-all duration-300 shadow-lg text-white transform hover:scale-105"
-                        >
-                          <HomeIcon className="w-5 h-5 mr-2" />
-                          {(isHRManager() || wfhStatus.hasApprovedRequest) ? 'Work From Home' : 'Apply WFH'}
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={handleCheckOut}
-                        disabled={submittingAttendance}
-                        className="w-full flex items-center justify-center py-4 px-6 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 rounded-xl font-semibold transition-all duration-300 text-white shadow-lg transform hover:scale-105 disabled:opacity-50"
-                      >
-                        {submittingAttendance ? (
-                          <>
-                            <LoadingSpinner size="small" />
-                            <span className="ml-2">Checking Out...</span>
-                          </>
-                        ) : (
-                          <>
-                            <StopIcon className="w-5 h-5 mr-2" />
-                            Check Out
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="mt-4">
-                    <div className="flex justify-between text-xs text-blue-200 mb-2 font-medium">
-                      <span>Progress</span>
-                      <span>{Math.min(Math.round((attendanceState.workingHours / 9) * 100), 100)}%</span>
-                    </div>
-                    <div className="w-full bg-slate-700/50 rounded-full h-3 backdrop-blur-sm border border-slate-600/30">
-                      <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 shadow-md" 
-                        style={{ width: `${Math.min((attendanceState.workingHours / 9) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </QuickAccessCard>
-            )} */}
+            
             {!isManagerOnly && attendanceState && (
               <QuickAccessCard title="Today's Attendance" gradient={true}>
                 <div className="bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-800 rounded-xl p-6 text-white shadow-lg border border-white/10">
@@ -1531,7 +1300,7 @@ const Dashboard = () => {
               </div>
             </QuickAccessCard>
 
-            {/* Enhanced Upcoming Festivals Card */}
+            
             <QuickAccessCard title="🎉 Upcoming Festivals & Celebrations" className="overflow-hidden" gradient={true}>
               {birthdayFestivalData.festivals.upcoming_festivals.length === 0 ? (
                 <div className="text-center py-12">

@@ -6,7 +6,7 @@ from .autocomplete import UserAutocomplete, ResourceAutocomplete,ResourceTypeAut
 
 router = DefaultRouter()
 router.register(r'resource-types', ResourceTypeViewSet)
-router.register(r'access-levels', AccessLevelViewSet)
+# router.register(r'access-levels', AccessLevelViewSet)
 router.register(r'resources', ResourceViewSet)
 router.register(r'access-requests', AccessRequestViewSet, basename='access-request')
 

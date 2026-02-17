@@ -1,147 +1,321 @@
-# from django.shortcuts import render
-
-# # Create your views here.
-# from rest_framework import generics, status
-# from rest_framework.decorators import api_view
-# from rest_framework.response import Response
-# from django.utils import timezone
-# from .models import Employee, Department, OnboardingTask
-# from .serializers import EmployeeSerializer, DepartmentSerializer, OnboardingTaskSerializer
-# from utils.permissions import IsHRManager, IsEmployee
-# from django.db.models import Q
-# from django.contrib.auth import get_user_model
-# User = get_user_model()
-# class EmployeeListCreateView(generics.ListCreateAPIView):
-#     queryset = Employee.objects.all()
-#     serializer_class = EmployeeSerializer
-#     permission_classes = [IsEmployee]
-
-#     def create(self, request, *args, **kwargs):
-#         print("🚀 Incoming Employee Payload:", request.data)  # Log incoming data
-
-#         serializer = self.get_serializer(data=request.data)
-#         if not serializer.is_valid():
-#             print("❌ Validation Errors:", serializer.errors)  # Log errors
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#         self.perform_create(serializer)
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-# class UserListView(generics.ListAPIView):
-#     """
-#     Get all users who don't have employee records yet
-#     """
-#     permission_classes = [IsHRManager]
-    
-#     def get(self, request, *args, **kwargs):
-#         # Get users who don't have employee records
-#         users_without_employee = User.objects.filter(
-#             ~Q(employee__isnull=False)  # Users without employee records
-#         ).values('id', 'first_name', 'last_name', 'email', 'username')
-        
-#         return Response({
-#             'results': list(users_without_employee)
-#         })
-# class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Employee.objects.all()
-#     serializer_class = EmployeeSerializer
-#     permission_classes = [IsEmployee]
-
-# class DepartmentListCreateView(generics.ListCreateAPIView):
-#     queryset = Department.objects.all()
-#     serializer_class = DepartmentSerializer
-#     permission_classes = [IsHRManager]
-
-# class OnboardingTaskListCreateView(generics.ListCreateAPIView):
-#     serializer_class = OnboardingTaskSerializer
-#     permission_classes = [IsEmployee]
-    
-#     def get_queryset(self):
-#         if hasattr(self.request.user, 'profile') and self.request.user.profile.role == 'HR_MANAGER':
-#             return OnboardingTask.objects.all()
-#         return OnboardingTask.objects.filter(employee__user=self.request.user)
-    
-#     def perform_create(self, serializer):
-#         serializer.save(assigned_by=self.request.user)
-
-# @api_view(['PATCH'])
-# def complete_onboarding_task(request, task_id):
-#     try:
-#         task = OnboardingTask.objects.get(id=task_id, employee__user=request.user)
-#         task.status = 'COMPLETED'
-#         task.completed_at = timezone.now()
-#         task.save()
-#         return Response({'message': 'Task completed successfully'})
-#     except OnboardingTask.DoesNotExist:
-#         return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
 # # employees/views.py
-
-# from django.shortcuts import render
 # from rest_framework import generics, status
-# from rest_framework.decorators import api_view
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
 # from rest_framework.response import Response
 # from django.utils import timezone
-# from .models import Employee, Department, OnboardingTask
-# from .serializers import EmployeeSerializer, DepartmentSerializer, OnboardingTaskSerializer
-# from utils.permissions import IsHRManager, IsEmployee
+# from datetime import date, timedelta
 # from django.db.models import Q
-# from django.contrib.auth import get_user_model
-# # from onboarding.models import Employee as OnboardingEmployee
+# from .models import Employee, Department, OnboardingTask, EmployeeBirthday, Festival
+# from .serializers import (
+#     EmployeeSerializer, DepartmentSerializer, OnboardingTaskSerializer,
+#     EmployeeBirthdaySerializer, FestivalSerializer
+# )
+# from authentication.models import User, UserProfile
+# from utils.permissions import IsHRManager, IsEmployee, IsManager
 
-# User = get_user_model()
+
+
+
+
+# @api_view(['GET'])
+# @permission_classes([IsEmployee])
+# def get_employee_profile_data(request):
+#     """
+#     Get comprehensive employee profile data including team, manager info, and peer colleagues
+#     """
+#     try:
+#         user = request.user
+        
+#         # Get current user's employee data
+#         try:
+#             current_employee = Employee.objects.select_related(
+#                 'user', 'department', 'manager', 'manager__user'
+#             ).get(user=user)
+#         except Employee.DoesNotExist:
+#             return Response({
+#                 'error': 'Employee record not found'
+#             }, status=status.HTTP_404_NOT_FOUND)
+        
+#         # # Get team members (employees who report to current employee)
+#         # direct_reports = Employee.objects.select_related(
+#         #     'user', 'department'
+#         # ).filter(
+#         #     manager=current_employee, 
+#         #     status='ACTIVE'
+#         # )
+        
+#         # Get peer colleagues or all employees for HR/Admin
+#         peer_colleagues = []
+#         user_role = getattr(getattr(user, 'profile', None), 'role', None)
+        
+#         if user_role in ['HR_MANAGER', 'ADMIN']:
+#             # For HR/Admin, "peers" will be all active employees except self
+#             peer_colleagues = Employee.objects.select_related(
+#                 'user', 'department'
+#             ).filter(
+#                 status='ACTIVE'
+#             ).exclude(
+#                 id=current_employee.id
+#             )
+#             print(f"👑 {user_role} - fetching all employees as peers")
+#         elif current_employee.manager:
+#             # Regular peer logic
+#             peer_colleagues = Employee.objects.select_related(
+#                 'user', 'department'
+#             ).filter(
+#                 manager=current_employee.manager,  # Same manager as current employee
+#                 status='ACTIVE'
+#             ).exclude(
+#                 id=current_employee.id  # Exclude current employee from peers list
+#             )
+        
+#         # Serialize data
+#         employee_data = EmployeeSerializer(current_employee, context={'request': request}).data
+#         # team_data = EmployeeSerializer(direct_reports, many=True, context={'request': request}).data
+#         peers_data = EmployeeSerializer(peer_colleagues, many=True, context={'request': request}).data
+        
+#         # Get manager data if exists
+#         manager_data = None
+#         if current_employee.manager:
+#             manager_data = EmployeeSerializer(current_employee.manager, context={'request': request}).data
+        
+#         response_data = {
+#             'employee': employee_data,
+#             'peers': peers_data,         # Colleagues with same manager
+#             'manager': manager_data,
+           
+#         }
+        
+#         return Response(response_data)
+        
+#     except Exception as e:
+#         import traceback
+#         traceback.print_exc()
+#         return Response({
+#             'error': f'Failed to fetch employee profile data: {str(e)}'
+#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# @api_view(['GET'])
+# @permission_classes([IsManager])
+# def get_manager_profile_data(request):
+#     """
+#     Get manager profile data - same structure as employee but 'peers' contains direct reports
+#     """
+#     try:
+#         user = request.user
+        
+#         # Get current user's employee data
+#         try:
+#             current_manager = Employee.objects.select_related(
+#                 'user', 'department', 'manager', 'manager__user'
+#             ).get(user=user)
+#         except Employee.DoesNotExist:
+#             return Response({
+#                 'error': 'Manager record not found'
+#             }, status=status.HTTP_404_NOT_FOUND)
+        
+#         # For managers, 'peers' will be their direct reports (team members)
+#         direct_reports = Employee.objects.select_related(
+#             'user', 'department'
+#         ).filter(
+#             manager=current_manager, 
+#             status='ACTIVE'
+#         )
+        
+#         # Serialize data
+#         employee_data = EmployeeSerializer(current_manager, context={'request': request}).data
+#         peers_data = EmployeeSerializer(direct_reports, many=True, context={'request': request}).data
+        
+#         # Get manager data if exists
+#         manager_data = None
+#         if current_manager.manager:
+#             manager_data = EmployeeSerializer(current_manager.manager, context={'request': request}).data
+        
+#         response_data = {
+#             'employee': employee_data,
+#             'peers': peers_data,         # For managers, this contains direct reports
+#             'manager': manager_data,
+#         }
+        
+#         return Response(response_data)
+        
+#     except Exception as e:
+#         import traceback
+#         traceback.print_exc()
+#         return Response({
+#             'error': f'Failed to fetch manager profile data: {str(e)}'
+#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# @api_view(['GET'])
+# @permission_classes([IsHRManager])
+# def get_all_managers_with_teams(request):
+#     """
+#     Get all managers and their team counts (HR only)
+#     """
+#     try:
+#         # Get all employees who have subordinates (are managers)
+#         managers = Employee.objects.filter(
+#             status='ACTIVE'
+#         ).select_related('user', 'department')
+        
+#         managers_with_teams = []
+        
+#         for manager in managers:
+#             # Count team members for each potential manager
+#             team_count = Employee.objects.filter(
+#                 manager=manager,
+#                 status='ACTIVE'
+#             ).count()
+            
+#             if team_count > 0:  # Only include actual managers (who have team members)
+#                 manager_data = EmployeeSerializer(manager, context={'request': request}).data
+#                 manager_data['team_count'] = team_count
+#                 managers_with_teams.append(manager_data)
+        
+#         print(f"👥 Found {len(managers_with_teams)} managers with teams")
+        
+#         return Response({
+#             'managers': managers_with_teams,
+#             'count': len(managers_with_teams)
+#         })
+        
+#     except Exception as e:
+#         print(f"❌ Error getting managers: {str(e)}")
+#         return Response({
+#             'error': f'Failed to fetch managers: {str(e)}'
+#         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # class EmployeeListCreateView(generics.ListCreateAPIView):
 #     serializer_class = EmployeeSerializer
 #     permission_classes = [IsEmployee]
-    
+
 #     def get_queryset(self):
-#         # Optimize queries by including related objects
-#         return Employee.objects.select_related(
+#         user = self.request.user
+#         qs = Employee.objects.select_related(
 #             'user', 'department', 'manager', 'manager__user'
 #         ).all()
-    
+#         # If user has global view permission, allow full queryset
+#         if user.has_perm('employees.view_employee'):
+#             return qs
+#         # Role-based fallback
+#         role = getattr(getattr(user, 'profile', None), 'role', None)
+#         if role == 'HR_MANAGER':
+#             return qs
+#         if role == 'MANAGER':
+#             try:
+#                 manager_emp = Employee.objects.get(user=user)
+#                 team_ids = Employee.objects.filter(manager=manager_emp, status='ACTIVE').values_list('id', flat=True)
+#                 return qs.filter(id__in=list(team_ids) + [manager_emp.id])
+#             except Employee.DoesNotExist:
+#                 return qs.none()
+#         # Regular employee: only self record
+#         try:
+#             emp = Employee.objects.get(user=user)
+#             return qs.filter(id=emp.id)
+#         except Employee.DoesNotExist:
+#             return qs.none()
+
 #     def create(self, request, *args, **kwargs):
-#         print("🚀 Incoming Employee Payload:", request.data)  # Log incoming data
-#         serializer = self.get_serializer(data=request.data)
+#         print("🚀 Incoming Employee Payload:", request.data)
+#         # Allow via Django add permission or HR role
+#         if not (
+#             request.user.has_perm('employees.add_employee') or
+#             (hasattr(request.user, 'profile') and request.user.profile.role == 'HR_MANAGER')
+#         ):
+#             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+        
+#         # Transform frontend data structure to match serializer expectations
+#         transformed_data = {
+#             'user_data': request.data.get('user'),
+#             'profile_data': request.data.get('profile'),
+#             'employee_id': request.data.get('employee_id'),
+#             'department_id': request.data.get('department_id'),
+#             'position': request.data.get('position'),
+#             'hire_date': request.data.get('hire_date'),
+#             'manager_id': request.data.get('manager') if request.data.get('manager') else None,
+#         }
+        
+#         serializer = self.get_serializer(data=transformed_data)
 #         if not serializer.is_valid():
-#             print("❌ Validation Errors:", serializer.errors)  # Log errors
+#             print("❌ Validation Errors:", serializer.errors)
 #             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-#         self.perform_create(serializer)
+#         employee = serializer.save()
         
-#         # Get the created employee with related data for response
-#         employee = Employee.objects.select_related(
-#             'user', 'department', 'manager', 'manager__user'
-#         ).get(id=serializer.instance.id)
+#         # Return employee data
+#         response_data = self.get_serializer(employee).data
         
-#         response_serializer = self.get_serializer(employee)
-#         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(response_data, status=status.HTTP_201_CREATED)
 
+# # Rest of your views remain the same...
 # class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
 #     serializer_class = EmployeeSerializer
 #     permission_classes = [IsEmployee]
-    
+
 #     def get_queryset(self):
 #         return Employee.objects.select_related(
 #             'user', 'department', 'manager', 'manager__user'
 #         ).all()
+
+#     def get_object(self):
+#         obj = super().get_object()
+#         user = self.request.user
+#         # View access: allow if has perm or HR, or manager over team, or owner
+#         if user.has_perm('employees.view_employee'):
+#             return obj
+#         role = getattr(getattr(user, 'profile', None), 'role', None)
+#         if role == 'HR_MANAGER':
+#             return obj
+#         if role == 'MANAGER':
+#             try:
+#                 manager_emp = Employee.objects.get(user=user)
+#                 team_ids = set(Employee.objects.filter(manager=manager_emp, status='ACTIVE').values_list('id', flat=True))
+#                 if obj.id in team_ids or obj.id == manager_emp.id:
+#                     return obj
+#             except Employee.DoesNotExist:
+#                 pass
+#         if getattr(obj, 'user_id', None) == getattr(user, 'id', None):
+#             return obj
+#         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+#     def update(self, request, *args, **kwargs):
+#         user = request.user
+#         obj = self.get_object()
+#         allowed = (
+#             user.has_perm('employees.change_employee') or
+#             (hasattr(user, 'profile') and user.profile.role == 'HR_MANAGER') or
+#             (
+#                 hasattr(user, 'profile') and user.profile.role == 'MANAGER' and
+#                 Employee.objects.filter(user=user, id=obj.manager_id).exists()
+#             )
+#         )
+#         if not allowed:
+#             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+#         return super().update(request, *args, **kwargs)
+
+#     def partial_update(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
+
+#     def destroy(self, request, *args, **kwargs):
+#         user = request.user
+#         if not (user.has_perm('employees.delete_employee') or (hasattr(user, 'profile') and user.profile.role == 'HR_MANAGER')):
+#             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+#         return super().destroy(request, *args, **kwargs)
 
 # class UserListView(generics.ListAPIView):
 #     """
 #     Get all users who don't have employee records yet
 #     """
 #     permission_classes = [IsHRManager]
-    
+
 #     def get(self, request, *args, **kwargs):
 #         # Get users who don't have employee records
 #         users_without_employee = User.objects.filter(
-#             ~Q(employee__isnull=False)  # Users without employee records
+#             ~Q(employee__isnull=False)
 #         ).values('id', 'first_name', 'last_name', 'email', 'username')
-        
 #         return Response({
 #             'results': list(users_without_employee)
 #         })
@@ -149,21 +323,32 @@
 # class DepartmentListCreateView(generics.ListCreateAPIView):
 #     queryset = Department.objects.all()
 #     serializer_class = DepartmentSerializer
-#     permission_classes = [IsHRManager]
+#     def get_permissions(self):
+#         if self.request.method in ['GET', 'HEAD', 'OPTIONS']:
+#             return [IsAuthenticated()]
+#         return [IsHRManager()]
+#     def list(self, request, *args, **kwargs):
+#         # If no departments exist yet, seed a sensible default set
+#         if Department.objects.count() == 0:
+#             defaults = [
+#                 'Human Resources','Information Technology','Finance','Marketing','Sales',
+#                 'Operations','Development','Design','Quality Assurance','Customer Support'
+#             ]
+#             Department.objects.bulk_create([Department(name=name) for name in defaults])
+#         return super().list(request, *args, **kwargs)
 
 # class OnboardingTaskListCreateView(generics.ListCreateAPIView):
 #     serializer_class = OnboardingTaskSerializer
 #     permission_classes = [IsEmployee]
-    
+
 #     def get_queryset(self):
 #         queryset = OnboardingTask.objects.select_related(
 #             'employee', 'employee__user', 'employee__department', 'assigned_by'
 #         )
-        
 #         if hasattr(self.request.user, 'profile') and self.request.user.profile.role == 'HR_MANAGER':
 #             return queryset.all()
 #         return queryset.filter(employee__user=self.request.user)
-    
+
 #     def perform_create(self, serializer):
 #         serializer.save(assigned_by=self.request.user)
 
@@ -177,6 +362,180 @@
 #         return Response({'message': 'Task completed successfully'})
 #     except OnboardingTask.DoesNotExist:
 #         return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+
+
+
+# # Your existing views remain the same...
+
+# class EmployeeBirthdayListView(generics.ListAPIView):
+#     """
+#     Get employee birthdays - today's birthdays and upcoming birthdays
+#     """
+#     serializer_class = EmployeeBirthdaySerializer
+#     permission_classes = [IsEmployee]
+
+#     def get_queryset(self):
+#         return EmployeeBirthday.objects.select_related(
+#             'employee', 'employee__user', 'employee__department'
+#         ).filter(employee__status='ACTIVE')
+
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         today = date.today()
+        
+#         # Get today's birthdays
+#         todays_birthdays = []
+#         upcoming_birthdays = []
+        
+#         for birthday in queryset:
+#             if birthday.is_birthday_today and birthday.notify_team:
+#                 todays_birthdays.append(self.get_serializer(birthday).data)
+#             elif birthday.days_until_birthday <= 7 and birthday.days_until_birthday > 0:
+#                 upcoming_birthdays.append(self.get_serializer(birthday).data)
+        
+#         # Sort upcoming birthdays by days until birthday
+#         upcoming_birthdays.sort(key=lambda x: x['days_until_birthday'])
+        
+#         return Response({
+#             'todays_birthdays': todays_birthdays,
+#             'upcoming_birthdays': upcoming_birthdays[:5],  # Limit to next 5    
+#             'total_today': len(todays_birthdays),
+#             'has_birthdays_today': len(todays_birthdays) > 0
+#         })
+
+
+# class FestivalListView(generics.ListAPIView):
+#     """
+#     Get festivals - today's festivals and upcoming festivals
+#     """
+#     serializer_class = FestivalSerializer
+#     permission_classes = [IsEmployee]
+
+#     def get_queryset(self):
+#         return Festival.objects.filter(notify_employees=True)
+
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         today = date.today()
+        
+#         # Get today's festivals
+#         todays_festivals = []
+#         upcoming_festivals = []
+        
+#         for festival in queryset:
+#             if festival.is_today:
+#                 todays_festivals.append(self.get_serializer(festival).data)
+#             elif festival.days_until_festival <= 30 and festival.days_until_festival > 0:
+#                 upcoming_festivals.append(self.get_serializer(festival).data)
+        
+#         # Sort upcoming festivals by days until festival
+#         upcoming_festivals.sort(key=lambda x: x['days_until_festival'])
+        
+#         return Response({
+#             'todays_festivals': todays_festivals,
+#             'upcoming_festivals': upcoming_festivals[:10],  # Limit to next 10
+#             'total_today': len(todays_festivals),
+#             'has_festivals_today': len(todays_festivals) > 0
+#         })
+
+
+# @api_view(['GET'])
+# def dashboard_birthday_festival_data(request):
+#     """
+#     Combined endpoint for dashboard birthday and festival data
+#     """
+#     try:
+#         # print("🚀 Dashboard birthday/festival API called")
+#         # print(f"📝 User: {request.user}")
+#         # print(f"📝 User authenticated: {request.user.is_authenticated}")
+        
+#         # Debug: Check if models exist and have data
+#         try:
+#             birthday_count = EmployeeBirthday.objects.count()
+#             festival_count = Festival.objects.count()
+#             employee_count = Employee.objects.count()
+            
+#             # print(f"📊 Total birthdays in DB: {birthday_count}")
+#             # print(f"📊 Total festivals in DB: {festival_count}")
+#             # print(f"📊 Total employees in DB: {employee_count}")
+#         except Exception as model_error:
+#             print(f"❌ Model error: {model_error}")
+#             return Response(
+#                 {'error': f'Database model error: {str(model_error)}'}, 
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
+        
+#         # Get birthday data
+#         birthday_queryset = EmployeeBirthday.objects.select_related(
+#             'employee', 'employee__user', 'employee__department'
+#         ).filter(employee__status='ACTIVE')
+        
+#         # print(f"📊 Active employee birthdays: {birthday_queryset.count()}")
+        
+#         todays_birthdays = []
+#         upcoming_birthdays = []
+        
+#         for birthday in birthday_queryset:
+#             # print(f"🎂 Processing birthday: {birthday.employee.user.get_full_name()} - {birthday.birth_date}")
+#             # print(f"🎂 Is today: {birthday.is_birthday_today}, Days until: {birthday.days_until_birthday}")
+            
+#             if birthday.is_birthday_today and birthday.notify_team:
+#                 todays_birthdays.append(EmployeeBirthdaySerializer(birthday).data)
+#             elif birthday.days_until_birthday <= 7 and birthday.days_until_birthday > 0:
+#                 upcoming_birthdays.append(EmployeeBirthdaySerializer(birthday).data)
+        
+#         # Sort upcoming birthdays
+#         upcoming_birthdays.sort(key=lambda x: x['days_until_birthday'])
+        
+#         # Get festival data
+#         festival_queryset = Festival.objects.filter(notify_employees=True)
+#         # print(f"📊 Festivals to notify: {festival_queryset.count()}")
+        
+#         todays_festivals = []
+#         upcoming_festivals = []
+        
+#         for festival in festival_queryset:
+#             # print(f"🎉 Processing festival: {festival.name} - {festival.date}")
+#             # print(f"🎉 Is today: {festival.is_today}, Days until: {festival.days_until_festival}")
+            
+#             if festival.is_today:
+#                 todays_festivals.append(FestivalSerializer(festival).data)
+#             elif festival.days_until_festival <= 30 and festival.days_until_festival > 0:
+#                 upcoming_festivals.append(FestivalSerializer(festival).data)
+        
+#         # Sort upcoming festivals
+#         upcoming_festivals.sort(key=lambda x: x['days_until_festival'])
+        
+#         result = {
+#             'birthdays': {
+#                 'todays_birthdays': todays_birthdays,
+#                 'upcoming_birthdays': upcoming_birthdays[:5],
+#                 'total_today': len(todays_birthdays),
+#                 'has_birthdays_today': len(todays_birthdays) > 0
+#             },
+#             'festivals': {
+#                 'todays_festivals': todays_festivals,
+#                 'upcoming_festivals': upcoming_festivals[:10],
+#                 'total_today': len(todays_festivals),
+#                 'has_festivals_today': len(todays_festivals) > 0
+#             }
+#         }
+        
+#         # print(f"✅ Returning data: {result}")
+#         return Response(result)
+        
+#     except Exception as e:
+#         print(f"❌ Error in dashboard_birthday_festival_data: {str(e)}")
+#         import traceback
+#         traceback.print_exc()
+        
+#         return Response(
+#             {'error': f'Failed to fetch birthday and festival data: {str(e)}'}, 
+#             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#         )
 
 
 
@@ -195,9 +554,30 @@ from .serializers import (
 )
 from authentication.models import User, UserProfile
 from utils.permissions import IsHRManager, IsEmployee, IsManager
+from utils.roles import (
+    has_executive_access,
+    has_management_access,
+    has_lead_access,
+    can_manage_hr,
+    get_permission_level,
+    PERMISSION_LEVELS,
+    ROLE_CATEGORIES
+)
 
 
-
+# Helper function to get manager's team employees
+def get_manager_team_employees(user):
+    """Get list of employee IDs that a manager can access (team + self)"""
+    try:
+        manager_employee = Employee.objects.get(user=user)
+        team_employee_ids = Employee.objects.filter(
+            manager=manager_employee,
+            status='ACTIVE'
+        ).values_list('id', flat=True)
+        # Include manager's own ID
+        return list(team_employee_ids) + [manager_employee.id]
+    except Employee.DoesNotExist:
+        return []
 
 
 @api_view(['GET'])
@@ -219,20 +599,16 @@ def get_employee_profile_data(request):
                 'error': 'Employee record not found'
             }, status=status.HTTP_404_NOT_FOUND)
         
-        # # Get team members (employees who report to current employee)
-        # direct_reports = Employee.objects.select_related(
-        #     'user', 'department'
-        # ).filter(
-        #     manager=current_employee, 
-        #     status='ACTIVE'
-        # )
+        # Get user role and permission level
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
         
-        # Get peer colleagues or all employees for HR/Admin
+        # Get peer colleagues based on role
         peer_colleagues = []
-        user_role = getattr(getattr(user, 'profile', None), 'role', None)
         
-        if user_role in ['HR_MANAGER', 'ADMIN']:
-            # For HR/Admin, "peers" will be all active employees except self
+        if permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
+            # Executives and HR see all active employees except self
             peer_colleagues = Employee.objects.select_related(
                 'user', 'department'
             ).filter(
@@ -241,20 +617,31 @@ def get_employee_profile_data(request):
                 id=current_employee.id
             )
             print(f"👑 {user_role} - fetching all employees as peers")
-        elif current_employee.manager:
-            # Regular peer logic
+            
+        elif has_management_access(user_role) or has_lead_access(user_role):
+            # Managers and Team Leads see their team
             peer_colleagues = Employee.objects.select_related(
                 'user', 'department'
             ).filter(
-                manager=current_employee.manager,  # Same manager as current employee
+                manager=current_employee,
+                status='ACTIVE'
+            )
+            print(f"👨‍💼 {user_role} - fetching direct reports as peers")
+            
+        elif current_employee.manager:
+            # Regular employees see peers (same manager)
+            peer_colleagues = Employee.objects.select_related(
+                'user', 'department'
+            ).filter(
+                manager=current_employee.manager,
                 status='ACTIVE'
             ).exclude(
-                id=current_employee.id  # Exclude current employee from peers list
+                id=current_employee.id
             )
+            print(f"👤 {user_role} - fetching peers with same manager")
         
         # Serialize data
         employee_data = EmployeeSerializer(current_employee, context={'request': request}).data
-        # team_data = EmployeeSerializer(direct_reports, many=True, context={'request': request}).data
         peers_data = EmployeeSerializer(peer_colleagues, many=True, context={'request': request}).data
         
         # Get manager data if exists
@@ -264,9 +651,10 @@ def get_employee_profile_data(request):
         
         response_data = {
             'employee': employee_data,
-            'peers': peers_data,         # Colleagues with same manager
+            'peers': peers_data,
             'manager': manager_data,
-           
+            'user_role': user_role,
+            'permission_level': permission_level
         }
         
         return Response(response_data)
@@ -280,13 +668,22 @@ def get_employee_profile_data(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsManager])
+@permission_classes([IsEmployee])
 def get_manager_profile_data(request):
     """
     Get manager profile data - same structure as employee but 'peers' contains direct reports
     """
     try:
         user = request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+        
+        # Check if user has management access
+        if not (has_management_access(user_role) or has_lead_access(user_role) or permission_level >= PERMISSION_LEVELS['SENIOR_LEADER']):
+            return Response({
+                'error': 'Only managers and team leads can access this endpoint'
+            }, status=status.HTTP_403_FORBIDDEN)
         
         # Get current user's employee data
         try:
@@ -317,8 +714,10 @@ def get_manager_profile_data(request):
         
         response_data = {
             'employee': employee_data,
-            'peers': peers_data,         # For managers, this contains direct reports
+            'peers': peers_data,  # For managers, this contains direct reports
             'manager': manager_data,
+            'team_count': direct_reports.count(),
+            'user_role': user_role
         }
         
         return Response(response_data)
@@ -330,13 +729,32 @@ def get_manager_profile_data(request):
             'error': f'Failed to fetch manager profile data: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET'])
-@permission_classes([IsHRManager])
+@permission_classes([IsEmployee])
 def get_all_managers_with_teams(request):
     """
-    Get all managers and their team counts (HR only)
+    Get all managers and their team counts
+    Available to HR, Executives, and Senior Leaders
     """
     try:
+        user = request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+        
+        # Check if user has access to view all managers
+        has_access = (
+            permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or
+            can_manage_hr(user_role) or
+            user.has_perm('employees.view_employee')
+        )
+        
+        if not has_access:
+            return Response({
+                'error': 'Only HR and Senior Leaders can view all managers'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         # Get all employees who have subordinates (are managers)
         managers = Employee.objects.filter(
             status='ACTIVE'
@@ -379,35 +797,58 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         qs = Employee.objects.select_related(
             'user', 'department', 'manager', 'manager__user'
         ).all()
-        # If user has global view permission, allow full queryset
+        
+        # Get user role and permission level
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+        
+        # Check Django permission first
         if user.has_perm('employees.view_employee'):
             return qs
-        # Role-based fallback
-        role = getattr(getattr(user, 'profile', None), 'role', None)
-        if role == 'HR_MANAGER':
+        
+        # Apply role-based filtering
+        if permission_level >= PERMISSION_LEVELS['EXECUTIVE']:
+            # C-Level can see all employees
             return qs
-        if role == 'MANAGER':
+            
+        elif permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
+            # VP/Directors and HR can see all employees
+            return qs
+            
+        elif has_management_access(user_role) or has_lead_access(user_role):
+            # Managers and Team Leads see their team + self
+            allowed_employee_ids = get_manager_team_employees(user)
+            return qs.filter(id__in=allowed_employee_ids)
+            
+        else:
+            # Regular employees see only themselves
             try:
-                manager_emp = Employee.objects.get(user=user)
-                team_ids = Employee.objects.filter(manager=manager_emp, status='ACTIVE').values_list('id', flat=True)
-                return qs.filter(id__in=list(team_ids) + [manager_emp.id])
+                emp = Employee.objects.get(user=user)
+                return qs.filter(id=emp.id)
             except Employee.DoesNotExist:
                 return qs.none()
-        # Regular employee: only self record
-        try:
-            emp = Employee.objects.get(user=user)
-            return qs.filter(id=emp.id)
-        except Employee.DoesNotExist:
-            return qs.none()
 
     def create(self, request, *args, **kwargs):
         print("🚀 Incoming Employee Payload:", request.data)
-        # Allow via Django add permission or HR role
-        if not (
-            request.user.has_perm('employees.add_employee') or
-            (hasattr(request.user, 'profile') and request.user.profile.role == 'HR_MANAGER')
-        ):
-            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get user role and permission level
+        user = request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        
+        # Check permissions: Django permission OR HR role OR Executive
+        has_permission = (
+            user.has_perm('employees.add_employee') or
+            can_manage_hr(user_role) or
+            has_executive_access(user_role)
+        )
+        
+        if not has_permission:
+            return Response(
+                {'detail': 'Permission denied. Only HR and Executives can add employees.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         # Transform frontend data structure to match serializer expectations
         transformed_data = {
@@ -432,7 +873,7 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         
         return Response(response_data, status=status.HTTP_201_CREATED)
 
-# Rest of your views remain the same...
+
 class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EmployeeSerializer
     permission_classes = [IsEmployee]
@@ -445,37 +886,63 @@ class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         obj = super().get_object()
         user = self.request.user
-        # View access: allow if has perm or HR, or manager over team, or owner
+        
+        # Get user role and permission level
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+        
+        # Check view access
         if user.has_perm('employees.view_employee'):
             return obj
-        role = getattr(getattr(user, 'profile', None), 'role', None)
-        if role == 'HR_MANAGER':
+            
+        if permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
+            # Senior leaders and HR can view any employee
             return obj
-        if role == 'MANAGER':
-            try:
-                manager_emp = Employee.objects.get(user=user)
-                team_ids = set(Employee.objects.filter(manager=manager_emp, status='ACTIVE').values_list('id', flat=True))
-                if obj.id in team_ids or obj.id == manager_emp.id:
-                    return obj
-            except Employee.DoesNotExist:
-                pass
+            
+        if has_management_access(user_role) or has_lead_access(user_role):
+            # Managers and Team Leads can view their team + self
+            allowed_employee_ids = get_manager_team_employees(user)
+            if obj.id in allowed_employee_ids:
+                return obj
+                
         if getattr(obj, 'user_id', None) == getattr(user, 'id', None):
+            # User can view their own profile
             return obj
-        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        self.permission_denied(self.request, "Cannot access this employee record")
 
     def update(self, request, *args, **kwargs):
         user = request.user
         obj = self.get_object()
+        
+        # Get user role and permission level
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+        
+        # Check update permissions
         allowed = (
             user.has_perm('employees.change_employee') or
-            (hasattr(user, 'profile') and user.profile.role == 'HR_MANAGER') or
-            (
-                hasattr(user, 'profile') and user.profile.role == 'MANAGER' and
-                Employee.objects.filter(user=user, id=obj.manager_id).exists()
-            )
+            permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or
+            can_manage_hr(user_role)
         )
+        
+        # Managers can update their team members
+        if not allowed and (has_management_access(user_role) or has_lead_access(user_role)):
+            try:
+                manager_employee = Employee.objects.get(user=user)
+                if obj.manager_id == manager_employee.id:
+                    allowed = True
+            except Employee.DoesNotExist:
+                pass
+        
         if not allowed:
-            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {'detail': 'Permission denied.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
@@ -483,58 +950,149 @@ class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         user = request.user
-        if not (user.has_perm('employees.delete_employee') or (hasattr(user, 'profile') and user.profile.role == 'HR_MANAGER')):
-            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        
+        # Only HR, Executives, and users with delete permission can delete
+        allowed = (
+            user.has_perm('employees.delete_employee') or
+            can_manage_hr(user_role) or
+            has_executive_access(user_role)
+        )
+        
+        if not allowed:
+            return Response(
+                {'detail': 'Permission denied. Only HR and Executives can delete employees.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
         return super().destroy(request, *args, **kwargs)
+
 
 class UserListView(generics.ListAPIView):
     """
     Get all users who don't have employee records yet
+    Available to HR and Executives only
     """
-    permission_classes = [IsHRManager]
+    permission_classes = [IsEmployee]
 
     def get(self, request, *args, **kwargs):
+        user = request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        
+        # Check if user has access
+        has_access = (
+            can_manage_hr(user_role) or
+            has_executive_access(user_role) or
+            user.has_perm('auth.view_user')
+        )
+        
+        if not has_access:
+            return Response(
+                {'error': 'Only HR and Executives can view this list'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         # Get users who don't have employee records
         users_without_employee = User.objects.filter(
             ~Q(employee__isnull=False)
         ).values('id', 'first_name', 'last_name', 'email', 'username')
+        
         return Response({
             'results': list(users_without_employee)
         })
 
+
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+    
     def get_permissions(self):
         if self.request.method in ['GET', 'HEAD', 'OPTIONS']:
             return [IsAuthenticated()]
-        return [IsHRManager()]
+        return [IsEmployee()]
+    
+    def create(self, request, *args, **kwargs):
+        # Check if user can create departments
+        user = request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        
+        has_permission = (
+            user.has_perm('employees.add_department') or
+            can_manage_hr(user_role) or
+            has_executive_access(user_role)
+        )
+        
+        if not has_permission:
+            return Response(
+                {'detail': 'Permission denied. Only HR and Executives can create departments.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().create(request, *args, **kwargs)
+    
     def list(self, request, *args, **kwargs):
         # If no departments exist yet, seed a sensible default set
         if Department.objects.count() == 0:
             defaults = [
-                'Human Resources','Information Technology','Finance','Marketing','Sales',
-                'Operations','Development','Design','Quality Assurance','Customer Support'
+                'Human Resources', 'Information Technology', 'Finance', 'Marketing', 'Sales',
+                'Operations', 'Development', 'Design', 'Quality Assurance', 'Customer Support',
+                'Engineering', 'Product Management', 'Data Science', 'Security', 'Legal'
             ]
             Department.objects.bulk_create([Department(name=name) for name in defaults])
         return super().list(request, *args, **kwargs)
+
 
 class OnboardingTaskListCreateView(generics.ListCreateAPIView):
     serializer_class = OnboardingTaskSerializer
     permission_classes = [IsEmployee]
 
     def get_queryset(self):
+        user = self.request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+        
         queryset = OnboardingTask.objects.select_related(
             'employee', 'employee__user', 'employee__department', 'assigned_by'
         )
-        if hasattr(self.request.user, 'profile') and self.request.user.profile.role == 'HR_MANAGER':
+        
+        # HR and Senior Leaders can see all onboarding tasks
+        if permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
             return queryset.all()
-        return queryset.filter(employee__user=self.request.user)
+        
+        # Managers can see their team's onboarding tasks
+        if has_management_access(user_role):
+            allowed_employee_ids = get_manager_team_employees(user)
+            return queryset.filter(employee_id__in=allowed_employee_ids)
+        
+        # Regular employees see only their own tasks
+        return queryset.filter(employee__user=user)
 
     def perform_create(self, serializer):
+        # Check if user can create onboarding tasks
+        user = self.request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        
+        has_permission = (
+            user.has_perm('employees.add_onboardingtask') or
+            can_manage_hr(user_role) or
+            has_management_access(user_role) or
+            has_executive_access(user_role)
+        )
+        
+        if not has_permission:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Only HR, Managers, and Executives can create onboarding tasks.')
+        
         serializer.save(assigned_by=self.request.user)
 
+
 @api_view(['PATCH'])
+@permission_classes([IsEmployee])
 def complete_onboarding_task(request, task_id):
     try:
         task = OnboardingTask.objects.get(id=task_id, employee__user=request.user)
@@ -543,14 +1101,11 @@ def complete_onboarding_task(request, task_id):
         task.save()
         return Response({'message': 'Task completed successfully'})
     except OnboardingTask.DoesNotExist:
-        return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-    
+        return Response(
+            {'error': 'Task not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
 
-
-
-
-
-# Your existing views remain the same...
 
 class EmployeeBirthdayListView(generics.ListAPIView):
     """
@@ -583,7 +1138,7 @@ class EmployeeBirthdayListView(generics.ListAPIView):
         
         return Response({
             'todays_birthdays': todays_birthdays,
-            'upcoming_birthdays': upcoming_birthdays[:5],  # Limit to next 5    
+            'upcoming_birthdays': upcoming_birthdays[:5],  # Limit to next 5
             'total_today': len(todays_birthdays),
             'has_birthdays_today': len(todays_birthdays) > 0
         })
@@ -625,45 +1180,21 @@ class FestivalListView(generics.ListAPIView):
 
 
 @api_view(['GET'])
+@permission_classes([IsEmployee])
 def dashboard_birthday_festival_data(request):
     """
     Combined endpoint for dashboard birthday and festival data
     """
     try:
-        # print("🚀 Dashboard birthday/festival API called")
-        # print(f"📝 User: {request.user}")
-        # print(f"📝 User authenticated: {request.user.is_authenticated}")
-        
-        # Debug: Check if models exist and have data
-        try:
-            birthday_count = EmployeeBirthday.objects.count()
-            festival_count = Festival.objects.count()
-            employee_count = Employee.objects.count()
-            
-            # print(f"📊 Total birthdays in DB: {birthday_count}")
-            # print(f"📊 Total festivals in DB: {festival_count}")
-            # print(f"📊 Total employees in DB: {employee_count}")
-        except Exception as model_error:
-            print(f"❌ Model error: {model_error}")
-            return Response(
-                {'error': f'Database model error: {str(model_error)}'}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
         # Get birthday data
         birthday_queryset = EmployeeBirthday.objects.select_related(
             'employee', 'employee__user', 'employee__department'
         ).filter(employee__status='ACTIVE')
         
-        # print(f"📊 Active employee birthdays: {birthday_queryset.count()}")
-        
         todays_birthdays = []
         upcoming_birthdays = []
         
         for birthday in birthday_queryset:
-            # print(f"🎂 Processing birthday: {birthday.employee.user.get_full_name()} - {birthday.birth_date}")
-            # print(f"🎂 Is today: {birthday.is_birthday_today}, Days until: {birthday.days_until_birthday}")
-            
             if birthday.is_birthday_today and birthday.notify_team:
                 todays_birthdays.append(EmployeeBirthdaySerializer(birthday).data)
             elif birthday.days_until_birthday <= 7 and birthday.days_until_birthday > 0:
@@ -674,15 +1205,11 @@ def dashboard_birthday_festival_data(request):
         
         # Get festival data
         festival_queryset = Festival.objects.filter(notify_employees=True)
-        # print(f"📊 Festivals to notify: {festival_queryset.count()}")
         
         todays_festivals = []
         upcoming_festivals = []
         
         for festival in festival_queryset:
-            # print(f"🎉 Processing festival: {festival.name} - {festival.date}")
-            # print(f"🎉 Is today: {festival.is_today}, Days until: {festival.days_until_festival}")
-            
             if festival.is_today:
                 todays_festivals.append(FestivalSerializer(festival).data)
             elif festival.days_until_festival <= 30 and festival.days_until_festival > 0:
@@ -706,7 +1233,6 @@ def dashboard_birthday_festival_data(request):
             }
         }
         
-        # print(f"✅ Returning data: {result}")
         return Response(result)
         
     except Exception as e:

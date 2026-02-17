@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { adminUserAPI, employeeAPI } from '../../services/api';
 import { isAdmin } from '../../utils/auth';
 import { toast } from 'react-toastify';
-
+import { getRoleDisplayName } from '../../utils/roleConfig';
 const UsersAuthHome = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -12,24 +12,29 @@ const UsersAuthHome = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmUser, setConfirmUser] = useState(null);
 ;
+  // const getUserRoleLabel = (user) => {
+  //   if (!user) return 'Employee';
+  //   if (user.is_superuser) return 'ADMIN';
+  //   const role = user.profile?.role || 'EMPLOYEE';
+  //   switch (role) {
+  //     case 'HR_MANAGER':
+  //       return 'HR Manager';
+  //     case 'IT_SUPPORTER':
+  //       return 'IT Supporter';
+  //     case 'MANAGER':
+  //       return 'Manager';
+  //     case 'ADMIN':
+  //       return 'ADMIN';
+  //     default:
+  //       return 'Employee';
+  //   }
+  // };
   const getUserRoleLabel = (user) => {
-    if (!user) return 'Employee';
-    if (user.is_superuser) return 'ADMIN';
-    const role = user.profile?.role || 'EMPLOYEE';
-    switch (role) {
-      case 'HR_MANAGER':
-        return 'HR Manager';
-      case 'IT_SUPPORTER':
-        return 'IT Supporter';
-      case 'MANAGER':
-        return 'Manager';
-      case 'ADMIN':
-        return 'ADMIN';
-      default:
-        return 'Employee';
-    }
-  };
-
+  if (!user) return '—';
+  return user.profile?.role
+    ? getRoleDisplayName(user.profile.role)
+    : '—';
+};
   useEffect(() => {
     const loadUsers = async () => {
       try {

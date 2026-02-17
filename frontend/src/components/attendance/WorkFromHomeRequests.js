@@ -1180,26 +1180,9 @@ const WorkFromHomeRequests = () => {
   const fetchWFHRequests = async () => {
     try {
       setLoading(true);
-      const params = {};
-      if (filters.status) params.status = filters.status;
-
-      if (filters.month) {
-        // Calculate start and end date of the selected month
-        const [year, month] = filters.month.split('-');
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0); // Last day of month
-
-        // Format as YYYY-MM-DD for API
-        const offset = startDate.getTimezoneOffset();
-        const startLocal = new Date(startDate.getTime() - (offset * 60 * 1000));
-        const endLocal = new Date(endDate.getTime() - (offset * 60 * 1000));
-
-        params.start_date = startLocal.toISOString().split('T')[0];
-        params.end_date = endLocal.toISOString().split('T')[0];
-      }
-
-      const response = await workFromHomeAPI.getWFHRequests(params);
-
+      const filterParam = filters.status === '' ? null : filters.status;
+      const response = await workFromHomeAPI.getWFHRequests(filterParam);
+      console.log('API response for WFH requests:', response);
       // Handle different response formats
       let requestsData = [];
       if (response.results) {
@@ -1211,7 +1194,7 @@ const WorkFromHomeRequests = () => {
       } else if (response.data && Array.isArray(response.data)) {
         requestsData = response.data;
       }
-
+      console.log('Fetched WFH requests:', requestsData);
       setRequests(Array.isArray(requestsData) ? requestsData : []);
 
       // Set pending approvals count for HR and Managers
@@ -1718,9 +1701,19 @@ const WorkFromHomeRequests = () => {
                               <h4 className="text-md font-medium text-gray-900">
                                 {request.employee_name}
                               </h4>
-                              <p className="text-sm text-gray-600">Employee ID: {request.employee_id}</p>
-                              <p className="text-sm text-gray-600">Department: {request.employee_department}</p>
-                              <p className="text-sm text-gray-600">Period: {request.formatted_start_date} to {request.formatted_end_date}</p>
+
+                              <p className="text-sm text-gray-600">
+                                Employee ID: {request.employee?.employee_id || '—'}
+                              </p>
+
+                              <p className="text-sm text-gray-600">
+                                Department: {request.employee?.department || request.employee?.sub_department || '—'}
+                              </p>
+
+                              <p className="text-sm text-gray-600">
+                                Request Date: {formatDate(request.request_date)}
+                              </p>
+
                               <p className="text-sm text-gray-700 mt-1">
                                 <span className="font-medium">Reason:</span> {request.reason}
                               </p>
