@@ -61,10 +61,10 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { theme } = useTheme();
 
   const navigation = [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard', 
-      icon: HomeIcon, 
+    {
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: HomeIcon,
       roles: ['EMPLOYEE', 'HR_MANAGER', 'ADMIN', 'MANAGER', 'IT_SUPPORTER'],
       description: 'Overview and quick stats',
       color: 'from-blue-500 to-indigo-600'
@@ -77,19 +77,19 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: 'Manage users and authentication',
       color: 'from-sky-500 to-blue-600',
     },
-    { 
-      name: 'Asset Management', 
-      href: '/onboarding/assets', 
-      icon: WrenchScrewdriverIcon, 
+    {
+      name: 'Asset Management',
+      href: '/onboarding/assets',
+      icon: WrenchScrewdriverIcon,
       roles: ['HR_MANAGER', 'ADMIN', 'IT_SUPPORTER'],
       description: 'Manage company assets',
       color: 'from-orange-500 to-red-600'
     },
-    { 
-      name: 'My Profile', 
-      href: '/profile', 
-      icon: UserGroupIcon, 
-      roles: ['EMPLOYEE','HR_MANAGER','MANAGER', 'IT_SUPPORTER', 'ADMIN'],
+    {
+      name: 'My Profile',
+      href: '/profile',
+      icon: UserGroupIcon,
+      roles: ['EMPLOYEE', 'HR_MANAGER', 'MANAGER', 'IT_SUPPORTER', 'ADMIN'],
       description: 'View and edit your profile',
       color: 'from-purple-500 to-pink-600'
     },
@@ -101,26 +101,26 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: 'View your team members and reporting structure',
       color: 'from-emerald-500 to-teal-600',
     },
-    { 
-      name: 'Employees', 
-      href: '/employees', 
-      icon: UsersIcon, 
+    {
+      name: 'Employees',
+      href: '/employees',
+      icon: UsersIcon,
       roles: ['HR_MANAGER', 'ADMIN'],
       description: 'Manage employee directory',
       color: 'from-green-500 to-emerald-600'
     },
-    { 
-      name: 'Attendance', 
-      href: '/attendance', 
-      icon: ClockIcon, 
+    {
+      name: 'Attendance',
+      href: '/attendance',
+      icon: ClockIcon,
       roles: ['EMPLOYEE', 'HR_MANAGER', 'ADMIN', 'MANAGER', 'IT_SUPPORTER'],
       description: 'Track time and attendance',
       color: 'from-yellow-500 to-orange-600'
     },
-    { 
-      name: 'Leave Management', 
-      href: '/leave', 
-      icon: CalendarDaysIcon, 
+    {
+      name: 'Leave Management',
+      href: '/leave',
+      icon: CalendarDaysIcon,
       roles: ['EMPLOYEE', 'HR_MANAGER', 'ADMIN', 'MANAGER', 'IT_SUPPORTER'],
       description: 'Manage leave requests',
       color: 'from-blue-600 to-purple-600'
@@ -133,58 +133,58 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: 'Manage WFH requests',
       color: 'from-violet-500 to-purple-600'
     },
-    { 
-      name: 'Resource Management', 
-      href: '/resource-management', 
-      icon: KeyIcon, 
+    {
+      name: 'Support 24/7',
+      href: '/resource-management',
+      icon: KeyIcon,
       roles: ['EMPLOYEE', 'HR_MANAGER', 'ADMIN', 'MANAGER', 'IT_SUPPORTER'],
       description: 'Access requests and resources',
       color: 'from-emerald-500 to-teal-600'
     },
-    { 
-      name: 'My Assets', 
-      href: '/my-assets', 
-      icon: ComputerDesktopIcon, 
+    {
+      name: 'My Assets',
+      href: '/my-assets',
+      icon: ComputerDesktopIcon,
       roles: ['EMPLOYEE', 'HR_MANAGER', 'ADMIN', 'MANAGER', 'IT_SUPPORTER'],
       description: 'Assets assigned to you',
       color: 'from-indigo-500 to-blue-600'
     },
-    { 
-      name: 'Employee Onboarding', 
-      href: '/onboarding/employees', 
-      icon: UserPlusIcon, 
+    {
+      name: 'Employee Onboarding',
+      href: '/onboarding/employees',
+      icon: UserPlusIcon,
       roles: ['HR_MANAGER', 'ADMIN'],
       description: 'Manage new employee onboarding',
       color: 'from-cyan-500 to-blue-600'
     },
-    { 
-      name: 'Onboarding Links', 
-      href: '/onboarding/link-generator', 
-      icon: LinkIcon, 
+    {
+      name: 'Onboarding Links',
+      href: '/onboarding/link-generator',
+      icon: LinkIcon,
       roles: ['HR_MANAGER', 'ADMIN'],
       description: 'Generate secure onboarding links',
       color: 'from-indigo-500 to-purple-600'
     },
-    { 
-      name: 'Employee Offboarding', 
-      href: '/onboarding/offboarding', 
-      icon: UserMinusIcon, 
+    {
+      name: 'Employee Offboarding',
+      href: '/onboarding/offboarding',
+      icon: UserMinusIcon,
       roles: ['HR_MANAGER', 'ADMIN'],
       description: 'Manage employee exit process',
       color: 'from-rose-500 to-pink-600'
     },
-    { 
-      name: 'Biometric Devices', 
-      href: '/attendance/biometric', 
-      icon: ComputerDesktopIcon, 
+    {
+      name: 'Biometric Devices',
+      href: '/attendance/biometric',
+      icon: ComputerDesktopIcon,
       roles: ['HR_MANAGER', 'ADMIN', 'IT_SUPPORTER'],
       description: 'Manage biometric integration',
       color: 'from-teal-500 to-cyan-600'
     },
-    { 
-      name: 'Settings', 
-      href: '/profile', 
-      icon: CogIcon, 
+    {
+      name: 'Settings',
+      href: '/settings',
+      icon: CogIcon,
       roles: ['HR_MANAGER', 'ADMIN', 'IT_SUPPORTER'],
       description: 'System configuration',
       color: 'from-gray-500 to-slate-600'
@@ -251,7 +251,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     <>
       {/* Mobile backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-all duration-300"
           onClick={onClose}
         />
@@ -289,7 +289,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             {filteredNavigation.map((item) => {
               const Icon = item.icon;
               const isActive = isActiveLink(item.href);
-              
+
               return (
                 <Link
                   key={item.name}
@@ -309,17 +309,17 @@ const Sidebar = ({ isOpen, onClose }) => {
                   {isActive && (
                     <div className={`absolute inset-0 bg-gradient-to-r ${theme.primaryGradient} opacity-20 animate-pulse`}></div>
                   )}
-                  
+
                   <div className={`
                     relative z-10 w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-300
-                    ${isActive 
-                      ? 'bg-white/20 shadow-md border border-white/30' 
+                    ${isActive
+                      ? 'bg-white/20 shadow-md border border-white/30'
                       : `bg-gradient-to-r ${item.color} opacity-80 group-hover:opacity-100 group-hover:shadow-md group-hover:scale-110`
                     }
                   `}>
                     <Icon className="h-4 w-4 text-white" />
                   </div>
-                  
+
                   <div className="flex-1 relative z-10">
                     <div className="font-semibold">{item.name}</div>
                     <div className={`
@@ -329,7 +329,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                       {item.description}
                     </div>
                   </div>
-                  
+
                   {isActive && (
                     <div className="relative z-10 flex items-center space-x-1">
                       <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
@@ -351,7 +351,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   Online
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between text-xs">
                 <span className="text-gray-300 font-medium">Version</span>
                 <span className="text-blue-300 font-semibold bg-blue-500/20 px-2 py-0.5 rounded-full border border-blue-500/30">

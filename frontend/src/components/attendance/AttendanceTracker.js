@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { 
@@ -24,6 +26,8 @@ import { useTheme } from '../../context/ThemeContext';
 
 const AttendanceTracker = () => {
   const { theme } = useTheme();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -40,8 +44,7 @@ const AttendanceTracker = () => {
     onTimePercent: 0
   });
   const [filters, setFilters] = useState({
-    start_date: '',
-    end_date: '',
+    month: new Date().toISOString().slice(0, 7), // Default to current month YYYY-MM
     status: '',
     employee_id: ''
   });
@@ -94,8 +97,22 @@ const AttendanceTracker = () => {
     try {
       setLoading(true);
       const params = {};
-      if (filters.start_date) params.start_date = filters.start_date;
-      if (filters.end_date) params.end_date = filters.end_date;
+      if (filters.month) {
+        // Calculate start and end date of the selected month
+        const [year, month] = filters.month.split('-');
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0); // Last day of month
+        
+        // Format as YYYY-MM-DD for API
+        // Adjust for timezone to ensure we get the correct date string
+        const offset = startDate.getTimezoneOffset();
+        const startLocal = new Date(startDate.getTime() - (offset * 60 * 1000));
+        const endLocal = new Date(endDate.getTime() - (offset * 60 * 1000));
+        
+        params.start_date = startLocal.toISOString().split('T')[0];
+        params.end_date = endLocal.toISOString().split('T')[0];
+      }
+      
       if (filters.status) params.status = filters.status;
       if (filters.employee_id) params.employee_id = filters.employee_id;
 
@@ -109,7 +126,14 @@ const AttendanceTracker = () => {
         setPendingApprovalsCount(response.data.pending_approvals_count);
       }
       
-      calculateStats(Array.isArray(records) ? records : []);
+      const targetId = filters.employee_id || user?.employee_id;
+      const recordsToStat = Array.isArray(records) 
+        ? records.filter(r => {
+            const rEmpId = r.employee?.id || r.employee_id || r.employee;
+            return String(rEmpId) === String(targetId);
+          })
+        : [];
+      calculateStats(recordsToStat);
     } catch (error) {
       toast.error('Failed to fetch attendance records');
       setAttendanceRecords([]);
@@ -126,12 +150,17 @@ const AttendanceTracker = () => {
       console.error('Failed to fetch user pending requests:', error);
     }
   };
+  const isLate = (checkInTime) => {
+    if (!checkInTime) return false;
+    const [hours, minutes, seconds] = checkInTime.split(':').map(Number);
+    return hours > 10 || (hours === 10 && (minutes > 0 || seconds > 0));
+  };
 
   const calculateStats = (records) => {
     const approvedRecords = records.filter(r => !r.is_pending_approval);
-    const presentDays = approvedRecords.filter(r => r.status === 'PRESENT').length;
+    const presentDays = approvedRecords.filter(r => r.status === 'PRESENT' && !isLate(r.check_in_time)).length;
     const absentDays = approvedRecords.filter(r => r.status === 'ABSENT').length;
-    const lateDays = approvedRecords.filter(r => r.status === 'LATE').length;
+    const lateDays = approvedRecords.filter(r => r.status === 'LATE' || isLate(r.check_in_time)).length;
     const workingRecords = approvedRecords.filter(r => r.check_in_time && r.check_out_time);
     let totalMinutes = 0;
     for (const r of workingRecords) {
@@ -175,7 +204,7 @@ const AttendanceTracker = () => {
     setSubmitting(true);
     try {
       const existingRecord = attendanceRecords.find(record => 
-        record.date === data.date
+        record.date === data.date && (record.employee?.id === user?.employee_id || record.employee_id === user?.employee_id)
       );
       
       if (existingRecord) {
@@ -286,7 +315,7 @@ const AttendanceTracker = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ start_date: '', end_date: '', status: '', employee_id: '' });
+    setFilters({ month: new Date().toISOString().slice(0, 7), status: '', employee_id: '' });
   };
 
   const exportAttendance = () => {
@@ -331,7 +360,7 @@ const AttendanceTracker = () => {
     if (type === 'clockin') {
       toast.info('Web Clock-In coming soon');
     } else if (type === 'wfh') {
-      toast.info('Open Work From Home request page');
+      navigate('/work-from-home');
     } else if (type === 'policy') {
       toast.info('Open Attendance Policy');
     }
@@ -981,21 +1010,11 @@ const AttendanceTracker = () => {
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Month</label>
               <input
-                type="date"
-                value={filters.start_date}
-                onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
-              <input
-                type="date"
-                value={filters.end_date}
-                onChange={(e) => handleFilterChange('end_date', e.target.value)}
+                type="month"
+                value={filters.month}
+                onChange={(e) => handleFilterChange('month', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
             </div>

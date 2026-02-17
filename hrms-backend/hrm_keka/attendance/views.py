@@ -44,37 +44,70 @@ class AttendanceRecordListView(generics.ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        print(f"🔍 Current user: {user}")
-        # Start with full queryset, then restrict if user lacks view permission
         queryset = AttendanceRecord.objects.all()
+        
+        # Visibility filters
+        target_employee_id = self.request.query_params.get('employee_id')
+        include_peers = self.request.query_params.get('include_peers') == 'true'
 
         if not user.has_perm('attendance.view_attendancerecord'):
             # Fallback to role-based scoping when user doesn't have explicit view permission
             if hasattr(user, 'profile'):
                 user_role = user.profile.role
-                print(f"🔍 User role: {user_role}")
 
                 if user_role in ['HR_MANAGER', 'ADMIN']:
-                    pass  # HR Manager and Admin can see all records
+                    if target_employee_id:
+                        queryset = queryset.filter(employee_id=target_employee_id)
                 elif user_role == 'MANAGER':
                     allowed_employee_ids = get_manager_team_employees(user)
-                    queryset = queryset.filter(employee_id__in=allowed_employee_ids)
-                    print(f"🔍 Manager filtered queryset: {queryset}")
+                    if target_employee_id:
+                        if int(target_employee_id) in allowed_employee_ids:
+                            queryset = queryset.filter(employee_id=target_employee_id)
+                        else:
+                            queryset = queryset.none()
+                    else:
+                        queryset = queryset.filter(employee_id__in=allowed_employee_ids)
                 else:
-                    # For EMPLOYEE and IT_SUPPORTER: only show OWN records (no peers)
-                    # This ensures data privacy - employees should not see their peers' attendance
+                    # For EMPLOYEE and IT_SUPPORTER: 
+                    # Default to showing ONLY own records unless include_peers=true is passed (used by My Team page)
                     try:
                         employee = Employee.objects.get(user=user)
-                        queryset = queryset.filter(employee=employee)
-                        print(f"🔍 Employee/IT_SUPPORTER filtered queryset (own only): {employee.id}")
+                        
+                        if target_employee_id:
+                            if int(target_employee_id) == employee.id:
+                                queryset = queryset.filter(employee=employee)
+                            elif include_peers and employee.manager:
+                                is_peer = Employee.objects.filter(
+                                    id=target_employee_id,
+                                    manager=employee.manager,
+                                    status='ACTIVE'
+                                ).exists()
+                                if is_peer:
+                                    queryset = queryset.filter(employee_id=target_employee_id)
+                                else:
+                                    queryset = queryset.none()
+                            else:
+                                queryset = queryset.none()
+                        else:
+                            if include_peers and employee.manager:
+                                peers = Employee.objects.filter(
+                                    manager=employee.manager,
+                                    status='ACTIVE'
+                                ).values_list('id', flat=True)
+                                allowed_ids = [employee.id] + list(peers)
+                                queryset = queryset.filter(employee_id__in=allowed_ids)
+                            else:
+                                queryset = queryset.filter(employee=employee)
                     except Employee.DoesNotExist:
-                        queryset = AttendanceRecord.objects.none()
+                        queryset = queryset.none()
             else:
                 try:
                     employee = Employee.objects.get(user=user)
                     queryset = queryset.filter(employee=employee)
                 except Employee.DoesNotExist:
-                    queryset = AttendanceRecord.objects.none()
+                    queryset = queryset.none()
+        elif target_employee_id:
+            queryset = queryset.filter(employee_id=target_employee_id)
         
         # Filter by date range if provided
         start_date = self.request.query_params.get('start_date')
@@ -530,15 +563,19 @@ def apply_work_from_home(request):
             print(f"❌ WFH Serializer Errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-        # Check if already applied for this date
-        print(f"🔍 Checking if WFH exists for {employee.user} on {serializer.validated_data['request_date']}")
-        existing_request = WorkFromHomeRequest.objects.filter(
+        # Check if any overlapping WFH exists for these dates
+        start_date = serializer.validated_data['start_date']
+        end_date = serializer.validated_data['end_date']
+        
+        print(f"🔍 Checking if overlapping WFH exists for {employee.user} from {start_date} to {end_date}")
+        overlapping_request = WorkFromHomeRequest.objects.filter(
             employee=employee,
-            request_date=serializer.validated_data['request_date']
+            start_date__lte=end_date,
+            end_date__gte=start_date
         ).first()
         
-        if existing_request:
-            msg = f"Already applied for WFH on {existing_request.request_date}. Status: {existing_request.status}"
+        if overlapping_request:
+            msg = f"Already applied for WFH during some of these dates ({overlapping_request.start_date} to {overlapping_request.end_date}). Status: {overlapping_request.status}"
             print(f"⚠️ {msg}")
             return Response({
                 'error': msg
@@ -565,12 +602,14 @@ def apply_work_from_home(request):
             # Deduplicate
             recipients = list(set(recipients))
             
+            date_range_str = f"{wfh_request.start_date} to {wfh_request.end_date}" if wfh_request.start_date != wfh_request.end_date else f"{wfh_request.start_date}"
+            
             for recipient in recipients:
                 NotificationService.create_notification(
                     recipient=recipient,
                     notification_type='WFH_REQUEST',
                     title=f"New WFH Request: {employee.user.get_full_name()}",
-                    message=f"{employee.user.get_full_name()} has requested WFH for {wfh_request.request_date}. Reason: {wfh_request.reason[:50]}...",
+                    message=f"{employee.user.get_full_name()} has requested WFH for {date_range_str}. Reason: {wfh_request.reason[:50]}...",
                     sender=request.user,
                     action_url='/attendance/wfh-requests',
                     action_text='Review Request'
@@ -611,10 +650,14 @@ def check_wfh_status(request):
             check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
         
         try:
-            wfh_request = WorkFromHomeRequest.objects.get(
+            wfh_request = WorkFromHomeRequest.objects.filter(
                 employee=employee,
-                request_date=check_date
-            )
+                start_date__lte=check_date,
+                end_date__gte=check_date
+            ).first()
+            
+            if not wfh_request:
+                raise WorkFromHomeRequest.DoesNotExist()
             return Response({
                 'has_wfh_request': True,
                 'status': wfh_request.status,
@@ -700,6 +743,17 @@ def get_wfh_requests(request):
             requests = requests.filter(status=status_filter.upper())
             print(f"🔽 Filtered by status '{status_filter}': {requests.count()} requests")
         
+        # Filter by date range if provided
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        
+        if start_date:
+            requests = requests.filter(start_date__gte=start_date)
+            print(f"📅 Filtered by start_date '{start_date}': {requests.count()} requests")
+        if end_date:
+            requests = requests.filter(end_date__lte=end_date)
+            print(f"📅 Filtered by end_date '{end_date}': {requests.count()} requests")
+        
         # Serialize the data
         serializer = WorkFromHomeRequestSerializer(requests, many=True)
         serialized_data = serializer.data
@@ -782,7 +836,7 @@ def approve_wfh_request(request, request_id):
                     recipient=wfh_request.employee.user,
                     notification_type='WFH_APPROVED',
                     title="WFH Request Approved",
-                    message=f"Your WFH request for {wfh_request.request_date} has been approved.",
+                    message=f"Your WFH request from {wfh_request.start_date} to {wfh_request.end_date} has been approved.",
                     sender=request.user,
                     action_url='/attendance',
                     action_text='View Attendance'
@@ -808,7 +862,7 @@ def approve_wfh_request(request, request_id):
                     recipient=wfh_request.employee.user,
                     notification_type='WFH_REJECTED',
                     title="WFH Request Rejected",
-                    message=f"Your WFH request for {wfh_request.request_date} has been rejected. Reason: {wfh_request.rejection_reason}",
+                    message=f"Your WFH request from {wfh_request.start_date} to {wfh_request.end_date} has been rejected. Reason: {wfh_request.rejection_reason}",
                     sender=request.user,
                     action_url='/attendance',
                     action_text='View Attendance'
@@ -857,7 +911,8 @@ def send_wfh_request_email(wfh_request):
                     <h3>Employee Details:</h3>
                     <p><strong>Name:</strong> {wfh_request.employee.user.get_full_name()}</p>
                     <p><strong>Employee ID:</strong> {wfh_request.employee.employee_id}</p>
-                    <p><strong>Requested Date:</strong> {wfh_request.request_date.strftime('%B %d, %Y')}</p>
+                    <p><strong>Start Date:</strong> {wfh_request.start_date.strftime('%B %d, %Y')}</p>
+                    <p><strong>End Date:</strong> {wfh_request.end_date.strftime('%B %d, %Y')}</p>
                     <p><strong>Applied On:</strong> {wfh_request.applied_at.strftime('%B %d, %Y at %I:%M %p')}</p>
                 </div>
                 
@@ -901,12 +956,12 @@ def send_wfh_approval_email(wfh_request, approved=True):
                 <div style="font-size: 18px; margin-bottom: 20px;">
                     <p>Hi <strong>{wfh_request.employee.user.first_name}</strong>,</p>
                     
-                    <p>Your work from home request for <strong>{wfh_request.request_date.strftime('%B %d, %Y')}</strong> has been <strong>{'approved' if approved else 'rejected'}</strong>.</p>
+                    <p>Your work from home request from <strong>{wfh_request.start_date.strftime('%B %d, %Y')}</strong> to <strong>{wfh_request.end_date.strftime('%B %d, %Y')}</strong> has been <strong>{'approved' if approved else 'rejected'}</strong>.</p>
                 </div>
                 
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
                     <p><strong>Request Details:</strong></p>
-                    <p><strong>Date:</strong> {wfh_request.request_date.strftime('%B %d, %Y')}</p>
+                    <p><strong>Duration:</strong> {wfh_request.start_date.strftime('%B %d, %Y')} to {wfh_request.end_date.strftime('%B %d, %Y')}</p>
                     <p><strong>Reason:</strong> {wfh_request.reason}</p>
                     <p><strong>{'Approved' if approved else 'Rejected'} by:</strong> {wfh_request.approved_by.user.get_full_name() if wfh_request.approved_by else 'Manager'}</p>
                 </div>

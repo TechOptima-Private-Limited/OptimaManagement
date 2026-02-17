@@ -135,7 +135,7 @@ const ResourceDashboard = () => {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Resource Management Dashboard</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Support 24/7 Dashboard</h2>
         <p className="text-gray-600">Overview of your access requests and system status</p>
       </div>
 
@@ -300,7 +300,7 @@ const ResourceDashboard = () => {
                 <p className="text-xs text-gray-500">All systems operational</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
               <div>
@@ -308,7 +308,7 @@ const ResourceDashboard = () => {
                 <p className="text-xs text-gray-500">Notifications active</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
               <div>

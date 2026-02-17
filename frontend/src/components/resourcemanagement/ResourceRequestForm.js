@@ -607,25 +607,26 @@ const ResourceRequestForm = () => {
 
   // Safely extract access levels with fallback
   const accessLevels = React.useMemo(() => {
+    let rawData = [];
     if (accessLevelsData) {
       if (Array.isArray(accessLevelsData)) {
-        return accessLevelsData;
+        rawData = accessLevelsData;
+      } else if (accessLevelsData.results && Array.isArray(accessLevelsData.results)) {
+        rawData = accessLevelsData.results;
+      } else if (accessLevelsData.data && Array.isArray(accessLevelsData.data)) {
+        rawData = accessLevelsData.data;
       }
+    }
 
-      if (accessLevelsData.results && Array.isArray(accessLevelsData.results)) {
-        return accessLevelsData.results;
-      }
-
-      if (accessLevelsData.data && Array.isArray(accessLevelsData.data)) {
-        return accessLevelsData.data;
-      }
+    if (rawData && rawData.length > 0) {
+      return rawData;
     }
 
     // Fallback data
     return [
-      { id: 1, name: 'Read', description: 'Read-only access' },
-      { id: 2, name: 'Write', description: 'Read and write access' },
-      { id: 3, name: 'Admin', description: 'Full administrative access' }
+      { id: 1, name: 'read only', description: 'Read-only access' },
+      { id: 2, name: 'write only', description: 'Write-only access' },
+      { id: 3, name: 'read and write', description: 'Read and write access' }
     ];
   }, [accessLevelsData]);
 

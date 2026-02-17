@@ -36,6 +36,7 @@ class Asset(models.Model):
         ('ASSIGNED', 'Assigned'),
         ('DAMAGED', 'Damaged'),
         ('LOST', 'Lost'),
+        ('DISPOSED', 'Disposed'),
     ]
 
     asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE)

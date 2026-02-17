@@ -466,7 +466,7 @@ const ResourceManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent`}>
-                  Resource Management
+                  Support 24/7
                 </h1>
                 <p className="text-gray-600 mt-2">
                   Manage access requests, resources, and permissions

@@ -14,7 +14,8 @@ class WorkFromHomeRequest(models.Model):
     ]
     
     employee = models.ForeignKey('employees.Employee', on_delete=models.CASCADE)
-    request_date = models.DateField()
+    start_date = models.DateField()
+    end_date = models.DateField()
     reason = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     applied_at = models.DateTimeField(auto_now_add=True)
@@ -23,11 +24,10 @@ class WorkFromHomeRequest(models.Model):
     rejection_reason = models.TextField(blank=True)
     
     class Meta:
-        unique_together = ['employee', 'request_date']
         ordering = ['-applied_at']
     
     def __str__(self):
-        return f"{self.employee.user.get_full_name()} - {self.request_date} ({self.status})"
+        return f"{self.employee.user.get_full_name()} - {self.start_date} to {self.end_date} ({self.status})"
 
 
 class AttendanceRecord(models.Model):
@@ -77,15 +77,12 @@ class AttendanceRecord(models.Model):
         return f"{self.employee.user.get_full_name()} - {self.date} - {self.status}"
     def can_work_from_home_today(self):
         """Check if employee has approved WFH for today"""
-        try:
-            wfh_request = WorkFromHomeRequest.objects.get(
-                employee=self.employee,
-                request_date=self.date,
-                status='APPROVED'
-            )
-            return True
-        except WorkFromHomeRequest.DoesNotExist:
-            return False
+        return WorkFromHomeRequest.objects.filter(
+            employee=self.employee,
+            start_date__lte=self.date,
+            end_date__gte=self.date,
+            status='APPROVED'
+        ).exists()
     def clear_original_values(self):
         """Clear temporary original values after approval/rejection"""
         self.original_check_in_time = None

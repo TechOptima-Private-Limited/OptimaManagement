@@ -1137,15 +1137,15 @@ const WorkFromHomeRequests = () => {
     pendingRequests: 0
   });
   const [filters, setFilters] = useState({
-    start_date: '',
-    end_date: '',
+    month: new Date().toISOString().slice(0, 7), // Default to current month YYYY-MM
     status: '',
     employee_id: ''
   });
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
-      request_date: new Date().toISOString().split('T')[0],
+      start_date: new Date().toISOString().split('T')[0],
+      end_date: new Date().toISOString().split('T')[0],
       reason: ''
     }
   });
@@ -1180,8 +1180,25 @@ const WorkFromHomeRequests = () => {
   const fetchWFHRequests = async () => {
     try {
       setLoading(true);
-      const filterParam = filters.status === '' ? null : filters.status;
-      const response = await workFromHomeAPI.getWFHRequests(filterParam);
+      const params = {};
+      if (filters.status) params.status = filters.status;
+
+      if (filters.month) {
+        // Calculate start and end date of the selected month
+        const [year, month] = filters.month.split('-');
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0); // Last day of month
+
+        // Format as YYYY-MM-DD for API
+        const offset = startDate.getTimezoneOffset();
+        const startLocal = new Date(startDate.getTime() - (offset * 60 * 1000));
+        const endLocal = new Date(endDate.getTime() - (offset * 60 * 1000));
+
+        params.start_date = startLocal.toISOString().split('T')[0];
+        params.end_date = endLocal.toISOString().split('T')[0];
+      }
+
+      const response = await workFromHomeAPI.getWFHRequests(params);
 
       // Handle different response formats
       let requestsData = [];
@@ -1230,7 +1247,8 @@ const WorkFromHomeRequests = () => {
       await workFromHomeAPI.createWFHRequest(data);
       toast.success('Work from home request submitted successfully!');
       reset({
-        request_date: new Date().toISOString().split('T')[0],
+        start_date: new Date().toISOString().split('T')[0],
+        end_date: new Date().toISOString().split('T')[0],
         reason: ''
       });
       setShowRequestModal(false);
@@ -1310,8 +1328,10 @@ const WorkFromHomeRequests = () => {
       employee_name: request.employee_name,
       employee_id: request.employee_id,
       employee_department: request.employee_department,
-      request_date: request.request_date,
-      formatted_request_date: request.formatted_request_date,
+      start_date: request.start_date,
+      end_date: request.end_date,
+      formatted_start_date: request.formatted_start_date,
+      formatted_end_date: request.formatted_end_date,
       reason: request.reason,
       action: action
     };
@@ -1330,14 +1350,14 @@ const WorkFromHomeRequests = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ start_date: '', end_date: '', status: '', employee_id: '' });
+    setFilters({ month: new Date().toISOString().slice(0, 7), status: '', employee_id: '' });
   };
 
   const exportWFHRequests = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
-      "Date,Employee,Department,Reason,Status,Applied On,Approved By\n" +
+      "Date Range,Employee,Department,Reason,Status,Applied On,Approved By\n" +
       requests.map(request =>
-        `${request.formatted_request_date},${request.employee_name},${request.employee_department},"${request.reason}",${request.status},${request.formatted_applied_at},${request.approved_by_name || ''}`
+        `${request.formatted_start_date} - ${request.formatted_end_date},${request.employee_name},${request.employee_department},"${request.reason}",${request.status},${request.formatted_applied_at},${request.approved_by_name || ''}`
       ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -1436,18 +1456,20 @@ const WorkFromHomeRequests = () => {
       },
     }] : []),
     {
-      header: 'Request Date',
-      accessor: 'formatted_request_date',
+      header: 'Request Period',
+      accessor: 'formatted_start_date',
       render: (date, row) => (
         <div className="flex items-center">
           <CalendarDaysIcon className="h-4 w-4 text-gray-400 mr-2" />
           <div>
-            <div className="text-sm font-medium text-gray-900">{date}</div>
-            {row.days_until_request >= 0 && (
+            <div className="text-sm font-medium text-gray-900">
+              {row.formatted_start_date === row.formatted_end_date ? row.formatted_start_date : `${row.formatted_start_date} - ${row.formatted_end_date}`}
+            </div>
+            {row.days_until_start >= 0 && (
               <div className="text-xs text-gray-500">
-                {row.days_until_request === 0 ? 'Today' :
-                  row.days_until_request === 1 ? 'Tomorrow' :
-                    `In ${row.days_until_request} days`}
+                {row.days_until_start === 0 ? 'Starts Today' :
+                  row.days_until_start === 1 ? 'Starts Tomorrow' :
+                    `Starts in ${row.days_until_start} days`}
               </div>
             )}
           </div>
@@ -1634,7 +1656,7 @@ const WorkFromHomeRequests = () => {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-amber-800">
-                            Request for {request.formatted_request_date}
+                            Range: {request.formatted_start_date} - {request.formatted_end_date}
                           </p>
                           <p className="text-xs text-amber-600">
                             Waiting for {isHRManager() ? 'HR' : 'manager'} approval
@@ -1698,7 +1720,7 @@ const WorkFromHomeRequests = () => {
                               </h4>
                               <p className="text-sm text-gray-600">Employee ID: {request.employee_id}</p>
                               <p className="text-sm text-gray-600">Department: {request.employee_department}</p>
-                              <p className="text-sm text-gray-600">Request Date: {request.formatted_request_date}</p>
+                              <p className="text-sm text-gray-600">Period: {request.formatted_start_date} to {request.formatted_end_date}</p>
                               <p className="text-sm text-gray-700 mt-1">
                                 <span className="font-medium">Reason:</span> {request.reason}
                               </p>
@@ -1753,23 +1775,13 @@ const WorkFromHomeRequests = () => {
             <FunnelIcon className="h-6 w-6 mr-2 text-indigo-500" />
             Filter Requests
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Month</label>
               <input
-                type="date"
-                value={filters.start_date}
-                onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
-              <input
-                type="date"
-                value={filters.end_date}
-                onChange={(e) => handleFilterChange('end_date', e.target.value)}
+                type="month"
+                value={filters.month}
+                onChange={(e) => handleFilterChange('month', e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
               />
             </div>
@@ -1849,17 +1861,32 @@ const WorkFromHomeRequests = () => {
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Request Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register('request_date', { required: 'Request date is required' })}
-                  type="date"
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
-                />
-                {errors.request_date && <p className="text-red-500 text-sm mt-1">{errors.request_date.message}</p>}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Start Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    {...register('start_date', { required: 'Start date is required' })}
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+                  />
+                  {errors.start_date && <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    End Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    {...register('end_date', { required: 'End date is required' })}
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+                  />
+                  {errors.end_date && <p className="text-red-500 text-sm mt-1">{errors.end_date.message}</p>}
+                </div>
               </div>
 
               <div>
@@ -1940,7 +1967,7 @@ const WorkFromHomeRequests = () => {
                         Work From Home Request Details
                       </h3>
                       <p className="text-blue-100">
-                        {selectedRequest.employee_name} - {selectedRequest.formatted_request_date}
+                        {selectedRequest.employee_name} - {selectedRequest.formatted_start_date} to {selectedRequest.formatted_end_date}
                       </p>
                     </div>
                   </div>
@@ -1970,8 +1997,10 @@ const WorkFromHomeRequests = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Request Date:</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.formatted_request_date}</p>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Period:</label>
+                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">
+                        {selectedRequest.formatted_start_date} to {selectedRequest.formatted_end_date}
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Applied On:</label>
@@ -2000,16 +2029,16 @@ const WorkFromHomeRequests = () => {
                     </div>
                   )}
 
-                  {selectedRequest.days_until_request >= 0 && (
+                  {selectedRequest.days_until_start >= 0 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                       <div className="flex items-center">
                         <CalendarDaysIcon className="h-5 w-5 text-blue-500 mr-2" />
                         <div>
-                          <p className="text-sm font-medium text-blue-800">Time Until Request Date</p>
+                          <p className="text-sm font-medium text-blue-800">Time Until Start Date</p>
                           <p className="text-sm text-blue-700">
-                            {selectedRequest.days_until_request === 0 ? 'Today' :
-                              selectedRequest.days_until_request === 1 ? 'Tomorrow' :
-                                `In ${selectedRequest.days_until_request} days`}
+                            {selectedRequest.days_until_start === 0 ? 'Today' :
+                              selectedRequest.days_until_start === 1 ? 'Tomorrow' :
+                                `In ${selectedRequest.days_until_start} days`}
                           </p>
                         </div>
                       </div>
@@ -2042,7 +2071,7 @@ const WorkFromHomeRequests = () => {
         title={
           <div className="flex items-center">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${selectedApproval?.action === 'approve' ? 'bg-emerald-500 bg-opacity-20' :
-                selectedApproval?.action === 'reject' ? 'bg-rose-500 bg-opacity-20' : 'bg-blue-500 bg-opacity-20'
+              selectedApproval?.action === 'reject' ? 'bg-rose-500 bg-opacity-20' : 'bg-blue-500 bg-opacity-20'
               }`}>
               {selectedApproval?.action === 'approve' ? (
                 <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
@@ -2059,7 +2088,7 @@ const WorkFromHomeRequests = () => {
                     'Work From Home Request Details'}
               </h3>
               <p className="text-sm text-gray-600">
-                {selectedApproval?.employee_name} - {selectedApproval?.formatted_request_date}
+                {selectedApproval?.employee_name} - {selectedApproval?.formatted_start_date} to {selectedApproval?.formatted_end_date}
               </p>
             </div>
           </div>
@@ -2106,8 +2135,8 @@ const WorkFromHomeRequests = () => {
                   type="submit"
                   disabled={submitting}
                   className={`flex-1 px-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 transform hover:scale-105 transition-all duration-200 ${selectedApproval.action === 'approve'
-                      ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
-                      : 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
+                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
+                    : 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
                     }`}
                 >
                   {submitting ? (

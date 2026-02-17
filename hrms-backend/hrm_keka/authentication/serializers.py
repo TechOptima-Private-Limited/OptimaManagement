@@ -3,9 +3,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, Permission
 from .models import User, UserProfile
 
-
-
-
 class EmployeeRegistrationSerializer(serializers.Serializer):
     """Simple employee registration with just email and password"""
     email = serializers.EmailField()
@@ -77,14 +74,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     groups = serializers.SerializerMethodField()
+    employee_id = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_superuser', 'profile', 'groups']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_superuser', 'profile', 'groups', 'employee_id']
     
     def get_groups(self, obj):
         """Return group names for the user so frontend can derive effective role."""
         return list(obj.groups.values_list('name', flat=True))
+
+    def get_employee_id(self, obj):
+        """Return the database PK of the associated Employee record."""
+        try:
+            return obj.employee.id
+        except Exception:
+            return None
 
 
 

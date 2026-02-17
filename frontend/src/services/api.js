@@ -29,19 +29,19 @@
 //   (response) => response,
 //   async (error) => {
 //     const originalRequest = error.config;
-    
+
 //     if (error.response?.status === 401 && !originalRequest._retry) {
 //       originalRequest._retry = true;
-      
+
 //       try {
 //         const refreshToken = localStorage.getItem('refresh_token');
 //         const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
 //           refresh: refreshToken,
 //         });
-        
+
 //         const { access } = response.data;
 //         localStorage.setItem('access_token', access);
-        
+
 //         return api(originalRequest);
 //       } catch (refreshError) {
 //         localStorage.removeItem('access_token');
@@ -51,7 +51,7 @@
 //         return Promise.reject(refreshError);
 //       }
 //     }
-    
+
 //     return Promise.reject(error);
 //   }
 // );
@@ -94,7 +94,7 @@
 //   // Attendance Records
 //   getAttendanceRecords: (params) => api.get('/attendance/records/', { params }),
 //   markManualAttendance: (data) => api.post('/attendance/manual/', data),
-  
+
 //   // Biometric Integration
 //   getBiometricDevices: () => api.get('/attendance/devices/'),
 //   createBiometricDevice: (data) => api.post('/attendance/devices/', data),
@@ -138,19 +138,19 @@
 // //   createLeaveType: (data) => api.post('/leave/types/', data),
 // //   updateLeaveType: (id, data) => api.patch(`/leave/types/${id}/`, data),
 // //   deleteLeaveType: (id) => api.delete(`/leave/types/${id}/`),
-  
+
 // //   getLeavePolicies: () => api.get('/leave/policies/'),
 // //   createLeavePolicy: (data) => api.post('/leave/policies/', data),
 // //   updateLeavePolicy: (id, data) => api.patch(`/leave/policies/${id}/`, data),
 // //   deleteLeavePolicy: (id) => api.delete(`/leave/policies/${id}/`),
-  
+
 // //   getLeaveRequests: (params) => api.get('/leave/requests/', { params }),
 // //   createLeaveRequest: (data) => api.post('/leave/requests/', data),
 // //   getLeaveRequest: (id) => api.get(`/leave/requests/${id}/`),
 // //   updateLeaveRequest: (id, data) => api.patch(`/leave/requests/${id}/`, data),
 // //   approveLeaveRequest: (requestId, data) => api.patch(`/leave/requests/${requestId}/approve/`, data),
 // //   cancelLeaveRequest: (requestId) => api.patch(`/leave/requests/${requestId}/cancel/`),
-  
+
 // //   getLeaveBalances: (params) => api.get('/leave/balances/', { params }),
 // //   getLeaveSummary: () => api.get('/leave/summary/'),
 // //   getLeaveAnalytics: () => api.get('/leave/analytics/'),
@@ -241,19 +241,19 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
           refresh: refreshToken,
         });
-        
+
         const { access } = response.data;
         localStorage.setItem('access_token', access);
-        
+
         return api(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem('access_token');
@@ -263,7 +263,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -320,7 +320,7 @@ export const employeeAPI = {
   getOnboardingTasks: () => api.get('/employees/onboarding/'),
   completeOnboardingTask: (taskId) => api.patch(`/employees/onboarding/${taskId}/complete/`),
   getUsers: () => api.get('/employees/users/'),
-  
+
   // NEW: Profile-related endpoints
   getEmployeeProfileData: () => api.get('/employees/profile-data/'),
   getBirthdayFestivalData: () => api.get('/employees/birthday-festival/'),
@@ -332,22 +332,22 @@ export const employeeAPI = {
 export const profileAPI = {
   // Get current user profile with all details
   getCurrentProfile: () => api.get('/auth/profile/'),
-  
+
   // Update user profile (personal information)
   updateProfile: (data) => api.patch('/auth/profile/', data),
-  
+
   // Get employee-specific profile data (team, manager, employment details)
   getEmployeeProfileData: () => api.get('/employees/profile-data/'),
-  
+
   // Get team members by manager ID
   getTeamMembersByManagerId: (managerId) => api.get(`/employees/team/${managerId}/`),
-  
+
   // Get all managers with their teams (HR only)
   getAllManagersWithTeams: () => api.get('/employees/managers/'),
-  
+
   // Debug employee relationships (for troubleshooting)
   debugEmployeeRelationships: () => api.get('/employees/debug-relationships/'),
-  
+
   // Upload profile picture (if you want to add this feature later)
   uploadProfilePicture: (formData) => {
     return api.post('/auth/profile/upload-picture/', formData, {
@@ -363,7 +363,7 @@ export const attendanceAPI = {
   // Attendance Records
   getAttendanceRecords: (params) => api.get('/attendance/records/', { params }),
   markManualAttendance: (data) => api.post('/attendance/manual/', data),
-  
+
   // Biometric Integration
   getBiometricDevices: () => api.get('/attendance/devices/'),
   createBiometricDevice: (data) => api.post('/attendance/devices/', data),
@@ -371,7 +371,7 @@ export const attendanceAPI = {
   deleteBiometricDevice: (id) => api.delete(`/attendance/devices/${id}/`),
   syncBiometricData: (data) => api.post('/attendance/biometric-sync/', data),
   pingLocation: (data) => api.post('/attendance/location/ping/', data),
-  
+
   // Approval workflow
   approveEdit: (recordId, data) => api.post(`/attendance/approve-edit/${recordId}/`, data),
 };
@@ -385,11 +385,10 @@ export const workFromHomeAPI = {
     const params = date ? `?date=${date}` : '';
     return api.get(`/attendance/wfh/status/${params}`);
   },
-  getWFHRequests: (status = null) => {
-    const params = status ? `?status=${status}` : '';
-    return api.get(`/attendance/wfh/requests/${params}`);
+  getWFHRequests: (params = {}) => {
+    return api.get('/attendance/wfh/requests/', { params });
   },
-  approveWFHRequest: (requestId, data) => 
+  approveWFHRequest: (requestId, data) =>
     api.post(`/attendance/wfh/requests/${requestId}/approve/`, data)
 };
 

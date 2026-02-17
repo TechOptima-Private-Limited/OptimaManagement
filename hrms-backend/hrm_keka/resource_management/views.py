@@ -689,6 +689,36 @@ from .utils import send_request_notification, send_status_notification, send_ema
 import base64
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from rest_framework import permissions
+
+class IsResourceAdmin(permissions.BasePermission):
+    """
+    Custom permission to only allow Admins, HR Managers, and IT Supporters to edit resources.
+    """
+    def has_permission(self, request, view):
+        # Allow read-only access to authenticated users if needed (or restrict fully)
+        # For now, we restrict fully to admin types for modification
+        if not request.user.is_authenticated:
+            return False
+            
+        # Superusers and staff always allowed
+        if request.user.is_superuser or request.user.is_staff:
+            return True
+            
+        # Check user profile role
+        user_role = getattr(request.user.profile, 'role', None) if hasattr(request.user, 'profile') else None
+        if user_role in ['ADMIN', 'HR_MANAGER', 'IT_SUPPORTER']:
+            return True
+            
+        # Check groups
+        user_groups = request.user.groups.values_list('name', flat=True)
+        if any(g in user_groups for g in ['Resource Team', 'Admin', 'HR Manager', 'IT Supporter']):
+            return True
+            
+        # Allow safe methods (GET, HEAD, OPTIONS) for authenticated users? 
+        # The user requirement implies full management access for IT Supporter.
+        
+        return False
 
 @login_required
 def resource_owner_dashboard(request):
@@ -1422,16 +1452,21 @@ def send_assignee_notification(access_request, action):
         print(f"Error sending assignee notification: {str(e)}")
 
 # Rest of the ViewSets remain the same...
+class AccessLevelViewSet(viewsets.ModelViewSet):
+    queryset = AccessLevel.objects.all()
+    serializer_class = AccessLevelSerializer
+    permission_classes = [IsAuthenticated, IsResourceAdmin]
+
 class ResourceTypeViewSet(viewsets.ModelViewSet):
     queryset = ResourceType.objects.all()
     serializer_class = ResourceTypeSerializer
     # Admin-oriented endpoints: honor Django model permissions so extras grant access
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [IsAuthenticated, IsResourceAdmin]
 
 class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsResourceAdmin]
 
     def get_queryset(self):
         qs = Resource.objects.all()

@@ -4,7 +4,8 @@ import { workFromHomeAPI } from '../../services/api'; // Add this import
 
 const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    request_date: '',
+    start_date: '',
+    end_date: '',
     reason: ''
   });
   const [loading, setLoading] = useState(false);
@@ -24,37 +25,55 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.request_date) {
-      newErrors.request_date = 'Date is required';
-    } else {
-      const selectedDate = new Date(formData.request_date);
+
+    if (!formData.start_date) {
+      newErrors.start_date = 'Start date is required';
+    }
+
+    if (!formData.end_date) {
+      newErrors.end_date = 'End date is required';
+    }
+
+    if (formData.start_date && formData.end_date) {
+      const start = new Date(formData.start_date);
+      const end = new Date(formData.end_date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
-      if (selectedDate < today) {
-        newErrors.request_date = 'Cannot apply for past dates';
+
+      if (start < today) {
+        newErrors.start_date = 'Start date cannot be in the past';
       }
-      
+
+      if (end < start) {
+        newErrors.end_date = 'End date cannot be before start date';
+      }
+
       const maxDate = new Date();
       maxDate.setDate(maxDate.getDate() + 30);
-      if (selectedDate > maxDate) {
-        newErrors.request_date = 'Cannot apply more than 30 days in advance';
+      if (start > maxDate) {
+        newErrors.start_date = 'Cannot apply more than 30 days in advance';
+      }
+
+      // Limit range to 30 days
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 30) {
+        newErrors.end_date = 'WFH request cannot exceed 30 days';
       }
     }
-    
+
     if (!formData.reason.trim()) {
       newErrors.reason = 'Reason is required';
     } else if (formData.reason.trim().length < 10) {
       newErrors.reason = 'Reason must be at least 10 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
 
-// ... in the component
+  // ... in the component
 
   const handleSubmit = async () => {
     if (!validateForm()) {
@@ -65,22 +84,22 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
     try {
       // Use the workFromHomeAPI service - it returns response.data directly
       const response = await workFromHomeAPI.applyWFH(formData);
-      
+
       // Since your API service likely returns response.data directly
       toast.success('Work from home request submitted successfully! HR has been notified.');
-      setFormData({ request_date: '', reason: '' });
+      setFormData({ start_date: '', end_date: '', reason: '' });
       setErrors({});
       onSuccess && onSuccess();
       onClose();
-      
+
     } catch (error) {
       console.error('WFH application error:', error);
-      
+
       // Handle different types of errors
       if (error.response) {
         // The request was made and the server responded with a status code
         const errorData = error.response.data;
-        
+
         if (errorData.error) {
           toast.error(errorData.error);
         } else if (typeof errorData === 'object') {
@@ -90,7 +109,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             newErrors[field] = Array.isArray(errorData[field]) ? errorData[field][0] : errorData[field];
           });
           setErrors(newErrors);
-          
+
           // Show a general error message
           const firstErrorMessage = Object.values(newErrors)[0];
           toast.error(firstErrorMessage || 'Please fix the form errors');
@@ -110,7 +129,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
 
   // Get today's date for min attribute
   const today = new Date().toISOString().split('T')[0];
-  
+
   // Get max date (30 days from today)
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30);
@@ -119,11 +138,11 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div 
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" 
+        <div
+          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
           onClick={onClose}
         ></div>
-        
+
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="bg-white px-6 pt-6 pb-4">
             <div className="flex items-center mb-6">
@@ -137,27 +156,46 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                 <p className="text-sm text-gray-600">Submit your request to work remotely</p>
               </div>
             </div>
-            
+
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  name="request_date"
-                  value={formData.request_date}
-                  onChange={handleInputChange}
-                  min={today}
-                  max={maxDateString}
-                  className={`w-full px-3 py-2 border ${
-                    errors.request_date ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
-                  required
-                />
-                {errors.request_date && (
-                  <p className="text-red-500 text-xs mt-1">{errors.request_date}</p>
-                )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="start_date"
+                    value={formData.start_date}
+                    onChange={handleInputChange}
+                    min={today}
+                    className={`w-full px-3 py-2 border ${errors.start_date ? 'border-red-500' : 'border-gray-300'
+                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
+                    required
+                  />
+                  {errors.start_date && (
+                    <p className="text-red-500 text-xs mt-1">{errors.start_date}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date}
+                    onChange={handleInputChange}
+                    min={formData.start_date || today}
+                    className={`w-full px-3 py-2 border ${errors.end_date ? 'border-red-500' : 'border-gray-300'
+                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
+                    required
+                  />
+                  {errors.end_date && (
+                    <p className="text-red-500 text-xs mt-1">{errors.end_date}</p>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -169,9 +207,8 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                   value={formData.reason}
                   onChange={handleInputChange}
                   rows="4"
-                  className={`w-full px-3 py-2 border ${
-                    errors.reason ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
+                  className={`w-full px-3 py-2 border ${errors.reason ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
                   placeholder="Please provide a reason for working from home (e.g., medical appointment, family emergency, etc.)"
                   required
                 />
@@ -200,7 +237,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-gray-50 px-6 py-3 sm:flex sm:flex-row-reverse">
             <button
               type="button"

@@ -56,7 +56,7 @@ const EditEmployeeModal = ({ isOpen, onClose, onSuccess, employee }) => {
       setOnboardingEmployeeId(null);
 
       setFormData({
-        employee_id: employee.employee_id || '',
+        employee_id: employee.user?.username || employee.user_info?.username || employee.employee_id || '',
         department_id: employee.department?.id || '',
         position: employee.position || '',
         hire_date: employee.hire_date || '',
@@ -352,7 +352,7 @@ const EditEmployeeModal = ({ isOpen, onClose, onSuccess, employee }) => {
                   {employeeName}
                 </p>
                 <p className="text-blue-200 text-sm">
-                  ID: {employee.employee_id}
+                  Username: {formData.employee_id}
                 </p>
               </div>
 
@@ -375,7 +375,7 @@ const EditEmployeeModal = ({ isOpen, onClose, onSuccess, employee }) => {
               {/* Employee ID */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Employee ID
+                  Username
                 </label>
                 <div className="relative">
                   <input
@@ -480,7 +480,7 @@ const EditEmployeeModal = ({ isOpen, onClose, onSuccess, employee }) => {
                       .filter(emp => emp.id !== employee.id) // Don't allow self-reporting
                       .map((emp) => (
                       <option key={emp.id} value={emp.id}>
-                        {emp.user_info?.full_name || `${emp.user?.first_name} ${emp.user?.last_name}`} ({emp.employee_id})
+                        {emp.user_info?.full_name || `${emp.user?.first_name} ${emp.user?.last_name}`} ({emp.user?.username || emp.user_info?.username || emp.employee_id})
                       </option>
                     ))}
                   </select>
@@ -1112,7 +1112,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Employee ID <span className="text-red-500">*</span></label>
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Username <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         name="employee_id"
@@ -1123,7 +1123,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                             ? 'border-red-300 focus:border-red-500 focus:ring-2 sm:focus:ring-4 focus:ring-red-100' 
                             : 'border-gray-200 focus:border-blue-500 focus:ring-2 sm:focus:ring-4 focus:ring-blue-100'
                         }`}
-                        placeholder="Enter employee ID"
+                        placeholder="Enter username (e.g. TO-00076)"
                         required
                       />
                       {errors.employee_id && <p className="text-red-500 text-xs mt-1">{errors.employee_id}</p>}
@@ -1210,7 +1210,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                         <option value="">None</option>
                         {employees.map((emp) => (
                           <option key={emp.id} value={emp.id}>
-                            {emp.user?.first_name} {emp.user?.last_name} ({emp.employee_id})
+                            {emp.user?.first_name} {emp.user?.last_name} ({emp.user?.username || emp.user_info?.username || emp.employee_id})
                           </option>
                         ))}
                       </select>
@@ -1617,7 +1617,7 @@ const EmployeeList = () => {
                         </h3>
                         <p className="text-indigo-600 font-medium mt-1">{employee.position || 'No Position'}</p>
                         <p className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full inline-block mt-1">
-                          ID: {employee.employee_id || 'No ID'}
+                          Username: {employee.user?.username || employee.user_info?.username || employee.employee_id || 'No ID'}
                         </p>
                       </div>
                       {/* Enhanced Action Buttons (HR Manager and Admin) */}

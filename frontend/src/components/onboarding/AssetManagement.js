@@ -880,17 +880,28 @@ const AssetManagement = () => {
     }
   };
 
-  const deleteAsset = async (assetId) => {
-    if (!window.confirm('Are you sure you want to delete this asset?')) {
+  const disposeAsset = async (assetId) => {
+    if (!window.confirm('Are you sure you want to dispose of this asset? It will be moved to the Disposed section.')) {
       return;
     }
     try {
-      await requestWithRetry(() => api.delete(`/assets/assets/${assetId}/`));
-      toast.success('Asset deleted');
+      await requestWithRetry(() => api.patch(`/assets/assets/${assetId}/`, { status: 'DISPOSED' }));
+      toast.success('Asset moved to Disposed section');
       fetchAssets();
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Failed to delete asset');
+      console.error('Error disposing asset:', error);
+      toast.error('Failed to dispose of asset');
+    }
+  };
+
+  const restoreAsset = async (assetId) => {
+    try {
+      await requestWithRetry(() => api.patch(`/assets/assets/${assetId}/`, { status: 'AVAILABLE' }));
+      toast.success('Asset restored to Available');
+      fetchAssets();
+    } catch (error) {
+      console.error('Error restoring asset:', error);
+      toast.error('Failed to restore asset');
     }
   };
 
@@ -930,6 +941,7 @@ const AssetManagement = () => {
     if (s === 'ASSIGNED') return 'bg-blue-100 text-blue-800';
     if (s === 'DAMAGED') return 'bg-red-100 text-red-800';
     if (s === 'LOST') return 'bg-gray-200 text-gray-700';
+    if (s === 'DISPOSED') return 'bg-gray-400 text-white';
     return 'bg-gray-100 text-gray-800';
   };
 
@@ -942,12 +954,18 @@ const AssetManagement = () => {
   const filteredAssets = (assets || []).filter(asset => {
     const cat = getCategoryFor(asset);
     const isHardwareCategory = cat ? cat === 'HARDWARE' : true;
+    const status = String(asset.status || '').toUpperCase();
+
+    // Exclude disposed assets from regular hardware/software lists
+    if (activeSection !== 'disposed' && status === 'DISPOSED') return false;
+    // Exclude other assets when in disposed section
+    if (activeSection === 'disposed' && status !== 'DISPOSED') return false;
+
     if (activeSection === 'hardware' && !isHardwareCategory) return false;
     const matchesSearch = asset.employee_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.serial_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.description?.toLowerCase().includes(searchTerm.toLowerCase());
     // Filter by status instead of type for the dropdown
-    const status = String(asset.status || '').toUpperCase();
     const matchesStatus =
       filterType === 'all' ||
       status === String(filterType || '').toUpperCase();
@@ -1077,6 +1095,13 @@ const AssetManagement = () => {
     canManageTypes || canManageAssignments || canManageReturns || canManageStatuses
   );
 
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const baseUrl = 'http://127.0.0.1:8000';
+    return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
@@ -1122,6 +1147,7 @@ const AssetManagement = () => {
             { key: 'offboarding_returns', label: 'Offboarding Asset Returns', route: 'returns' },
             { key: 'employee_statuses', label: 'Employee Statuses', route: 'statuses' },
             { key: 'asset_repairs', label: 'Asset Repairs', route: 'repairs' },
+            { key: 'asset_disposed', label: 'Asset Disposed', route: 'disposed' },
           ].map((item) => {
             const selected = activeSection === item.route;
             return (
@@ -2092,15 +2118,108 @@ const AssetManagement = () => {
                                   Repair
                                 </button>
                                 <button
-                                  onClick={(e) => { e.stopPropagation(); deleteAsset(asset.id); }}
+                                  onClick={(e) => { e.stopPropagation(); disposeAsset(asset.id); }}
                                   className="p-1 px-2 text-red-600 hover:bg-red-50 rounded"
-                                  title="Delete"
+                                  title="Dispose"
                                 >
                                   Trash
                                 </button>
                               </div>
                             </td>
                           )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        )
+      }
+
+      {
+        activeSection === 'disposed' && (
+          <>
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search disposed assets..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              {filteredAssets.length === 0 ? (
+                <div className="text-center py-12">
+                  <TrashIcon className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">No disposed assets</h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Assets you dispose of will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Tag</th>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial Number</th>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchased Date</th>
+                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredAssets.map((asset) => (
+                        <tr
+                          key={asset.id}
+                          className="hover:bg-gray-50 cursor-pointer"
+                          onClick={() => openAssetDetails(asset)}
+                        >
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            <div className="flex items-center gap-2">
+                              <div className="flex-shrink-0 p-1.5 bg-gray-100 rounded-lg text-gray-600">
+                                {getAssetIcon(asset.asset_type)}
+                              </div>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAssetTypeColor(asset.asset_type)}`}>
+                                {asset.asset_type.replace('_', ' ')}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            {asset.asset_tag || '-'}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            {asset.serial_number || '-'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            {asset.description || '-'}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            {asset.purchased_date ? new Date(asset.purchased_date).toLocaleDateString() : '-'}
+                          </td>
+                          <td
+                            className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              onClick={() => restoreAsset(asset.id)}
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              Restore
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -2187,13 +2306,13 @@ const AssetManagement = () => {
                       <div className="grid grid-cols-2 gap-3">
                         {detailsAsset.image_before && (
                           <div>
-                            <img src={detailsAsset.image_before} alt="Before" className="w-full h-32 object-cover rounded" />
+                            <img src={getImageUrl(detailsAsset.image_before)} alt="Before" className="w-full h-32 object-cover rounded" />
                             <p className="text-xs text-gray-500 mt-1">Before</p>
                           </div>
                         )}
                         {detailsAsset.image_after && (
                           <div>
-                            <img src={detailsAsset.image_after} alt="After" className="w-full h-32 object-cover rounded" />
+                            <img src={getImageUrl(detailsAsset.image_after)} alt="After" className="w-full h-32 object-cover rounded" />
                             <p className="text-xs text-gray-500 mt-1">After</p>
                           </div>
                         )}

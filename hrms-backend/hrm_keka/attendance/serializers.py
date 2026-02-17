@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import AttendanceRecord, BiometricDevice
 from employees.serializers import EmployeeSerializer
+from .models import WorkFromHomeRequest
+from django.utils import timezone
 
 class AttendanceRecordSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(read_only=True)
@@ -28,30 +30,23 @@ class AttendanceLocationPingSerializer(serializers.Serializer):
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6)
     timestamp = serializers.DateTimeField(required=False)
 
-
-# attendance/serializers.py - Add these to your existing file
-
-from rest_framework import serializers
-from .models import WorkFromHomeRequest
-from employees.serializers import EmployeeSerializer
-from django.utils import timezone
-
 class WorkFromHomeRequestSerializer(serializers.ModelSerializer):
     employee_name = serializers.SerializerMethodField()
     employee_id = serializers.SerializerMethodField()
     employee_department = serializers.SerializerMethodField()
     approved_by_name = serializers.SerializerMethodField()
     formatted_applied_at = serializers.SerializerMethodField()
-    formatted_request_date = serializers.SerializerMethodField()
-    days_until_request = serializers.SerializerMethodField()
+    formatted_start_date = serializers.SerializerMethodField()
+    formatted_end_date = serializers.SerializerMethodField()
+    days_until_start = serializers.SerializerMethodField()
     
     class Meta:
         model = WorkFromHomeRequest
         fields = [
             'id', 'employee', 'employee_name', 'employee_id', 'employee_department',
-            'request_date', 'formatted_request_date', 'reason', 'status', 
+            'start_date', 'end_date', 'formatted_start_date', 'formatted_end_date', 'reason', 'status', 
             'applied_at', 'formatted_applied_at', 'approved_by', 'approved_by_name', 
-            'approved_at', 'rejection_reason', 'days_until_request'
+            'approved_at', 'rejection_reason', 'days_until_start'
         ]
     
     def get_employee_name(self, obj):
@@ -69,59 +64,41 @@ class WorkFromHomeRequestSerializer(serializers.ModelSerializer):
     def get_formatted_applied_at(self, obj):
         return obj.applied_at.strftime('%B %d, %Y at %I:%M %p')
     
-    # def get_formatted_request_date(self, obj):
-    #     return obj.request_date.strftime('%B %d, %Y')
-    
-    # def get_days_until_request(self, obj):
-    #     today = timezone.now().date()
-    #     delta = obj.request_date - today
-    #     return delta.days
-    def get_formatted_request_date(self, obj):
-        # Debug the date formatting
-        # print(f"🔍 Formatting date for request {obj.id}:")
-        # print(f"    📅 Raw request_date: {obj.request_date}")
-        # print(f"    📅 Type: {type(obj.request_date)}")
-        
-        formatted = obj.request_date.strftime('%B %d, %Y')
-        # print(f"    📅 Formatted: {formatted}")
-        
-        return formatted
+    def get_formatted_start_date(self, obj):
+        return obj.start_date.strftime('%B %d, %Y')
 
-    def get_days_until_request(self, obj):
-        # Debug the days calculation
+    def get_formatted_end_date(self, obj):
+        return obj.end_date.strftime('%B %d, %Y')
+
+    def get_days_until_start(self, obj):
         from django.utils import timezone
-        
         today = timezone.now().date()
-        request_date = obj.request_date
-        
-        # print(f"🧮 Calculating days for request {obj.id}:")
-        # print(f"    📅 Today: {today} (type: {type(today)})")
-        # print(f"    📅 Request date: {request_date} (type: {type(request_date)})")
-        
-        # Ensure both are date objects
-        if hasattr(request_date, 'date'):
-            request_date = request_date.date()
-        
-        delta = request_date - today
-        days = delta.days
-        
-        # print(f"    📊 Delta: {delta}")
-        # print(f"    🔢 Days: {days}")
-        
-        return days
+        start_date = obj.start_date
+        if hasattr(start_date, 'date'):
+            start_date = start_date.date()
+        delta = start_date - today
+        return delta.days
 
 class WorkFromHomeApplySerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkFromHomeRequest
-        fields = ['request_date', 'reason']
+        fields = ['start_date', 'end_date', 'reason']
         
-    def validate_request_date(self, value):
-        # Can't apply for past dates
-        if value < timezone.now().date():
-            raise serializers.ValidationError("Cannot apply for past dates")
+    def validate(self, data):
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        today = timezone.now().date()
+
+        if start_date < today:
+            raise serializers.ValidationError({"start_date": "Cannot apply for past dates"})
         
-        # Can't apply for more than 30 days in advance
-        if (value - timezone.now().date()).days > 30:
-            raise serializers.ValidationError("Cannot apply more than 30 days in advance")
-        
-        return value
+        if end_date < start_date:
+            raise serializers.ValidationError({"end_date": "End date cannot be before start date"})
+            
+        if (start_date - today).days > 30:
+            raise serializers.ValidationError({"start_date": "Cannot apply more than 30 days in advance"})
+            
+        if (end_date - start_date).days > 30:
+            raise serializers.ValidationError({"end_date": "WFH request cannot exceed 30 days"})
+
+        return data

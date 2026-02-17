@@ -39,7 +39,7 @@
 //   const fetchProfileData = async () => {
 //     try {
 //       setLoading(true);
-      
+
 //       // Fetch user profile
 //       const profileResponse = await fetch(' http://127.0.0.1:8000//api/auth/profile/', {
 //         headers: {
@@ -47,7 +47,7 @@
 //           'Content-Type': 'application/json'
 //         }
 //       });
-      
+
 //       if (profileResponse.ok) {
 //         const profileData = await profileResponse.json();
 //         setProfile(profileData);
@@ -79,7 +79,7 @@
 //         // setPeers(employeeProfileData.peers || []);
 //         setManager(employeeProfileData.manager);
 //       }
-    
+
 
 //     } catch (error) {
 //       console.error('Error fetching profile data:', error);
@@ -92,7 +92,7 @@
 //   const handleSave = async () => {
 //     try {
 //       setSaving(true);
-      
+
 //       const response = await fetch(' http://127.0.0.1:8000//api/auth/profile/', {
 //         method: 'PATCH',
 //         headers: {
@@ -138,7 +138,7 @@
 //       'HR_MANAGER': { color: 'from-blue-500 to-indigo-600', icon: '🏢', label: 'HR Manager' },
 //       'EMPLOYEE': { color: 'from-green-500 to-emerald-600', icon: '👤', label: 'Employee' }
 //     };
-    
+
 //     const config = roleConfig[role] || roleConfig['EMPLOYEE'];
 //     return (
 //       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${config.color} shadow-lg`}>
@@ -529,12 +529,12 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { 
-  UserIcon, 
-  PencilIcon, 
-  EnvelopeIcon, 
-  PhoneIcon, 
-  MapPinIcon, 
+import {
+  UserIcon,
+  PencilIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  MapPinIcon,
   CalendarDaysIcon,
   BuildingOfficeIcon,
   UserGroupIcon,
@@ -602,7 +602,7 @@ const UserProfile = () => {
   // const fetchProfileData = async () => {
   //   try {
   //     setLoading(true);
-      
+
   //     // Fetch user profile
   //     const profileResponse = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
   //       headers: {
@@ -610,7 +610,7 @@ const UserProfile = () => {
   //         'Content-Type': 'application/json'
   //       }
   //     });
-      
+
   //     if (profileResponse.ok) {
   //       const profileData = await profileResponse.json();
   //       setProfile(profileData);
@@ -626,7 +626,7 @@ const UserProfile = () => {
 
   //       // Check if user is HR Manager and fetch appropriate data
   //       const isHRManager = profileData.profile?.role === 'HR_MANAGER';
-        
+
   //       if (isHRManager) {
   //         // Fetch all managers with teams for HR Manager
   //         await fetchAllManagersWithTeams();
@@ -645,7 +645,7 @@ const UserProfile = () => {
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch user profile
       const profileResponse = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
         headers: {
@@ -653,7 +653,7 @@ const UserProfile = () => {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
         setProfile(profileData);
@@ -669,8 +669,8 @@ const UserProfile = () => {
 
         // Check user role and fetch appropriate data
         const userRole = profileData.profile?.role;
-        
-        switch(userRole) {
+
+        switch (userRole) {
           case 'HR_MANAGER':
             await fetchAllManagersWithTeams();
             break;
@@ -727,7 +727,7 @@ const UserProfile = () => {
   const [peerManagers, setPeerManagers] = useState([]);
   const [managerOfManager, setManagerOfManager] = useState(null);
   const [managerStats, setManagerStats] = useState({});
-  
+
   const fetchManagerData = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/employees/managers/profile-data/', {
@@ -757,7 +757,7 @@ const UserProfile = () => {
     try {
       // First get employee data for HR manager
       await fetchEmployeeProfileData();
-      
+
       // Then get all managers with teams
       const managersResponse = await fetch('http://127.0.0.1:8000/api/employees/managers-with-teams/', {
         headers: {
@@ -780,7 +780,7 @@ const UserProfile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      
+
       const response = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
         method: 'PATCH',
         headers: {
@@ -826,7 +826,7 @@ const UserProfile = () => {
       'HR_MANAGER': { color: 'from-blue-500 to-indigo-600', icon: '🏢', label: 'HR Manager' },
       'EMPLOYEE': { color: 'from-green-500 to-emerald-600', icon: '👤', label: 'Employee' }
     };
-    
+
     const config = roleConfig[role] || roleConfig['EMPLOYEE'];
     return (
       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${config.color} shadow-lg`}>
@@ -949,7 +949,7 @@ const UserProfile = () => {
                       <input
                         type="text"
                         value={editData.first_name}
-                        onChange={(e) => setEditData({...editData, first_name: e.target.value})}
+                        onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       />
                     ) : (
@@ -969,7 +969,7 @@ const UserProfile = () => {
                       <input
                         type="text"
                         value={editData.last_name}
-                        onChange={(e) => setEditData({...editData, last_name: e.target.value})}
+                        onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       />
                     ) : (
@@ -1001,7 +1001,7 @@ const UserProfile = () => {
                       <input
                         type="tel"
                         value={editData.phone_number}
-                        onChange={(e) => setEditData({...editData, phone_number: e.target.value})}
+                        onChange={(e) => setEditData({ ...editData, phone_number: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                         placeholder="Enter phone number"
                       />
@@ -1022,7 +1022,7 @@ const UserProfile = () => {
                       <input
                         type="date"
                         value={editData.date_of_birth}
-                        onChange={(e) => setEditData({...editData, date_of_birth: e.target.value})}
+                        onChange={(e) => setEditData({ ...editData, date_of_birth: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       />
                     ) : (
@@ -1042,7 +1042,7 @@ const UserProfile = () => {
                       <input
                         type="tel"
                         value={editData.emergency_contact}
-                        onChange={(e) => setEditData({...editData, emergency_contact: e.target.value})}
+                        onChange={(e) => setEditData({ ...editData, emergency_contact: e.target.value })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                         placeholder="Enter emergency contact"
                       />
@@ -1062,7 +1062,7 @@ const UserProfile = () => {
                     {editMode ? (
                       <textarea
                         value={editData.address}
-                        onChange={(e) => setEditData({...editData, address: e.target.value})}
+                        onChange={(e) => setEditData({ ...editData, address: e.target.value })}
                         rows="3"
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                         placeholder="Enter your address"
@@ -1079,8 +1079,8 @@ const UserProfile = () => {
             </div>
 
             {/* Employment Details */}
-          {employee && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20">
+            {employee && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20">
                 <div className={`bg-gradient-to-r ${theme.primaryGradient} px-6 py-4`}>
                   <h2 className="text-xl font-bold text-white flex items-center">
                     <BriefcaseIcon className="w-6 h-6 mr-3" />
@@ -1091,10 +1091,10 @@ const UserProfile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Employee ID */}
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Employee ID</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
                       <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-3" />
-                        <span className="text-gray-900 font-mono">{employee.employee_id}</span>
+                        <span className="text-gray-900 font-mono">{employee.user?.username || employee.user_info?.username || employee.employee_id}</span>
                       </div>
                     </div>
                     {/* Department */}
@@ -1126,77 +1126,77 @@ const UserProfile = () => {
               </div>
             )}
 
-          {/* Documents - read only */}
-          {employee && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20">
-              <div className={`bg-gradient-to-r ${theme.primaryGradient} px-6 py-4`}>
-                <h2 className="text-xl font-bold text-white flex items-center">
-                  <ShieldCheckIcon className="w-6 h-6 mr-3" />
-                  Documents
-                </h2>
-              </div>
-              <div className="p-6">
-                {documentsLoading ? (
-                  <div className="flex items-center justify-center h-24">
-                    <LoadingSpinner text="Loading documents..." />
-                  </div>
-                ) : documents && documents.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 text-sm">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                            Type
-                          </th>
-                          <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                            Action
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {documents.map((doc) => (
-                          <tr key={`${doc.field}-${doc.doc_type}`}>
-                            <td className="px-4 py-2 whitespace-nowrap text-gray-900">
-                              {doc.doc_type}
-                            </td>
-                            <td className="px-4 py-2 whitespace-nowrap">
-                              {doc.url ? (
-                                <a
-                                  href={doc.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                  View
-                                </a>
-                              ) : (
-                                <span className="text-gray-500 text-xs">
-                                  Not available
-                                </span>
-                              )}
-                            </td>
+            {/* Documents - read only */}
+            {employee && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-white/20">
+                <div className={`bg-gradient-to-r ${theme.primaryGradient} px-6 py-4`}>
+                  <h2 className="text-xl font-bold text-white flex items-center">
+                    <ShieldCheckIcon className="w-6 h-6 mr-3" />
+                    Documents
+                  </h2>
+                </div>
+                <div className="p-6">
+                  {documentsLoading ? (
+                    <div className="flex items-center justify-center h-24">
+                      <LoadingSpinner text="Loading documents..." />
+                    </div>
+                  ) : documents && documents.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                              Type
+                            </th>
+                            <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                              Action
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <p className="mt-3 text-xs text-gray-500">
-                      Documents shown here are read-only. Contact HR if any updates are needed.
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {documents.map((doc) => (
+                            <tr key={`${doc.field}-${doc.doc_type}`}>
+                              <td className="px-4 py-2 whitespace-nowrap text-gray-900">
+                                {doc.doc_type}
+                              </td>
+                              <td className="px-4 py-2 whitespace-nowrap">
+                                {doc.url ? (
+                                  <a
+                                    href={doc.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                  >
+                                    View
+                                  </a>
+                                ) : (
+                                  <span className="text-gray-500 text-xs">
+                                    Not available
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="mt-3 text-xs text-gray-500">
+                        Documents shown here are read-only. Contact HR if any updates are needed.
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      No documents have been uploaded for your profile yet.
                     </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    No documents have been uploaded for your profile yet.
-                  </p>
-                )}
-                {documentsError && (
-                  <p className="mt-2 text-sm text-red-500">{documentsError}</p>
-                )}
+                  )}
+                  {documentsError && (
+                    <p className="mt-2 text-sm text-red-500">{documentsError}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Right Column - Team & Manager OR All Managers */}
+          {/* Right Column - Team & Manager OR All Managers */}
           <div className="space-y-6">
             {/* Manager Card - Show for non-HR users */}
             {!isHRManager && manager && (
@@ -1216,8 +1216,7 @@ const UserProfile = () => {
                       <h3 className="text-lg font-bold text-gray-900">
                         {manager.user_info?.full_name}
                       </h3>
-                      <p className="text-gray-600">{manager.position}</p>
-                      <p className="text-sm text-gray-500">Employee ID: {manager.employee_id}</p>
+                      <p className="text-sm text-gray-500">Username: {manager.user?.username || manager.user_info?.username || manager.employee_id}</p>
                     </div>
                   </div>
                 </div>
@@ -1248,7 +1247,7 @@ const UserProfile = () => {
                                 {managerItem.user_info?.full_name}
                               </h4>
                               <p className="text-xs text-gray-600">{managerItem.position}</p>
-                              <p className="text-xs text-gray-500">ID: {managerItem.employee_id}</p>
+                              <p className="text-xs text-gray-500">Username: {managerItem.user?.username || managerItem.user_info?.username || managerItem.employee_id}</p>
                               <p className="text-xs text-gray-500">Dept: {managerItem.department?.name || 'N/A'}</p>
                             </div>
                           </div>
@@ -1281,7 +1280,7 @@ const UserProfile = () => {
                               {member.user_info?.full_name}
                             </h4>
                             <p className="text-xs text-gray-600">{member.position}</p>
-                            <p className="text-xs text-gray-500">ID: {member.employee_id}</p>
+                            <p className="text-xs text-gray-500">Username: {member.user?.username || member.user_info?.username || member.employee_id}</p>
                           </div>
                         </div>
                       ))}

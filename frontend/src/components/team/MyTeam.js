@@ -92,12 +92,20 @@ const MyTeam = () => {
     }
   };
 
-  const fetchTeamAttendanceData = async (teamMembers = null) => {
+  const fetchTeamAttendanceData = async (teamMembers = null, currentUser = null) => {
     try {
       const today = toLocalDate(new Date());
 
-      // Use provided team members or fall back to state
-      const membersToProcess = teamMembers || team;
+      // Use provided team members or fall back to state, and always include the current employee
+      // to ensure the manager/employee sees their own status in the overview
+      const baseMembers = teamMembers || team;
+      const effectiveEmployee = currentUser || employee;
+
+      const membersToProcess = effectiveEmployee ? (
+        baseMembers.some(m => String(m.id) === String(effectiveEmployee.id))
+          ? baseMembers
+          : [...baseMembers, effectiveEmployee]
+      ) : baseMembers;
 
       // Get team member IDs
       const teamMemberIds = membersToProcess.map(member => member.id);
@@ -117,7 +125,8 @@ const MyTeam = () => {
       // We'll filter for team members client-side
       const attendanceResponse = await attendanceAPI.getAttendanceRecords({
         start_date: today,
-        end_date: today
+        end_date: today,
+        include_peers: true
       });
 
       const attendanceRecords = attendanceResponse.data.results || attendanceResponse.data || [];
@@ -213,7 +222,6 @@ const MyTeam = () => {
 
       membersToProcess.forEach(member => {
         const memberIdStr = String(member.id);
-        const memberName = member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim();
 
         // Try multiple ways to match attendance record
         const attendanceRecord = teamAttendanceRecords.find(ar => {
@@ -221,74 +229,58 @@ const MyTeam = () => {
           return arEmployeeId && String(arEmployeeId) === memberIdStr;
         });
 
-
         const hasWFH = approvedWFH.some(wfh => {
           const wfhEmployeeId = wfh.employee?.id || wfh.employee;
           return wfhEmployeeId && String(wfhEmployeeId) === memberIdStr;
         });
 
-        // Check if employee has approved leave for today
         const hasLeave = approvedLeaves.some(leave => {
           const leaveEmployeeId = leave.employee?.id || leave.employee;
           return leaveEmployeeId && String(leaveEmployeeId) === memberIdStr;
         });
 
-        // If employee has approved leave, add to onLeave and skip other checks
         if (hasLeave) {
           onLeave.push(member);
           return;
         }
 
-        // Check if they have checked in (has check_in_time)
-        const hasCheckedIn = attendanceRecord && attendanceRecord.check_in_time;
+        const hasCheckedIn = !!(attendanceRecord && attendanceRecord.check_in_time);
 
-        if (hasWFH && hasCheckedIn) {
-          // Work from home and checked in - count as checked in and show in WFH category
-          workFromHome.push(member);
-          remoteLogin.push(member); // WFH is also considered remote login
-        } else if (hasWFH) {
-          // Work from home but not checked in yet
-          workFromHome.push(member);
-        } else if (hasCheckedIn) {
-          // Checked in - determine if remote or office
-          // Check for remote indicators: notes mentioning remote/WFH
+        // Determine lateness
+        let isLate = false;
+        if (hasCheckedIn) {
+          const [hours, minutes, seconds] = attendanceRecord.check_in_time.split(':').map(Number);
+          if (hours > 10 || (hours === 10 && (minutes > 0 || seconds > 0))) {
+            isLate = true;
+          }
+          if (attendanceRecord.status === 'LATE') isLate = true;
+        }
+
+        if (hasCheckedIn) {
+          // Add to late list if applicable
+          if (isLate) {
+            late.push({ ...member, attendanceRecord });
+          } else {
+            onTime.push({ ...member, attendanceRecord });
+          }
+
+          // Check for remote login indicators
           const notes = (attendanceRecord.notes || '').toLowerCase();
           const isRemoteNote = notes.includes('remote') || notes.includes('wfh') || notes.includes('work from home');
           const isOfficeNote = notes.includes('office');
-
-          // Consider it remote if notes indicate remote/WFH (and not explicitly office)
-          // If notes say "Office", it's definitely office check-in
-          const isRemoteLogin = isRemoteNote && !isOfficeNote;
+          const isRemoteLogin = (hasWFH || isRemoteNote) && !isOfficeNote;
 
           if (isRemoteLogin) {
-            // Remote login - show in remote login category but still count as checked in
             remoteLogin.push(member);
-          } else {
-            // Office check-in - categorize by status
-            // BUSINESS RULE: If check_in_time is after 10:00:00 AM, it's LATE
-            const checkInTimeStr = attendanceRecord.check_in_time;
-            let isLate = false;
-
-            if (checkInTimeStr) {
-              const [hours, minutes, seconds] = checkInTimeStr.split(':').map(Number);
-              // 10:00:00 is On Time, 10:00:01 is Late
-              if (hours > 10 || (hours === 10 && (minutes > 0 || seconds > 0))) {
-                isLate = true;
-              }
-            }
-
-            if (isLate || attendanceRecord.status === 'LATE') {
-              // Store record with member for delay calculation in UI
-              late.push({ ...member, attendanceRecord });
-            } else {
-              // Default to ON TIME if status is PRESENT, null, undefined, or any other value
-              onTime.push({ ...member, attendanceRecord });
-            }
           }
         }
-        // Note: "onLeave" would require leave management integration
-        // For now, we'll check if status is ABSENT without check-in
-        if (attendanceRecord && attendanceRecord.status === 'ABSENT' && !attendanceRecord.check_in_time) {
+
+        // Always add to WFH category if they have an approved request, regardless of check-in
+        if (hasWFH) {
+          workFromHome.push(member);
+        }
+
+        if (attendanceRecord && attendanceRecord.status === 'ABSENT' && !hasCheckedIn) {
           onLeave.push(member);
         }
       });
@@ -321,9 +313,9 @@ const MyTeam = () => {
 
       // Fetch attendance, leaves, and WFH for the month using shared API services
       const [attendanceRes, leaveRes, wfhRes] = await Promise.all([
-        attendanceAPI.getAttendanceRecords({ start_date: startDate, end_date: endDate }),
+        attendanceAPI.getAttendanceRecords({ start_date: startDate, end_date: endDate, include_peers: true }),
         leaveAPI.getLeaveRequests({ start_date: startDate, end_date: endDate, status: 'APPROVED' }),
-        workFromHomeAPI.getWFHRequests('APPROVED') // WFH API might not support date range in this specific method yet, but we'll filter it
+        workFromHomeAPI.getWFHRequests({ status: 'APPROVED' }) // WFH API might not support date range in this specific method yet, but we'll filter it
       ]);
 
       const attendance = attendanceRes.data.results || attendanceRes.data || [];
@@ -421,7 +413,8 @@ const MyTeam = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setEmployee(data.employee);
+        const currentEmployee = data.employee;
+        setEmployee(currentEmployee);
         // For employees, peers are colleagues (same manager), not direct reports
         // But for display purposes, we can show peers or empty array if they don't manage anyone
         const teamData = data.peers || [];
@@ -429,8 +422,8 @@ const MyTeam = () => {
         setManager(data.manager);
 
         // Fetch attendance after team data is loaded
-        if (teamData.length > 0) {
-          await fetchTeamAttendanceData(teamData);
+        if (teamData.length > 0 || currentEmployee) {
+          await fetchTeamAttendanceData(teamData, currentEmployee);
         }
       }
     } catch (error) {
@@ -450,15 +443,16 @@ const MyTeam = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setEmployee(data.employee);
+        const currentEmployee = data.employee;
+        setEmployee(currentEmployee);
         // For managers, peers are direct reports (team members)
         const teamData = data.peers || [];
         setTeam(teamData);
         setManager(data.manager);
 
         // Fetch attendance after team data is loaded
-        if (teamData.length > 0) {
-          await fetchTeamAttendanceData(teamData);
+        if (teamData.length > 0 || currentEmployee) {
+          await fetchTeamAttendanceData(teamData, currentEmployee);
         }
       }
     } catch (error) {
@@ -585,14 +579,20 @@ const MyTeam = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
               <div className="text-sm font-semibold text-gray-800 mb-2">Not yet arrived today</div>
               {(() => {
-                // Include all checked-in categories: onTime, late, workFromHome, and remoteLogin
+                // Include all checked-in categories for accurate exclusion
                 const checkedInIds = new Set([
-                  ...attendanceStats.onTime.map(m => m.id),
-                  ...attendanceStats.late.map(m => m.id),
-                  ...attendanceStats.workFromHome.map(m => m.id),
-                  ...attendanceStats.remoteLogin.map(m => m.id)
+                  ...attendanceStats.onTime.map(m => String(m.id)),
+                  ...attendanceStats.late.map(m => String(m.id)),
+                  ...attendanceStats.workFromHome.map(m => String(m.id)),
+                  ...attendanceStats.remoteLogin.map(m => String(m.id))
                 ]);
-                const notArrived = team.filter(member => !checkedInIds.has(member.id) && !attendanceStats.onLeave.find(m => m.id === member.id));
+
+                const notArrived = team.filter(member => {
+                  const memberIdStr = String(member.id);
+                  const isCheckedIn = checkedInIds.has(memberIdStr);
+                  const isOnLeave = attendanceStats.onLeave.some(m => String(m.id) === memberIdStr);
+                  return !isCheckedIn && !isOnLeave;
+                });
 
                 return notArrived.length > 0 ? (
                   <div className="space-y-1">
@@ -742,21 +742,19 @@ const MyTeam = () => {
                               <td key={day} className="px-1 py-2 text-center">
                                 <div className={`w-6 h-6 mx-auto rounded-full flex items-center justify-center text-[9px] font-bold transition-all duration-200
                                   ${status === 'PRESENT' ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200' :
-                                    status === 'LATE' ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-200' :
-                                      status === 'WFH' ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200' :
-                                        status === 'LEAVE' ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-200' :
-                                          status === 'ABSENT' ? 'bg-red-100 text-red-700 ring-1 ring-red-200' :
-                                            status === 'HALF_DAY' ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-200' :
-                                              status === 'WEEKOFF' ? 'bg-gray-100 text-gray-500 ring-1 ring-gray-200' :
-                                                'bg-gray-50 text-gray-300'}
+                                    status === 'WFH' ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200' :
+                                      status === 'LEAVE' ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-200' :
+                                        status === 'ABSENT' ? 'bg-red-100 text-red-700 ring-1 ring-red-200' :
+                                          status === 'HALF_DAY' ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-200' :
+                                            status === 'WEEKOFF' ? 'bg-gray-100 text-gray-500 ring-1 ring-gray-200' :
+                                              'bg-gray-50 text-gray-300'}
                                 `}>
                                   {status === 'PRESENT' ? 'P' :
-                                    status === 'LATE' ? 'L' :
-                                      status === 'WFH' ? 'W' :
-                                        status === 'LEAVE' ? 'V' :
-                                          status === 'ABSENT' ? 'A' :
-                                            status === 'HALF_DAY' ? 'H' :
-                                              status === 'WEEKOFF' ? 'WO' : ''}
+                                    status === 'WFH' ? 'W' :
+                                      status === 'LEAVE' ? 'L' :
+                                        status === 'ABSENT' ? 'A' :
+                                          status === 'HALF_DAY' ? 'H' :
+                                            status === 'WEEKOFF' ? 'WO' : ''}
                                 </div>
                               </td>
                             );
@@ -774,15 +772,11 @@ const MyTeam = () => {
                   <span className="text-[10px] text-gray-500 font-medium">Present</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-amber-100 ring-1 ring-amber-200 rounded flex items-center justify-center text-[9px] font-bold text-amber-700">L</div>
-                  <span className="text-[10px] text-gray-500 font-medium">Late</span>
-                </div>
-                <div className="flex items-center space-x-1.5">
                   <div className="w-4 h-4 bg-indigo-100 ring-1 ring-indigo-200 rounded flex items-center justify-center text-[9px] font-bold text-indigo-700">W</div>
                   <span className="text-[10px] text-gray-500 font-medium">WFH</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-orange-100 ring-1 ring-orange-200 rounded flex items-center justify-center text-[9px] font-bold text-orange-700">V</div>
+                  <div className="w-4 h-4 bg-orange-100 ring-1 ring-orange-200 rounded flex items-center justify-center text-[9px] font-bold text-orange-700">L</div>
                   <span className="text-[10px] text-gray-500 font-medium">Leave (Vacation)</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
@@ -929,20 +923,20 @@ const MyTeam = () => {
               </div>
 
               <div className="flex-1 overflow-auto custom-scrollbar px-6 pb-6">
-                <div className="border border-gray-800 rounded-lg bg-[#161f2e] overflow-hidden">
+                <div className="border border-gray-800 rounded-lg bg-[#161f2e] overflow-x-auto custom-scrollbar">
                   {selectedCategory === 'late' ? (
                     <div className="inline-block min-w-full align-middle">
                       <table className="min-w-full border-separate border-spacing-0">
                         <thead>
                           <tr className="bg-[#1c2636]">
                             <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider sticky left-0 bg-[#1c2636] z-20 border-b border-gray-800 min-w-[220px]">Employee</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Department</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Sub Department</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Location</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Job Title</th>
-                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Clock-in Time</th>
-                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Assigned Shift</th>
-                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">Delay</th>
+                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[150px]">Department</th>
+                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[150px]">Team (Manager)</th>
+                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[120px]">Location</th>
+                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[150px]">Job Title</th>
+                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[120px]">Clock-in Time</th>
+                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[200px]">Assigned Shift</th>
+                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[100px]">Delay</th>
                           </tr>
                         </thead>
                         <tbody className="bg-[#0f172a] divide-y divide-gray-800">
@@ -977,7 +971,7 @@ const MyTeam = () => {
                                   {member.department?.name || 'N/A'}
                                 </td>
                                 <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-400 font-medium border-b border-gray-800/50">
-                                  {member.sub_department || 'Not Available'}
+                                  {member.manager?.user_info?.full_name || 'Individual'}
                                 </td>
                                 <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-400 font-medium border-b border-gray-800/50">
                                   {member.location || 'Hyderabad'}
