@@ -386,35 +386,35 @@ const Dashboard = () => {
       const todayRecord = allRecords.length > 0 ? allRecords[0] : null;
 
       if (todayRecord && todayRecord.check_in_time && !todayRecord.check_out_time) {
-      const reconstructedCheckIn = new Date(
-        `${todayRecord.date}T${todayRecord.check_in_time}`
-      );
+        const reconstructedCheckIn = new Date(
+          `${todayRecord.date}T${todayRecord.check_in_time}`
+        );
 
-      // ✅ Only restore state if this session created it
-      const wasThisSession = localStorage.getItem(`attendance_${user?.id}`);
-      
-      if (wasThisSession) {
-        // User checked in during this browser session - restore the UI state
-        setAttendanceState(prev => ({
-          ...(prev || {}),
-          isCheckedIn: false,
-          checkInTime: reconstructedCheckIn,
-          isWorkFromHome: todayRecord.notes?.includes('Work from Home') || false,
-          todayAttendance: todayRecord,
-          pendingSubmission: true
-        }));
-      } else {
-        // User checked in from another device/session - DON'T auto-check-in here
-        setAttendanceState(prev => ({
-          ...(prev || {}),
-          isCheckedIn: false,  // ✅ Don't show as checked in
-          checkInTime: null,
-          isWorkFromHome: false,
-          todayAttendance: todayRecord,
-          pendingSubmission: false
-        }));
+        // ✅ Only restore state if this session created it
+        const wasThisSession = localStorage.getItem(`attendance_${user?.id}`);
+
+        if (wasThisSession) {
+          // User checked in during this browser session - restore the UI state
+          setAttendanceState(prev => ({
+            ...(prev || {}),
+            isCheckedIn: false,
+            checkInTime: reconstructedCheckIn,
+            isWorkFromHome: todayRecord.notes?.includes('Work from Home') || false,
+            todayAttendance: todayRecord,
+            pendingSubmission: true
+          }));
+        } else {
+          // User checked in from another device/session - DON'T auto-check-in here
+          setAttendanceState(prev => ({
+            ...(prev || {}),
+            isCheckedIn: false,  // ✅ Don't show as checked in
+            checkInTime: null,
+            isWorkFromHome: false,
+            todayAttendance: todayRecord,
+            pendingSubmission: false
+          }));
+        }
       }
-    }
     } catch (error) {
       console.error('Failed to check today attendance/WFH:', error);
     }
@@ -536,15 +536,7 @@ const Dashboard = () => {
 
   const handleCheckIn = async (workFromHome = false) => {
     if (isManagerOnly) return;
-    // ✅ NEW: When clicking Office button without WFH approval, show popup
-    if (!workFromHome && !isHRManager() && !wfhStatus.hasApprovedRequest) {
-      console.log('💡 Showing WFH popup before office check-in');
-      toast.info('💡 Would you like to work from home instead? Apply for WFH approval.', {
-        duration: 4000
-      });
-      setShowWFHPopup(true);
-      return;  // Stop here - don't check in yet
-    }
+
     if (workFromHome) {
       if (isHRManager() || wfhStatus.hasApprovedRequest) {
         const now = new Date();
@@ -597,7 +589,7 @@ const Dashboard = () => {
       pendingSubmission: true
     }));
 
-    toast.success('🏢 Office Check-in successful! Timer is running.');
+    toast.success('🌐 Remote Login successful! Timer is running.');
     // Immediately create a check-in record
     try {
       const coords = await getGeoCoords();
@@ -606,7 +598,7 @@ const Dashboard = () => {
         check_in_time: now.toTimeString().slice(0, 8),
         status: 'PRESENT',
         attendance_type: 'MANUAL',
-        notes: 'Office'
+        notes: 'Remote Login'
       };
       if (coords) {
         attendanceData.check_in_lat = Number(coords.lat).toFixed(6);
@@ -669,7 +661,7 @@ const Dashboard = () => {
       check_in_time: checkInTime.toTimeString().slice(0, 8),
       status: 'PRESENT',
       attendance_type: 'MANUAL',
-      notes: attendanceState.isWorkFromHome ? 'Work from Home' : 'Office'
+      notes: attendanceState.isWorkFromHome ? 'Work from Home' : 'Remote Login'
     };
 
     if (includeCheckOut) {
@@ -749,7 +741,7 @@ const Dashboard = () => {
     return () => clearInterval(id);
   }, [attendanceState?.isCheckedIn, isManagerOnly]);
 
- 
+
   const BirthdayBanner = () => {
     if (!birthdayFestivalData.birthdays.has_birthdays_today) return null;
 
@@ -794,7 +786,7 @@ const Dashboard = () => {
       </div>
     );
   };
-  
+
   const FestivalBanner = () => {
     if (!birthdayFestivalData.festivals.has_festivals_today) return null;
 
@@ -829,7 +821,7 @@ const Dashboard = () => {
   // ===================
 
   const FestivalCard = ({ festival }) => {
-    
+
     const getGradientClass = (type) => {
       switch (type?.toLowerCase()) {
         case 'religious': return 'from-amber-300 via-orange-400 to-red-400';
@@ -908,7 +900,7 @@ const Dashboard = () => {
 
   const BirthdayCard = ({ birthday }) => {
     return (
-     
+
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-300 via-purple-400 to-indigo-500 p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group min-w-[380px] max-w-[380px]">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
@@ -1094,7 +1086,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      
+
 
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Birthday Banner */}
@@ -1106,7 +1098,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {!isManagerOnly && attendanceState && (
               <QuickAccessCard title="Today's Attendance" gradient={true}>
                 <div className="bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-800 rounded-xl p-6 text-white shadow-lg border border-white/10">
@@ -1157,12 +1149,12 @@ const Dashboard = () => {
                             )
                           }
                           className={`flex items-center justify-center py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md ${(attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager())
-                            ? 'bg-gray00/50 text-gray-300 cursor-not-allowed opacity-50'
-                            : 'bg-gradnt-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white transform hover:scale-105'
+                            ? 'bg-gray-400/50 text-gray-300 cursor-not-allowed opacity-50'
+                            : 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white transform hover:scale-105'
                             }`}
                         >
                           <PlayIcon className="w-5 h-5 mr-2" />
-                          {(attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager()) ? 'Office (Disabled)' : 'Check In (Office)'}
+                          {(attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager()) ? 'Remote Login (Disabled)' : 'Remote Login'}
                         </button>
 
                         <button
@@ -1300,7 +1292,7 @@ const Dashboard = () => {
               </div>
             </QuickAccessCard>
 
-            
+
             <QuickAccessCard title="🎉 Upcoming Festivals & Celebrations" className="overflow-hidden" gradient={true}>
               {birthdayFestivalData.festivals.upcoming_festivals.length === 0 ? (
                 <div className="text-center py-12">

@@ -244,11 +244,11 @@ const MyTeam = () => {
           return;
         }
 
-        const hasCheckedIn = !!(attendanceRecord && attendanceRecord.check_in_time);
+        const hasCheckedIn = !!(attendanceRecord && (attendanceRecord.check_in_time || attendanceRecord.status === 'PRESENT' || attendanceRecord.status === 'LATE'));
 
         // Determine lateness
         let isLate = false;
-        if (hasCheckedIn) {
+        if (hasCheckedIn && attendanceRecord.check_in_time) {
           const [hours, minutes, seconds] = attendanceRecord.check_in_time.split(':').map(Number);
           if (hours > 10 || (hours === 10 && (minutes > 0 || seconds > 0))) {
             isLate = true;
@@ -379,7 +379,7 @@ const MyTeam = () => {
     // 3. Check Attendance
     const record = calendarData.attendance?.find(a => {
       const empId = a.employee?.id || a.employee_id || a.employee;
-      return String(empId) === empIdStr && (a.date === dateStr || (a.check_in_time && a.check_in_time.startsWith(dateStr)));
+      return String(empId) === empIdStr && a.date === dateStr;
     });
 
     if (record) {

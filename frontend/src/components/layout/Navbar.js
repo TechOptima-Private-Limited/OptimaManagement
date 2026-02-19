@@ -124,24 +124,24 @@ const Navbar = ({ onMenuToggle }) => {
   };
 
   const getRoleBadge = (role) => {
-  if (!role) {
+    if (!role) {
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r from-gray-400 to-gray-500 shadow">
+          —
+        </span>
+      );
+    }
+
     return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r from-gray-400 to-gray-500 shadow">
-        —
+      <span
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white shadow
+        ${getRoleBadgeColor(role)}`}
+      >
+        <span className="mr-1">{getRoleIcon(role)}</span>
+        {getRoleDisplayName(role)}
       </span>
     );
-  }
-
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold text-white shadow
-        ${getRoleBadgeColor(role)}`}
-    >
-      <span className="mr-1">{getRoleIcon(role)}</span>
-      {getRoleDisplayName(role)}
-    </span>
-  );
-};
+  };
 
   return (
     <nav className={`bg-gradient-to-r ${theme.navbarGradient} shadow-xl border-b border-white/20 sticky top-0 z-40 backdrop-blur-sm`}>
@@ -332,7 +332,7 @@ const Navbar = ({ onMenuToggle }) => {
                   </Link>
 
                   <Link
-                    to="/help"
+                    to="/resource-management"
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-300"
                     onClick={() => setShowUserMenu(false)}
                   >

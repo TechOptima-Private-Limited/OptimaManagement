@@ -1506,6 +1506,7 @@ def get_manager_team_employees(user):
 class AttendanceRecordListView(generics.ListAPIView):
     serializer_class = AttendanceRecordSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None
     
     def get_queryset(self):
         user = self.request.user
@@ -1517,6 +1518,7 @@ class AttendanceRecordListView(generics.ListAPIView):
         user_profile = getattr(user, 'profile', None)
         user_role = getattr(user_profile, 'role', None) if user_profile else None
         permission_level = get_permission_level(user_role) if user_role else 0
+        include_peers = self.request.query_params.get('include_peers') == 'true'
         
         # Check Django permission first
         if not user.has_perm('attendance.view_attendancerecord'):
@@ -1527,17 +1529,32 @@ class AttendanceRecordListView(generics.ListAPIView):
             elif permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
                 # VP/Director/HR can see all records
                 pass
-            elif permission_level >= PERMISSION_LEVELS['MANAGER'] or has_management_access(user_role):
-                # Managers see their team + self
+            elif permission_level >= PERMISSION_LEVELS['LEAD'] or has_management_access(user_role):
+                # Managers and Leads see their team + self
                 allowed_employee_ids = get_manager_team_employees(user)
                 queryset = queryset.filter(employee_id__in=allowed_employee_ids)
-                print(f"🔍 Manager filtered queryset: {queryset}")
+                print(f"🔍 Manager/Lead filtered queryset: {queryset}")
             else:
-                # Regular employees see only their own records
+                # Regular employees
                 try:
                     employee = Employee.objects.get(user=user)
-                    queryset = queryset.filter(employee=employee)
-                    print(f"🔍 Employee filtered queryset (own only): {employee.id}")
+                    if include_peers:
+                        # Find peers (employees with the same manager)
+                        peer_ids = []
+                        if employee.manager:
+                            peers = Employee.objects.filter(
+                                manager=employee.manager,
+                                status='ACTIVE'
+                            ).values_list('id', flat=True)
+                            peer_ids = list(peers)
+                        
+                        allowed_ids = [employee.id] + peer_ids
+                        queryset = queryset.filter(employee_id__in=allowed_ids)
+                        print(f"🔍 Employee peer-aware filtered queryset: {allowed_ids}")
+                    else:
+                        # Only own records
+                        queryset = queryset.filter(employee=employee)
+                        print(f"🔍 Employee filtered queryset (own only): {employee.id}")
                 except Employee.DoesNotExist:
                     queryset = AttendanceRecord.objects.none()
         
@@ -1575,8 +1592,9 @@ class AttendanceRecordListView(generics.ListAPIView):
         
         # Add pending approvals data for appropriate roles
         if permission_level >= PERMISSION_LEVELS['MANAGER'] or can_manage_hr(user_role):
+            results = response.data.get('results', response.data) if isinstance(response.data, dict) else response.data
             response.data = {
-                'results': response.data.get('results', response.data),
+                'results': results,
                 'pending_approvals_count': pending_count,
                 'has_pending_approvals': pending_count > 0,
                 'user_role': user_role

@@ -289,7 +289,7 @@
 //             {filteredNavigation.map((item) => {
 //               const Icon = item.icon;
 //               const isActive = isActiveLink(item.href);
-              
+
 //               return (
 //                 <Link
 //                   key={item.name}
@@ -309,7 +309,7 @@
 //                   {isActive && (
 //                     <div className={`absolute inset-0 bg-gradient-to-r ${theme.primaryGradient} opacity-20 animate-pulse`}></div>
 //                   )}
-                  
+
 //                   <div className={`
 //                     relative z-10 w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-300
 //                     ${isActive 
@@ -319,7 +319,7 @@
 //                   `}>
 //                     <Icon className="h-4 w-4 text-white" />
 //                   </div>
-                  
+
 //                   <div className="flex-1 relative z-10">
 //                     <div className="font-semibold">{item.name}</div>
 //                     <div className={`
@@ -329,7 +329,7 @@
 //                       {item.description}
 //                     </div>
 //                   </div>
-                  
+
 //                   {isActive && (
 //                     <div className="relative z-10 flex items-center space-x-1">
 //                       <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
@@ -351,7 +351,7 @@
 //                   Online
 //                 </span>
 //               </div>
-              
+
 //               <div className="flex items-center justify-between text-xs">
 //                 <span className="text-gray-300 font-medium">Version</span>
 //                 <span className="text-blue-300 font-semibold bg-blue-500/20 px-2 py-0.5 rounded-full border border-blue-500/30">
@@ -443,7 +443,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const userRole = getUserRole();
   const [permissions, setPermissions] = React.useState([]);
-  
+
   React.useEffect(() => {
     (async () => {
       try {
@@ -456,7 +456,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   }, []);
 
   const hasPerm = (code) => (permissions || []).includes(code);
-  
+
   const allowedByPerms = (href) => {
     if (href === '/onboarding/assets') {
       const assetPerms = [
@@ -475,7 +475,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     if (href === '/leave') return hasPerm('leave_management.view_leaverequest');
     return false;
   };
-  
+
   const { theme } = useTheme();
 
   // Helper function to check if user has access based on permission level
@@ -519,10 +519,10 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const navigation = [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard', 
-      icon: HomeIcon, 
+    {
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: HomeIcon,
       roles: getAllRoles(),
       description: 'Overview and quick stats',
       color: 'from-blue-500 to-indigo-600'
@@ -535,18 +535,18 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: 'Manage users and authentication',
       color: 'from-sky-500 to-blue-600',
     },
-    { 
-      name: 'Asset Management', 
-      href: '/onboarding/assets', 
-      icon: WrenchScrewdriverIcon, 
+    {
+      name: 'Asset Management',
+      href: '/onboarding/assets',
+      icon: WrenchScrewdriverIcon,
       roles: [...getITRoles(), ...getHRRoles()],
       description: 'Manage company assets',
       color: 'from-orange-500 to-red-600'
     },
-    { 
-      name: 'My Profile', 
-      href: '/profile', 
-      icon: UserGroupIcon, 
+    {
+      name: 'My Profile',
+      href: '/profile',
+      icon: UserGroupIcon,
       roles: getAllRoles(),
       description: 'View and edit your profile',
       color: 'from-purple-500 to-pink-600'
@@ -559,26 +559,26 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: 'View your team members and reporting structure',
       color: 'from-emerald-500 to-teal-600',
     },
-    { 
-      name: 'Employees', 
-      href: '/employees', 
-      icon: UsersIcon, 
+    {
+      name: 'Employees',
+      href: '/employees',
+      icon: UsersIcon,
       roles: [...getHRRoles(), ...getManagementRoles()],
       description: 'Manage employee directory',
       color: 'from-green-500 to-emerald-600'
     },
-    { 
-      name: 'Attendance', 
-      href: '/attendance', 
-      icon: ClockIcon, 
+    {
+      name: 'Attendance',
+      href: '/attendance',
+      icon: ClockIcon,
       roles: getAllRoles(),
       description: 'Track time and attendance',
       color: 'from-yellow-500 to-orange-600'
     },
-    { 
-      name: 'Leave Management', 
-      href: '/leave', 
-      icon: CalendarDaysIcon, 
+    {
+      name: 'Leave Management',
+      href: '/leave',
+      icon: CalendarDaysIcon,
       roles: getAllRoles(),
       description: 'Manage leave requests',
       color: 'from-blue-600 to-purple-600'
@@ -591,64 +591,64 @@ const Sidebar = ({ isOpen, onClose }) => {
       description: 'Manage WFH requests',
       color: 'from-violet-500 to-purple-600'
     },
-    { 
-      name: 'Resource Management', 
-      href: '/resource-management', 
-      icon: KeyIcon, 
+    {
+      name: 'Support 24/7',
+      href: '/resource-management',
+      icon: KeyIcon,
       roles: getAllRoles(),
-      description: 'Access requests and resources',
+      description: 'Access support and resources',
       color: 'from-emerald-500 to-teal-600'
     },
-    { 
-      name: 'My Assets', 
-      href: '/my-assets', 
-      icon: ComputerDesktopIcon, 
+    {
+      name: 'My Assets',
+      href: '/my-assets',
+      icon: ComputerDesktopIcon,
       roles: getAllRoles(),
       description: 'Assets assigned to you',
       color: 'from-indigo-500 to-blue-600'
     },
-    { 
-      name: 'Employee Onboarding', 
-      href: '/onboarding/employees', 
-      icon: UserPlusIcon, 
+    {
+      name: 'Employee Onboarding',
+      href: '/onboarding/employees',
+      icon: UserPlusIcon,
       roles: getHRRoles(),
       description: 'Manage new employee onboarding',
       color: 'from-cyan-500 to-blue-600'
     },
-    { 
-      name: 'Onboarding Links', 
-      href: '/onboarding/link-generator', 
-      icon: LinkIcon, 
+    {
+      name: 'Onboarding Links',
+      href: '/onboarding/link-generator',
+      icon: LinkIcon,
       roles: getHRRoles(),
       description: 'Generate secure onboarding links',
       color: 'from-indigo-500 to-purple-600'
     },
-    { 
-      name: 'Employee Offboarding', 
-      href: '/onboarding/offboarding', 
-      icon: UserMinusIcon, 
+    {
+      name: 'Employee Offboarding',
+      href: '/onboarding/offboarding',
+      icon: UserMinusIcon,
       roles: getHRRoles(),
       description: 'Manage employee exit process',
       color: 'from-rose-500 to-pink-600'
     },
-    { 
-      name: 'Biometric Devices', 
-      href: '/attendance/biometric', 
-      icon: ComputerDesktopIcon, 
+    {
+      name: 'Biometric Devices',
+      href: '/attendance/biometric',
+      icon: ComputerDesktopIcon,
       roles: [...getITRoles(), ...getHRRoles()],
       description: 'Manage biometric integration',
       color: 'from-teal-500 to-cyan-600'
     },
-    { 
-      name: 'Settings', 
-      href: '/profile', 
-      icon: CogIcon, 
+    {
+      name: 'Settings',
+      href: '/profile',
+      icon: CogIcon,
       roles: [...getManagementRoles(), ...getITRoles(), ...getHRRoles()],
       description: 'System configuration',
       color: 'from-gray-500 to-slate-600'
     },
   ];
-  
+
   const filteredNavigation = navigation.filter((item) => {
     if (!(item.roles.includes(userRole) || allowedByPerms(item.href))) return false;
     // Extra safety: Users and Authentication should only show for authorized roles

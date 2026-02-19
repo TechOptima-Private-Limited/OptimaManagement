@@ -36,7 +36,7 @@
 //   const [biometricDevices, setBiometricDevices] = useState([]);
 //   const [lastSyncTime, setLastSyncTime] = useState(null);
 //   const [isSyncing, setIsSyncing] = useState(false);
-  
+
 //   const [stats, setStats] = useState({
 //     totalDays: 0,
 //     presentDays: 0,
@@ -82,7 +82,7 @@
 //     if (isManagementRole && biometricDevices.length > 0) {
 //       // Sync immediately on mount
 //       syncAllBiometricDevices();
-      
+
 //       // Then sync every 1 minute
 //       const syncInterval = setInterval(() => {
 //         syncAllBiometricDevices();
@@ -181,12 +181,12 @@
 //       console.log('Fetched attendance records:', response.data);
 //       const records = response.data.results || response.data;
 //       setAttendanceRecords(Array.isArray(records) ? records : []);
-      
+
 //       // Both HR Manager and Manager get pending approvals count
 //       if (isManagementRole && response.data.pending_approvals_count !== undefined) {
 //         setPendingApprovalsCount(response.data.pending_approvals_count);
 //       }
-      
+
 //       calculateStats(Array.isArray(records) ? records : []);
 //     } catch (error) {
 //       toast.error('Failed to fetch attendance records');
@@ -255,7 +255,7 @@
 //       const existingRecord = attendanceRecords.find(record => 
 //         record.date === data.date
 //       );
-      
+
 //       if (existingRecord) {
 //         if (!data.edit_reason || data.edit_reason.trim() === '') {
 //           toast.error('Please provide a reason for editing this attendance record');
@@ -263,17 +263,17 @@
 //           return;
 //         }
 //       }
-      
+
 //       const response = await attendanceAPI.markManualAttendance(data);
-      
+
 //       const isPending = response.data?.requires_approval || response.data?.is_pending_approval;
-      
+
 //       if (isPending) {
 //         toast.success(response.data?.message || '🎉 Edit request submitted! HR and managers have been notified for approval.');
 //       } else {
 //         toast.success('✅ Attendance marked successfully!');
 //       }
-      
+
 //       reset({
 //         date: new Date().toISOString().split('T')[0],
 //         status: 'PRESENT'
@@ -301,13 +301,13 @@
 //       };
 
 //       await attendanceAPI.approveEdit(selectedApproval.id, requestData);
-      
+
 //       toast.success(
 //         approvalData.action === 'approve' 
 //           ? '✅ Edit request approved successfully!' 
 //           : '❌ Edit request rejected successfully!'
 //       );
-      
+
 //       setShowApprovalModal(false);
 //       setSelectedApproval(null);
 //       resetApproval();
@@ -327,25 +327,25 @@
 //       employee_id: record.employee?.employee_id,
 //       date: record.date,
 //       edit_reason: record.edit_reason,
-      
+
 //       // ORIGINAL VALUES (what was there before edit request)
 //       original_check_in_time: record.original_check_in_time || 'Not recorded',
 //       original_check_out_time: record.original_check_out_time || 'Not recorded', 
 //       original_status: record.original_status || 'Not recorded',
 //       original_notes: record.original_notes || 'None',
-      
+
 //       // REQUESTED VALUES (what employee wants to change TO)
 //       requested_check_in_time: record.check_in_time,
 //       requested_check_out_time: record.check_out_time,
 //       requested_status: record.status,
 //       requested_notes: record.notes,
-      
+
 //       action: action
 //     };
-    
+
 //     setSelectedApproval(approval);
 //     setShowApprovalModal(true);
-    
+
 //     if (action === 'approve') {
 //       // Pre-fill form with EMPLOYEE'S REQUESTED VALUES
 //       resetApproval({
@@ -374,7 +374,7 @@
 //       attendanceRecords.map(record => 
 //         `${record.date},${record.employee?.user_info?.first_name} ${record.employee?.user_info?.last_name},${record.check_in_time || ''},${record.check_out_time || ''},${record.status},${record.attendance_type},${record.is_pending_approval ? 'Pending' : 'Approved'}`
 //       ).join("\n");
-    
+
 //     const encodedUri = encodeURI(csvContent);
 //     const link = document.createElement("a");
 //     link.setAttribute("href", encodedUri);
@@ -558,13 +558,13 @@
 //       accessor: 'check_in_time',
 //       render: (checkIn, row) => {
 //         if (!checkIn || !row.check_out_time) return <span className="text-gray-400">-</span>;
-        
+
 //         const checkInTime = new Date(`2000-01-01T${checkIn}`);
 //         const checkOutTime = new Date(`2000-01-01T${row.check_out_time}`);
 //         const diffMs = checkOutTime - checkInTime;
 //         const hours = Math.floor(diffMs / (1000 * 60 * 60));
 //         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        
+
 //         return (
 //           <span className="inline-flex items-center px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-sm font-medium">
 //             {hours}h {minutes}m
@@ -632,7 +632,7 @@
 //                 </div>
 //               )}
 //             </div>
-            
+
 //             <div className="flex space-x-3">
 //               <button
 //                 onClick={exportAttendance}
@@ -816,7 +816,7 @@
 //               <ClockIcon className="h-6 w-6 mr-2 text-amber-500" />
 //               Your Pending Edit Requests
 //             </h3>
-            
+
 //             {userPendingRequests.length > 0 ? (
 //               <div className="space-y-4">
 //                 {userPendingRequests
@@ -872,7 +872,7 @@
 //                 {attendanceRecords.filter(r => r.is_pending_approval).length} Pending
 //               </span>
 //             </div>
-            
+
 //             {attendanceRecords.filter(r => r.is_pending_approval).length > 0 ? (
 //               <div className="space-y-6">
 //                 {attendanceRecords
@@ -1024,7 +1024,7 @@
 //                 </div>
 //               )}
 //             </div>
-            
+
 //             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 //               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
 //                 <div>
@@ -1201,7 +1201,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           <Table
 //             columns={columns}
 //             data={attendanceRecords}
@@ -1257,7 +1257,7 @@
 //                     </p>
 //                   </div>
 //                 </div>
-                
+
 //                 {selectedApproval.edit_reason && (
 //                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
 //                     <p className="text-sm text-blue-800">
@@ -1336,7 +1336,7 @@
 //                       💡 You can modify these values if corrections are needed before approving.
 //                     </p>
 //                   </div>
-                  
+
 //                   <div className="grid grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-2">Check In Time</label>
@@ -1475,10 +1475,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { 
-  CalendarIcon, 
-  ClockIcon, 
-  UserIcon, 
+import {
+  CalendarIcon,
+  ClockIcon,
+  UserIcon,
   XCircleIcon,
   FunnelIcon,
   DocumentChartBarIcon,
@@ -1512,7 +1512,7 @@ const AttendanceTracker = () => {
   const [biometricDevices, setBiometricDevices] = useState([]);
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  
+
   const [stats, setStats] = useState({
     totalDays: 0,
     presentDays: 0,
@@ -1522,7 +1522,7 @@ const AttendanceTracker = () => {
     onTimePercent: 0
   });
   const [filters, setFilters] = useState({
-    month: new Date().toISOString().slice(0, 7), // Default to current month YYYY-MM
+    date: new Date().toISOString().split('T')[0], // Default to today's date YYYY-MM-DD
     status: '',
     employee_id: ''
   });
@@ -1557,7 +1557,7 @@ const AttendanceTracker = () => {
     if (isManagementRole && biometricDevices.length > 0) {
       // Sync immediately on mount
       syncAllBiometricDevices();
-      
+
       // Then sync every 1 minute
       const syncInterval = setInterval(() => {
         syncAllBiometricDevices();
@@ -1647,22 +1647,12 @@ const AttendanceTracker = () => {
     try {
       setLoading(true);
       const params = {};
-      if (filters.month) {
-        // Calculate start and end date of the selected month
-        const [year, month] = filters.month.split('-');
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0); // Last day of month
-        
-        // Format as YYYY-MM-DD for API
-        // Adjust for timezone to ensure we get the correct date string
-        const offset = startDate.getTimezoneOffset();
-        const startLocal = new Date(startDate.getTime() - (offset * 60 * 1000));
-        const endLocal = new Date(endDate.getTime() - (offset * 60 * 1000));
-        
-        params.start_date = startLocal.toISOString().split('T')[0];
-        params.end_date = endLocal.toISOString().split('T')[0];
+      if (filters.date) {
+        // Use the selected date for both start and end to get records for that specific day
+        params.start_date = filters.date;
+        params.end_date = filters.date;
       }
-      
+
       if (filters.status) params.status = filters.status;
       if (filters.employee_id) params.employee_id = filters.employee_id;
 
@@ -1670,18 +1660,18 @@ const AttendanceTracker = () => {
       console.log('Fetched attendance records:', response.data);
       const records = response.data.results || response.data;
       setAttendanceRecords(Array.isArray(records) ? records : []);
-      
+
       // Both HR Manager and Manager get pending approvals count
       if (isManagementRole && response.data.pending_approvals_count !== undefined) {
         setPendingApprovalsCount(response.data.pending_approvals_count);
       }
-      
+
       const targetId = filters.employee_id || user?.employee_id;
-      const recordsToStat = Array.isArray(records) 
+      const recordsToStat = Array.isArray(records)
         ? records.filter(r => {
-            const rEmpId = r.employee?.id || r.employee_id || r.employee;
-            return String(rEmpId) === String(targetId);
-          })
+          const rEmpId = r.employee?.id || r.employee_id || r.employee;
+          return String(rEmpId) === String(targetId);
+        })
         : [];
       calculateStats(recordsToStat);
     } catch (error) {
@@ -1753,10 +1743,10 @@ const AttendanceTracker = () => {
   const onSubmit = async (data) => {
     setSubmitting(true);
     try {
-      const existingRecord = attendanceRecords.find(record => 
+      const existingRecord = attendanceRecords.find(record =>
         record.date === data.date && (record.employee?.id === user?.employee_id || record.employee_id === user?.employee_id)
       );
-      
+
       if (existingRecord) {
         if (!data.edit_reason || data.edit_reason.trim() === '') {
           toast.error('Please provide a reason for editing this attendance record');
@@ -1764,17 +1754,17 @@ const AttendanceTracker = () => {
           return;
         }
       }
-      
+
       const response = await attendanceAPI.markManualAttendance(data);
-      
+
       const isPending = response.data?.requires_approval || response.data?.is_pending_approval;
-      
+
       if (isPending) {
         toast.success(response.data?.message || '🎉 Edit request submitted! HR and managers have been notified for approval.');
       } else {
         toast.success('✅ Attendance marked successfully!');
       }
-      
+
       reset({
         date: new Date().toISOString().split('T')[0],
         status: 'PRESENT'
@@ -1802,13 +1792,13 @@ const AttendanceTracker = () => {
       };
 
       await attendanceAPI.approveEdit(selectedApproval.id, requestData);
-      
+
       toast.success(
-        approvalData.action === 'approve' 
-          ? '✅ Edit request approved successfully!' 
+        approvalData.action === 'approve'
+          ? '✅ Edit request approved successfully!'
           : '❌ Edit request rejected successfully!'
       );
-      
+
       setShowApprovalModal(false);
       setSelectedApproval(null);
       resetApproval();
@@ -1828,25 +1818,25 @@ const AttendanceTracker = () => {
       employee_id: record.display_id || 'N/A',
       date: record.date,
       edit_reason: record.edit_reason,
-      
+
       // ORIGINAL VALUES (what was there before edit request)
       original_check_in_time: record.original_check_in_time || 'Not recorded',
-      original_check_out_time: record.original_check_out_time || 'Not recorded', 
+      original_check_out_time: record.original_check_out_time || 'Not recorded',
       original_status: record.original_status || 'Not recorded',
       original_notes: record.original_notes || 'None',
-      
+
       // REQUESTED VALUES (what employee wants to change TO)
       requested_check_in_time: record.check_in_time,
       requested_check_out_time: record.check_out_time,
       requested_status: record.status,
       requested_notes: record.notes,
-      
+
       action: action
     };
-    
+
     setSelectedApproval(approval);
     setShowApprovalModal(true);
-    
+
     if (action === 'approve') {
       // Pre-fill form with EMPLOYEE'S REQUESTED VALUES
       resetApproval({
@@ -1866,16 +1856,16 @@ const AttendanceTracker = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ month: new Date().toISOString().slice(0, 7), status: '', employee_id: '' });
+    setFilters({ date: new Date().toISOString().split('T')[0], status: '', employee_id: '' });
   };
 
   const exportAttendance = () => {
-    const csvContent = "data:text/csv;charset=utf-8," + 
+    const csvContent = "data:text/csv;charset=utf-8," +
       "Date,Employee,Employee ID,Check In,Check Out,Status,Type,Approval Status\n" +
-      attendanceRecords.map(record => 
+      attendanceRecords.map(record =>
         `${record.date},${record.display_name || 'Unknown'},${record.display_id || 'N/A'},${record.check_in_time || ''},${record.check_out_time || ''},${record.status},${record.attendance_type},${record.is_pending_approval ? 'Pending' : 'Approved'}`
       ).join("\n");
-    
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -1958,8 +1948,8 @@ const AttendanceTracker = () => {
                 `${employee?.user_info?.first_name?.[0] || ''}${employee?.user_info?.last_name?.[0] || ''}`
               ) : (
                 // No employee - use biometric name or ID
-                row.biometric_user_name?.split(' ').map(n => n[0]).join('') || 
-                row.biometric_user_id?.substring(0, 2) || 
+                row.biometric_user_name?.split(' ').map(n => n[0]).join('') ||
+                row.biometric_user_id?.substring(0, 2) ||
                 'N/A'
               )}
             </span>
@@ -2071,13 +2061,13 @@ const AttendanceTracker = () => {
       accessor: 'check_in_time',
       render: (checkIn, row) => {
         if (!checkIn || !row.check_out_time) return <span className="text-gray-400">-</span>;
-        
+
         const checkInTime = new Date(`2000-01-01T${checkIn}`);
         const checkOutTime = new Date(`2000-01-01T${row.check_out_time}`);
         const diffMs = checkOutTime - checkInTime;
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         return (
           <span className="inline-flex items-center px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-sm font-medium">
             {hours}h {minutes}m
@@ -2109,9 +2099,9 @@ const AttendanceTracker = () => {
                 <div>
                   <h1 className="text-3xl font-bold">Attendance Tracker</h1>
                   <p className="text-blue-100 mt-1">
-                    {isHRManager() ? 'Manage attendance for all employees with smart insights' : 
-                     isManager() ? 'Manage attendance for your team with smart insights' : 
-                     'Track your daily attendance and performance'}
+                    {isHRManager() ? 'Manage attendance for all employees with smart insights' :
+                      isManager() ? 'Manage attendance for your team with smart insights' :
+                        'Track your daily attendance and performance'}
                   </p>
                 </div>
               </div>
@@ -2145,7 +2135,7 @@ const AttendanceTracker = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="flex space-x-3">
               <button
                 onClick={exportAttendance}
@@ -2213,7 +2203,7 @@ const AttendanceTracker = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Timings</h3>
               <div className="flex space-x-1">
-                {['S','M','T','W','T','F','S'].map((d, idx) => {
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => {
                   const jsDay = new Date().getDay();
                   const active = idx === jsDay;
                   return (
@@ -2228,7 +2218,7 @@ const AttendanceTracker = () => {
               </p>
               <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
                 {(() => {
-                  const percent = Math.max(0, Math.min(100, Math.round((todayDurationMinutes / (9*60)) * 100)));
+                  const percent = Math.max(0, Math.min(100, Math.round((todayDurationMinutes / (9 * 60)) * 100)));
                   return <div className={`h-full bg-gradient-to-r ${theme.primaryGradient}`} style={{ width: `${percent}%` }} />
                 })()}
               </div>
@@ -2328,7 +2318,7 @@ const AttendanceTracker = () => {
               <ClockIcon className="h-6 w-6 mr-2 text-amber-500" />
               Your Pending Edit Requests
             </h3>
-            
+
             {userPendingRequests.length > 0 ? (
               <div className="space-y-4">
                 {userPendingRequests
@@ -2384,7 +2374,7 @@ const AttendanceTracker = () => {
                 {attendanceRecords.filter(r => r.is_pending_approval).length} Pending
               </span>
             </div>
-            
+
             {attendanceRecords.filter(r => r.is_pending_approval).length > 0 ? (
               <div className="space-y-6">
                 {attendanceRecords
@@ -2541,7 +2531,7 @@ const AttendanceTracker = () => {
                 </div>
               )}
             </div>
-            
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                 <div>
@@ -2605,8 +2595,8 @@ const AttendanceTracker = () => {
                     Reason for Edit <span className="text-red-500">*</span>
                   </label>
                   <textarea
-                    {...register('edit_reason', { 
-                      required: showEditReason ? 'Reason is required for editing or adding past attendance' : false 
+                    {...register('edit_reason', {
+                      required: showEditReason ? 'Reason is required for editing or adding past attendance' : false
                     })}
                     rows={3}
                     placeholder="Please explain why you need to edit this attendance record..."
@@ -2657,12 +2647,13 @@ const AttendanceTracker = () => {
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Month</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Select Date</label>
               <input
-                type="month"
-                value={filters.month}
-                onChange={(e) => handleFilterChange('month', e.target.value)}
+                type="date"
+                value={filters.date}
+                onChange={(e) => handleFilterChange('date', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                max={new Date().toISOString().split('T')[0]}
               />
             </div>
 
@@ -2708,14 +2699,14 @@ const AttendanceTracker = () => {
               </div>
             </div>
           </div>
-          
+
           <Table
             columns={columns}
             data={attendanceRecords}
             loading={loading}
             emptyMessage={
-              isManager() 
-                ? "No attendance records found for your team" 
+              isManager()
+                ? "No attendance records found for your team"
                 : "No attendance records found"
             }
           />
@@ -2760,7 +2751,7 @@ const AttendanceTracker = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 {selectedApproval.edit_reason && (
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
                     <p className="text-sm text-blue-800">
@@ -2839,7 +2830,7 @@ const AttendanceTracker = () => {
                       💡 You can modify these values if corrections are needed before approving.
                     </p>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Check In Time</label>
@@ -2890,7 +2881,7 @@ const AttendanceTracker = () => {
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <p className="text-sm text-red-800 flex items-center">
                       <XCircleIcon className="h-4 w-4 mr-2" />
-                      Are you sure you want to reject this attendance edit request? 
+                      Are you sure you want to reject this attendance edit request?
                       The employee will need to resubmit if they want to make changes.
                     </p>
                   </div>
@@ -2903,11 +2894,10 @@ const AttendanceTracker = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 flex items-center justify-center space-x-2 ${
-                    selectedApproval.action === 'approve'
+                  className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 flex items-center justify-center space-x-2 ${selectedApproval.action === 'approve'
                       ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white'
                       : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
-                  }`}
+                    }`}
                 >
                   {submitting ? (
                     <>

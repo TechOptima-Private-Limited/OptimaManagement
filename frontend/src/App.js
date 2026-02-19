@@ -39,7 +39,7 @@ import EmployeeOnboardingRouter from './components/onboarding/EmployeeOnboarding
 import OnboardingSuccessPage from './components/onboarding/OnboardingSuccessPage';
 import OnboardingLinkGenerator from './components/onboarding/OnboardingLinkGenerator';
 
-// Resource Management Components
+// Support 24/7 Components
 import ResourceManagement from './components/resourcemanagement/ResourceManagement';
 import MyAssets from './components/assets/MyAssets';
 import { AuthProvider } from './context/AuthContext';
@@ -328,7 +328,7 @@ function App() {
                 } 
               />
               
-              {/* Resource Management */}
+              {/* Support 24/7 */}
               <Route 
                 path="/resource-management/*" 
                 element={
