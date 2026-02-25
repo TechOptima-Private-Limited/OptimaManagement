@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from resource_requests.models import ResourceRequest, DeliveryRequest, PMORequest
 from resource_management.models import AccessRequest, Resource
 from assets.models import Asset, AssetReturn
+from crm.models import Lead, Deal, Company, Contact
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Count, Q
@@ -41,6 +42,7 @@ def get_dashboard_data():
 
     # ITSM (Resource Management) Data
     total_access_requests = AccessRequest.objects.count()
+    solved_tickets = AccessRequest.objects.filter(status='APPROVED').count()
     access_status_dist = (
         AccessRequest.objects.values('status')
         .annotate(count=Count('id'))
@@ -56,7 +58,10 @@ def get_dashboard_data():
         AccessRequest.objects.filter(requested_at__gte=timezone.now() - timezone.timedelta(days=30))
         .extra({'date': "date(requested_at)"})
         .values('date')
-        .annotate(count=Count('id'))
+        .annotate(
+            total=Count('id'),
+            solved=Count('id', filter=Q(status='APPROVED'))
+        )
         .order_by('date')
     )
 
@@ -83,6 +88,26 @@ def get_dashboard_data():
         .order_by('date')
     )
 
+    # CRM Data
+    total_leads = Lead.objects.count()
+    total_deals = Deal.objects.count()
+    total_companies = Company.objects.count()
+    total_contacts = Contact.objects.count()
+    
+    deal_stage_dist = (
+        Deal.objects.values('stage__name')
+        .annotate(count=Count('id'))
+        .order_by()
+    )
+    
+    lead_trend = (
+        Lead.objects.filter(creation_date__gte=timezone.now() - timezone.timedelta(days=30))
+        .extra({'date': "date(creation_date)"})
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+
     return {
         'resource_request': {
             'total_requests': total_requests,
@@ -98,11 +123,18 @@ def get_dashboard_data():
             'pmo_by_business_type': {item['business_type']: item['count'] for item in pmo_by_business_type}
         },
         'resource_management': {
-            'total_access_requests': total_access_requests,
+            'total_tickets': total_access_requests,
+            'solved_tickets': solved_tickets,
             'access_requests_by_status': {item['status']: item['count'] for item in access_status_dist},
             'access_requests_by_priority': {item['priority']: item['count'] for item in access_priority_dist},
             'active_resources': active_resources,
-            'access_requests_by_date': {item['date'].strftime('%Y-%m-%d'): item['count'] for item in access_requests_by_date}
+            'access_requests_by_date': [
+                {
+                    'date': item['date'].strftime('%Y-%m-%d'),
+                    'total': item['total'],
+                    'solved': item['solved']
+                } for item in access_requests_by_date
+            ]
         },
         'asset_management': {
             'total_assets': total_assets,
@@ -112,6 +144,19 @@ def get_dashboard_data():
             'damaged_assets': damaged_assets,
             'returned_assets_by_condition': {item['condition']: item['count'] for item in return_condition_dist},
             'return_by_date': {item['date'].strftime('%Y-%m-%d'): item['count'] for item in return_by_date}
+        },
+        'crm_management': {
+            'total_leads': total_leads,
+            'total_deals': total_deals,
+            'total_companies': total_companies,
+            'total_contacts': total_contacts,
+            'deal_stage_dist': {item['stage__name'] or str(_('No Stage')): item['count'] for item in deal_stage_dist},
+            'lead_trend': [
+                {
+                    'date': item['date'].strftime('%Y-%m-%d'),
+                    'count': item['count']
+                } for item in lead_trend
+            ]
         }
     }
 
