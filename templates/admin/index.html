@@ -2,7 +2,6 @@
 {% load i18n static %}
 
 {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
 <style>
     /* Light Theme (Professional & Clean) */
     :root {
@@ -20,7 +19,7 @@
         --dashboard-card-text: #2F80ED;
         --dashboard-card-border: #2F80ED;
     }
-    
+
     /* Dark Theme (Modern & Stylish) */
     [data-theme="dark"],
     .theme-dark {
@@ -38,7 +37,7 @@
         --dashboard-card-text: #440808;
         --dashboard-card-border: #0F62FE;
     }
-    
+
     /* Auto-detect system theme */
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme="light"]) {
@@ -57,16 +56,16 @@
             --dashboard-card-border: #0F62FE;
         }
     }
-    
+
     body {
         font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background: var(--dashboard-bg) !important;
         color: var(--dashboard-text) !important;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
-    
+
     /* Force background update for main content area */
-    #content-main { 
+    #content-main {
         padding: 20px;
         background: var(--dashboard-bg) !important;
         max-width: 1400px;
@@ -74,16 +73,16 @@
         min-height: 100vh;
         transition: background-color 0.3s ease;
     }
-    
+
     /* Ensure main container follows theme */
     .main,
     #main {
         background: var(--dashboard-bg) !important;
         transition: background-color 0.3s ease;
     }
-    
+
     /* Dashboard Toggle Buttons */
-    .dashboard-toggle { 
+    .dashboard-toggle {
         margin-bottom: 25px;
         background: var(--dashboard-glass-bg);
         backdrop-filter: blur(10px);
@@ -93,7 +92,7 @@
         box-shadow: 0 4px 16px var(--dashboard-shadow);
         border: 1px solid var(--dashboard-glass-border);
     }
-    
+
     .dashboard-toggle button {
         margin: 0;
         margin-right: 6px;
@@ -108,23 +107,23 @@
         transition: all 0.3s ease;
         position: relative;
     }
-    
+
     .dashboard-toggle button:last-child {
         margin-right: 0;
     }
-    
+
     .dashboard-toggle button:hover {
         background: var(--dashboard-glass-border);
         transform: translateY(-1px);
     }
-    
+
     .dashboard-toggle button.active {
         background: var(--dashboard-primary);
         color: white;
         box-shadow: 0 2px 8px var(--dashboard-shadow);
         transform: translateY(-1px);
     }
-    
+
     /* Tab Buttons */
     .tab-buttons {
         margin-bottom: 25px;
@@ -132,7 +131,7 @@
         gap: 10px;
         flex-wrap: wrap;
     }
-    
+
     .tab-buttons button {
         padding: 12px 24px;
         background: var(--dashboard-glass-bg);
@@ -145,14 +144,14 @@
         transition: all 0.3s ease;
         backdrop-filter: blur(10px);
     }
-    
+
     .tab-buttons button:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px var(--dashboard-shadow);
         border-color: var(--dashboard-primary);
         background: var(--dashboard-glass-border);
     }
-    
+
     .tab-buttons button.active {
         background: var(--dashboard-primary);
         color: white;
@@ -160,7 +159,7 @@
         box-shadow: 0 4px 12px var(--dashboard-shadow);
         transform: translateY(-2px);
     }
-    
+
     /* Dashboard Grid */
     .dashboard-grid {
         display: grid;
@@ -168,7 +167,7 @@
         gap: 20px;
         margin-bottom: 25px;
     }
-    
+
     /* Dashboard Cards - Light Theme with Blue Borders and Blue Text */
     .dashboard-card {
         background: var(--dashboard-card-bg);
@@ -183,34 +182,50 @@
         position: relative;
         overflow: hidden;
     }
-    
+
+    /* Chart cards must NOT clip the legend at the bottom */
+    .dashboard-card.dashboard-chart {
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        height: 320px;
+        padding: 16px 16px 12px;
+    }
+
     .dashboard-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 24px var(--dashboard-shadow);
         border-color: var(--dashboard-primary);
     }
-    
-    .dashboard-chart { 
-        height: 200px; 
+
+    /* Canvas fills remaining space inside the chart card */
+    .dashboard-chart canvas {
+        flex: 1 1 0;
+        min-height: 0;
+        width: 100% !important;
+    }
+
+    .dashboard-chart {
         padding: 10px;
     }
-    
-    .hidden { 
-        display: none !important; 
+
+    .hidden {
+        display: none !important;
     }
-    
-    .card-title { 
-        font-weight: 600; 
-        margin-bottom: 12px; 
+
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 12px;
         font-size: 13px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         opacity: 0.9;
         color: var(--dashboard-card-text);
     }
-    
-    .card-value { 
-        font-size: 2.2em; 
+
+    .card-value {
+        font-size: 2.2em;
         font-weight: 700;
         margin-bottom: 5px;
         color: var(--dashboard-card-text);
@@ -227,7 +242,7 @@
     .card-pdus {
         --card-accent: #FF4757;
     }
-    
+
     /* Chart Cards */
     .card-location,
     .card-access,
@@ -235,7 +250,7 @@
     .card-monitor {
         --card-accent: var(--dashboard-primary);
     }
-    
+
     /* Dark theme specific card styling - Red background cards with white text */
     [data-theme="dark"] .card-computers,
     [data-theme="dark"] .card-software,
@@ -257,7 +272,7 @@
         color: white;
         border-color: #FF4757;
     }
-    
+
     [data-theme="dark"] .card-computers .card-title,
     [data-theme="dark"] .card-computers .card-value,
     [data-theme="dark"] .card-software .card-title,
@@ -292,7 +307,7 @@
     .theme-dark .card-pdus .card-value {
         color: white;
     }
-    
+
     /* Dark theme chart cards with white background */
     [data-theme="dark"] .card-location,
     [data-theme="dark"] .card-access,
@@ -306,7 +321,7 @@
         color: #333333;
         border-color: #333333;
     }
-    
+
     [data-theme="dark"] .card-location .card-title,
     [data-theme="dark"] .card-access .card-title,
     [data-theme="dark"] .card-asset .card-title,
@@ -317,7 +332,7 @@
     .theme-dark .card-monitor .card-title {
         color: #333333;
     }
-    
+
     /* Recent Actions Styling */
     .module {
         background: var(--dashboard-card-bg);
@@ -327,24 +342,25 @@
         padding: 25px;
         box-shadow: 0 4px 16px var(--dashboard-shadow);
     }
-    
-    .module h2, .module h3 {
+
+    .module h2,
+    .module h3 {
         color: var(--dashboard-text);
         font-weight: 600;
         margin-bottom: 16px;
         background: none;
         padding: 0;
     }
-    
+
     .module p {
         color: var(--dashboard-text);
     }
-    
+
     .actionlist {
         list-style: none;
         padding: 0;
     }
-    
+
     .actionlist li {
         background: var(--dashboard-glass-bg);
         margin-bottom: 10px;
@@ -354,121 +370,145 @@
         transition: all 0.3s ease;
         backdrop-filter: blur(10px);
     }
-    
+
     .actionlist li:hover {
         background: var(--dashboard-glass-border);
         transform: translateX(3px);
         box-shadow: 0 2px 8px var(--dashboard-shadow);
     }
-    
+
     .actionlist li a {
         color: var(--dashboard-primary);
         text-decoration: none;
         font-weight: 500;
     }
-    
+
     .actionlist li a:hover {
         color: var(--dashboard-secondary);
     }
-    
+
     .mini.quiet {
         color: var(--dashboard-text);
         opacity: 0.7;
         font-size: 12px;
     }
-    
+
     /* Responsive Design */
     @media (max-width: 1024px) {
         #content-main {
             padding: 15px;
         }
-        
+
         .dashboard-grid {
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
         }
     }
-    
+
     @media (max-width: 768px) {
         #content-main {
             padding: 12px;
         }
-        
+
         .dashboard-grid {
             grid-template-columns: 1fr;
             gap: 15px;
         }
-        
+
         .tab-buttons {
             flex-direction: column;
         }
-        
+
         .tab-buttons button {
             width: 100%;
             margin-bottom: 8px;
         }
-        
+
         .dashboard-toggle {
             width: 100%;
             justify-content: center;
         }
-        
+
         .card-value {
             font-size: 1.8em;
         }
-        
-        .dashboard-chart {
-            height: 180px;
+
+        .dashboard-card.dashboard-chart {
+            height: 300px;
         }
     }
-    
+
     @media (max-width: 480px) {
         #content-main {
             padding: 10px;
         }
-        
+
         .dashboard-card {
             padding: 15px;
         }
-        
+
         .card-value {
             font-size: 1.6em;
         }
-        
+
         .card-title {
             font-size: 11px;
         }
-        
-        .dashboard-chart {
-            height: 160px;
+
+        .dashboard-card.dashboard-chart {
+            height: 280px;
         }
     }
-    
+
     /* Animation for page load */
     @keyframes fadeInUp {
         from {
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-    
+
     .dashboard-card {
         animation: fadeInUp 0.5s ease-out forwards;
     }
-    
-    .dashboard-card:nth-child(1) { animation-delay: 0.1s; }
-    .dashboard-card:nth-child(2) { animation-delay: 0.2s; }
-    .dashboard-card:nth-child(3) { animation-delay: 0.3s; }
-    .dashboard-card:nth-child(4) { animation-delay: 0.4s; }
-    .dashboard-card:nth-child(5) { animation-delay: 0.5s; }
-    .dashboard-card:nth-child(6) { animation-delay: 0.6s; }
-    .dashboard-card:nth-child(7) { animation-delay: 0.7s; }
-    .dashboard-card:nth-child(8) { animation-delay: 0.8s; }
-    
+
+    .dashboard-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .dashboard-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .dashboard-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .dashboard-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .dashboard-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .dashboard-card:nth-child(6) {
+        animation-delay: 0.6s;
+    }
+
+    .dashboard-card:nth-child(7) {
+        animation-delay: 0.7s;
+    }
+
+    .dashboard-card:nth-child(8) {
+        animation-delay: 0.8s;
+    }
+
     /* Ensure proper contrast in both light and dark modes */
     @media (prefers-color-scheme: dark) {
         .card-title {
@@ -481,7 +521,7 @@
 {% block extrahead %}{{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const toggle = document.querySelector('.dashboard-toggle');
         const dashboard = document.getElementById('dashboard');
         const recentActions = document.getElementById('recent-actions');
@@ -490,12 +530,12 @@
 
         if (toggle && dashboard && recentActions) {
             toggle.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     // Remove active class from all toggle buttons
                     toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
                     // Add active class to clicked button
                     this.classList.add('active');
-                    
+
                     if (this.textContent === 'Dashboard') {
                         dashboard.classList.remove('hidden');
                         recentActions.classList.add('hidden');
@@ -505,40 +545,24 @@
                     }
                 });
             });
-            
+
             // Set default active state for Dashboard button
             toggle.querySelector('button').classList.add('active');
         }
 
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                tabContents.forEach(content => content.classList.add('hidden'));
-                document.getElementById(this.dataset.tab).classList.remove('hidden');
-            });
-        });
-        // Activate the first tab by default
-        if (tabButtons.length > 0) {
-            tabButtons[0].classList.add('active');
-            tabContents[0].classList.remove('hidden');
-        }
-
-        // Enhanced Chart.js initialization with theme-aware styling
+        // --- Chart Initialization (lazy: only init once per tab, when tab becomes visible) ---
         if (dashboard) {
-            // Detect current theme more reliably
             const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' ||
-                             document.body.classList.contains('dark-theme') ||
-                             document.body.classList.contains('theme-dark') ||
-                             (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            
-            // Theme-aware text colors for charts
-            const chartTextColor = isDarkMode ? '#440808' : '#333333'; // Light gray for dark theme, dark gray for light theme
+                document.body.classList.contains('dark-theme') ||
+                document.body.classList.contains('theme-dark') ||
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            const chartTextColor = isDarkMode ? '#555555' : '#333333';
             const gridColor = isDarkMode ? 'rgba(224, 224, 224, 0.1)' : 'rgba(51, 51, 51, 0.1)';
             const tooltipBgColor = isDarkMode ? 'rgba(57, 57, 57, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-            const tooltipTextColor = isDarkMode ? '#440808' : '#333333';
+            const tooltipTextColor = isDarkMode ? '#eeeeee' : '#333333';
             const borderColor = isDarkMode ? '#0F62FE' : '#2F80ED';
-            
+
             const chartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -546,12 +570,8 @@
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: chartTextColor, // Theme-aware text color
-                            font: {
-                                size: 12,
-                                family: 'Roboto',
-                                weight: 'bold'
-                            },
+                            color: chartTextColor,
+                            font: { size: 12, family: 'Roboto', weight: 'bold' },
                             padding: 15,
                             boxWidth: 15,
                             usePointStyle: true
@@ -561,14 +581,8 @@
                         backgroundColor: tooltipBgColor,
                         titleColor: tooltipTextColor,
                         bodyColor: tooltipTextColor,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13,
-                            weight: 'bold'
-                        },
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13, weight: 'bold' },
                         borderColor: borderColor,
                         borderWidth: 1
                     }
@@ -579,278 +593,182 @@
                 ...chartOptions,
                 scales: {
                     y: {
-                        ticks: {
-                            color: chartTextColor, // Theme-aware text color
-                            font: {
-                                family: 'Roboto',
-                                size: 12,
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
+                        ticks: { color: chartTextColor, font: { family: 'Roboto', size: 12, weight: 'bold' } },
+                        grid: { color: gridColor, drawBorder: false }
                     },
                     x: {
-                        ticks: {
-                            color: chartTextColor, // Theme-aware text color
-                            font: {
-                                family: 'Roboto',
-                                size: 12,
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
+                        ticks: { color: chartTextColor, font: { family: 'Roboto', size: 12, weight: 'bold' } },
+                        grid: { color: gridColor, drawBorder: false }
                     }
                 }
             };
 
-            // Consistent color palette for all themes - Orange, Purple, Blue
             const chartColors = {
-                orange: '#FFA502',
-                purple: '#A55EEA', 
-                blue: '#3742FA',
-                red: '#FF4757',
-                yellow: '#FFC312',
-                // Chart specific colors
-                pending: '#A55EEA',
-                approved: '#FFA502',
-                rejected: '#FF4757',
-                onsite: '#FFA502',
-                nearShore: '#A55EEA', 
-                offshore: '#3742FA'
+                orange: '#FFA502', purple: '#A55EEA', blue: '#3742FA',
+                red: '#FF4757', yellow: '#FFC312'
             };
 
-            const locationData = {
-                labels: Object.keys({{ dashboard_data.resource_request.by_location|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.resource_request.by_location|safe }}),
-                    backgroundColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderWidth: 2,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('resourceLocationChart'), {
-                type: 'pie',
-                data: locationData,
-                options: chartOptions
-            });
+            // Track which tabs have had charts initialized
+            const initializedTabs = new Set();
 
-            const deliveryStatusData = {
-                labels: Object.keys({{ dashboard_data.resource_request.delivery_status_dist|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.resource_request.delivery_status_dist|safe }}),
-                    backgroundColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderWidth: 5,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('deliveryStatusChart'), {
-                type: 'pie',
-                data: deliveryStatusData,
-                options: chartOptions
-            });
+            function initChartsForTab(tabId) {
+                if (initializedTabs.has(tabId)) return;
+                initializedTabs.add(tabId);
 
-            const businessTypeData = {
-                labels: Object.keys({{ dashboard_data.resource_request.pmo_by_business_type|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.resource_request.pmo_by_business_type|safe }}),
-                    backgroundColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderWidth: 5,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('businessTypeChart'), {
-                type: 'pie',
-                data: businessTypeData,
-                options: chartOptions
-            });
+                if (tabId === 'resource-request-tab') {
+                    const locData = JSON.parse('{{ dashboard_data.resource_request.by_location_json|escapejs }}');
+                    new Chart(document.getElementById('resourceLocationChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(locData),
+                            datasets: [{ data: Object.values(locData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
 
-            const accessStatusData = {
-                labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.resource_management.access_requests_by_status|safe }}),
-                    backgroundColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderWidth: 5,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('accessStatusChart'), {
-                type: 'pie',
-                data: accessStatusData,
-                options: chartOptions
-            });
+                    const delData = JSON.parse('{{ dashboard_data.resource_request.delivery_status_dist_json|escapejs }}');
+                    new Chart(document.getElementById('deliveryStatusChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(delData),
+                            datasets: [{ data: Object.values(delData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
 
-            const accessDateData = {
-                labels: Object.keys({{ dashboard_data.resource_management.access_requests_by_date|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.resource_management.access_requests_by_date|safe }}),
-                    backgroundColor: chartColors.orange,
-                    borderColor: chartColors.orange,
-                    borderWidth: 2,
-                    hoverBackgroundColor: chartColors.orange,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('accessDateChart'), {
-                type: 'bar',
-                data: accessDateData,
-                options: barChartOptions
-            });
-
-            const assetStatusData = {
-                labels: Object.keys({{ dashboard_data.asset_management.assets_by_status|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.asset_management.assets_by_status|safe }}),
-                    backgroundColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue,
-                        chartColors.red
-                    ],
-                    borderColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue,
-                        chartColors.red
-                    ],
-                    borderWidth: 2,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('assetStatusChart'), {
-                type: 'pie',
-                data: assetStatusData,
-                options: chartOptions
-            });
-
-            const returnConditionData = {
-                labels: Object.keys({{ dashboard_data.asset_management.returned_assets_by_condition|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.asset_management.returned_assets_by_condition|safe }}),
-                    backgroundColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderColor: [
-                        chartColors.orange,
-                        chartColors.purple,
-                        chartColors.blue
-                    ],
-                    borderWidth: 2,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('returnConditionChart'), {
-                type: 'pie',
-                data: returnConditionData,
-                options: chartOptions
-            });
-
-            const returnDateData = {
-                labels: Object.keys({{ dashboard_data.asset_management.return_by_date|safe }}),
-                datasets: [{
-                    data: Object.values({{ dashboard_data.asset_management.return_by_date|safe }}),
-                    backgroundColor: chartColors.blue,
-                    borderColor: chartColors.blue,
-                    borderWidth: 2,
-                    hoverBackgroundColor: chartColors.blue,
-                    hoverBorderWidth: 3
-                }]
-            };
-            new Chart(document.getElementById('returnDateChart'), {
-                type: 'bar',
-                data: returnDateData,
-                options: barChartOptions
-            });
-        }
-        
-        // Listen for theme changes and update charts
-        const themeObserver = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' && 
-                    (mutation.attributeName === 'data-theme' || mutation.attributeName === 'class')) {
-                    // Update background immediately
-                    document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
-                    document.getElementById('content-main').style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
-                    
-                    // Small delay to ensure CSS variables are updated, then reload charts
-                    setTimeout(() => {
-                        location.reload();
-                    }, 200);
+                    const bizData = JSON.parse('{{ dashboard_data.resource_request.pmo_by_business_type_json|escapejs }}');
+                    new Chart(document.getElementById('businessTypeChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(bizData),
+                            datasets: [{ data: Object.values(bizData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
                 }
-            });
+
+                if (tabId === 'resource-management-tab') {
+                    const accStatusData = JSON.parse('{{ dashboard_data.resource_management.access_requests_by_status_json|escapejs }}');
+                    new Chart(document.getElementById('accessStatusChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(accStatusData),
+                            datasets: [{ data: Object.values(accStatusData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue, chartColors.red], borderColor: [chartColors.orange, chartColors.purple, chartColors.blue, chartColors.red], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
+
+                    const accDateData = JSON.parse('{{ dashboard_data.resource_management.access_requests_by_date_json|escapejs }}');
+                    new Chart(document.getElementById('accessDateChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(accDateData),
+                            datasets: [{ data: Object.values(accDateData), backgroundColor: chartColors.orange, borderColor: chartColors.orange, borderWidth: 2, hoverBackgroundColor: chartColors.orange, hoverBorderWidth: 3 }]
+                        },
+                        options: barChartOptions
+                    });
+                }
+
+                if (tabId === 'asset-management-tab') {
+                    const assetStatusData = JSON.parse('{{ dashboard_data.asset_management.assets_by_status_json|escapejs }}');
+                    new Chart(document.getElementById('assetStatusChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(assetStatusData),
+                            datasets: [{ data: Object.values(assetStatusData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue, chartColors.red], borderColor: [chartColors.orange, chartColors.purple, chartColors.blue, chartColors.red], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
+
+                    const retCondData = JSON.parse('{{ dashboard_data.asset_management.returned_assets_by_condition_json|escapejs }}');
+                    new Chart(document.getElementById('returnConditionChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(retCondData),
+                            datasets: [{ data: Object.values(retCondData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderColor: [chartColors.orange, chartColors.purple, chartColors.blue], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
+
+                    const retDateData = JSON.parse('{{ dashboard_data.asset_management.return_by_date_json|escapejs }}');
+                    new Chart(document.getElementById('returnDateChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(retDateData),
+                            datasets: [{ data: Object.values(retDateData), backgroundColor: chartColors.blue, borderColor: chartColors.blue, borderWidth: 2, hoverBackgroundColor: chartColors.blue, hoverBorderWidth: 3 }]
+                        },
+                        options: barChartOptions
+                    });
+                }
+
+                if (tabId === 'crm-tab') {
+                    const leadSrcData = JSON.parse('{{ dashboard_data.crm.lead_sources_json|escapejs }}');
+                    new Chart(document.getElementById('leadSourceChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(leadSrcData),
+                            datasets: [{ data: Object.values(leadSrcData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue, chartColors.red, chartColors.yellow], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
+
+                    const dealStgData = JSON.parse('{{ dashboard_data.crm.deal_stages_json|escapejs }}');
+                    new Chart(document.getElementById('dealStageChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(dealStgData),
+                            datasets: [{ data: Object.values(dealStgData), backgroundColor: [chartColors.orange, chartColors.purple, chartColors.blue, chartColors.red, chartColors.yellow], borderWidth: 2, hoverBorderWidth: 3 }]
+                        },
+                        options: chartOptions
+                    });
+
+                    new Chart(document.getElementById('crmRequestStatusChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: ['Pending', 'Duplicate', 'Processed'],
+                            datasets: [{
+                                data: [
+                                    {{ dashboard_data.crm.request_status.pending_count }},
+                            {{ dashboard_data.crm.request_status.duplicate_count }},
+                                    {{ dashboard_data.crm.request_status.processed_count }}
+                                ],
+                backgroundColor: [chartColors.orange, chartColors.red, chartColors.blue],
+                    borderWidth: 2,
+                        hoverBorderWidth: 3
+            }]
+        },
+        options: chartOptions
+    });
+                }
+            }
+
+    // Tab switching with lazy chart init
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            tabContents.forEach(content => content.classList.add('hidden'));
+            const tabEl = document.getElementById(this.dataset.tab);
+            tabEl.classList.remove('hidden');
+            initChartsForTab(this.dataset.tab);
         });
-        
-        // Observe changes to html element and body
-        themeObserver.observe(document.documentElement, { 
-            attributes: true, 
-            attributeFilter: ['data-theme', 'class'] 
-        });
-        themeObserver.observe(document.body, { 
-            attributes: true, 
-            attributeFilter: ['class'] 
-        });
-        
-        // Also listen for system theme changes
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addListener(function() {
-                // Update background immediately
-                document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
-                document.getElementById('content-main').style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
-                
-                setTimeout(() => {
-                    location.reload();
-                }, 200);
-            });
+    });
+
+    // Activate the first tab by default
+    if (tabButtons.length > 0) {
+        tabButtons[0].classList.add('active');
+        tabContents[0].classList.remove('hidden');
+        initChartsForTab(tabButtons[0].dataset.tab);
+    }
         }
-        
-        // Force background update on load
-        setTimeout(() => {
+
+    // Force background update on load
+    setTimeout(() => {
+        if (document.getElementById('content-main')) {
             document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
             document.getElementById('content-main').style.background = getComputedStyle(document.documentElement).getPropertyValue('--dashboard-bg');
-        }, 100);
+        }
+    }, 100);
     });
 </script>
 {% endblock %}
@@ -858,126 +776,158 @@
 {% block content %}
 <div id="content-main">
     {% if dashboard_data %}
-        <div class="dashboard-toggle">
-            <button>Dashboard</button>
-            <button>Recent Actions</button>
+    <div class="dashboard-toggle">
+        <button>Dashboard</button>
+        <button>Recent Actions</button>
+    </div>
+
+    <div id="dashboard">
+        <div class="tab-buttons">
+            <button data-tab="resource-request-tab">Resource Requests</button>
+            <button data-tab="resource-management-tab">ITSM</button>
+            <button data-tab="asset-management-tab">Assets</button>
+            <button data-tab="crm-tab">CRM</button>
         </div>
 
-        <div id="dashboard">
-            <div class="tab-buttons">
-                <button data-tab="resource-request-tab">Resource Requests</button>
-                <button data-tab="resource-management-tab">ITSM</button>
-                <button data-tab="asset-management-tab">Assets</button>
+        <!-- Resource Requests Tab -->
+        <div id="resource-request-tab" class="tab-content dashboard-grid">
+            <div class="dashboard-card card-computers">
+                <div class="card-title">Total Requests</div>
+                <div class="card-value">{{ dashboard_data.resource_request.total_requests }}</div>
             </div>
-
-            <!-- Resource Requests Tab -->
-            <div id="resource-request-tab" class="tab-content dashboard-grid">
-                <div class="dashboard-card card-computers">
-                    <div class="card-title">Total Requests</div>
-                    <div class="card-value">{{ dashboard_data.resource_request.total_requests }}</div>
-                </div>
-                <div class="dashboard-card card-network">
-                    <div class="card-title">Pending Deliveries</div>
-                    <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.pending }}</div>
-                </div>
-                <div class="dashboard-card card-network">
-                    <div class="card-title">Approved PMOs</div>
-                    <div class="card-value">{{ dashboard_data.resource_request.pmo_requests_approved }}</div>
-                </div>
-                <div class="dashboard-card card-racks">
-                    <div class="card-title">Rejected Deliveries</div>
-                    <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.rejected }}</div>
-                </div>
-                <div class="dashboard-card card-location dashboard-chart">
-                    <canvas id="resourceLocationChart"></canvas>
-                </div>
-                <div class="dashboard-card card-access dashboard-chart">
-                    <canvas id="deliveryStatusChart"></canvas>
-                </div>
-                <div class="dashboard-card card-asset dashboard-chart">
-                    <canvas id="businessTypeChart"></canvas>
-                </div>
-                <div class="dashboard-card card-monitor dashboard-chart" style="display:none;">
-                    <canvas id="returnConditionChart"></canvas>
-                </div>
+            <div class="dashboard-card card-network">
+                <div class="card-title">Pending Deliveries</div>
+                <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.pending }}</div>
             </div>
-
-            <!-- Resource Management Tab -->
-            <div id="resource-management-tab" class="tab-content dashboard-grid hidden">
-                <div class="dashboard-card card-monitors">
-                    <div class="card-title">Total Access Requests</div>
-                    <div class="card-value">{{ dashboard_data.resource_management.total_access_requests }}</div>
-                </div>
-                <div class="dashboard-card card-monitors">
-                    <div class="card-title">Pending Access</div>
-                    <div class="card-value">
-                        {% for status, count in dashboard_data.resource_management.access_requests_by_status.items %}
-                            {% if status == 'PENDING' %}{{ count }}{% endif %}
-                        {% endfor %}{% if 'PENDING' not in dashboard_data.resource_management.access_requests_by_status.keys %}0{% endif %}
-                    </div>
-                </div>
-                <div class="dashboard-card card-printers">
-                    <div class="card-title">Active Resources</div>
-                    <div class="card-value">{{ dashboard_data.resource_management.active_resources }}</div>
-                </div>
-                <div class="dashboard-card card-pdus">
-                    <div class="card-title">Priority High</div>
-                    <div class="card-value">
-                        {% for priority, count in dashboard_data.resource_management.access_requests_by_priority.items %}
-                            {% if priority == 'HIGH' %}{{ count }}{% endif %}
-                        {% endfor %}{% if 'HIGH' not in dashboard_data.resource_management.access_requests_by_priority.keys %}0{% endif %}
-                    </div>
-                </div>
-                <div class="dashboard-card card-location dashboard-chart" style="display:none;">
-                    <canvas id="resourceLocationChart"></canvas>
-                </div>
-                <div class="dashboard-card card-access dashboard-chart">
-                    <canvas id="accessStatusChart"></canvas>
-                </div>
-                <div class="dashboard-card card-asset dashboard-chart" style="display:none;">
-                    <canvas id="assetStatusChart"></canvas>
-                </div>
-                <div class="dashboard-card card-monitor dashboard-chart">
-                    <canvas id="accessDateChart"></canvas>
-                </div>
+            <div class="dashboard-card card-network">
+                <div class="card-title">Approved PMOs</div>
+                <div class="card-value">{{ dashboard_data.resource_request.pmo_requests_approved }}</div>
             </div>
-
-            <!-- Assets Tab -->
-            <div id="asset-management-tab" class="tab-content dashboard-grid hidden">
-                <div class="dashboard-card card-computers">
-                    <div class="card-title">Total Assets</div>
-                    <div class="card-value">{{ dashboard_data.asset_management.total_assets }}</div>
-                </div>
-                <div class="dashboard-card card-software">
-                    <div class="card-title">Assigned Assets</div>
-                    <div class="card-value">{{ dashboard_data.asset_management.assigned_assets }}</div>
-                </div>
-                <div class="dashboard-card card-network">
-                    <div class="card-title">Available Assets</div>
-                    <div class="card-value">
-                        {% for status, count in dashboard_data.asset_management.assets_by_status.items %}
-                            {% if status == 'AVAILABLE' %}{{ count }}{% endif %}
-                        {% endfor %}{% if 'AVAILABLE' not in dashboard_data.asset_management.assets_by_status.keys %}0{% endif %}
-                    </div>
-                </div>
-                <div class="dashboard-card card-racks">
-                    <div class="card-title">Damaged Assets</div>
-                    <div class="card-value">{{ dashboard_data.asset_management.damaged_assets }}</div>
-                </div>
-                <div class="dashboard-card card-location dashboard-chart" style="display:none;">
-                    <canvas id="resourceLocationChart"></canvas>
-                </div>
-                <div class="dashboard-card card-access dashboard-chart" style="display:none;">
-                    <canvas id="accessStatusChart"></canvas>
-                </div>
-                <div class="dashboard-card card-asset dashboard-chart">
-                    <canvas id="assetStatusChart"></canvas>
-                </div>
-                <div class="dashboard-card card-monitor dashboard-chart">
-                    <canvas id="returnConditionChart"></canvas>
-                </div>
+            <div class="dashboard-card card-racks">
+                <div class="card-title">Rejected Deliveries</div>
+                <div class="card-value">{{ dashboard_data.resource_request.delivery_requests.rejected }}</div>
+            </div>
+            <div class="dashboard-card card-location dashboard-chart">
+                <div class="card-title">Requests by Location</div>
+                <canvas id="resourceLocationChart"></canvas>
+            </div>
+            <div class="dashboard-card card-access dashboard-chart">
+                <div class="card-title">Delivery Status Distribution</div>
+                <canvas id="deliveryStatusChart"></canvas>
+            </div>
+            <div class="dashboard-card card-asset dashboard-chart">
+                <div class="card-title">PMO by Business Type</div>
+                <canvas id="businessTypeChart"></canvas>
             </div>
         </div>
+
+        <!-- Resource Management Tab -->
+        <div id="resource-management-tab" class="tab-content dashboard-grid hidden">
+            <div class="dashboard-card card-monitors">
+                <div class="card-title">Total Access Requests</div>
+                <div class="card-value">{{ dashboard_data.resource_management.total_access_requests }}</div>
+            </div>
+            <div class="dashboard-card card-monitors">
+                <div class="card-title">Pending Access Requests</div>
+                <div class="card-value">
+                    {% for status, count in dashboard_data.resource_management.access_requests_by_status.items %}
+                    {% if status == 'PENDING' %}{{ count }}{% endif %}
+                    {% endfor %}
+                    {% if 'PENDING' not in dashboard_data.resource_management.access_requests_by_status %}0{% endif %}
+                </div>
+            </div>
+            <div class="dashboard-card card-printers">
+                <div class="card-title">Active Resources</div>
+                <div class="card-value">{{ dashboard_data.resource_management.active_resources }}</div>
+            </div>
+            <div class="dashboard-card card-pdus">
+                <div class="card-title">High Priority Requests</div>
+                <div class="card-value">
+                    {% for priority, count in dashboard_data.resource_management.access_requests_by_priority.items %}
+                    {% if priority == 'HIGH' %}{{ count }}{% endif %}
+                    {% endfor %}
+                    {% if 'HIGH' not in dashboard_data.resource_management.access_requests_by_priority %}0{% endif %}
+                </div>
+            </div>
+            <div class="dashboard-card card-access dashboard-chart">
+                <div class="card-title">Access Requests by Status</div>
+                <canvas id="accessStatusChart"></canvas>
+            </div>
+            <div class="dashboard-card card-monitor dashboard-chart">
+                <div class="card-title">Access Requests by Date (Last 30 Days)</div>
+                <canvas id="accessDateChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Assets Tab -->
+        <div id="asset-management-tab" class="tab-content dashboard-grid hidden">
+            <div class="dashboard-card card-computers">
+                <div class="card-title">Total Assets</div>
+                <div class="card-value">{{ dashboard_data.asset_management.total_assets }}</div>
+            </div>
+            <div class="dashboard-card card-software">
+                <div class="card-title">Assigned Assets</div>
+                <div class="card-value">{{ dashboard_data.asset_management.assigned_assets }}</div>
+            </div>
+            <div class="dashboard-card card-network">
+                <div class="card-title">Available Assets</div>
+                <div class="card-value">
+                    {% for status, count in dashboard_data.asset_management.assets_by_status.items %}
+                    {% if status == 'AVAILABLE' %}{{ count }}{% endif %}
+                    {% endfor %}
+                    {% if 'AVAILABLE' not in dashboard_data.asset_management.assets_by_status %}0{% endif %}
+                </div>
+            </div>
+            <div class="dashboard-card card-racks">
+                <div class="card-title">Damaged Assets</div>
+                <div class="card-value">{{ dashboard_data.asset_management.damaged_assets }}</div>
+            </div>
+            <div class="dashboard-card card-asset dashboard-chart">
+                <div class="card-title">Assets by Status</div>
+                <canvas id="assetStatusChart"></canvas>
+            </div>
+            <div class="dashboard-card card-monitor dashboard-chart">
+                <div class="card-title">Return Condition Distribution</div>
+                <canvas id="returnConditionChart"></canvas>
+            </div>
+            <div class="dashboard-card card-location dashboard-chart">
+                <div class="card-title">Returns by Date (Last 30 Days)</div>
+                <canvas id="returnDateChart"></canvas>
+            </div>
+        </div>
+
+        <!-- CRM Tab -->
+        <div id="crm-tab" class="tab-content dashboard-grid hidden">
+            <div class="dashboard-card card-computers">
+                <div class="card-title">Total Leads</div>
+                <div class="card-value">{{ dashboard_data.crm.total_leads }}</div>
+            </div>
+            <div class="dashboard-card card-software">
+                <div class="card-title">Total Deals</div>
+                <div class="card-value">{{ dashboard_data.crm.total_deals }}</div>
+            </div>
+            <div class="dashboard-card card-network">
+                <div class="card-title">Deal Amount</div>
+                <div class="card-value">{{ dashboard_data.crm.deal_amount_total|floatformat:2 }}</div>
+            </div>
+            <div class="dashboard-card card-racks">
+                <div class="card-title">Inquiries</div>
+                <div class="card-value">{{ dashboard_data.crm.total_requests }}</div>
+            </div>
+            <div class="dashboard-card card-location dashboard-chart">
+                <div class="card-title">Lead Sources</div>
+                <canvas id="leadSourceChart"></canvas>
+            </div>
+            <div class="dashboard-card card-access dashboard-chart">
+                <div class="card-title">Deal Stages</div>
+                <canvas id="dealStageChart"></canvas>
+            </div>
+            <div class="dashboard-card card-asset dashboard-chart">
+                <div class="card-title">Inquiry Request Status</div>
+                <canvas id="crmRequestStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
     <div id="recent-actions" class="module {% if dashboard_data %}hidden{% endif %}">
@@ -989,22 +939,24 @@
         <p>{% translate 'None available' %}</p>
         {% else %}
         <ul class="actionlist">
-        {% for entry in admin_log %}
-        <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
-            <span class="visually-hidden">{% if entry.is_addition %}{% translate 'Added:' %}{% elif entry.is_change %}{% translate 'Changed:' %}{% elif entry.is_deletion %}{% translate 'Deleted:' %}{% endif %}</span>
-            {% if entry.is_deletion or not entry.get_admin_url %}
+            {% for entry in admin_log %}
+            <li
+                class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                <span class="visually-hidden">{% if entry.is_addition %}{% translate 'Added:' %}{% elif entry.is_change
+                    %}{% translate 'Changed:' %}{% elif entry.is_deletion %}{% translate 'Deleted:' %}{% endif %}</span>
+                {% if entry.is_deletion or not entry.get_admin_url %}
                 {{ entry.object_repr }}
-            {% else %}
+                {% else %}
                 <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
-            {% endif %}
-            <br>
-            {% if entry.content_type %}
+                {% endif %}
+                <br>
+                {% if entry.content_type %}
                 <span class="mini quiet">{% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}</span>
-            {% else %}
+                {% else %}
                 <span class="mini quiet">{% translate 'Unknown content' %}</span>
-            {% endif %}
-        </li>
-        {% endfor %}
+                {% endif %}
+            </li>
+            {% endfor %}
         </ul>
         {% endif %}
     </div>
