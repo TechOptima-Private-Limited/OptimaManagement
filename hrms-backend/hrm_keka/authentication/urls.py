@@ -6,6 +6,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('employee-register/', views.employee_register, name='employee_register'),
     path('login/', views.login, name='login'),
+    path('captcha/', views.get_captcha, name='get_captcha'),
+
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/permissions/', views.me_permissions, name='me_permissions'),
     path('profile/', views.UserProfileView.as_view(), name='user_profile'),

@@ -10,9 +10,28 @@ from .models import Notification
 from .services import NotificationService
 from .serializers import NotificationSerializer
 from webpush.models import PushInformation, SubscriptionInfo
+from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_vapid_public_key(request):
+    """Get the VAPID public key for push notifications"""
+    try:
+        public_key = getattr(settings, 'WEBPUSH_SETTINGS', {}).get('VAPID_PUBLIC_KEY')
+        if not public_key:
+            # Fallback to direct setting if not in dictionary
+            public_key = getattr(settings, 'VAPID_PUBLIC_KEY', None)
+            
+        if not public_key:
+            return Response({'error': 'VAPID_PUBLIC_KEY not configured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        return Response({'public_key': public_key}, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"❌ Error getting VAPID public key: {str(e)}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer

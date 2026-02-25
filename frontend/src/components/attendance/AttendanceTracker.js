@@ -1498,6 +1498,78 @@ import Table from '../common/Table';
 import Modal from '../common/Modal';
 import { useTheme } from '../../context/ThemeContext';
 
+const AttendanceVisual = ({ logs }) => {
+  if (!logs || logs.length === 0) return <div className="h-4 w-full bg-gray-100 rounded-full"></div>;
+
+  // Sort logs by time
+  const sortedLogs = [...logs].sort((a, b) => a.time.localeCompare(b.time));
+
+  // Viewport: 8 AM to 8 PM (12 hours = 720 minutes)
+  // If logs are outside this, expand it? For now, keep fixed to match most enterprise UIs
+  const START_MIN = 8 * 60; // 08:00
+  const END_MIN = 20 * 60;   // 20:00
+  const TOTAL_MIN = END_MIN - START_MIN;
+
+  const toMins = (timeStr) => {
+    if (!timeStr) return 0;
+    const [h, m] = timeStr.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  const segments = [];
+  for (let i = 0; i < sortedLogs.length; i += 2) {
+    const start = toMins(sortedLogs[i].time);
+    const end = sortedLogs[i + 1] ? toMins(sortedLogs[i + 1].time) : null;
+    segments.push({ start, end, startTime: sortedLogs[i].time, endTime: sortedLogs[i + 1]?.time });
+  }
+
+  return (
+    <div className="relative h-4 w-48 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
+      {/* 1h Tick marks */}
+      {[...Array(11)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute h-full border-l border-gray-200 z-10"
+          style={{ left: `${((i + 1) * 60) / TOTAL_MIN * 100}%` }}
+        ></div>
+      ))}
+
+      {segments.map((seg, idx) => {
+        const left = ((seg.start - START_MIN) / TOTAL_MIN) * 100;
+        let width = 0;
+        if (seg.end) {
+          width = ((seg.end - seg.start) / TOTAL_MIN) * 100;
+        } else {
+          // Ongoing session
+          const now = new Date();
+          const nowMins = now.getHours() * 60 + now.getMinutes();
+          // Only show up to viewport end
+          width = ((Math.min(END_MIN, nowMins) - seg.start) / TOTAL_MIN) * 100;
+        }
+
+        // Don't render if completely outside viewport
+        if (left + width < 0 || left > 100) return null;
+
+        // Clip to viewport
+        const clippedLeft = Math.max(0, left);
+        const clippedRight = Math.min(100, left + width);
+        const clippedWidth = clippedRight - clippedLeft;
+
+        if (clippedWidth <= 0) return null;
+
+        return (
+          <div
+            key={idx}
+            className="absolute top-0 h-full bg-indigo-500 opacity-90 transition-all hover:opacity-100"
+            style={{ left: `${clippedLeft}%`, width: `${clippedWidth}%` }}
+            title={`${seg.startTime} - ${seg.endTime || 'Ongoing'}`}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
 const AttendanceTracker = () => {
   const { theme } = useTheme();
   const { user } = useAuth();
@@ -1521,8 +1593,16 @@ const AttendanceTracker = () => {
     avgMinutesPerDay: 0,
     onTimePercent: 0
   });
+  // Default date ranges: Start of current month to today
+  const getFirstDayOfMonth = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  };
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
+
   const [filters, setFilters] = useState({
-    date: new Date().toISOString().split('T')[0], // Default to today's date YYYY-MM-DD
+    start_date: getFirstDayOfMonth(),
+    end_date: getTodayDate(),
     status: '',
     employee_id: ''
   });
@@ -1552,8 +1632,9 @@ const AttendanceTracker = () => {
     }
   }, [isManagementRole]);
 
-  // Auto-sync biometric data every 1 minute
+  // Auto-sync or auto-poll biometric data every 1 minute
   useEffect(() => {
+    // Management roles trigger the actual device sync
     if (isManagementRole && biometricDevices.length > 0) {
       // Sync immediately on mount
       syncAllBiometricDevices();
@@ -1565,7 +1646,15 @@ const AttendanceTracker = () => {
 
       return () => clearInterval(syncInterval);
     }
-  }, [isManagementRole, biometricDevices]);
+    // Regular employees just poll the database for updates
+    else if (!isManagementRole) {
+      const pollInterval = setInterval(() => {
+        fetchAttendanceRecords(true);
+      }, 60000);
+
+      return () => clearInterval(pollInterval);
+    }
+  }, [isManagementRole, biometricDevices.length]);
 
   useEffect(() => {
     fetchAttendanceRecords();
@@ -1625,17 +1714,17 @@ const AttendanceTracker = () => {
 
       if (totalSynced > 0) {
         setLastSyncTime(new Date());
-        // Refresh attendance records
-        fetchAttendanceRecords();
         // Show subtle notification
         toast.success(`🔄 Auto-synced ${totalSynced} biometric records`, {
           position: "bottom-right",
           autoClose: 2000,
           hideProgressBar: true,
         });
-      } else {
-        setLastSyncTime(new Date());
       }
+
+      setLastSyncTime(new Date());
+      // Always refresh attendance records after a sync attempt
+      fetchAttendanceRecords(true);
     } catch (error) {
       console.error('Biometric auto-sync error:', error);
     } finally {
@@ -1643,15 +1732,12 @@ const AttendanceTracker = () => {
     }
   };
 
-  const fetchAttendanceRecords = async () => {
+  const fetchAttendanceRecords = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const params = {};
-      if (filters.date) {
-        // Use the selected date for both start and end to get records for that specific day
-        params.start_date = filters.date;
-        params.end_date = filters.date;
-      }
+      if (filters.start_date) params.start_date = filters.start_date;
+      if (filters.end_date) params.end_date = filters.end_date;
 
       if (filters.status) params.status = filters.status;
       if (filters.employee_id) params.employee_id = filters.employee_id;
@@ -1666,11 +1752,13 @@ const AttendanceTracker = () => {
         setPendingApprovalsCount(response.data.pending_approvals_count);
       }
 
+      // Filter records for the target employee to calculate stats (matching the user or filter)
       const targetId = filters.employee_id || user?.employee_id;
       const recordsToStat = Array.isArray(records)
         ? records.filter(r => {
-          const rEmpId = r.employee?.id || r.employee_id || r.employee;
-          return String(rEmpId) === String(targetId);
+          // Check all possible identity fields to ensure a match
+          const recordId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
+          return String(recordId) === String(targetId);
         })
         : [];
       calculateStats(recordsToStat);
@@ -1856,7 +1944,69 @@ const AttendanceTracker = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ date: new Date().toISOString().split('T')[0], status: '', employee_id: '' });
+    setFilters({
+      start_date: getFirstDayOfMonth(),
+      end_date: getTodayDate(),
+      status: '',
+      employee_id: ''
+    });
+  };
+
+  /**
+   * Returns attendance records with virtual WEEK_OFF rows injected for Sundays
+   * (and Saturdays if applicable) that have no existing attendance record.
+   * Only applies when viewing a single employee's data (not management overview).
+   */
+  const getDisplayRecords = () => {
+    const records = attendanceRecords;
+    // Only inject week-off rows for single-employee views
+    // For management with multiple employees, skip injection to avoid duplicates
+    const startDateStr = filters.start_date;
+    const endDateStr = filters.end_date;
+    if (!startDateStr || !endDateStr) return records;
+
+    const existingDates = new Set(records.map(r => r.date));
+    const weekOffRows = [];
+    const start = new Date(startDateStr);
+    const end = new Date(endDateStr);
+    const current = new Date(start);
+
+    while (current <= end) {
+      const dayOfWeek = current.getDay(); // 0 = Sunday
+      const dateStr = current.toISOString().split('T')[0];
+
+      if ((dayOfWeek === 0 || dayOfWeek === 6) && !existingDates.has(dateStr)) {
+        // Saturday or Sunday with no attendance record → WEEK OFF
+        weekOffRows.push({
+          id: `week-off-${dateStr}`,
+          date: dateStr,
+          status: 'WEEK_OFF',
+          check_in_time: null,
+          check_out_time: null,
+          attendance_type: '-',
+          is_pending_approval: false,
+          display_name: null,
+          display_id: null,
+          employee: null,
+          biometric_logs: [],
+          _isWeekOff: true,
+        });
+      }
+      current.setDate(current.getDate() + 1);
+    }
+
+    if (weekOffRows.length === 0) return records;
+
+    // Merge and sort descending by date (newest first)
+    const merged = [...records, ...weekOffRows];
+    merged.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+
+    // If a specific status filter is applied, filter week-off rows accordingly
+    if (filters.status && filters.status !== 'WEEK_OFF') {
+      return merged.filter(r => !r._isWeekOff);
+    }
+
+    return merged;
   };
 
   const exportAttendance = () => {
@@ -1880,13 +2030,15 @@ const AttendanceTracker = () => {
   const hasExistingRecord = attendanceRecords.some(record => record.date === selectedDate);
   const showEditReason = (hasExistingRecord || isPastDate) && !isHRManager();
   const todayRecord = attendanceRecords.find(r => r.date === todayStr);
-  const computeDurationMinutes = (checkIn, checkOut) => {
+  const computeDurationMinutes = (checkIn, checkOut, recordDate) => {
     if (!checkIn) return 0;
-    const start = new Date(`2000-01-01T${checkIn}`);
-    const end = checkOut ? new Date(`2000-01-01T${checkOut}`) : now;
+    // Use a consistent date string to avoid duration leaps (like the year 2000 vs now)
+    const dateStr = recordDate || new Date().toISOString().split('T')[0];
+    const start = new Date(`${dateStr}T${checkIn}`);
+    const end = checkOut ? new Date(`${dateStr}T${checkOut}`) : now;
     return Math.max(0, Math.floor((end - start) / 60000));
   };
-  const todayDurationMinutes = todayRecord ? computeDurationMinutes(todayRecord.check_in_time, todayRecord.check_out_time) : 0;
+  const todayDurationMinutes = todayRecord ? computeDurationMinutes(todayRecord.check_in_time, todayRecord.check_out_time, todayRecord.date) : 0;
   const pad = (n) => String(n).padStart(2, '0');
   const formatNow = () => {
     const h = now.getHours();
@@ -1972,8 +2124,8 @@ const AttendanceTracker = () => {
       accessor: 'date',
       render: (date) => (
         <div className="flex items-center">
-          <div className="p-1 rounded-lg bg-blue-50 mr-2">
-            <CalendarIcon className="h-4 w-4 text-blue-600" />
+          <div className="p-1 rounded-lg bg-red-50 mr-2">
+            <CalendarIcon className="h-4 w-4 text-red-600" />
           </div>
           <span className="font-medium">{formatDate(date)}</span>
         </div>
@@ -1982,30 +2134,70 @@ const AttendanceTracker = () => {
     {
       header: 'Check In',
       accessor: 'check_in_time',
-      render: (time) => (
-        <div className="flex items-center">
-          <div className="p-1 rounded-lg bg-green-50 mr-2">
-            <ClockIcon className="h-4 w-4 text-green-600" />
+      render: (time, row) => {
+        if (row._isWeekOff) return <span className="text-gray-400">—</span>;
+        return (
+          <div className="flex items-center">
+            <div className="p-1 rounded-lg bg-green-50 mr-2">
+              <ClockIcon className="h-4 w-4 text-green-600" />
+            </div>
+            <span className={time ? 'text-gray-900 font-medium' : 'text-gray-400'}>
+              {formatTimeDisplay(time) || 'Not checked in'}
+            </span>
           </div>
-          <span className={time ? 'text-gray-900 font-medium' : 'text-gray-400'}>
-            {formatTimeDisplay(time) || 'Not checked in'}
+        );
+      },
+    },
+    {
+      header: 'Arrival',
+      accessor: 'check_in_time',
+      render: (time, row) => {
+        if (row._isWeekOff) return <span className="text-gray-400">—</span>;
+        if (!time) return <span className="text-gray-400">—</span>;
+
+        // Parse check_in_time (HH:MM:SS or HH:MM)
+        const [h, m] = time.split(':').map(Number);
+        const checkInMinutes = h * 60 + m;
+        const cutoffMinutes = 10 * 60; // 10:00 AM
+
+        if (checkInMinutes <= cutoffMinutes) {
+          return (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+              ✓ On Time
+            </span>
+          );
+        }
+
+        const diffMinutes = checkInMinutes - cutoffMinutes;
+        const lateHrs = Math.floor(diffMinutes / 60);
+        const lateMins = diffMinutes % 60;
+        const lateLabel = lateHrs > 0
+          ? `${lateHrs}h ${lateMins}m late`
+          : `${lateMins}m late`;
+
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
+            ⏰ {lateLabel}
           </span>
-        </div>
-      ),
+        );
+      },
     },
     {
       header: 'Check Out',
       accessor: 'check_out_time',
-      render: (time) => (
-        <div className="flex items-center">
-          <div className="p-1 rounded-lg bg-red-50 mr-2">
-            <ClockIcon className="h-4 w-4 text-red-600" />
+      render: (time, row) => {
+        if (row._isWeekOff) return <span className="text-gray-400">—</span>;
+        return (
+          <div className="flex items-center">
+            <div className="p-1 rounded-lg bg-red-50 mr-2">
+              <ClockIcon className="h-4 w-4 text-red-600" />
+            </div>
+            <span className={time ? 'text-gray-900 font-medium' : 'text-gray-400'}>
+              {formatTimeDisplay(time) || 'Not checked out'}
+            </span>
           </div>
-          <span className={time ? 'text-gray-900 font-medium' : 'text-gray-400'}>
-            {formatTimeDisplay(time) || 'Not checked out'}
-          </span>
-        </div>
-      ),
+        );
+      },
     },
     {
       header: 'Status',
@@ -2015,31 +2207,35 @@ const AttendanceTracker = () => {
     {
       header: 'Type',
       accessor: 'attendance_type',
-      render: (type) => (
-        <div className="flex items-center">
-          {type === 'BIOMETRIC' && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
-              <ServerIcon className="w-3 h-3 mr-1" />
-              Biometric
-            </span>
-          )}
-          {type === 'MANUAL' && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-              Manual
-            </span>
-          )}
-          {type === 'QR_CODE' && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-              QR Code
-            </span>
-          )}
-        </div>
-      ),
+      render: (type, row) => {
+        if (row._isWeekOff) return <span className="text-gray-400">—</span>;
+        return (
+          <div className="flex items-center">
+            {type === 'BIOMETRIC' && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                <ServerIcon className="w-3 h-3 mr-1" />
+                Biometric
+              </span>
+            )}
+            {type === 'MANUAL' && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                Manual
+              </span>
+            )}
+            {type === 'QR_CODE' && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100">
+                QR Code
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       header: 'Approval Status',
       accessor: 'is_pending_approval',
-      render: (isPending) => {
+      render: (isPending, row) => {
+        if (row._isWeekOff) return <span className="text-gray-400">—</span>;
         if (isPending) {
           return (
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
@@ -2057,7 +2253,42 @@ const AttendanceTracker = () => {
       },
     },
     {
-      header: 'Working Hours',
+      header: 'Attendance Visual',
+      accessor: 'biometric_logs',
+      render: (logs) => <AttendanceVisual logs={logs} />,
+    },
+    {
+      header: 'Effective Hours',
+      accessor: 'biometric_logs',
+      render: (logs) => {
+        if (!logs || logs.length < 2) return <span className="text-gray-400">-</span>;
+
+        const sortedLogs = [...logs].sort((a, b) => a.time.localeCompare(b.time));
+        let totalMinutes = 0;
+
+        const toMins = (timeStr) => {
+          const [h, m] = timeStr.split(':').map(Number);
+          return h * 60 + m;
+        };
+
+        for (let i = 0; i < sortedLogs.length; i += 2) {
+          if (sortedLogs[i + 1]) {
+            totalMinutes += (toMins(sortedLogs[i + 1].time) - toMins(sortedLogs[i].time));
+          }
+        }
+
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+
+        return (
+          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-sm font-semibold">
+            {h}h {m}m
+          </span>
+        );
+      },
+    },
+    {
+      header: 'Gross Hours',
       accessor: 'check_in_time',
       render: (checkIn, row) => {
         if (!checkIn || !row.check_out_time) return <span className="text-gray-400">-</span>;
@@ -2098,7 +2329,7 @@ const AttendanceTracker = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold">Attendance Tracker</h1>
-                  <p className="text-blue-100 mt-1">
+                  <p className="text-red-50 mt-1">
                     {isHRManager() ? 'Manage attendance for all employees with smart insights' :
                       isManager() ? 'Manage attendance for your team with smart insights' :
                         'Track your daily attendance and performance'}
@@ -2181,11 +2412,11 @@ const AttendanceTracker = () => {
               <span className="text-xs text-gray-500">This period</span>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                <p className="text-xs text-blue-700 font-medium">Avg hrs / day</p>
+              <div className="p-4 rounded-xl bg-red-50 border border-red-100">
+                <p className="text-xs text-red-700 font-medium">Avg hrs / day</p>
                 <div className="mt-1 flex items-center">
-                  <ClockIcon className="h-5 w-5 text-blue-600 mr-2" />
-                  <p className="text-lg font-semibold text-blue-900">{minutesToHHMM(stats.avgMinutesPerDay)}</p>
+                  <ClockIcon className="h-5 w-5 text-red-600 mr-2" />
+                  <p className="text-lg font-semibold text-red-900">{minutesToHHMM(stats.avgMinutesPerDay)}</p>
                 </div>
               </div>
               <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
@@ -2207,7 +2438,7 @@ const AttendanceTracker = () => {
                   const jsDay = new Date().getDay();
                   const active = idx === jsDay;
                   return (
-                    <span key={idx} className={`text-xs px-2 py-1 rounded-md border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>{d}</span>
+                    <span key={idx} className={`text-xs px-2 py-1 rounded-md border ${active ? 'bg-red-600 text-white border-red-600' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>{d}</span>
                   );
                 })}
               </div>
@@ -2238,7 +2469,7 @@ const AttendanceTracker = () => {
                 <button
                   type="button"
                   onClick={() => setUse24Hour(!use24Hour)}
-                  className={`w-10 h-6 rounded-full border transition-colors ${use24Hour ? 'bg-indigo-600 border-indigo-600' : 'bg-gray-200 border-gray-200'}`}
+                  className={`w-10 h-6 rounded-full border transition-colors ${use24Hour ? 'bg-red-600 border-red-600' : 'bg-gray-200 border-gray-200'}`}
                 >
                   <span className={`block h-5 w-5 bg-white rounded-full transform transition-transform ${use24Hour ? 'translate-x-4' : 'translate-x-0'}`} />
                 </button>
@@ -2270,14 +2501,14 @@ const AttendanceTracker = () => {
             title="Total Days"
             value={stats.totalDays}
             icon={CalendarIcon}
-            gradient="from-blue-500 to-blue-600"
+            gradient="from-red-500 to-red-600"
             trend="This month"
           />
           <StatCard
             title="Present Days"
             value={stats.presentDays}
             icon={UserIcon}
-            gradient="from-emerald-500 to-emerald-600"
+            gradient="from-rose-500 to-rose-600"
             percentage={stats.totalDays > 0 ? Math.round((stats.presentDays / stats.totalDays) * 100) : 0}
             trend="Attendance rate"
           />
@@ -2285,28 +2516,28 @@ const AttendanceTracker = () => {
             title="Absent Days"
             value={stats.absentDays}
             icon={XCircleIcon}
-            gradient="from-red-500 to-red-600"
+            gradient="from-red-600 to-red-700"
             trend="Total absences"
           />
           <StatCard
             title="Late Days"
             value={stats.lateDays}
             icon={ClockIcon}
-            gradient="from-amber-500 to-amber-600"
+            gradient="from-orange-500 to-orange-600"
             trend="Late arrivals"
           />
           <StatCard
             title="Avg Hours / Day"
             value={minutesToHHMM(stats.avgMinutesPerDay)}
             icon={ClockIcon}
-            gradient="from-indigo-500 to-indigo-600"
+            gradient="from-gray-500 to-gray-600"
             trend="Working time"
           />
           <StatCard
             title="On-Time Arrival"
             value={`${stats.onTimePercent}%`}
             icon={CheckCircleIcon}
-            gradient="from-teal-500 to-teal-600"
+            gradient="from-orange-500 to-red-600"
             trend="Punctuality"
           />
         </div>
@@ -2366,7 +2597,7 @@ const AttendanceTracker = () => {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8" data-approvals-section>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-                <CheckCircleIcon className="h-6 w-6 mr-2 text-purple-500" />
+                <CheckCircleIcon className="h-6 w-6 mr-2 text-red-600" />
                 Pending Approval Requests
                 {isManager() && <span className="text-sm font-normal text-gray-500 ml-2">(Your Team)</span>}
               </h3>
@@ -2380,10 +2611,10 @@ const AttendanceTracker = () => {
                 {attendanceRecords
                   .filter(record => record.is_pending_approval)
                   .map((record) => (
-                    <div key={record.id} className="border border-gray-200 rounded-2xl p-6 bg-gradient-to-r from-gray-50 to-blue-50">
+                    <div key={record.id} className="border border-gray-200 rounded-2xl p-6 bg-[#F0F0F0]">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center space-x-4">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center">
                             <span className="text-white font-semibold">
                               {/* ✅ Use display_name for avatar */}
                               {record.display_name?.split(' ').map(n => n[0]).join('') || 'N/A'}
@@ -2422,8 +2653,8 @@ const AttendanceTracker = () => {
                       </div>
 
                       {record.edit_reason && (
-                        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                          <p className="text-sm text-blue-800">
+                        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                          <p className="text-sm text-red-800">
                             <span className="font-semibold">Employee's Reason:</span> "{record.edit_reason}"
                           </p>
                         </div>
@@ -2640,69 +2871,103 @@ const AttendanceTracker = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-            <FunnelIcon className="h-5 w-5 mr-2 text-purple-500" />
-            Filter Records
-          </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Select Date</label>
-              <input
-                type="date"
-                value={filters.date}
-                onChange={(e) => handleFilterChange('date', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                max={new Date().toISOString().split('T')[0]}
-              />
-            </div>
+        {(() => {
+          const today = new Date();
+          const months = Array.from({ length: 6 }, (_, i) => {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            return {
+              label: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
+              year: d.getFullYear(),
+              month: d.getMonth(),
+            };
+          });
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              >
-                <option value="">All Status</option>
-                <option value="PRESENT">Present</option>
-                <option value="ABSENT">Absent</option>
-                <option value="LATE">Late</option>
-                <option value="HALF_DAY">Half Day</option>
-              </select>
-            </div>
+          const isLast30Active = (() => {
+            const d30 = new Date(today);
+            d30.setDate(today.getDate() - 29);
+            const expected_start = d30.toISOString().split('T')[0];
+            const expected_end = today.toISOString().split('T')[0];
+            return filters.start_date === expected_start && filters.end_date === expected_end;
+          })();
 
-            <div className="flex items-end">
-              <button
-                onClick={clearFilters}
-                className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-4 py-3 rounded-xl font-medium transition-all flex items-center justify-center space-x-2"
-              >
-                <FunnelIcon className="h-4 w-4" />
-                <span>Clear Filters</span>
-              </button>
+          const activeMonthIndex = months.findIndex(m => {
+            const ms = new Date(m.year, m.month, 1).toISOString().split('T')[0];
+            const me = new Date(m.year, m.month + 1, 0).toISOString().split('T')[0];
+            return filters.start_date === ms && filters.end_date === me;
+          });
+
+          const setLast30 = () => {
+            const d30 = new Date(today);
+            d30.setDate(today.getDate() - 29);
+            handleFilterChange('start_date', d30.toISOString().split('T')[0]);
+            handleFilterChange('end_date', today.toISOString().split('T')[0]);
+          };
+
+          const setMonth = (m) => {
+            const ms = new Date(m.year, m.month, 1).toISOString().split('T')[0];
+            const me = new Date(m.year, m.month + 1, 0).toISOString().split('T')[0];
+            handleFilterChange('start_date', ms);
+            handleFilterChange('end_date', me);
+          };
+
+          return (
+            <div className="mb-8 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+              <div className="flex items-center px-6 py-4 gap-3">
+                <span className="text-gray-700 text-sm font-medium whitespace-nowrap mr-4">
+                  {isLast30Active ? 'Last 30 Days' : activeMonthIndex >= 0 ? months[activeMonthIndex].label : 'Custom Range'}
+                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* 30 DAYS pill */}
+                  <button
+                    onClick={setLast30}
+                    className="px-4 py-1.5 rounded-full text-xs font-bold tracking-wider transition-all"
+                    style={isLast30Active
+                      ? { background: '#dc2626', color: '#fff' }
+                      : { background: 'transparent', color: '#dc2626', border: '1px solid #dc2626' }}
+                  >
+                    30 DAYS
+                  </button>
+                  {/* Month pills */}
+                  {months.map((m, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setMonth(m)}
+                      className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider transition-all"
+                      style={activeMonthIndex === i
+                        ? { background: '#dc2626', color: '#fff' }
+                        : { background: 'transparent', color: '#dc2626', border: '1px solid transparent' }}
+                      onMouseEnter={e => { if (activeMonthIndex !== i) e.currentTarget.style.borderColor = '#dc2626'; }}
+                      onMouseLeave={e => { if (activeMonthIndex !== i) e.currentTarget.style.borderColor = 'transparent'; }}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
+
 
         {/* Attendance Records */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+          <div className="px-6 py-5 border-b border-gray-200 bg-[#F0F0F0]">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-                <DocumentChartBarIcon className="h-6 w-6 mr-2 text-blue-600" />
+                <DocumentChartBarIcon className="h-6 w-6 mr-2 text-red-600" />
                 Attendance Records
                 {isManager() && <span className="text-sm font-normal text-gray-500 ml-2">(Your Team)</span>}
               </h3>
               <div className="flex items-center space-x-2 text-sm text-gray-600 bg-white px-3 py-1 rounded-lg border">
                 <CalendarIcon className="h-4 w-4" />
-                <span className="font-medium">{attendanceRecords.length} records</span>
+                <span className="font-medium">{getDisplayRecords().length} records</span>
               </div>
             </div>
           </div>
 
           <Table
             columns={columns}
-            data={attendanceRecords}
+            data={getDisplayRecords()}
             loading={loading}
             emptyMessage={
               isManager()
@@ -2735,7 +3000,7 @@ const AttendanceTracker = () => {
             <form onSubmit={handleApprovalSubmit(handleApprovalAction)}>
               <div className="mb-6">
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center">
                     <span className="text-white font-semibold">
                       {/* ✅ Use employee_name from selectedApproval (already has display_name) */}
                       {selectedApproval.employee_name?.split(' ').map(n => n[0]).join('') || 'N/A'}
@@ -2753,8 +3018,8 @@ const AttendanceTracker = () => {
                 </div>
 
                 {selectedApproval.edit_reason && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                    <p className="text-sm text-red-800">
                       <span className="font-semibold">Employee's Reason:</span> "{selectedApproval.edit_reason}"
                     </p>
                   </div>
@@ -2895,8 +3160,8 @@ const AttendanceTracker = () => {
                   type="submit"
                   disabled={submitting}
                   className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 flex items-center justify-center space-x-2 ${selectedApproval.action === 'approve'
-                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white'
-                      : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white'
+                    : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
                     }`}
                 >
                   {submitting ? (
@@ -2943,12 +3208,12 @@ const AttendanceTracker = () => {
               onClick={() => {
                 document.querySelector('[data-approvals-section]')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-full p-4 shadow-lg transition-all transform hover:scale-105"
+              className="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white rounded-full p-4 shadow-lg transition-all transform hover:scale-105"
               title={`${attendanceRecords.filter(r => r.is_pending_approval).length} pending approvals`}
             >
               <div className="relative">
                 <ClockIcon className="h-6 w-6" />
-                <span className="absolute -top-2 -right-2 bg-white text-red-600 rounded-full text-xs font-bold w-6 h-6 flex items-center justify-center border-2 border-red-500">
+                <span className="absolute -top-2 -right-2 bg-white text-red-700 rounded-full text-xs font-bold w-6 h-6 flex items-center justify-center border-2 border-red-600">
                   {attendanceRecords.filter(r => r.is_pending_approval).length}
                 </span>
               </div>

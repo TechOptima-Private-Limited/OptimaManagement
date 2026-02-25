@@ -5,6 +5,7 @@ urlpatterns = [
     # Notification CRUD
     path('', views.NotificationListView.as_view(), name='notification_list'),
     path('unread-count/', views.get_unread_count, name='unread_count'),
+    path('vapid-public-key/', views.get_vapid_public_key, name='vapid_public_key'),
     path('<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
     path('<int:notification_id>/delete/', views.delete_notification, name='delete_notification'),
     path('mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),

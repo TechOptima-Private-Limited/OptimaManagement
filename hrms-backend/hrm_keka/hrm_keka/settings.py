@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # 'django_ckeditor_5',
     'assets',
     'webpush',
+    'captcha',
 ]
 
 # CKEditor 5 Configuration
@@ -143,6 +144,7 @@ EMAIL_THREAD_ID = config('EMAIL_THREAD_ID', default='1')
 
 # Site and email lists
 SITE_URL = config('SITE_URL', default='http://localhost:8000')
+IT_SUPPORT_EMAIL = config('IT_SUPPORT_EMAIL', default='')
 PMO_EMAILS = config('PMO_EMAILS', default='', cast=Csv())
 TEAM_EMAILS = config('TEAM_EMAILS', default='', cast=Csv())
 

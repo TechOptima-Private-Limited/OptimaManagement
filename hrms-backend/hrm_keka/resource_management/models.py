@@ -384,6 +384,8 @@ class AccessRequest(models.Model):
     REQUEST_TYPE_CHOICES = [
         ('NEW', 'New Access'),
         ('IT', 'IT Support'),
+        ('ASSET_REPAIR', 'Asset Repair'),
+        ('ACCESS', 'Access Request'),
     ]
 
     request_type = models.CharField(
@@ -395,6 +397,7 @@ class AccessRequest(models.Model):
     ticket_number = models.CharField(max_length=20, unique=True, default='ACC000000001', verbose_name="Ticket Number")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='access_requests', verbose_name="Requester")
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE, null=True,blank=True,verbose_name="Resource")
+    asset = models.ForeignKey('assets.Asset', on_delete=models.SET_NULL, null=True, blank=True, related_name='access_requests', verbose_name="Asset")
     access_level = models.ForeignKey(AccessLevel, on_delete=models.CASCADE, null=True,blank=True,verbose_name="Access Level")
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM', verbose_name="Priority")
     justification = CKEditor5Field('Justification', config_name='default')
@@ -578,14 +581,25 @@ class AccessRequest(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding:  # Only if creating new instance
             prefix = 'ACC'
+            if self.request_type == 'IT':
+                prefix = 'ITS'
+            elif self.request_type == 'ASSET_REPAIR':
+                prefix = 'REP'
+            elif self.request_type == 'ACCESS':
+                prefix = 'ACC'
+            
             date = timezone.now().strftime('%Y%m%d')
             last_ticket = AccessRequest.objects.filter(
                 ticket_number__startswith=f'{prefix}{date}'
             ).order_by('-ticket_number').first()
             
             if last_ticket:
-                last_number = int(last_ticket.ticket_number[-4:])
-                new_number = str(last_number + 1).zfill(4)
+                try:
+                    # Extract numeric part (e.g., last 4 digits)
+                    last_number = int(last_ticket.ticket_number[-4:])
+                    new_number = str(last_number + 1).zfill(4)
+                except ValueError:
+                    new_number = '0001'
             else:
                 new_number = '0001'
             

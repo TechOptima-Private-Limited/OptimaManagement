@@ -1,0 +1,23 @@
+﻿--- Verifying Extended Notification Recipients ---
+Roles being notified: ['HR_MANAGER', 'HR_EXECUTIVE', 'ADMIN', 'PRODUCT_MANAGER', 'PROJECT_MANAGER']
+Found 3 recipients in database.
+ - pakanati.jayavardhan@gmail.com (Role: ADMIN)
+ - ganesh@yopmail.com (Role: HR_MANAGER)
+ - kalvikpanchagiri03@gmail.com (Role: PROJECT_MANAGER)
+
+--- Verifying Permission Logic ---
+Role: HR_MANAGER
+ - can_manage_hr: True
+ - has_management_access: True
+Role: HR_EXECUTIVE
+ - can_manage_hr: True
+ - has_management_access: False
+Role: ADMIN
+ - can_manage_hr: True
+ - has_management_access: False
+Role: PRODUCT_MANAGER
+ - can_manage_hr: False
+ - has_management_access: True
+Role: PROJECT_MANAGER
+ - can_manage_hr: False
+ - has_management_access: True

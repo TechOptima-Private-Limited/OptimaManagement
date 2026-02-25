@@ -3,6 +3,16 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 const ThemeContext = createContext();
 
 const themes = {
+  crimson: {
+    id: 'crimson',
+    name: 'Crimson',
+    navbarGradient: 'from-red-600 via-rose-600 to-red-700',
+    headerGradient: 'from-gray-700 via-gray-800 to-gray-900',
+    sidebarGradient: 'from-slate-900 via-gray-900 to-zinc-900',
+    surfaceGradient: 'from-gray-100 via-gray-50 to-white',
+    primaryGradient: 'from-red-500 to-rose-600',
+    avatarGradient: 'from-red-500 to-rose-600',
+  },
   indigo: {
     id: 'indigo',
     name: 'Indigo',
@@ -68,7 +78,7 @@ const themes = {
 export const ThemeProvider = ({ children }) => {
   const [themeId, setThemeId] = useState(() => {
     const saved = localStorage.getItem('hr_theme');
-    return saved && themes[saved] ? saved : 'indigo';
+    return saved && themes[saved] ? saved : 'crimson';
   });
 
   useEffect(() => {
@@ -76,12 +86,12 @@ export const ThemeProvider = ({ children }) => {
   }, [themeId]);
 
   const theme = useMemo(() => {
-    const selected = themes[themeId] || themes.indigo;
+    const selected = themes[themeId] || themes.crimson;
     // Keep gray base for sidebar and surfaces while allowing accent changes elsewhere
     return {
       ...selected,
       sidebarGradient: themes.slate.sidebarGradient,
-      surfaceGradient: themes.slate.surfaceGradient,
+      surfaceGradient: themes.crimson.surfaceGradient,
     };
   }, [themeId]);
 

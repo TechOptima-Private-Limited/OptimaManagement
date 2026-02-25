@@ -41,6 +41,7 @@ import OnboardingLinkGenerator from './components/onboarding/OnboardingLinkGener
 
 // Support 24/7 Components
 import ResourceManagement from './components/resourcemanagement/ResourceManagement';
+import HolidayManagement from './components/admin/HolidayManagement';
 import MyAssets from './components/assets/MyAssets';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -343,6 +344,16 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MyAssets />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Holiday Management */}
+              <Route 
+                path="/holidays" 
+                element={
+                  <ProtectedRoute>
+                    <HolidayManagement />
                   </ProtectedRoute>
                 } 
               />

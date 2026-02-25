@@ -614,13 +614,13 @@ const MyTeam = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
               <div>
                 <div className="text-xs font-medium text-gray-500">On time employees</div>
-                <div className="mt-2 text-2xl font-bold text-emerald-600">{attendanceStats.onTime.length}</div>
+                <div className="mt-2 text-2xl font-bold text-red-700">{attendanceStats.onTime.length}</div>
               </div>
               {attendanceStats.onTime.length > 0 && (
                 <button
                   type="button"
                   onClick={() => handleViewEmployees('on_time')}
-                  className="text-xs text-indigo-600 font-medium cursor-pointer hover:underline"
+                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
                 >
                   View employees
                 </button>
@@ -636,7 +636,7 @@ const MyTeam = () => {
                 <button
                   type="button"
                   onClick={() => handleViewEmployees('late')}
-                  className="text-xs text-indigo-600 font-medium cursor-pointer hover:underline"
+                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
                 >
                   View employees
                 </button>
@@ -646,13 +646,13 @@ const MyTeam = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
               <div>
                 <div className="text-xs font-medium text-gray-500">Work from home</div>
-                <div className="mt-2 text-2xl font-bold text-sky-600">{attendanceStats.workFromHome.length}</div>
+                <div className="mt-2 text-2xl font-bold text-rose-600">{attendanceStats.workFromHome.length}</div>
               </div>
               {attendanceStats.workFromHome.length > 0 && (
                 <button
                   type="button"
                   onClick={() => handleViewEmployees('wfh')}
-                  className="text-xs text-indigo-600 font-medium cursor-pointer hover:underline"
+                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
                 >
                   View employees
                 </button>
@@ -662,13 +662,13 @@ const MyTeam = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
               <div>
                 <div className="text-xs font-medium text-gray-500">Remote login</div>
-                <div className="mt-2 text-2xl font-bold text-purple-600">{attendanceStats.remoteLogin.length}</div>
+                <div className="mt-2 text-2xl font-bold text-red-600">{attendanceStats.remoteLogin.length}</div>
               </div>
               {attendanceStats.remoteLogin.length > 0 && (
                 <button
                   type="button"
                   onClick={() => handleViewEmployees('remote')}
-                  className="text-xs text-indigo-600 font-medium cursor-pointer hover:underline"
+                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
                 >
                   View employees
                 </button>
@@ -728,7 +728,7 @@ const MyTeam = () => {
                         <tr key={member.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                           <td className="sticky left-0 bg-white px-4 py-2 border-r border-gray-100 z-10">
                             <div className="flex items-center space-x-2">
-                              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-[10px] font-bold text-blue-600">
+                              <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center text-[10px] font-bold text-red-600">
                                 {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
                               </div>
                               <span className="text-xs font-medium text-gray-700 truncate max-w-[140px]">
@@ -742,10 +742,10 @@ const MyTeam = () => {
                               <td key={day} className="px-1 py-2 text-center">
                                 <div className={`w-6 h-6 mx-auto rounded-full flex items-center justify-center text-[9px] font-bold transition-all duration-200
                                   ${status === 'PRESENT' ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200' :
-                                    status === 'WFH' ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200' :
+                                    status === 'WFH' ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-100' :
                                       status === 'LEAVE' ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-200' :
                                         status === 'ABSENT' ? 'bg-red-100 text-red-700 ring-1 ring-red-200' :
-                                          status === 'HALF_DAY' ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-200' :
+                                          status === 'HALF_DAY' ? 'bg-red-50 text-red-700 ring-1 ring-red-100' :
                                             status === 'WEEKOFF' ? 'bg-gray-100 text-gray-500 ring-1 ring-gray-200' :
                                               'bg-gray-50 text-gray-300'}
                                 `}>
@@ -772,7 +772,7 @@ const MyTeam = () => {
                   <span className="text-[10px] text-gray-500 font-medium">Present</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-indigo-100 ring-1 ring-indigo-200 rounded flex items-center justify-center text-[9px] font-bold text-indigo-700">W</div>
+                  <div className="w-4 h-4 bg-rose-50 ring-1 ring-rose-100 rounded flex items-center justify-center text-[9px] font-bold text-rose-700">W</div>
                   <span className="text-[10px] text-gray-500 font-medium">WFH</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
@@ -784,7 +784,7 @@ const MyTeam = () => {
                   <span className="text-[10px] text-gray-500 font-medium">Absent</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-blue-100 ring-1 ring-blue-200 rounded flex items-center justify-center text-[9px] font-bold text-blue-700">H</div>
+                  <div className="w-4 h-4 bg-red-50 ring-1 ring-red-100 rounded flex items-center justify-center text-[9px] font-bold text-red-700">H</div>
                   <span className="text-[10px] text-gray-500 font-medium">Half Day</span>
                 </div>
                 <div className="flex items-center space-x-1.5">

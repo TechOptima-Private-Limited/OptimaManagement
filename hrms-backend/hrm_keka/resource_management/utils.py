@@ -2960,6 +2960,8 @@ def send_request_notification(access_request):
                 'ticket': access_request.ticket_number,
                 'user': access_request.user,
                 'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
+                'requester': access_request.user.get_full_name() if access_request.user else 'Unknown',
+                'requester_employee_id': access_request.user.username if access_request.user else 'N/A',
                 'priority': access_request.get_priority_display(),
                 'justification': access_request.justification,
                 'duration': access_request.duration,
@@ -2996,18 +2998,18 @@ def send_request_notification(access_request):
                     print(f"USER EMAIL FAILED with template: {template}")
             
             # Send email to IT admins/team
+            admin_recipients = []
+            
+            # 1. Always include IT Support email from settings
+            if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
+                admin_recipients.append(settings.IT_SUPPORT_EMAIL)
+
+            # 2. Add resource team email if assigned
             if access_request.resource and access_request.resource.resource_team_email:
-                admin_recipients = [access_request.resource.resource_team_email]
-            else:
-                # Fallback to platform admins (staff/superusers or members of admin-like groups)
-                try:
-                    User = get_user_model()
-                    admin_groups = ['Resource Team', 'Admin', 'HR Admin', 'HR Manager', 'IT Support']
-                    qs = User.objects.filter(Q(is_superuser=True) | Q(is_staff=True) | Q(groups__name__in=admin_groups)).distinct()
-                    admin_recipients = [u.email for u in qs if u.email]
-                except Exception as e:
-                    print(f"Failed to build admin recipients: {str(e)}")
-                    admin_recipients = []
+                admin_recipients.append(access_request.resource.resource_team_email)
+            
+            # Deduplicate
+            admin_recipients = list(set(admin_recipients))
 
             if not admin_recipients:
                 print("No admin recipients found for IT request; skipping team email")
@@ -3021,11 +3023,11 @@ def send_request_notification(access_request):
                 print(f"Trying team template: {template}")
                 result = send_email_notification(
                     access_request,
-                    f"Access Request {access_request.ticket_number}",
+                    f"New IT Support Request - {access_request.ticket_number}",
                     template,
                     it_support_context,
                     admin_recipients,
-                    is_reply=True
+                    is_reply=False # Use False for first notification
                 )
                 
                 if result:
@@ -3050,8 +3052,61 @@ def send_request_notification(access_request):
                 else:
                     print(f"TEAM EMAIL FAILED with template: {template}")
             
+        elif access_request.request_type == 'ASSET_REPAIR':
+            # Asset Repair-specific context
+            repair_context = {
+                'ticket': access_request.ticket_number,
+                'user': access_request.user,
+                'user_name': access_request.user.get_full_name() if access_request.user else 'Unknown',
+                'requester': access_request.user.get_full_name() if access_request.user else 'Unknown',
+                'requester_employee_id': access_request.user.username if access_request.user else 'N/A',
+                'asset': access_request.asset.name if access_request.asset else 'N/A',
+                'asset_tag': access_request.asset.asset_tag if access_request.asset else 'N/A',
+                'priority': access_request.get_priority_display(),
+                'justification': access_request.justification,
+                'duration': access_request.duration,
+            }
+            print(f"Preparing to send Asset Repair emails...")
+            
+            # Send to user
+            send_email_notification(
+                access_request,
+                f"Asset Repair Request Submitted - {access_request.ticket_number}",
+                'it_support_user.html', # Fallback to it_support_user if specialist repair template doesn't exist
+                repair_context,
+                [access_request.user.email],
+                is_reply=False
+            )
+            NotificationService.create_notification(
+                recipient=access_request.user,
+                notification_type='RESOURCE_REQUEST',
+                title="Asset Repair Request Submitted",
+                message=f"Your repair request {access_request.ticket_number} for {repair_context['asset']} has been submitted.",
+                action_url=f"/resource-management/requests"
+            )
+
+            # Send to IT/Asset Admin
+            admin_recipients = []
+            if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
+                admin_recipients.append(settings.IT_SUPPORT_EMAIL)
+            
+            # Asset team email from AssetType if possible
+            if access_request.asset and access_request.asset.asset_type and access_request.asset.asset_type.asset_team_email:
+                admin_recipients.append(access_request.asset.asset_type.asset_team_email)
+            
+            admin_recipients = list(set(admin_recipients))
+            if admin_recipients:
+                send_email_notification(
+                    access_request,
+                    f"New Asset Repair Request - {access_request.ticket_number}",
+                    'it_support_team.html',
+                    repair_context,
+                    admin_recipients,
+                    is_reply=False # Use False for first notification
+                )
+
         else:
-            # Regular access request (non-IT)
+            # Regular access request (non-IT, ACCESS, NEW)
             print("Processing regular access request...")
             user_context = {
                 'ticket': access_request.ticket_number,
@@ -3092,28 +3147,29 @@ def send_request_notification(access_request):
             # Send to admins/team
             team_context = user_context.copy()
             team_context['requester'] = user_context['user_name']
+            
+            admin_recipients = []
+            
+            # Always include IT Support email from settings
+            if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
+                admin_recipients.append(settings.IT_SUPPORT_EMAIL)
+
             if access_request.resource and access_request.resource.resource_team_email:
-                admin_recipients = [access_request.resource.resource_team_email]
-            else:
-                try:
-                    User = get_user_model()
-                    admin_groups = ['Resource Team', 'Admin', 'HR Admin', 'HR Manager', 'IT Support']
-                    qs = User.objects.filter(Q(is_superuser=True) | Q(is_staff=True) | Q(groups__name__in=admin_groups)).distinct()
-                    admin_recipients = [u.email for u in qs if u.email]
-                except Exception as e:
-                    print(f"Failed to build admin recipients: {str(e)}")
-                    admin_recipients = []
+                admin_recipients.append(access_request.resource.resource_team_email)
+            
+            # Deduplicate
+            admin_recipients = list(set(admin_recipients))
 
             if not admin_recipients:
                 print("No admin recipients found for regular access request")
             else:
                 team_result = send_email_notification(
                     access_request,
-                    f"Access Request {access_request.ticket_number}",
+                    f"New Access Request - {access_request.ticket_number}",
                     'new_request_team.html',
                     team_context,
                     admin_recipients,
-                    is_reply=True
+                    is_reply=False # Use False for first notification
                 )
                 
                 if team_result:

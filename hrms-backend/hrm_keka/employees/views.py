@@ -553,7 +553,7 @@ from .serializers import (
     EmployeeBirthdaySerializer, FestivalSerializer
 )
 from authentication.models import User, UserProfile
-from utils.permissions import IsHRManager, IsEmployee, IsManager
+from utils.permissions import IsHRManager, IsEmployee, IsManager, IsHRorAdmin
 from utils.roles import (
     has_executive_access,
     has_management_access,
@@ -1177,6 +1177,24 @@ class FestivalListView(generics.ListAPIView):
             'total_today': len(todays_festivals),
             'has_festivals_today': len(todays_festivals) > 0
         })
+
+
+from rest_framework import viewsets
+
+class FestivalViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing festivals/holidays.
+    Only HR, Managers, Admins, and C-Level can access this.
+    """
+    queryset = Festival.objects.all().order_by('date')
+    serializer_class = FestivalSerializer
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsHRorAdmin() | IsManager()]
+
+    def get_queryset(self):
+        return self.queryset
 
 
 @api_view(['GET'])

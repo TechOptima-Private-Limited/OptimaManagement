@@ -1209,7 +1209,7 @@ from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from datetime import datetime, date
-from .models import AttendanceRecord, BiometricDevice, WorkFromHomeRequest, AttendanceLocationPing
+from .models import AttendanceRecord, BiometricDevice, WorkFromHomeRequest, AttendanceLocationPing, BiometricAttendanceLog
 from .serializers import (
     AttendanceRecordSerializer, BiometricDeviceSerializer, AttendanceCreateSerializer,
     WorkFromHomeRequestSerializer, WorkFromHomeApplySerializer, AttendanceLocationPingSerializer
@@ -1383,6 +1383,30 @@ def sync_biometric_logs(request):
                     record.save()
                     logger.info(f"📝 Updated attendance record for {biometric_user_id}")
                 
+                # ALWAYS STORE THE RAW BIOMETRIC LOG
+                bio_log, bio_created = BiometricAttendanceLog.objects.get_or_create(
+                    biometric_user_id=biometric_user_id,
+                    timestamp=log.timestamp,
+                    defaults={
+                        'biometric_user_name': biometric_user_name,
+                        'device_id': device_ip,
+                        'date': attendance_date,
+                        'time': attendance_time,
+                        'employee': employee,
+                        'attendance_record': record
+                    }
+                )
+                if bio_created:
+                    logger.info(f"📁 Saved raw biometric log for {biometric_user_id} at {log.timestamp}")
+                else:
+                    # If it already existed but wasn't linked to a record, link it now
+                    if record and not bio_log.attendance_record:
+                        bio_log.attendance_record = record
+                        bio_log.save()
+                    if employee and not bio_log.employee:
+                        bio_log.employee = employee
+                        bio_log.save()
+
                 synced_count += 1
                 
             except Exception as e:
@@ -1558,6 +1582,12 @@ class AttendanceRecordListView(generics.ListAPIView):
                 except Employee.DoesNotExist:
                     queryset = AttendanceRecord.objects.none()
         
+        # Filter by employee_id if provided (for dashboard/personal status)
+        employee_id_param = self.request.query_params.get('employee_id')
+        if employee_id_param:
+            queryset = queryset.filter(employee__employee_id=employee_id_param)
+            print(f"🔍 Filtered by employee_id param: {employee_id_param}")
+
         # Filter by date range if provided
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date')
@@ -2035,15 +2065,16 @@ def apply_work_from_home(request):
             print(f"❌ WFH Serializer Errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-        # Check if already applied for this date
-        print(f"🔍 Checking if WFH exists for {employee.user} on {serializer.validated_data['request_date']}")
+        # Check if already applied for this date range
+        print(f"🔍 Checking if WFH exists for {employee.user} between {serializer.validated_data['start_date']} and {serializer.validated_data['end_date']}")
         existing_request = WorkFromHomeRequest.objects.filter(
             employee=employee,
-            request_date=serializer.validated_data['request_date']
+            start_date__lte=serializer.validated_data['end_date'],
+            end_date__gte=serializer.validated_data['start_date']
         ).first()
         
         if existing_request:
-            msg = f"Already applied for WFH on {existing_request.request_date}. Status: {existing_request.status}"
+            msg = f"Already applied for WFH during this period ({existing_request.start_date} to {existing_request.end_date}). Status: {existing_request.status}"
             print(f"⚠️ {msg}")
             return Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -2062,7 +2093,7 @@ def apply_work_from_home(request):
             if employee.manager:
                 recipients.append(employee.manager.user)
             
-            hr_users = User.objects.filter(profile__role__in=['HR_MANAGER', 'HR_EXECUTIVE'], is_active=True)
+            hr_users = User.objects.filter(profile__role__in=['HR_MANAGER', 'HR_EXECUTIVE', 'ADMIN'], is_active=True)
             recipients.extend(list(hr_users))
             
             # Deduplicate
@@ -2073,7 +2104,7 @@ def apply_work_from_home(request):
                     recipient=recipient,
                     notification_type='WFH_REQUEST',
                     title=f"New WFH Request: {employee.user.get_full_name()}",
-                    message=f"{employee.user.get_full_name()} has requested WFH for {wfh_request.request_date}. Reason: {wfh_request.reason[:50]}...",
+                    message=f"{employee.user.get_full_name()}" + (f" has requested WFH from {wfh_request.start_date} to {wfh_request.end_date}." if wfh_request.start_date != wfh_request.end_date else f" has requested WFH for {wfh_request.start_date}.") + f" Reason: {wfh_request.reason[:50]}...",
                     sender=request.user,
                     action_url='/attendance/wfh-requests',
                     action_text='Review Request'
@@ -2114,18 +2145,29 @@ def check_wfh_status(request):
             check_date = datetime.strptime(check_date, '%Y-%m-%d').date()
         
         try:
-            wfh_request = WorkFromHomeRequest.objects.get(
+            wfh_request = WorkFromHomeRequest.objects.filter(
                 employee=employee,
-                request_date=check_date
-            )
-            return Response({
-                'has_wfh_request': True,
-                'status': wfh_request.status,
-                'can_work_from_home': wfh_request.status == 'APPROVED',
-                'request': WorkFromHomeRequestSerializer(wfh_request).data,
-                'is_hr_admin': False
-            })
+                start_date__lte=check_date,
+                end_date__gte=check_date
+            ).first()
+            
+            if wfh_request:
+                return Response({
+                    'has_wfh_request': True,
+                    'status': wfh_request.status,
+                    'can_work_from_home': wfh_request.status == 'APPROVED',
+                    'request': WorkFromHomeRequestSerializer(wfh_request).data,
+                    'is_hr_admin': False
+                })
+            else:
+                return Response({
+                    'has_wfh_request': False,
+                    'can_work_from_home': False,
+                    'request': None,
+                    'is_hr_admin': False
+                })
         except WorkFromHomeRequest.DoesNotExist:
+            # This should not happen with filter().first() but kept for safety
             return Response({
                 'has_wfh_request': False,
                 'can_work_from_home': False,
@@ -2264,7 +2306,7 @@ def approve_wfh_request(request, request_id):
                     recipient=wfh_request.employee.user,
                     notification_type='WFH_APPROVED',
                     title="WFH Request Approved",
-                    message=f"Your WFH request for {wfh_request.request_date} has been approved.",
+                    message=f"Your WFH request for {wfh_request.start_date}" + (f" to {wfh_request.end_date}" if wfh_request.start_date != wfh_request.end_date else "") + " has been approved.",
                     sender=request.user,
                     action_url='/attendance',
                     action_text='View Attendance'
@@ -2290,7 +2332,7 @@ def approve_wfh_request(request, request_id):
                     recipient=wfh_request.employee.user,
                     notification_type='WFH_REJECTED',
                     title="WFH Request Rejected",
-                    message=f"Your WFH request for {wfh_request.request_date} has been rejected. Reason: {wfh_request.rejection_reason}",
+                    message=f"Your WFH request for {wfh_request.start_date}" + (f" to {wfh_request.end_date}" if wfh_request.start_date != wfh_request.end_date else "") + f" has been rejected. Reason: {wfh_request.rejection_reason}",
                     sender=request.user,
                     action_url='/attendance',
                     action_text='View Attendance'
@@ -2317,7 +2359,7 @@ def send_wfh_request_email(wfh_request):
     """Send WFH request email to HR and managers"""
     try:
         hr_users = User.objects.filter(
-            profile__role__in=['HR_MANAGER', 'HR_EXECUTIVE'], 
+            profile__role__in=['HR_MANAGER', 'HR_EXECUTIVE', 'ADMIN'], 
             is_active=True
         )
         recipients = [user.email for user in hr_users if user.email]
@@ -2344,7 +2386,7 @@ def send_wfh_request_email(wfh_request):
                     <h3>Employee Details:</h3>
                     <p><strong>Name:</strong> {wfh_request.employee.user.get_full_name()}</p>
                     <p><strong>Employee ID:</strong> {wfh_request.employee.employee_id}</p>
-                    <p><strong>Requested Date:</strong> {wfh_request.request_date.strftime('%B %d, %Y')}</p>
+                    <p><strong>Requested Period:</strong> {wfh_request.start_date.strftime('%B %d, %Y')}{f" to {wfh_request.end_date.strftime('%B %d, %Y')}" if wfh_request.start_date != wfh_request.end_date else ""}</p>
                     <p><strong>Applied On:</strong> {wfh_request.applied_at.strftime('%B %d, %Y at %I:%M %p')}</p>
                 </div>
                 
@@ -2389,12 +2431,12 @@ def send_wfh_approval_email(wfh_request, approved=True):
                 <div style="font-size: 18px; margin-bottom: 20px;">
                     <p>Hi <strong>{wfh_request.employee.user.first_name}</strong>,</p>
                     
-                    <p>Your work from home request for <strong>{wfh_request.request_date.strftime('%B %d, %Y')}</strong> has been <strong>{'approved' if approved else 'rejected'}</strong>.</p>
+                    <p>Your work from home request for <strong>{wfh_request.start_date.strftime('%B %d, %Y')}{f" to {wfh_request.end_date.strftime('%B %d, %Y')}" if wfh_request.start_date != wfh_request.end_date else ""}</strong> has been <strong>{'approved' if approved else 'rejected'}</strong>.</p>
                 </div>
                 
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
                     <p><strong>Request Details:</strong></p>
-                    <p><strong>Date:</strong> {wfh_request.request_date.strftime('%B %d, %Y')}</p>
+                    <p><strong>Period:</strong> {wfh_request.start_date.strftime('%B %d, %Y')}{f" to {wfh_request.end_date.strftime('%B %d, %Y')}" if wfh_request.start_date != wfh_request.end_date else ""}</p>
                     <p><strong>Reason:</strong> {wfh_request.reason}</p>
                     <p><strong>{'Approved' if approved else 'Rejected'} by:</strong> {wfh_request.approved_by.user.get_full_name() if wfh_request.approved_by else 'Manager'}</p>
                 </div>

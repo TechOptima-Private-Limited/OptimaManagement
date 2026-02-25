@@ -409,6 +409,8 @@ class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     groups = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
+    employee_id = serializers.SerializerMethodField()
+    employee_pk = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -418,7 +420,9 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser',
             'role',
             'profile',
-            'groups'
+            'groups',
+            'employee_id',
+            'employee_pk'
         ]
 
     def get_groups(self, obj):
@@ -426,6 +430,14 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_role(self, obj):
         return getattr(getattr(obj, 'profile', None), 'role', None)
+
+    def get_employee_id(self, obj):
+        employee = getattr(obj, 'employee', None)
+        return employee.employee_id if employee else None
+
+    def get_employee_pk(self, obj):
+        employee = getattr(obj, 'employee', None)
+        return employee.id if employee else None
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

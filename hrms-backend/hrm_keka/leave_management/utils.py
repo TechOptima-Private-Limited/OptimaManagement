@@ -87,8 +87,8 @@ def send_leave_request_notification(leave_request):
             
             # Method 1: Check if profile exists and has role
             try:
-                hr_users = User.objects.filter(profile__role='HR_MANAGER', is_active=True)
-                logger.info(f"✅ Found {hr_users.count()} HR managers via profile.role")
+                hr_users = User.objects.filter(profile__role__in=['HR_MANAGER', 'HR_EXECUTIVE', 'ADMIN'], is_active=True)
+                logger.info(f"✅ Found {hr_users.count()} HR managers/Admins via profile.role")
             except:
                 logger.info("ℹ️ Profile.role method failed, trying alternatives")
             

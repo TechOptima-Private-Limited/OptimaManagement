@@ -228,15 +228,12 @@ class AttendanceRecord(models.Model):
         """Check if employee has approved WFH for today"""
         if not self.employee:
             return False
-        try:
-            wfh_request = WorkFromHomeRequest.objects.get(
-                employee=self.employee,
-                request_date=self.date,
-                status='APPROVED'
-            )
-            return True
-        except WorkFromHomeRequest.DoesNotExist:
-            return False
+        return WorkFromHomeRequest.objects.filter(
+            employee=self.employee,
+            start_date__lte=self.date,
+            end_date__gte=self.date,
+            status='APPROVED'
+        ).exists()
     
     def clear_original_values(self):
         """Clear temporary original values after approval/rejection"""

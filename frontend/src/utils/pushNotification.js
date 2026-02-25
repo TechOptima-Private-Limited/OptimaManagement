@@ -2,6 +2,8 @@
  * Utility for handling web push notification registration and subscription
  */
 
+import api from '../services/api';
+
 const VAPID_PUBLIC_KEY = process.env.REACT_APP_VAPID_PUBLIC_KEY;
 
 if (!VAPID_PUBLIC_KEY) {
@@ -36,16 +38,32 @@ export const registerServiceWorker = async () => {
  */
 export const subscribeUser = async (registration) => {
     try {
-        if (!VAPID_PUBLIC_KEY) {
-            throw new Error('VAPID_PUBLIC_KEY is missing');
+        let activeVapidKey = VAPID_PUBLIC_KEY;
+
+        if (!activeVapidKey) {
+            console.log('VAPID_PUBLIC_KEY missing in env, fetching from backend...');
+            try {
+                // Use our standard api service which handles baseURL and Auth headers
+                const response = await api.get('/notifications/vapid-public-key/');
+                if (response.data && response.data.public_key) {
+                    activeVapidKey = response.data.public_key;
+                    console.log('Successfully fetched VAPID key from backend');
+                }
+            } catch (fetchError) {
+                console.error('Failed to fetch VAPID key from backend:', fetchError);
+            }
+        }
+
+        if (!activeVapidKey) {
+            throw new Error('VAPID_PUBLIC_KEY is missing (checked env and backend)');
         }
 
         if (!registration.pushManager) {
             throw new Error('Push Manager not supported by your browser');
         }
 
-        console.log('Using VAPID Public Key:', VAPID_PUBLIC_KEY);
-        const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+        console.log('Using VAPID Public Key:', activeVapidKey);
+        const applicationServerKey = urlBase64ToUint8Array(activeVapidKey);
 
         // Check for existing subscription
         let subscription = await registration.pushManager.getSubscription();

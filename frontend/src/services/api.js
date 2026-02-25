@@ -241,19 +241,19 @@
 //   (response) => response,
 //   async (error) => {
 //     const originalRequest = error.config;
-    
+
 //     if (error.response?.status === 401 && !originalRequest._retry) {
 //       originalRequest._retry = true;
-      
+
 //       try {
 //         const refreshToken = localStorage.getItem('refresh_token');
 //         const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
 //           refresh: refreshToken,
 //         });
-        
+
 //         const { access } = response.data;
 //         localStorage.setItem('access_token', access);
-        
+
 //         return api(originalRequest);
 //       } catch (refreshError) {
 //         localStorage.removeItem('access_token');
@@ -263,7 +263,7 @@
 //         return Promise.reject(refreshError);
 //       }
 //     }
-    
+
 //     return Promise.reject(error);
 //   }
 // );
@@ -320,7 +320,7 @@
 //   getOnboardingTasks: () => api.get('/employees/onboarding/'),
 //   completeOnboardingTask: (taskId) => api.patch(`/employees/onboarding/${taskId}/complete/`),
 //   getUsers: () => api.get('/employees/users/'),
-  
+
 //   // NEW: Profile-related endpoints
 //   getEmployeeProfileData: () => api.get('/employees/profile-data/'),
 //   getBirthdayFestivalData: () => api.get('/employees/birthday-festival/'),
@@ -332,22 +332,22 @@
 // export const profileAPI = {
 //   // Get current user profile with all details
 //   getCurrentProfile: () => api.get('/auth/profile/'),
-  
+
 //   // Update user profile (personal information)
 //   updateProfile: (data) => api.patch('/auth/profile/', data),
-  
+
 //   // Get employee-specific profile data (team, manager, employment details)
 //   getEmployeeProfileData: () => api.get('/employees/profile-data/'),
-  
+
 //   // Get team members by manager ID
 //   getTeamMembersByManagerId: (managerId) => api.get(`/employees/team/${managerId}/`),
-  
+
 //   // Get all managers with their teams (HR only)
 //   getAllManagersWithTeams: () => api.get('/employees/managers/'),
-  
+
 //   // Debug employee relationships (for troubleshooting)
 //   debugEmployeeRelationships: () => api.get('/employees/debug-relationships/'),
-  
+
 //   // Upload profile picture (if you want to add this feature later)
 //   uploadProfilePicture: (formData) => {
 //     return api.post('/auth/profile/upload-picture/', formData, {
@@ -363,7 +363,7 @@
 //   // Attendance Records
 //   getAttendanceRecords: (params) => api.get('/attendance/records/', { params }),
 //   markManualAttendance: (data) => api.post('/attendance/manual/', data),
-  
+
 //   // Biometric Integration
 //   getBiometricDevices: () => api.get('/attendance/devices/'),
 //   createBiometricDevice: (data) => api.post('/attendance/devices/', data),
@@ -371,7 +371,7 @@
 //   deleteBiometricDevice: (id) => api.delete(`/attendance/devices/${id}/`),
 //   syncBiometricData: (data) => api.post('/attendance/biometric-sync/', data),
 //   pingLocation: (data) => api.post('/attendance/location/ping/', data),
-  
+
 //   // Approval workflow
 //   approveEdit: (recordId, data) => api.post(`/attendance/approve-edit/${recordId}/`, data),
 // };
@@ -549,6 +549,7 @@ export const authAPI = {
   refreshToken: (refreshToken) => api.post('/auth/token/refresh/', { refresh: refreshToken }),
   changePassword: (data) => api.post('/auth/profile/change-password/', data),
   getMyPermissions: () => api.get('/auth/me/permissions/'),
+  getCaptcha: () => api.get('/auth/captcha/'),
 };
 
 // Admin/HR user management API
@@ -599,6 +600,15 @@ export const employeeAPI = {
   getFestivals: () => api.get('/employees/festivals/'),
 };
 
+// Holiday Management API
+export const holidayAPI = {
+  getHolidays: () => api.get('/employees/holidays/'),
+  getHoliday: (id) => api.get(`/employees/holidays/${id}/`),
+  createHoliday: (data) => api.post('/employees/holidays/', data),
+  updateHoliday: (id, data) => api.put(`/employees/holidays/${id}/`, data),
+  deleteHoliday: (id) => api.delete(`/employees/holidays/${id}/`),
+};
+
 // Profile API - ENHANCED with better team management
 export const profileAPI = {
   // Get current user profile with all details
@@ -634,13 +644,13 @@ export const attendanceAPI = {
   // Attendance Records
   getAttendanceRecords: (params) => api.get('/attendance/records/', { params }),
   markManualAttendance: (data) => api.post('/attendance/manual/', data),
-  
+
   // Biometric Device Management
   getBiometricDevices: () => api.get('/attendance/devices/'),
   createBiometricDevice: (data) => api.post('/attendance/devices/', data),
   updateBiometricDevice: (id, data) => api.patch(`/attendance/devices/${id}/`, data),
   deleteBiometricDevice: (id) => api.delete(`/attendance/devices/${id}/`),
-  
+
   // ✨ NEW: Biometric Sync Endpoints
   /**
    * Sync biometric logs from device to database
@@ -654,7 +664,7 @@ export const attendanceAPI = {
       sync_date: syncDate || new Date().toISOString().split('T')[0]
     });
   },
-  
+
   /**
    * Fetch biometric logs without saving (preview mode)
    * @param {string} deviceIp - IP address of biometric device
@@ -667,10 +677,10 @@ export const attendanceAPI = {
       fetch_date: fetchDate || new Date().toISOString().split('T')[0]
     });
   },
-  
+
   // Legacy endpoint (keep for backward compatibility)
   syncBiometricData: (data) => api.post('/attendance/biometric-sync/', data),
-  
+
   // Location tracking
   pingLocation: (data) => api.post('/attendance/location/ping/', data),
 

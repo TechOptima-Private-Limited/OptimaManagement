@@ -1527,10 +1527,10 @@ const WorkFromHomeRequests = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-white">Work From Home Requests</h1>
-                <p className="mt-1 text-xl text-blue-100">
+                <p className="mt-1 text-xl text-red-50">
                   {getHeaderText()}
                 </p>
-                <div className="flex items-center space-x-6 text-blue-100 mt-4">
+                <div className="flex items-center space-x-6 text-red-50 mt-4">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
                     <span className="text-sm font-medium">{stats.totalRequests} Total Requests</span>
@@ -1553,11 +1553,11 @@ const WorkFromHomeRequests = () => {
               {!canViewAllRequests() && (
                 <button
                   onClick={() => setShowRequestModal(true)}
-                  className="group relative inline-flex items-center px-8 py-3 bg-white text-blue-600 rounded-xl font-semibold shadow-2xl hover:shadow-white/25 transform hover:scale-105 transition-all duration-300"
+                  className="group relative inline-flex items-center px-8 py-3 bg-white text-red-600 rounded-xl font-semibold shadow-2xl hover:shadow-white/25 transform hover:scale-105 transition-all duration-300"
                 >
                   <PlusIcon className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                   New Request
-                  <div className="absolute inset-0 bg-gradient-to-r from-white to-blue-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white to-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               )}
             </div>
@@ -1596,26 +1596,26 @@ const WorkFromHomeRequests = () => {
             title="Total Requests"
             value={stats.totalRequests}
             icon={CalendarDaysIcon}
-            color="from-blue-500 to-blue-600"
+            color="from-red-500 to-red-600"
           />
           <StatCard
             title="Approved"
             value={stats.approvedRequests}
             icon={CheckCircleIcon}
-            color="from-emerald-500 to-emerald-600"
+            color="from-rose-500 to-rose-600"
             percentage={stats.totalRequests > 0 ? Math.round((stats.approvedRequests / stats.totalRequests) * 100) : 0}
           />
           <StatCard
             title="Rejected"
             value={stats.rejectedRequests}
             icon={XCircleIcon}
-            color="from-rose-500 to-rose-600"
+            color="from-red-600 to-red-700"
           />
           <StatCard
             title="Pending"
             value={stats.pendingRequests}
             icon={ClockIcon}
-            color="from-amber-500 to-amber-600"
+            color="from-gray-500 to-gray-600"
           />
         </div>
 
@@ -1669,7 +1669,7 @@ const WorkFromHomeRequests = () => {
           <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50" data-approvals-section>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                <UserIcon className="h-6 w-6 mr-2 text-indigo-500" />
+                <UserIcon className="h-6 w-6 mr-2 text-red-600" />
                 Pending Approval Requests
                 {isManager() && (
                   <span className="ml-2 text-sm font-normal text-gray-600">(Your Team)</span>
@@ -1775,7 +1775,7 @@ const WorkFromHomeRequests = () => {
                 type="month"
                 value={filters.month}
                 onChange={(e) => handleFilterChange('month', e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all duration-200 outline-none"
               />
             </div>
 
@@ -1784,7 +1784,7 @@ const WorkFromHomeRequests = () => {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all duration-200 outline-none"
               >
                 <option value="">All Status</option>
                 <option value="PENDING">Pending</option>
@@ -1807,10 +1807,10 @@ const WorkFromHomeRequests = () => {
 
         {/* Enhanced WFH Requests Table */}
         <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/50 overflow-hidden">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200 bg-[#F0F0F0]">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                <DocumentChartBarIcon className="h-6 w-6 mr-2 text-indigo-500" />
+                <DocumentChartBarIcon className="h-6 w-6 mr-2 text-red-600" />
                 Work From Home Requests
                 {isManager() && (
                   <span className="ml-2 text-sm font-normal text-gray-600">(Your Team)</span>
@@ -1842,8 +1842,8 @@ const WorkFromHomeRequests = () => {
           }}
           title={
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
-                <PlusIcon className="h-6 w-6 text-blue-600" />
+              <div className="w-12 h-12 bg-red-500 bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
+                <PlusIcon className="h-6 w-6 text-red-600" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Submit Work From Home Request</h3>
@@ -1863,7 +1863,7 @@ const WorkFromHomeRequests = () => {
                     {...register('start_date', { required: 'Start date is required' })}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all duration-200 outline-none"
                   />
                   {errors.start_date && <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>}
                 </div>
@@ -1876,7 +1876,7 @@ const WorkFromHomeRequests = () => {
                     {...register('end_date', { required: 'End date is required' })}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all duration-200 outline-none"
                   />
                   {errors.end_date && <p className="text-red-500 text-sm mt-1">{errors.end_date.message}</p>}
                 </div>
@@ -1890,23 +1890,23 @@ const WorkFromHomeRequests = () => {
                   {...register('reason', { required: 'Reason is required' })}
                   rows={4}
                   placeholder="Please provide a reason for your work from home request..."
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none resize-none"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all duration-200 outline-none resize-none"
                 />
                 {errors.reason && <p className="text-red-500 text-sm mt-1">{errors.reason.message}</p>}
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-blue-800">
+                    <h3 className="text-sm font-medium text-red-800">
                       Please Note
                     </h3>
-                    <div className="mt-2 text-sm text-blue-700">
+                    <div className="mt-2 text-sm text-red-700">
                       <p>Your request will be sent to {isHRManager() ? 'HR' : 'your manager and HR'} for approval. You'll receive a notification once it's reviewed.</p>
                     </div>
                   </div>
@@ -1952,28 +1952,28 @@ const WorkFromHomeRequests = () => {
 
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
               {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6">
+              <div className="bg-gradient-to-r from-[#E7473C] to-red-600 px-6 py-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="ml-4">
                       <h3 className="text-2xl font-bold text-white">
                         Work From Home Request Details
                       </h3>
-                      <p className="text-blue-100">
+                      <p className="text-red-50">
                         {selectedRequest.employee_name} - {selectedRequest.formatted_start_date} to {selectedRequest.formatted_end_date}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedRequest(null)}
-                    className="text-white hover:text-blue-200 transition-colors duration-200"
+                    className="text-white hover:text-red-200 transition-colors duration-200"
                   >
                     <XCircleIcon className="h-6 w-6" />
                   </button>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 p-6">
+              <div className="bg-[#F0F0F0] p-6">
                 <div className="space-y-4">
                   {canViewAllRequests() && (
                     <div className="grid grid-cols-2 gap-4">
@@ -2023,12 +2023,12 @@ const WorkFromHomeRequests = () => {
                   )}
 
                   {selectedRequest.days_until_start >= 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div className="bg-red-50 border border-red-100 rounded-xl p-4">
                       <div className="flex items-center">
-                        <CalendarDaysIcon className="h-5 w-5 text-blue-500 mr-2" />
+                        <CalendarDaysIcon className="h-5 w-5 text-red-600 mr-2" />
                         <div>
-                          <p className="text-sm font-medium text-blue-800">Time Until Start Date</p>
-                          <p className="text-sm text-blue-700">
+                          <p className="text-sm font-medium text-red-800">Time Until Start Date</p>
+                          <p className="text-sm text-red-700">
                             {selectedRequest.days_until_start === 0 ? 'Today' :
                               selectedRequest.days_until_start === 1 ? 'Tomorrow' :
                                 `In ${selectedRequest.days_until_start} days`}
@@ -2064,14 +2064,14 @@ const WorkFromHomeRequests = () => {
         title={
           <div className="flex items-center">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${selectedApproval?.action === 'approve' ? 'bg-emerald-500 bg-opacity-20' :
-              selectedApproval?.action === 'reject' ? 'bg-rose-500 bg-opacity-20' : 'bg-blue-500 bg-opacity-20'
+              selectedApproval?.action === 'reject' ? 'bg-rose-500 bg-opacity-20' : 'bg-red-500 bg-opacity-20'
               }`}>
               {selectedApproval?.action === 'approve' ? (
                 <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
               ) : selectedApproval?.action === 'reject' ? (
                 <XCircleIcon className="h-6 w-6 text-rose-600" />
               ) : (
-                <EyeIcon className="h-6 w-6 text-blue-600" />
+                <EyeIcon className="h-6 w-6 text-red-600" />
               )}
             </div>
             <div>
@@ -2184,7 +2184,7 @@ const WorkFromHomeRequests = () => {
           >
             <div className="relative">
               <ClockIcon className="h-6 w-6" />
-              <span className="absolute -top-2 -right-2 bg-white text-red-600 rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center animate-pulse">
+              <span className="absolute -top-2 -right-2 bg-white text-red-700 rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center animate-pulse">
                 {requests.filter(r => r.status === 'PENDING').length}
               </span>
             </div>

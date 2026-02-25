@@ -83,6 +83,8 @@ class AccessLevelSerializer(serializers.ModelSerializer):
 class AccessRequestSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     resource_name = serializers.CharField(source='resource.name', read_only=True)
+    asset_name = serializers.CharField(source='asset.name', read_only=True)
+    asset_tag = serializers.CharField(source='asset.asset_tag', read_only=True)
     access_level_name = serializers.CharField(source='access_level.name', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)

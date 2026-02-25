@@ -737,9 +737,9 @@ class LeaveNotificationService:
             if hasattr(employee, 'manager') and employee.manager:
                 approvers.append(employee.manager.user)
             
-            # Add HR managers
+            # Add HR managers and Admins
             try:
-                hr_users = User.objects.filter(profile__role='HR_MANAGER')
+                hr_users = User.objects.filter(profile__role__in=['HR_MANAGER', 'HR_EXECUTIVE', 'ADMIN'])
                 approvers.extend(hr_users)
             except:
                 # Fallback to superusers

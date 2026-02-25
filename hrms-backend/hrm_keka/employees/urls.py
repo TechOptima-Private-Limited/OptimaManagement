@@ -45,4 +45,8 @@ urlpatterns = [
     path('birthdays/', views.EmployeeBirthdayListView.as_view(), name='employee_birthdays'),
     path('festivals/', views.FestivalListView.as_view(), name='festivals'),
     path('birthday-festival/', views.dashboard_birthday_festival_data, name='dashboard_birthday_festival'),
+
+    # Holiday management CRUD
+    path('holidays/', views.FestivalViewSet.as_view({'get': 'list', 'post': 'create'}), name='holiday_list_create'),
+    path('holidays/<int:pk>/', views.FestivalViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='holiday_detail'),
 ]

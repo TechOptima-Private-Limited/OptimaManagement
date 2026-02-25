@@ -20,10 +20,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { isHRManager, isManager, getUserRole } from '../../utils/auth';
-import { employeeAPI, attendanceAPI, leaveAPI, workFromHomeAPI } from '../../services/api';
+import { employeeAPI, attendanceAPI, leaveAPI, workFromHomeAPI, holidayAPI } from '../../services/api';
 import { formatDate, formatTime } from '../../utils/formatters';
 import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
+import Modal from '../common/Modal';
 import WorkFromHomePopup from '../attendance/WorkFromHomePopup';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -49,23 +50,38 @@ const calculateAttendanceStats = (records, targetEmployeeId = null) => {
   // Filter records for the target employee (if provided)
   const myRecords = targetEmployeeId
     ? records.filter(r => {
-      const empId = r.employee?.id || r.employee;
-      return String(empId) === String(targetEmployeeId);
+      // Robust matching: Check multiple identity fields against the target ID
+      const recordId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id)) || (r.employee_details && r.employee_details.employee_id);
+      const userId = r.user || (r.employee && r.employee.user);
+
+      return (recordId && String(recordId) === String(targetEmployeeId)) ||
+        (userId && String(userId) === String(targetEmployeeId));
     })
     : [];
 
   // On-Time Arrival (threshold 10:00:00)
   const isOnTime = (timeStr) => {
     if (!timeStr) return false;
-    // Standardize time string format (HH:MM:SS)
-    const parts = timeStr.split(':').map(Number);
-    const h = parts[0] || 0;
-    const m = parts[1] || 0;
-    const s = parts[2] || 0;
+    // Standardize time string format (handles HH:MM:SS, HH:MM, and 12h formats)
+    let h, m, s = 0;
+
+    if (String(timeStr).includes('AM') || String(timeStr).includes('PM')) {
+      const [time, modifier] = String(timeStr).split(' ');
+      let [hours, minutes] = time.split(':');
+      h = parseInt(hours, 10);
+      m = parseInt(minutes, 10);
+      if (modifier === 'PM' && h < 12) h += 12;
+      if (modifier === 'AM' && h === 12) h = 0;
+    } else {
+      const parts = String(timeStr).split(':').map(Number);
+      h = parts[0] || 0;
+      m = parts[1] || 0;
+      s = parts[2] || 0;
+    }
 
     // 10:00:00 is the limit
     if (h < 10) return true;
-    if (h === 10 && m === 0 && s === 0) return true;
+    if (h === 10 && m === 0 && (isNaN(s) || s === 0)) return true;
     return false;
   };
 
@@ -105,7 +121,7 @@ const calculateAttendanceStats = (records, targetEmployeeId = null) => {
     avgHours: calculateAvgHours(myRecords),
     onTimeArrival: calculateOnTimePercent(myRecords), // Monthly on-time % for user
     teamAvgHours: calculateAvgHours(records),         // Monthly avg hours for team
-    teamOnTime: calculateOnTimePercent(todayRecords)  // Today's on-time % for team
+    teamOnTime: todayRecords.length > 0 ? calculateOnTimePercent(todayRecords) : calculateOnTimePercent(records)  // Fallback to monthly if today is empty
   };
 };
 
@@ -202,6 +218,9 @@ const Dashboard = () => {
     }
   });
 
+  const [showHolidaysModal, setShowHolidaysModal] = useState(false);
+  const [allHolidays, setAllHolidays] = useState([]);
+
   // ===================
   // EFFECTS & LIFECYCLE
   // ===================
@@ -221,6 +240,7 @@ const Dashboard = () => {
   // Main effect for fetching data and setting timers
   useEffect(() => {
     fetchDashboardData();
+    fetchAllHolidays();
     fetchBirthdayFestivalData();
 
     // Only setup attendance-related functionality for employees and HR managers
@@ -238,7 +258,19 @@ const Dashboard = () => {
       }
     }, 1000);
 
-    return () => clearInterval(timer);
+    // Background polling every 60 seconds to keep data fresh
+    const poolTimer = setInterval(() => {
+      fetchDashboardData(true);
+      fetchAllHolidays(); // Keep this updated too
+      if (!isManagerOnly) {
+        checkTodayAttendance(true);
+      }
+    }, 60000);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(poolTimer);
+    };
   }, [isManagerOnly]);
 
   // ===================
@@ -273,7 +305,7 @@ const Dashboard = () => {
               {
                 duration: 8000,
                 style: {
-                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(90deg, #E7473C 0%, #F87171 100%)',
                   color: 'white'
                 }
               }
@@ -289,7 +321,7 @@ const Dashboard = () => {
               {
                 duration: 6000,
                 style: {
-                  background: 'linear-gradient(90deg, #ff7e5f 0%, #feb47b 100%)',
+                  background: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)',
                   color: 'white'
                 }
               }
@@ -313,8 +345,9 @@ const Dashboard = () => {
     }
   };
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (silent = false) => {
     try {
+      if (!silent) setDashboardData(prev => ({ ...prev, loading: true }));
       const promises = [];
 
       const now = new Date();
@@ -346,7 +379,7 @@ const Dashboard = () => {
           employees: results[0]?.data?.results || results[0]?.data || [],
           pendingLeaves: results[1]?.data?.results || results[1]?.data || [],
           approvedLeaves: results[2]?.data?.results || results[2]?.data || [],
-          attendanceStats: calculateAttendanceStats(allAttendance, user?.employee_id),
+          attendanceStats: calculateAttendanceStats(allAttendance, user?.employee_id || user?.employee_pk || user?.id),
           currentTime: new Date(),
           loading: false
         });
@@ -356,7 +389,7 @@ const Dashboard = () => {
           leaveBalances: results[0].data.leave_balances || [],
           leaveSummary: results[0].data,
           recentActivity: results[1]?.data?.results || results[1]?.data || [],
-          attendanceStats: calculateAttendanceStats(allAttendance, user?.employee_id),
+          attendanceStats: calculateAttendanceStats(allAttendance, user?.employee_id || user?.employee_pk || user?.id),
           currentTime: new Date(),
           loading: false
         });
@@ -367,8 +400,20 @@ const Dashboard = () => {
     }
   };
 
+  const fetchAllHolidays = async () => {
+    try {
+      const response = await holidayAPI.getHolidays();
+      const holidays = response.data.results || response.data || [];
+      // Sort holidays by date
+      const sortedHolidays = [...holidays].sort((a, b) => new Date(a.date) - new Date(b.date));
+      setAllHolidays(sortedHolidays);
+    } catch (error) {
+      console.error('Failed to fetch all holidays:', error);
+    }
+  };
+
   // Employee and HR Manager only functions
-  const checkTodayAttendance = async () => {
+  const checkTodayAttendance = async (silent = false) => {
     if (isManagerOnly) return;
 
     try {
@@ -381,9 +426,14 @@ const Dashboard = () => {
 
       const allRecords = response.data?.results || response.data || [];
       console.log('📡 Today attendance records:', allRecords);
-      // Backend now properly filters records, so we can trust it returns only our data
-      // Just take the first record for today (there should only be one per employee per day)
-      const todayRecord = allRecords.length > 0 ? allRecords[0] : null;
+
+      // Safety filter: ensure we only look at the current user's record
+      const myTodayRecords = allRecords.filter(r => {
+        const recordEmpId = r.employee?.id || r.employee;
+        return String(recordEmpId) === String(user?.employee_id);
+      });
+
+      const todayRecord = myTodayRecords.length > 0 ? myTodayRecords[0] : null;
 
       if (todayRecord && todayRecord.check_in_time && !todayRecord.check_out_time) {
         const reconstructedCheckIn = new Date(
@@ -397,22 +447,41 @@ const Dashboard = () => {
           // User checked in during this browser session - restore the UI state
           setAttendanceState(prev => ({
             ...(prev || {}),
-            isCheckedIn: false,
+            isCheckedIn: true,
             checkInTime: reconstructedCheckIn,
             isWorkFromHome: todayRecord.notes?.includes('Work from Home') || false,
             todayAttendance: todayRecord,
             pendingSubmission: true
           }));
         } else {
-          // User checked in from another device/session - DON'T auto-check-in here
+          // User checked in from another device/session - restore state but respect server truth
           setAttendanceState(prev => ({
             ...(prev || {}),
-            isCheckedIn: false,  // ✅ Don't show as checked in
-            checkInTime: null,
-            isWorkFromHome: false,
+            isCheckedIn: true,  // ✅ Show as checked in since server says so
+            checkInTime: reconstructedCheckIn,
+            isWorkFromHome: todayRecord.attendance_type === 'WFH' || todayRecord.notes?.includes('Work from Home'),
             todayAttendance: todayRecord,
             pendingSubmission: false
           }));
+        }
+      } else {
+        // No active check-in found for today (or already checked out)
+        // Reset state to ensure UI is in sync with server truth
+        setAttendanceState(prev => {
+          if (!prev?.isCheckedIn) return prev; // Already not checked in, avoid ripple updates
+
+          return {
+            ...prev,
+            isCheckedIn: false,
+            checkInTime: null,
+            isWorkFromHome: false,
+            pendingSubmission: false
+          };
+        });
+
+        // Also cleanup local storage if we're definitely not checked in anymore
+        if (user?.id) {
+          localStorage.removeItem(`attendance_${user.id}`);
         }
       }
     } catch (error) {
@@ -649,7 +718,6 @@ const Dashboard = () => {
       setSubmittingAttendance(false);
     }
   };
-
   const submitPendingAttendance = async (includeCheckOut = true) => {
     if (isManagerOnly || !attendanceState?.checkInTime) return;
 
@@ -658,11 +726,17 @@ const Dashboard = () => {
 
     const attendanceData = {
       date: toLocalDate(checkInTime),
-      check_in_time: checkInTime.toTimeString().slice(0, 8),
       status: 'PRESENT',
       attendance_type: 'MANUAL',
       notes: attendanceState.isWorkFromHome ? 'Work from Home' : 'Remote Login'
     };
+
+    // Only include check_in_time if we are NOT checking out.
+    // When checking out, the backend already has the check-in time, and omitting it
+    // avoids approval-triggering comparison mismatches.
+    if (!includeCheckOut) {
+      attendanceData.check_in_time = checkInTime.toTimeString().slice(0, 8);
+    }
 
     if (includeCheckOut) {
       attendanceData.check_out_time = now.toTimeString().slice(0, 8);
@@ -677,8 +751,10 @@ const Dashboard = () => {
     }
 
     try {
-      await attendanceAPI.markManualAttendance(attendanceData);
+      const response = await attendanceAPI.markManualAttendance(attendanceData);
+      return response.data;
     } catch (error) {
+      console.error('Failed to submit attendance:', error);
       const status = error?.response?.status;
       if (status === 404) {
         setAttendanceState(prev => prev ? { ...prev, pendingSubmission: false } : prev);
@@ -686,6 +762,7 @@ const Dashboard = () => {
           localStorage.removeItem(`attendance_${user.id}`);
         }
       }
+      throw error;
     }
   };
 
@@ -746,7 +823,7 @@ const Dashboard = () => {
     if (!birthdayFestivalData.birthdays.has_birthdays_today) return null;
 
     return (
-      <div className="mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
+      <div className="mb-6 bg-gradient-to-r from-[#E7473C] via-rose-400 to-orange-400 rounded-xl p-5 text-white relative overflow-hidden shadow-lg">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-2 left-10 text-6xl animate-bounce">🎂</div>
           <div className="absolute top-8 right-20 text-4xl animate-pulse">🎈</div>
@@ -791,7 +868,7 @@ const Dashboard = () => {
     if (!birthdayFestivalData.festivals.has_festivals_today) return null;
 
     return (
-      <div className="mb-6 bg-gradient-to-r from-orange-300 via-red-400 to-pink-400 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
+      <div className="mb-6 bg-gradient-to-r from-orange-300 via-red-400 to-pink-400 rounded-xl p-5 text-white relative overflow-hidden shadow-lg">
         <div className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
@@ -824,73 +901,81 @@ const Dashboard = () => {
 
     const getGradientClass = (type) => {
       switch (type?.toLowerCase()) {
-        case 'religious': return 'from-amber-300 via-orange-400 to-red-400';
-        case 'national': return 'from-blue-300 via-purple-400 to-pink-400';
-        case 'cultural': return 'from-green-300 via-blue-400 to-purple-400';
-        case 'international': return 'from-pink-300 via-purple-400 to-indigo-400';
-        default: return 'from-purple-300 via-pink-400 to-red-400';
+        case 'religious': return 'from-amber-400 via-orange-500 to-red-500';
+        case 'national': return 'from-blue-500 via-indigo-600 to-violet-600';
+        case 'cultural': return 'from-emerald-400 via-teal-500 to-cyan-600';
+        case 'international': return 'from-rose-400 via-pink-500 to-purple-600';
+        default: return 'from-orange-400 via-red-500 to-pink-500';
       }
     };
 
     return (
-      <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClass(festival.festival_type)} p-1 shadow-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-3xl group min-w-[380px] max-w-[380px]`}>
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-3 left-6 text-4xl animate-pulse">{festival.emoji}</div>
-          <div className="absolute top-8 right-8 text-2xl animate-bounce" style={{ animationDelay: '0.5s' }}>✨</div>
-          <div className="absolute bottom-6 left-8 text-3xl animate-pulse" style={{ animationDelay: '1s' }}>🌟</div>
-          <div className="absolute bottom-3 right-6 text-2xl animate-bounce" style={{ animationDelay: '1.5s' }}>💫</div>
+      <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${getGradientClass(festival.festival_type)} p-[2px] shadow-xl transform hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl group min-w-[300px] max-w-[300px]`}>
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-black/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full border border-white/20">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="text-5xl drop-shadow-lg">{festival.emoji}</div>
-              <div>
-                <h3 className="text-2xl font-bold text-white drop-shadow-md">{festival.name}</h3>
-                <div className="flex items-center space-x-2 mt-1">
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white/90 backdrop-blur-sm border border-white/30">
-                    {festival.festival_type?.replace('_', ' ').toUpperCase()}
-                  </span>
-                  {festival.is_holiday && (
-                    <span className="px-3 py-1 bg-red-500/80 rounded-full text-xs font-bold text-white backdrop-blur-sm border border-red-300/50">
-                      🏖️ HOLIDAY
+        <div className="relative bg-white/10 backdrop-blur-md rounded-[calc(1.5rem-2px)] p-5 h-full border border-white/30 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/20 transform group-hover:rotate-12 transition-transform duration-500">
+                  {festival.emoji}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white leading-tight drop-shadow-sm">{festival.name}</h3>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className="px-2 py-0.5 bg-white/20 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md border border-white/30">
+                      {festival.festival_type?.replace('_', ' ')}
                     </span>
-                  )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/20 backdrop-blur-md rounded-2xl px-3 py-2 border border-white/30 shadow-lg text-center min-w-[70px]">
+                <div className="text-lg font-black text-white leading-none">
+                  {festival.days_until_festival === 0 ? 'TODAY' : festival.days_until_festival}
+                </div>
+                <div className="text-[10px] text-white/80 font-bold uppercase tracking-tighter">
+                  {festival.days_until_festival === 0 ? '🎉' : 'Days to go'}
                 </div>
               </div>
             </div>
 
-            <div className="text-right">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
-                <div className="text-2xl font-black text-white drop-shadow-md">
-                  {festival.days_until_festival === 0 ? 'TODAY!' :
-                    festival.days_until_festival === 1 ? 'Tomorrow' :
-                      `${festival.days_until_festival} days`}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2 text-white/90">
+                <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
+                  <CalendarDaysIcon className="w-4 h-4" />
                 </div>
-                <div className="text-xs text-white/80 font-medium">
-                  {festival.days_until_festival === 0 ? '🎉' : 'to go'}
-                </div>
+                <span className="text-sm font-semibold">{festival.formatted_date}</span>
               </div>
+
+              {festival.is_holiday && (
+                <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-red-500/30 backdrop-blur-md rounded-xl border border-red-400/30">
+                  <span className="text-lg leading-none">🏖️</span>
+                  <span className="text-[11px] font-bold text-white uppercase tracking-widest">Public Holiday</span>
+                </div>
+              )}
+
+              {festival.description && (
+                <p className="text-white/80 text-xs leading-relaxed line-clamp-2 italic font-medium">
+                  "{festival.description}"
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="mb-4">
-            <div className="text-white/90 text-lg font-medium">📅 {festival.formatted_date}</div>
-          </div>
-
-          {festival.description && (
-            <div className="text-white/80 text-sm leading-relaxed mb-4">{festival.description}</div>
-          )}
-
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/20">
+          <div className="mt-6 pt-4 border-t border-white/20 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <StarIcon className="w-4 h-4 text-yellow-300" />
-              <span className="text-white/80 text-sm font-medium">Special Day</span>
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+              <span className="text-white/70 text-[10px] font-bold uppercase tracking-widest">Special Celebration</span>
             </div>
-            <div className="flex space-x-2">
-              <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="flex -space-x-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}></div>
+              ))}
             </div>
           </div>
         </div>
@@ -901,7 +986,7 @@ const Dashboard = () => {
   const BirthdayCard = ({ birthday }) => {
     return (
 
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-300 via-purple-400 to-indigo-500 p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group min-w-[380px] max-w-[380px]">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#FF8E8E] via-[#E7473C] to-[#C73229] p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group min-w-[320px] max-w-[320px]">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
           <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
@@ -910,17 +995,17 @@ const Dashboard = () => {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
         </div>
 
-        <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full border border-white/20">
-          <div className="flex items-start space-x-4 mb-4">
+        <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 h-full border border-white/20">
+          <div className="flex items-start space-x-4 mb-2">
             <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-white/30">
+              <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/30">
                 {birthday.avatar_initials}
               </div>
-              <div className="absolute -top-1 -right-1 text-2xl animate-bounce">🎉</div>
+              <div className="absolute -top-1 -right-1 text-xl animate-bounce">🎉</div>
             </div>
 
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-white drop-shadow-md mb-1">{birthday.employee_name}</h3>
+              <h3 className="text-lg font-bold text-white drop-shadow-md mb-0.5">{birthday.employee_name}</h3>
               <div className="text-white/80 text-sm mb-2">{birthday.employee_department}</div>
               <div className="flex items-center space-x-2">
                 <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white/90 backdrop-blur-sm border border-white/30">
@@ -930,21 +1015,21 @@ const Dashboard = () => {
             </div>
 
             <div className="text-center">
-              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-3 border-2 border-white/30 shadow-lg">
-                <div className="text-2xl font-black text-white drop-shadow-md">{birthday.age_today}</div>
+              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-2.5 border-2 border-white/30 shadow-lg">
+                <div className="text-xl font-black text-white drop-shadow-md">{birthday.age_today}</div>
                 <div className="text-xs text-white/90 font-medium">years</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-4">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 mb-2">
             <div className="text-white/90 text-center">
               <div className="text-lg font-semibold mb-1">🎉 Happy Birthday! 🎉</div>
               <div className="text-sm">Wishing you joy, success, and happiness on your special day! 🌟</div>
             </div>
           </div>
 
-          <div className="text-white/80 text-sm text-center mb-4">📅 {birthday.formatted_birth_date}</div>
+          <div className="text-white/80 text-xs text-center mb-2">📅 {birthday.formatted_birth_date}</div>
 
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/20">
             <div className="flex items-center space-x-2">
@@ -968,12 +1053,135 @@ const Dashboard = () => {
   //     {children}
   //   </div>
   // );
-  const QuickAccessCard = ({ title, children, className = "", gradient = false }) => (
-    <div className={`${gradient ? 'bg-gradient-to-br from-white to-blue-50/30' : 'bg-white/90 backdrop-blur-sm'} rounded-xl shadow-md border border-white/20 p-6 hover:shadow-lg transition-all duration-300 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">{title}</h3>
+  const QuickAccessCard = ({ title, children, className = "", gradient = false, headerAction = null }) => (
+    <div className={`${gradient ? 'bg-gradient-to-br from-white to-red-50/30' : 'bg-white/90 backdrop-blur-sm'} rounded-xl shadow-md border border-white/20 p-5 hover:shadow-lg transition-all duration-300 ${className}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-base font-semibold text-gray-900 flex items-center">{title}</h3>
+        {headerAction}
+      </div>
       {children}
     </div>
   );
+
+  const HolidaysModal = ({ isOpen, onClose, data }) => {
+    if (!isOpen) return null;
+
+    const displayHolidays = data || [];
+    const sortedHolidays = [...displayHolidays].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Helper to get month name (short)
+    const getMonthName = (dateStr) => {
+      return new Date(dateStr).toLocaleString('default', { month: 'short' }).toUpperCase();
+    };
+
+    // Helper to get day number
+    const getDayNumber = (dateStr) => {
+      return new Date(dateStr).getDate().toString().padStart(2, '0');
+    };
+
+    // Helper to get day name
+    const getDayName = (dateStr) => {
+      return new Date(dateStr).toLocaleString('default', { weekday: 'long' });
+    };
+
+    // Variety of colors for month header based on month
+    const getMonthColor = (idx) => {
+      const month = new Date(sortedHolidays[idx].date).getMonth();
+      const styleMap = {
+        0: 'bg-[#06b6d4]', // JAN: Cyan
+        1: 'bg-[#fb7185]', // FEB: Rose
+        2: 'bg-[#fbbf24]', // MAR: Amber
+        7: 'bg-[#d946ef]', // AUG: Magenta
+        8: 'bg-[#2dd4bf]', // SEPT: Teal
+        9: 'bg-[#fb7185]', // OCT: Rose
+        11: 'bg-[#3fbaf6]', // DEC: Blue
+      };
+      return styleMap[month] || 'bg-[#94a3b8]';
+    };
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-[#000000]/70 backdrop-blur-md" onClick={onClose} />
+
+        {/* Modal Content */}
+        <div className="relative bg-[#0b1221] w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border border-white/5 animate-in zoom-in-95 duration-200">
+          <div className="p-6 md:p-8">
+            {/* Custom Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-6">
+                <h2 className="text-xl font-medium text-white tracking-tight">Holidays</h2>
+                <div className="flex items-center space-x-4 text-base">
+                  <button className="text-slate-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                  </button>
+                  <span className="font-semibold text-white tracking-wide">2026</span>
+                  <button className="text-slate-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <button onClick={onClose} className="text-slate-400 hover:text-white transition-all transform hover:rotate-90">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Grid Content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar-holiday">
+              {sortedHolidays.length === 0 ? (
+                <div className="col-span-2 text-center py-10 bg-white/5 rounded-2xl border border-white/10">
+                  <p className="text-slate-400 text-base">No holidays found for this year.</p>
+                </div>
+              ) : (
+                sortedHolidays.map((h, idx) => (
+                  <div key={idx} className="flex items-center space-x-4 group">
+                    {/* Calendar Icon */}
+                    <div className="w-14 h-14 rounded-lg overflow-hidden shadow-lg flex flex-col border border-white/10 group-hover:border-white/20 transition-colors shrink-0">
+                      <div className={`h-5 ${getMonthColor(idx)} flex items-center justify-center text-[9px] font-black text-white tracking-[0.1em] opacity-90`}>
+                        {getMonthName(h.date)}
+                      </div>
+                      <div className="flex-1 bg-[#1a2236] flex items-center justify-center text-xl font-bold text-white tracking-tighter">
+                        {getDayNumber(h.date)}
+                      </div>
+                    </div>
+
+                    {/* Holiday Info */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-lg font-medium text-slate-100 group-hover:text-white transition-colors mb-0.5 truncate">{h.name}</h4>
+                      <p className="text-slate-500 text-sm font-medium">{getDayName(h.date)}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <style jsx>{`
+          .custom-scrollbar-holiday::-webkit-scrollbar {
+            width: 4px;
+          }
+          .custom-scrollbar-holiday::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+          }
+          .custom-scrollbar-holiday::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+          }
+          .custom-scrollbar-holiday::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+          }
+        `}</style>
+      </div>
+    );
+  };
   const LeaveBalanceCircle = ({ balance }) => {
     const used = balance.used_days;
     const total = balance.total_days;
@@ -984,24 +1192,24 @@ const Dashboard = () => {
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
     return (
-      <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl border border-blue-200/50 hover:shadow-md transition-all duration-300">
+      <div className="text-center p-4 rounded-xl border border-gray-200/70 hover:shadow-md transition-all duration-300" style={{ background: '#F0F0F0' }}>
         <div className="relative w-24 h-24 mx-auto mb-2">
           <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="8" fill="none" />
             <circle
-              cx="50" cy="50" r="45" stroke="url(#gradient)" strokeWidth="8" fill="none"
+              cx="50" cy="50" r="45" stroke="url(#redGradient)" strokeWidth="8" fill="none"
               strokeDasharray={strokeDasharray} strokeDashoffset={strokeDashoffset} strokeLinecap="round"
             />
             <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#8b5cf6" />
+              <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#E7473C" />
+                <stop offset="100%" stopColor="#ff6b5b" />
               </linearGradient>
             </defs>
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{remaining}</div>
+              <div className="text-xl font-bold" style={{ color: '#E7473C' }}>{remaining}</div>
               <div className="text-xs text-gray-500">left</div>
             </div>
           </div>
@@ -1034,7 +1242,7 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-white drop-shadow-lg">
               Welcome, {user?.first_name}! 👋
             </h1>
-            <p className="text-blue-100 mt-1 font-medium">
+            <p className="text-gray-300 mt-1 font-medium">
               {new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -1056,8 +1264,8 @@ const Dashboard = () => {
               <div className="text-right">
                 <div className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/20 ${attendanceState.isCheckedIn
                   ? attendanceState.isWorkFromHome
-                    ? 'bg-purple-500/80 text-white'
-                    : 'bg-green-500/80 text-white'
+                    ? 'bg-orange-500/80 text-white'
+                    : 'bg-red-500/80 text-white'
                   : 'bg-white/20 text-white'
                   }`}>
                   {attendanceState.isCheckedIn
@@ -1066,7 +1274,7 @@ const Dashboard = () => {
                   }
                 </div>
                 {attendanceState.isCheckedIn && (
-                  <div className="text-blue-100 text-sm mt-1 font-medium">
+                  <div className="text-gray-200 text-sm mt-1 font-medium">
                     Working: {formatWorkingTime()}
                   </div>
                 )}
@@ -1081,7 +1289,7 @@ const Dashboard = () => {
                   hour12: true,
                 })}
               </div>
-              <div className="text-blue-100 font-medium">Current Time</div>
+              <div className="text-gray-300 font-medium">Current Time</div>
             </div>
           </div>
         </div>
@@ -1101,10 +1309,10 @@ const Dashboard = () => {
 
             {!isManagerOnly && attendanceState && (
               <QuickAccessCard title="Today's Attendance" gradient={true}>
-                <div className="bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-800 rounded-xl p-6 text-white shadow-lg border border-white/10">
+                <div className="rounded-xl p-6 text-white shadow-lg border border-white/10" style={{ background: 'linear-gradient(135deg, #2d2d2d 0%, #424242 50%, #1a1a1a 100%)' }}>
                   {/* Shift Info */}
-                  <div className="text-sm text-blue-200 mb-4 flex items-center">
-                    <span className="bg-blue-800/50 px-3 py-1 rounded-full text-xs mr-3 font-semibold backdrop-blur-sm border border-blue-600/30">SHIFT TODAY</span>
+                  <div className="text-sm text-gray-300 mb-4 flex items-center">
+                    <span className="px-3 py-1 rounded-full text-xs mr-3 font-semibold backdrop-blur-sm border border-white/20" style={{ background: 'rgba(231,71,60,0.5)' }}>SHIFT TODAY</span>
                     <span className="font-medium">
                       {new Date().toLocaleDateString('en-US', {
                         weekday: 'long',
@@ -1120,7 +1328,7 @@ const Dashboard = () => {
                       <div className="text-2xl font-bold text-white drop-shadow-md">
                         {new Date().getDate()} {new Date().toLocaleDateString('en-US', { month: 'short' })} {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
                       </div>
-                      <div className="text-blue-200 text-sm font-medium">
+                      <div className="text-gray-300 text-sm font-medium">
                         {attendanceState.isCheckedIn ? 'Working' : 'Not started'} • {attendanceState.workingHours}h / 9h
                       </div>
                     </div>
@@ -1128,7 +1336,7 @@ const Dashboard = () => {
                       <div className="text-4xl font-mono font-bold text-white drop-shadow-lg">
                         {formatWorkingTime()}
                       </div>
-                      <div className="text-blue-200 text-xs font-medium">
+                      <div className="text-gray-300 text-xs font-medium">
                         {attendanceState.checkInTime
                           ? `Started ${attendanceState.checkInTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`
                           : 'Not started'
@@ -1160,7 +1368,7 @@ const Dashboard = () => {
                         <button
                           onClick={() => (isHRManager() || wfhStatus.hasApprovedRequest) ? handleCheckIn(true) : setShowWFHPopup(true)}
                           disabled={submittingAttendance}
-                          className="flex items-center justify-center py-4 px-6 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 rounded-xl font-semibold transition-all duration-300 shadow-md text-white transform hover:scale-105"
+                          className="flex items-center justify-center py-4 px-6 bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 rounded-xl font-semibold transition-all duration-300 shadow-md text-white transform hover:scale-105"
                         >
                           <HomeIcon className="w-5 h-5 mr-2" />
                           {(isHRManager() || wfhStatus.hasApprovedRequest) ? 'Work From Home' : 'Apply WFH'}
@@ -1189,14 +1397,14 @@ const Dashboard = () => {
 
                   {/* Progress Bar for Employees */}
                   <div className="mt-4">
-                    <div className="flex justify-between text-xs text-blue-200 mb-2 font-medium">
+                    <div className="flex justify-between text-xs text-gray-300 mb-2 font-medium">
                       <span>Progress</span>
                       <span>{Math.min(Math.round((attendanceState.workingHours / 9) * 100), 100)}%</span>
                     </div>
-                    <div className="w-full bg-slate-700/50 rounded-full h-3 backdrop-blur-sm border border-slate-600/30">
+                    <div className="w-full rounded-full h-3 backdrop-blur-sm border border-white/10" style={{ background: 'rgba(240,240,240,0.15)' }}>
                       <div
-                        className="bg-gradient-to-r from-blue-400 to-purple-500 h-3 rounded-full transition-all duration-500 shadow-sm"
-                        style={{ width: `${Math.min((attendanceState.workingHours / 9) * 100, 100)}%` }}
+                        className="h-3 rounded-full transition-all duration-500 shadow-sm"
+                        style={{ width: `${Math.min((attendanceState.workingHours / 9) * 100, 100)}%`, background: 'linear-gradient(90deg, #E7473C, #ff6b5b)' }}
                       ></div>
                     </div>
                   </div>
@@ -1207,8 +1415,8 @@ const Dashboard = () => {
             {/* Attendance Statistics Card */}
             <QuickAccessCard title="📊 Attendance Statistics" gradient={true}>
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200 shadow-sm">
-                  <div className="text-xs font-bold text-blue-600 uppercase mb-1">My Performance</div>
+                <div className="p-4 rounded-xl border border-gray-200 shadow-sm" style={{ background: '#F0F0F0' }}>
+                  <div className="text-xs font-bold uppercase mb-1" style={{ color: '#E7473C' }}>My Performance</div>
                   <div className="flex justify-between items-end">
                     <div>
                       <div className="text-xl font-bold text-gray-900">{dashboardData.attendanceStats?.avgHours}</div>
@@ -1221,7 +1429,7 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-200 shadow-sm">
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-xl border border-red-200 shadow-sm">
                   <div className="text-xs font-bold text-purple-600 uppercase mb-1">Team Overview</div>
                   <div className="flex justify-between items-end">
                     <div>
@@ -1246,13 +1454,14 @@ const Dashboard = () => {
                 {isManagerOrAbove && (
                   <Link
                     to="/leave"
-                    className="group flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    className="group flex items-center justify-center p-6 rounded-xl border border-red-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    style={{ background: '#F0F0F0' }}
                   >
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg transition-all duration-300" style={{ background: 'linear-gradient(135deg, #E7473C, #ff6b5b)' }}>
                         <CalendarDaysIcon className="h-6 w-6 text-white" />
                       </div>
-                      <span className="text-sm font-semibold text-blue-900">Manage Leaves</span>
+                      <span className="text-sm font-semibold text-gray-800">Manage Leaves</span>
                     </div>
                   </Link>
                 )}
@@ -1261,13 +1470,14 @@ const Dashboard = () => {
                 <>
                   <Link
                     to="/attendance"
-                    className="group flex items-center justify-center p-6 bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 rounded-xl hover:from-green-100 hover:to-emerald-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    className="group flex items-center justify-center p-6 rounded-xl border border-gray-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    style={{ background: '#F0F0F0' }}
                   >
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg transition-all duration-300" style={{ background: 'linear-gradient(135deg, #E7473C, #ff6b5b)' }}>
                         <ClockIcon className="h-6 w-6 text-white" />
                       </div>
-                      <span className="text-sm font-semibold text-green-900">View Attendance</span>
+                      <span className="text-sm font-semibold text-gray-800">View Attendance</span>
                     </div>
                   </Link>
                 </>
@@ -1277,13 +1487,14 @@ const Dashboard = () => {
                   <>
                     <Link
                       to="/leave"
-                      className="group flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-200 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      className="group flex items-center justify-center p-6 rounded-xl border border-red-100 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      style={{ background: '#F0F0F0' }}
                     >
                       <div className="text-center">
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg transition-all duration-300" style={{ background: 'linear-gradient(135deg, #E7473C, #ff6b5b)' }}>
                           <CalendarDaysIcon className="h-6 w-6 text-white" />
                         </div>
-                        <span className="text-sm font-semibold text-blue-900">Apply Leave</span>
+                        <span className="text-sm font-semibold text-gray-800">Apply Leave</span>
                       </div>
                     </Link>
 
@@ -1293,10 +1504,22 @@ const Dashboard = () => {
             </QuickAccessCard>
 
 
-            <QuickAccessCard title="🎉 Upcoming Festivals & Celebrations" className="overflow-hidden" gradient={true}>
+            <QuickAccessCard
+              title="🎉 Upcoming Festivals & Celebrations"
+              className="overflow-hidden"
+              gradient={true}
+              headerAction={
+                <button
+                  onClick={() => setShowHolidaysModal(true)}
+                  className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors uppercase tracking-wider"
+                >
+                  View All
+                </button>
+              }
+            >
               {birthdayFestivalData.festivals.upcoming_festivals.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-20 h-20 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <div className="text-4xl">🎭</div>
                   </div>
                   <p className="text-gray-600 text-lg font-medium">No upcoming festivals</p>
@@ -1326,15 +1549,29 @@ const Dashboard = () => {
                 </div>
               )}
             </QuickAccessCard>
+
+            <HolidaysModal
+              isOpen={showHolidaysModal}
+              onClose={() => setShowHolidaysModal(false)}
+              data={allHolidays}
+            />
             {/* Enhanced Upcoming Birthdays Card */}
-            <QuickAccessCard title="🎂 Upcoming Birthdays" className="overflow-hidden" gradient={true}>
+            <QuickAccessCard title="🎂 Upcoming Birthdays" className="overflow-hidden" gradient={false}>
               {birthdayFestivalData.birthdays.upcoming_birthdays.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-20 h-20 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <div className="text-4xl">🎂</div>
                   </div>
                   <p className="text-gray-600 text-lg font-medium">No upcoming birthdays</p>
                   <p className="text-gray-400 text-sm mt-2">We'll let you know when someone's special day is coming up!</p>
+                </div>
+              ) : birthdayFestivalData.birthdays.upcoming_birthdays.length === 1 ? (
+                // SINGLE CARD - CENTER IT
+                <div className="flex justify-center">
+                  <BirthdayCard
+                    key={birthdayFestivalData.birthdays.upcoming_birthdays[0].id}
+                    birthday={birthdayFestivalData.birthdays.upcoming_birthdays[0]}
+                  />
                 </div>
               ) : (
                 <div className="relative">
@@ -1357,24 +1594,25 @@ const Dashboard = () => {
               <QuickAccessCard title="👥 Team Overview" gradient={true}>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-100 p-4 rounded-xl border border-blue-200">
-                      <div className="text-2xl font-bold text-blue-600">{dashboardData.employees?.length || 0}</div>
-                      <div className="text-sm text-blue-800 font-medium">Total Employees</div>
+                    <div className="p-4 rounded-xl border border-gray-200" style={{ background: '#F0F0F0' }}>
+                      <div className="text-2xl font-bold" style={{ color: '#E7473C' }}>{dashboardData.employees?.length || 0}</div>
+                      <div className="text-sm text-gray-800 font-medium">Total Employees</div>
                     </div>
                     <div className="bg-gradient-to-r from-yellow-50 to-orange-100 p-4 rounded-xl border border-yellow-200">
                       <div className="text-2xl font-bold text-orange-600">{dashboardData.pendingLeaves?.length || 0}</div>
                       <div className="text-sm text-orange-800 font-medium">Pending Leaves</div>
                     </div>
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-100 p-4 rounded-xl border border-green-200">
-                      <div className="text-2xl font-bold text-green-600">{dashboardData.approvedLeaves?.length || 0}</div>
-                      <div className="text-sm text-green-800 font-medium">Approved Leaves</div>
+                    <div className="p-4 rounded-xl border border-gray-200" style={{ background: '#F0F0F0' }}>
+                      <div className="text-2xl font-bold text-gray-800">{dashboardData.approvedLeaves?.length || 0}</div>
+                      <div className="text-sm text-gray-800 font-medium">Approved Leaves</div>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
                     <Link
                       to="/employees"
-                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg transform hover:scale-105"
+                      className="inline-flex items-center px-4 py-2 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg transform hover:scale-105"
+                      style={{ background: 'linear-gradient(135deg, #E7473C, #c73229)' }}
                     >
                       View Team Details →
                     </Link>
@@ -1386,14 +1624,39 @@ const Dashboard = () => {
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* Go to Workplace Card */}
+            <QuickAccessCard title="🏢 Go to Workplace" gradient={true}>
+              <div className="space-y-4">
+                <div className="p-6 rounded-xl border border-gray-200 shadow-md text-center group transition-all duration-300 hover:shadow-xl" style={{ background: '#F0F0F0' }}>
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300" style={{ background: 'linear-gradient(135deg, #E7473C, #ff6b5b)' }}>
+                    <HomeIcon className="w-8 h-8 text-white" />
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Avarta Workplace</h4>
+                  <p className="text-sm text-gray-600 mb-6 font-medium">
+                    Access your technical workspace and project management tools.
+                  </p>
+                  <a
+                    href="https://avarta.techoptima.ai/login"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center w-full px-8 py-4 text-white font-bold rounded-xl transition-all duration-300 shadow-lg transform hover:scale-[1.02] active:scale-95"
+                    style={{ background: 'linear-gradient(135deg, #E7473C, #c73229)' }}
+                  >
+                    Go to Workplace
+                    <span className="ml-2 text-xl">→</span>
+                  </a>
+                </div>
+              </div>
+            </QuickAccessCard>
+
             {/* Leave Balances - Only for Employees and HR Managers */}
             {!isManagerOnly && (
               <QuickAccessCard title="🏖️ Leave Balances" gradient={true}>
                 <div className="space-y-4">
                   {dashboardData.leaveBalances?.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CalendarDaysIcon className="w-8 h-8 text-blue-600" />
+                    <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CalendarDaysIcon className="w-8 h-8 text-gray-400" />
                       </div>
                       <p className="text-gray-500 text-sm font-medium">No leave balances available</p>
                     </div>
@@ -1407,7 +1670,8 @@ const Dashboard = () => {
                   <div className="pt-4 border-t border-gray-200">
                     <Link
                       to="/leave"
-                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg transform hover:scale-105"
+                      className="inline-flex items-center px-4 py-2 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg transform hover:scale-105"
+                      style={{ background: 'linear-gradient(135deg, #E7473C, #c73229)' }}
                     >
                       Request Leave →
                     </Link>
@@ -1430,8 +1694,8 @@ const Dashboard = () => {
                   {birthdayFestivalData.birthdays.has_birthdays_today ? (
                     <div className="space-y-3">
                       {birthdayFestivalData.birthdays.todays_birthdays.map((birthday) => (
-                        <div key={birthday.id} className="flex items-center space-x-3 p-4 bg-gradient-to-r from-pink-50 via-purple-50 to-indigo-50 border border-pink-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                          <div className="w-12 h-12 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
+                        <div key={birthday.id} className="flex items-center space-x-3 p-4 bg-gradient-to-r from-red-50 via-rose-50 to-orange-50 border border-red-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                          <div className="w-12 h-12 bg-gradient-to-r from-[#E7473C] via-rose-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                             <span className="text-white text-sm font-bold">{birthday.avatar_initials}</span>
                           </div>
                           <div className="flex-1">
@@ -1440,14 +1704,14 @@ const Dashboard = () => {
                           </div>
                           <div className="text-right">
                             <div className="text-2xl mb-1">🎂</div>
-                            <div className="text-xs bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent font-bold">{birthday.age_today} years</div>
+                            <div className="text-xs bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent font-bold">{birthday.age_today} years</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
-                      <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-gray-100 to-blue-100 flex items-center justify-center">
+                    <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200">
+                      <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
                         <CakeIcon className="w-8 h-8 text-gray-400" />
                       </div>
                       <p className="text-sm text-gray-500 font-medium">No birthdays today</p>
@@ -1493,12 +1757,12 @@ const Dashboard = () => {
             {/* Enhanced Quick Actions */}
             <QuickAccessCard title="⚡ Quick Actions" gradient={true}>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200" style={{ background: '#F0F0F0' }}>
                   <span className="text-sm font-semibold text-gray-700 flex items-center">
-                    <ClockIcon className="w-4 h-4 mr-2 text-blue-600" />
+                    <ClockIcon className="w-4 h-4 mr-2" style={{ color: '#E7473C' }} />
                     Current Time
                   </span>
-                  <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <span className="text-xl font-bold" style={{ color: '#E7473C' }}>
                     {dashboardData.currentTime.toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -1513,10 +1777,11 @@ const Dashboard = () => {
                     <>
                       <Link
                         to="/leave"
-                        className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl text-blue-700 hover:from-blue-100 hover:to-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-red-100 transition-all duration-300 shadow-sm hover:shadow-md"
+                        style={{ background: '#F0F0F0' }}
                       >
-                        <span className="text-sm font-semibold">Manage Team Leaves</span>
-                        <CalendarDaysIcon className="w-5 h-5 text-blue-600 group-hover:text-indigo-600 transition-colors duration-300" />
+                        <span className="text-sm font-semibold text-gray-700">Manage Team Leaves</span>
+                        <CalendarDaysIcon className="w-5 h-5 transition-colors duration-300" style={{ color: '#E7473C' }} />
                       </Link>
 
                       <Link
@@ -1529,10 +1794,10 @@ const Dashboard = () => {
 
                       <Link
                         to="/employees"
-                        className="group flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl text-purple-700 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 shadow-sm hover:shadow-md"
+                        className="group flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl text-red-700 hover:from-red-100 hover:to-orange-100 transition-all duration-300 shadow-sm hover:shadow-md"
                       >
                         <span className="text-sm font-semibold">Employee Management</span>
-                        <UserGroupIcon className="w-5 h-5 text-purple-600 group-hover:text-pink-600 transition-colors duration-300" />
+                        <UserGroupIcon className="w-5 h-5 text-red-600 group-hover:text-orange-600 transition-colors duration-300" />
                       </Link>
                     </>
                   ) : (
@@ -1540,18 +1805,20 @@ const Dashboard = () => {
                       {/* Employee and HR Manager Quick Actions */}
                       <Link
                         to="/attendance"
-                        className="group flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl text-gray-700 hover:from-gray-100 hover:to-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-gray-200 transition-all duration-300 shadow-sm hover:shadow-md"
+                        style={{ background: '#F0F0F0' }}
                       >
-                        <span className="text-sm font-semibold">View Attendance Records</span>
-                        <ChartBarIcon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors duration-300" />
+                        <span className="text-sm font-semibold text-gray-700">View Attendance Records</span>
+                        <ChartBarIcon className="w-5 h-5 text-gray-600 group-hover:text-gray-800 transition-colors duration-300" />
                       </Link>
 
                       <Link
                         to="/leave"
-                        className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl text-blue-700 hover:from-blue-100 hover:to-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-red-100 transition-all duration-300 shadow-sm hover:shadow-md"
+                        style={{ background: '#F0F0F0' }}
                       >
-                        <span className="text-sm font-semibold">Apply for Leave</span>
-                        <CalendarDaysIcon className="w-5 h-5 text-blue-600 group-hover:text-indigo-600 transition-colors duration-300" />
+                        <span className="text-sm font-semibold text-gray-700">Apply for Leave</span>
+                        <CalendarDaysIcon className="w-5 h-5 transition-colors duration-300" style={{ color: '#E7473C' }} />
                       </Link>
 
                       <Link
@@ -1750,7 +2017,7 @@ const Dashboard = () => {
         /* Enhanced gradient borders */
         .gradient-border {
           position: relative;
-          background: linear-gradient(45deg, #667eea, #764ba2);
+          background: linear-gradient(45deg, #e63e57ff, #764ba2);
           border-radius: 12px;
           padding: 2px;
         }
@@ -1764,7 +2031,7 @@ const Dashboard = () => {
           bottom: 0;
           border-radius: 12px;
           padding: 2px;
-          background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+          background: linear-gradient(45deg, #e63e57ff, #764ba2, #f093fb, #f5576c);
           mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           mask-composite: exclude;
         }
@@ -1778,7 +2045,7 @@ const Dashboard = () => {
 
         /* Improved button animations */
         .btn-gradient {
-          background: linear-gradient(45deg, #667eea, #764ba2);
+          background: linear-gradient(45deg, #e63e57ff, #e63e57ff);
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
@@ -1853,12 +2120,12 @@ const Dashboard = () => {
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(45deg, #667eea, #764ba2);
+          background: linear-gradient(45deg, #e63e57ff, #764ba2);
           border-radius: 10px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(45deg, #5a67d8, #6b46c1);
+          background: linear-gradient(45deg, #e63e57ff, #6b46c1);
         }
       `}</style>
     </div>

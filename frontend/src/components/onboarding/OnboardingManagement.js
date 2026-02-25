@@ -3562,8 +3562,8 @@ const OnboardingManagement = () => {
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
                   className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
-                      ? 'bg-indigo-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-indigo-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
                   {tab.label} ({tab.count})
@@ -3598,19 +3598,10 @@ const OnboardingManagement = () => {
               <h3 className="text-2xl font-bold text-gray-900 mb-2">No candidates found</h3>
               <p className="text-gray-500 mb-6 max-w-md mx-auto">
                 {employees.length === 0
-                  ? "Get started by adding your first candidate to the onboarding process."
+                  ? "No candidates have been added to the onboarding process yet."
                   : "No candidates match your current filter and search criteria."
                 }
               </p>
-              {employees.length === 0 && (
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Add First Candidate
-                </button>
-              )}
             </div>
           ) : (
             filteredEmployees.map((employee, index) => {

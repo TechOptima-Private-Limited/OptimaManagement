@@ -12,6 +12,9 @@ from .serializers import (
     UserRegistrationSerializer, UserSerializer, EmployeeRegistrationSerializer, 
     UserDetailSerializer, UserUpdateSerializer, AdminUserSerializer
 )
+from captcha.models import CaptchaStore
+from captcha.helpers import captcha_image_url
+
 from .models import User
 from utils.permissions import IsHRorAdmin, IsAdmin
 from employees.models import Employee
@@ -86,12 +89,46 @@ def employee_register(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_captcha(request):
+    """Generate a new captcha and return key and image URL"""
+    key = CaptchaStore.generate_key()
+    image_url = captcha_image_url(key)
+    # Ensure image_url is an absolute URL if possible, or just the path
+    # django-simple-captcha helpers usually return the path
+    return Response({
+        'key': key,
+        'image_url': image_url
+    })
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
     email = request.data.get('email')
     password = request.data.get('password')
+    captcha_key = request.data.get('captcha_key')
+    captcha_value = request.data.get('captcha_value')
     
+    if not captcha_key or not captcha_value:
+        return Response({
+            'error': 'Captcha is required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Verify captcha
+    try:
+        captcha = CaptchaStore.objects.get(hashkey=captcha_key)
+        if captcha.response.lower() != captcha_value.lower():
+            return Response({
+                'error': 'Invalid captcha'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        captcha.delete()  # Captcha is valid, delete it
+    except CaptchaStore.DoesNotExist:
+        return Response({
+            'error': 'Captcha expired or invalid'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
     if email and password:
         user = authenticate(username=email, password=password)
         if user:

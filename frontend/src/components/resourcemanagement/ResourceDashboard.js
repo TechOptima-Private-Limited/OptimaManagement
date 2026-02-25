@@ -227,10 +227,10 @@ const ResourceDashboard = () => {
               type="button"
               onClick={() => navigate('/resource-management/request')}
               aria-label="Create new access request"
-              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-200 group"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-lg border border-red-200 hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                <div className="bg-red-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
                   <ServerIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
@@ -238,7 +238,7 @@ const ResourceDashboard = () => {
                   <p className="text-xs text-gray-500">Request access to resources</p>
                 </div>
               </div>
-              <svg className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 text-gray-400 group-hover:text-red-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -247,10 +247,10 @@ const ResourceDashboard = () => {
               type="button"
               onClick={() => navigate('/resource-management/request?type=IT')}
               aria-label="Open IT support request"
-              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200 hover:shadow-md transition-all duration-200 group"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200 hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex items-center space-x-3">
-                <div className="bg-purple-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                <div className="bg-orange-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
                   <ExclamationTriangleIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
@@ -258,7 +258,7 @@ const ResourceDashboard = () => {
                   <p className="text-xs text-gray-500">Get technical assistance</p>
                 </div>
               </div>
-              <svg className="h-5 w-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 text-gray-400 group-hover:text-orange-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -267,10 +267,10 @@ const ResourceDashboard = () => {
               type="button"
               onClick={() => navigate('/resource-management/requests')}
               aria-label="View all access requests"
-              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md transition-all duration-200 group"
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex items-center space-x-3">
-                <div className="bg-green-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                <div className="bg-gray-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
                   <ClockIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
@@ -278,7 +278,7 @@ const ResourceDashboard = () => {
                   <p className="text-xs text-gray-500">Track request status</p>
                 </div>
               </div>
-              <svg className="h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>

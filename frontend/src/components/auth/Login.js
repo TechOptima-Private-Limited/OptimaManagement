@@ -1,26 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
+import { authAPI } from '../../services/api';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const [captcha, setCaptcha] = useState({ key: '', imageUrl: '' });
+  const [fetchingCaptcha, setFetchingCaptcha] = useState(false);
+  const { register, handleSubmit, formState: { errors }, resetField } = useForm();
+
+  const fetchCaptcha = useCallback(async () => {
+    setFetchingCaptcha(true);
+    try {
+      const response = await authAPI.getCaptcha();
+      setCaptcha({
+        key: response.data.key,
+        imageUrl: response.data.image_url.startsWith('http')
+          ? response.data.image_url
+          : `${process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'}${response.data.image_url}`
+      });
+    } catch (error) {
+      console.error('Failed to fetch captcha:', error);
+      toast.error('Failed to load security code');
+    } finally {
+      setFetchingCaptcha(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, [fetchCaptcha]);
 
   const from = location.state?.from?.pathname || '/dashboard';
 
   const onSubmit = async (data) => {
-    const result = await login(data);
+    const loginData = {
+      ...data,
+      captcha_key: captcha.key,
+      captcha_value: data.captcha
+    };
+
+    const result = await login(loginData);
     if (result.success) {
       toast.success('Welcome back!');
       navigate(from, { replace: true });
     } else {
       toast.error(result.error);
+      // Refresh captcha on failure
+      fetchCaptcha();
+      resetField('captcha');
     }
   };
 
@@ -94,6 +128,44 @@ const Login = () => {
               </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="captcha" className="block text-sm font-medium text-gray-700">
+                Security Verification
+              </label>
+              <div className="flex items-center space-x-4">
+                <div className="bg-gray-100 rounded-lg p-1 flex items-center justify-center min-w-[120px] h-[48px] overflow-hidden">
+                  {fetchingCaptcha ? (
+                    <div className="animate-pulse flex space-x-4">
+                      <div className="h-8 w-24 bg-gray-300 rounded"></div>
+                    </div>
+                  ) : (
+                    <img
+                      src={captcha.imageUrl}
+                      alt="Captcha"
+                      className="h-full object-contain mix-blend-multiply"
+                    />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={fetchCaptcha}
+                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                  title="Refresh security code"
+                >
+                  <ArrowPathIcon className={`h-6 w-6 ${fetchingCaptcha ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+              <input
+                {...register('captcha', { required: 'Security verification is required' })}
+                type="text"
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter the code shown above"
+              />
+              {errors.captcha && (
+                <p className="mt-1 text-sm text-red-600">{errors.captcha.message}</p>
               )}
             </div>
 

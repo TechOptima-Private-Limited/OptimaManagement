@@ -923,7 +923,7 @@ const UserProfile = () => {
                     <div className={`w-24 h-24 bg-gradient-to-r ${theme.avatarGradient} rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-xl border-4 border-white`}>
                       {getInitials(profile?.first_name, profile?.last_name)}
                     </div>
-                    <button className="absolute -bottom-2 -right-2 p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-colors shadow-lg">
+                    <button className="absolute -bottom-2 -right-2 p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors shadow-lg">
                       <CameraIcon className="w-4 h-4" />
                     </button>
                   </div>
@@ -950,7 +950,7 @@ const UserProfile = () => {
                         type="text"
                         value={editData.first_name}
                         onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
                       />
                     ) : (
                       <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -970,7 +970,7 @@ const UserProfile = () => {
                         type="text"
                         value={editData.last_name}
                         onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
                       />
                     ) : (
                       <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -1002,7 +1002,7 @@ const UserProfile = () => {
                         type="tel"
                         value={editData.phone_number}
                         onChange={(e) => setEditData({ ...editData, phone_number: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
                         placeholder="Enter phone number"
                       />
                     ) : (
@@ -1023,7 +1023,7 @@ const UserProfile = () => {
                         type="date"
                         value={editData.date_of_birth}
                         onChange={(e) => setEditData({ ...editData, date_of_birth: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
                       />
                     ) : (
                       <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -1043,7 +1043,7 @@ const UserProfile = () => {
                         type="tel"
                         value={editData.emergency_contact}
                         onChange={(e) => setEditData({ ...editData, emergency_contact: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
                         placeholder="Enter emergency contact"
                       />
                     ) : (
@@ -1064,7 +1064,7 @@ const UserProfile = () => {
                         value={editData.address}
                         onChange={(e) => setEditData({ ...editData, address: e.target.value })}
                         rows="3"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
                         placeholder="Enter your address"
                       />
                     ) : (
@@ -1165,7 +1165,7 @@ const UserProfile = () => {
                                     href={doc.url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                   >
                                     View
                                   </a>
@@ -1237,9 +1237,9 @@ const UserProfile = () => {
                   managers.length > 0 ? (
                     <div className="space-y-4 max-h-96 overflow-y-auto">
                       {managers.map((managerItem) => (
-                        <div key={managerItem.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-300">
+                        <div key={managerItem.id} className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-100 hover:shadow-md transition-all duration-300">
                           <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                            <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-rose-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
                               {getInitials(managerItem.user_info?.first_name, managerItem.user_info?.last_name)}
                             </div>
                             <div className="flex-1">
@@ -1252,7 +1252,7 @@ const UserProfile = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                               {managerItem.team_count} team{managerItem.team_count !== 1 ? 's' : ''}
                             </span>
                           </div>
@@ -1271,8 +1271,8 @@ const UserProfile = () => {
                   team.length > 0 ? (
                     <div className="space-y-4">
                       {team.map((member) => (
-                        <div key={member.id} className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-300">
-                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                        <div key={member.id} className="flex items-center space-x-4 p-4 bg-red-50 rounded-lg border border-red-100 hover:shadow-md transition-all duration-300">
+                          <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-rose-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
                             {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
                           </div>
                           <div className="flex-1">
@@ -1306,13 +1306,13 @@ const UserProfile = () => {
                   <span className="text-gray-600">
                     {isHRManager ? 'Total Managers' : 'Team Size'}
                   </span>
-                  <span className="font-bold text-blue-600">
+                  <span className="font-bold text-red-600">
                     {isHRManager ? managers.length : team.length}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Department</span>
-                  <span className="font-bold text-green-600">{employee?.department?.name || 'N/A'}</span>
+                  <span className="font-bold text-gray-700">{employee?.department?.name || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Status</span>
@@ -1323,7 +1323,7 @@ const UserProfile = () => {
                 {isHRManager && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Total Team Members</span>
-                    <span className="font-bold text-purple-600">
+                    <span className="font-bold text-rose-600">
                       {managers.reduce((total, manager) => total + manager.team_count, 0)}
                     </span>
                   </div>
