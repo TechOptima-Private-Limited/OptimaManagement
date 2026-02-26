@@ -1823,3 +1823,31 @@ def fix_all_balances(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def on_leave_today(request):
+    """Get employees who are on approved leave today"""
+    today = timezone.now().date()
+    
+    # Filter for approved leave requests that cover today
+    leave_requests = LeaveRequest.objects.filter(
+        status='APPROVED',
+        start_date__lte=today,
+        end_date__gte=today
+    ).select_related('employee', 'employee__user', 'leave_type')
+    
+    results = []
+    for lr in leave_requests:
+        emp = lr.employee
+        user = emp.user
+        results.append({
+            'employee_id': emp.id,
+            'employee_name': f"{user.first_name} {user.last_name}",
+            'leave_type': lr.leave_type.name,
+            'start_date': lr.start_date,
+            'end_date': lr.end_date,
+            'initials': f"{user.first_name[0]}{user.last_name[0]}" if user.first_name and user.last_name else ""
+        })
+    
+    return Response(results)
+

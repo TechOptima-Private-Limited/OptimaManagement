@@ -702,7 +702,8 @@ export const workFromHomeAPI = {
     return api.get('/attendance/wfh/requests/', { params });
   },
   approveWFHRequest: (requestId, data) =>
-    api.post(`/attendance/wfh/requests/${requestId}/approve/`, data)
+    api.post(`/attendance/wfh/requests/${requestId}/approve/`, data),
+  getWFHToday: () => api.get('/attendance/wfh-today/'),
 };
 
 // Leave Management API
@@ -751,6 +752,7 @@ export const leaveAPI = {
   getLeaveAnalytics: () => api.get('/leave/analytics/'),
   initializeYearlyBalances: (data) => api.post('/leave/initialize-balances/', data),
   initializeMyBalances: (data) => api.post('/leave/balances/initialize/', data),
+  getOnLeaveToday: () => api.get('/leave/on-leave-today/'),
 };
 
 // Notification API - NEW (if you want to add notifications later)

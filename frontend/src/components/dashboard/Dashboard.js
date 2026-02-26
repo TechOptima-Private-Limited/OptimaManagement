@@ -139,6 +139,8 @@ const Dashboard = () => {
     recentActivity: [],
     attendanceStats: null,
     currentTime: new Date(),
+    onLeaveToday: [],
+    wfhToday: [],
     loading: true
   });
 
@@ -356,43 +358,59 @@ const Dashboard = () => {
       if (isManagerOrAbove) {
         // For managers and HR: fetch team data (page_size: 1000 for stats)
         promises.push(
-          employeeAPI.getEmployees({ limit: 10 }),
-          leaveAPI.getLeaveRequests({ status: 'PENDING', limit: 10 }),
-          leaveAPI.getLeaveRequests({ status: 'APPROVED', limit: 10 }),
-          attendanceAPI.getAttendanceRecords({ start_date: startOfMonth, page_size: 1000 })
+          employeeAPI.getEmployees({ limit: 10 }),                       // [0]
+          leaveAPI.getLeaveRequests({ status: 'PENDING', limit: 10 }),    // [1]
+          leaveAPI.getLeaveRequests({ status: 'APPROVED', limit: 10 }),   // [2]
+          attendanceAPI.getAttendanceRecords({ start_date: startOfMonth, page_size: 1000 }), // [3]
+          leaveAPI.getOnLeaveToday(),                                   // [4]
+          workFromHomeAPI.getWFHToday()                                 // [5]
         );
       } else {
         // For employees: fetch personal data
         promises.push(
-          leaveAPI.getLeaveSummary(),
-          attendanceAPI.getAttendanceRecords({ limit: 7 }),
-          leaveAPI.getLeaveRequests({ limit: 5 }),
-          attendanceAPI.getAttendanceRecords({ start_date: startOfMonth, page_size: 100 })
+          leaveAPI.getLeaveSummary(),                                   // [0]
+          attendanceAPI.getAttendanceRecords({ limit: 7 }),              // [1]
+          leaveAPI.getLeaveRequests({ limit: 5 }),                      // [2]
+          attendanceAPI.getAttendanceRecords({ start_date: startOfMonth, page_size: 100 }), // [3]
+          leaveAPI.getOnLeaveToday(),                                   // [4]
+          workFromHomeAPI.getWFHToday()                                 // [5]
         );
       }
 
       const results = await Promise.all(promises);
 
+      // Process attendance records for stats
+      const allAttendance = results[3]?.data?.results || results[3]?.data || [];
+      const stats = calculateAttendanceStats(allAttendance, user?.employee_id || user?.employee_pk || user?.id);
+
+      // Mandatory Leave/WFH today data for both paths
+      const onLeaveTodayData = results[4]?.data || [];
+      const wfhTodayData = results[5]?.data || [];
+
       if (isManagerOrAbove) {
-        const allAttendance = results[3]?.data?.results || results[3]?.data || [];
-        setDashboardData({
+        setDashboardData(prev => ({
+          ...prev,
           employees: results[0]?.data?.results || results[0]?.data || [],
           pendingLeaves: results[1]?.data?.results || results[1]?.data || [],
           approvedLeaves: results[2]?.data?.results || results[2]?.data || [],
-          attendanceStats: calculateAttendanceStats(allAttendance, user?.employee_id || user?.employee_pk || user?.id),
+          attendanceStats: stats,
+          onLeaveToday: onLeaveTodayData,
+          wfhToday: wfhTodayData,
           currentTime: new Date(),
           loading: false
-        });
+        }));
       } else {
-        const allAttendance = results[3]?.data?.results || results[3]?.data || [];
-        setDashboardData({
+        setDashboardData(prev => ({
+          ...prev,
           leaveBalances: results[0].data.leave_balances || [],
           leaveSummary: results[0].data,
           recentActivity: results[1]?.data?.results || results[1]?.data || [],
-          attendanceStats: calculateAttendanceStats(allAttendance, user?.employee_id || user?.employee_pk || user?.id),
+          attendanceStats: stats,
+          onLeaveToday: onLeaveTodayData,
+          wfhToday: wfhTodayData,
           currentTime: new Date(),
           loading: false
-        });
+        }));
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -1302,6 +1320,66 @@ const Dashboard = () => {
 
         {/* Festival Banner */}
         <FestivalBanner />
+
+
+        {/* On Leave and WFH Sections */}
+        {isManagerOrAbove && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <QuickAccessCard title="Who's on Leave Today" gradient={true}>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar-holiday">
+                {(dashboardData.onLeaveToday?.length || 0) > 0 ? (
+                  dashboardData.onLeaveToday.map((leave, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-white/40 hover:bg-white/80 transition-all duration-300">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-rose-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white/50">
+                          {leave.initials}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{leave.employee_name}</p>
+                          <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider">{leave.leave_type}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">ON LEAVE</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 italic text-sm">
+                    No one is on leave today
+                  </div>
+                )}
+              </div>
+            </QuickAccessCard>
+
+            <QuickAccessCard title="Who's Working From Home Today" gradient={true}>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar-holiday">
+                {(dashboardData.wfhToday?.length || 0) > 0 ? (
+                  dashboardData.wfhToday.map((wfh, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-white/40 hover:bg-white/80 transition-all duration-300">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white/50">
+                          {wfh.initials}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{wfh.employee_name}</p>
+                          <p className="text-[11px] text-gray-500 font-medium tracking-tight">Working Remote</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2 py-0.5 bg-orange-100 text-orange-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">WFH</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 italic text-sm">
+                    No one is working from home today
+                  </div>
+                )}
+              </div>
+            </QuickAccessCard>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
