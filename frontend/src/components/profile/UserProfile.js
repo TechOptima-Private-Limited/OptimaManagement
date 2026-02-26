@@ -664,7 +664,11 @@ const UserProfile = () => {
           phone_number: profileData.profile?.phone_number || '',
           address: profileData.profile?.address || '',
           date_of_birth: profileData.profile?.date_of_birth || '',
-          emergency_contact: profileData.profile?.emergency_contact || ''
+          emergency_contact: profileData.profile?.emergency_contact || '',
+          gender: profileData.profile?.gender || '',
+          blood_group: profileData.profile?.blood_group || '',
+          aadhaar_number: profileData.profile?.aadhaar_number || '',
+          pan_number: profileData.profile?.pan_number || '',
         });
 
         // Check user role and fetch appropriate data
@@ -816,7 +820,11 @@ const UserProfile = () => {
       phone_number: profile?.profile?.phone_number || '',
       address: profile?.profile?.address || '',
       date_of_birth: profile?.profile?.date_of_birth || '',
-      emergency_contact: profile?.profile?.emergency_contact || ''
+      emergency_contact: profile?.profile?.emergency_contact || '',
+      gender: profile?.profile?.gender || '',
+      blood_group: profile?.profile?.blood_group || '',
+      aadhaar_number: profile?.profile?.aadhaar_number || '',
+      pan_number: profile?.profile?.pan_number || '',
     });
   };
 
@@ -1073,6 +1081,116 @@ const UserProfile = () => {
                         <span className="text-gray-900">{profile?.profile?.address || 'Not specified'}</span>
                       </div>
                     )}
+                  </div>
+
+                  {/* Gender */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Gender
+                    </label>
+                    {editMode ? (
+                      <select
+                        value={editData.gender}
+                        onChange={(e) => setEditData({ ...editData, gender: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 bg-white"
+                      >
+                        <option value="">Select gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="OTHER">Other</option>
+                        <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                      </select>
+                    ) : (
+                      <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <UserIcon className="w-5 h-5 text-gray-400 mr-3" />
+                        <span className="text-gray-900">
+                          {profile?.profile?.gender
+                            ? { MALE: 'Male', FEMALE: 'Female', OTHER: 'Other', PREFER_NOT_TO_SAY: 'Prefer not to say' }[profile.profile.gender] || profile.profile.gender
+                            : 'Not specified'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Blood Group */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Blood Group
+                    </label>
+                    {editMode ? (
+                      <select
+                        value={editData.blood_group}
+                        onChange={(e) => setEditData({ ...editData, blood_group: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 bg-white"
+                      >
+                        <option value="">Select blood group</option>
+                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => (
+                          <option key={bg} value={bg}>{bg}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-3" />
+                        <span className="text-gray-900">{profile?.profile?.blood_group || 'Not specified'}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Aadhaar Number */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Aadhaar Number
+                    </label>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        value={editData.aadhaar_number}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 12);
+                          setEditData({ ...editData, aadhaar_number: val });
+                        }}
+                        maxLength={12}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
+                        placeholder="Enter 12-digit Aadhaar number"
+                      />
+                    ) : (
+                      <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-3" />
+                        <span className="text-gray-900 font-mono">
+                          {profile?.profile?.aadhaar_number
+                            ? `****-****-${String(profile.profile.aadhaar_number).slice(-4)}`
+                            : 'Not specified'}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">Stored securely — encrypted at rest</p>
+                  </div>
+
+                  {/* PAN Number */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      PAN Number
+                    </label>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        value={editData.pan_number}
+                        onChange={(e) => setEditData({ ...editData, pan_number: e.target.value.toUpperCase().slice(0, 10) })}
+                        maxLength={10}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
+                        placeholder="E.g. ABCDE1234F"
+                      />
+                    ) : (
+                      <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-3" />
+                        <span className="text-gray-900 font-mono">
+                          {profile?.profile?.pan_number
+                            ? `${String(profile.profile.pan_number).slice(0, 5)}*****`
+                            : 'Not specified'}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">Stored securely — encrypted at rest</p>
                   </div>
                 </div>
               </div>

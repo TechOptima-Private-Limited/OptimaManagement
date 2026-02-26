@@ -327,10 +327,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     emergency_contact = serializers.SerializerMethodField()
+    aadhaar_number = serializers.SerializerMethodField()
+    pan_number = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
-        fields = ['role', 'phone_number', 'address', 'date_of_birth', 'emergency_contact']
+        fields = [
+            'role', 'phone_number', 'address', 'date_of_birth',
+            'emergency_contact', 'gender', 'blood_group',
+            'aadhaar_number', 'pan_number',
+        ]
 
     def get_phone_number(self, obj):
         return obj.get_decrypted_phone()
@@ -341,25 +347,42 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_emergency_contact(self, obj):
         return obj.get_decrypted_emergency_contact()
 
+    def get_aadhaar_number(self, obj):
+        return obj.get_decrypted_aadhaar()
+
+    def get_pan_number(self, obj):
+        return obj.get_decrypted_pan()
+
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=False, allow_blank=True)
     address = serializers.CharField(required=False, allow_blank=True)
     emergency_contact = serializers.CharField(required=False, allow_blank=True)
+    aadhaar_number = serializers.CharField(required=False, allow_blank=True)
+    pan_number = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = UserProfile
-        fields = ['role', 'phone_number', 'address', 'date_of_birth', 'emergency_contact']
+        fields = [
+            'role', 'phone_number', 'address', 'date_of_birth',
+            'emergency_contact', 'gender', 'blood_group',
+            'aadhaar_number', 'pan_number',
+        ]
 
     def update(self, instance, validated_data):
         from utils.encryption import encryption_util
 
-        # 🔥 ROLE MUST BE UPDATED EXPLICITLY
         if 'role' in validated_data:
             instance.role = validated_data['role']
 
         if 'date_of_birth' in validated_data:
             instance.date_of_birth = validated_data['date_of_birth']
+
+        if 'gender' in validated_data:
+            instance.gender = validated_data['gender']
+
+        if 'blood_group' in validated_data:
+            instance.blood_group = validated_data['blood_group']
 
         if 'phone_number' in validated_data:
             value = validated_data['phone_number']
@@ -379,6 +402,18 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
                 encryption_util.encrypt(value.strip()) if value.strip() else ''
             )
 
+        if 'aadhaar_number' in validated_data:
+            value = validated_data['aadhaar_number']
+            instance.aadhaar_number = (
+                encryption_util.encrypt(value.strip()) if value.strip() else ''
+            )
+
+        if 'pan_number' in validated_data:
+            value = validated_data['pan_number']
+            instance.pan_number = (
+                encryption_util.encrypt(value.strip()) if value.strip() else ''
+            )
+
         instance.save()
         return instance
 
@@ -387,10 +422,16 @@ class UserProfileReadSerializer(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     emergency_contact = serializers.SerializerMethodField()
+    aadhaar_number = serializers.SerializerMethodField()
+    pan_number = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
-        fields = ['role', 'phone_number', 'address', 'date_of_birth', 'emergency_contact']
+        fields = [
+            'role', 'phone_number', 'address', 'date_of_birth',
+            'emergency_contact', 'gender', 'blood_group',
+            'aadhaar_number', 'pan_number',
+        ]
 
     def get_phone_number(self, obj):
         return obj.get_decrypted_phone()
@@ -400,6 +441,12 @@ class UserProfileReadSerializer(serializers.ModelSerializer):
 
     def get_emergency_contact(self, obj):
         return obj.get_decrypted_emergency_contact()
+
+    def get_aadhaar_number(self, obj):
+        return obj.get_decrypted_aadhaar()
+
+    def get_pan_number(self, obj):
+        return obj.get_decrypted_pan()
 
 
 # =====================================================
@@ -455,16 +502,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         if profile_data:
-            UserProfileUpdateSerializer(
+            profile_serializer = UserProfileUpdateSerializer(
                 instance.profile,
                 data=profile_data,
                 partial=True
-            ).is_valid(raise_exception=True)
-            UserProfileUpdateSerializer(
-                instance.profile,
-                data=profile_data,
-                partial=True
-            ).save()
+            )
+            profile_serializer.is_valid(raise_exception=True)
+            profile_serializer.save()
 
         return instance
 

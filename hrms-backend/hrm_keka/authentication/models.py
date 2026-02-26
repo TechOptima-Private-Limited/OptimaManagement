@@ -96,12 +96,35 @@ class UserProfile(models.Model):
         ('OTHERS', 'Others'),
     ]
     
+    GENDER_CHOICES = [
+        ('MALE', 'Male'),
+        ('FEMALE', 'Female'),
+        ('OTHER', 'Other'),
+        ('PREFER_NOT_TO_SAY', 'Prefer not to say'),
+    ]
+
+    BLOOD_GROUP_CHOICES = [
+        ('A+', 'A+'),
+        ('A-', 'A-'),
+        ('B+', 'B+'),
+        ('B-', 'B-'),
+        ('AB+', 'AB+'),
+        ('AB-', 'AB-'),
+        ('O+', 'O+'),
+        ('O-', 'O-'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='INTERN')
     phone_number = models.CharField(max_length=256, blank=True)
     address = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     emergency_contact = models.CharField(max_length=256, blank=True)
+    # New personal details
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, blank=True)
+    blood_group = models.CharField(max_length=5, choices=BLOOD_GROUP_CHOICES, blank=True)
+    aadhaar_number = models.CharField(max_length=512, blank=True)  # encrypted
+    pan_number = models.CharField(max_length=512, blank=True)      # encrypted
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -113,6 +136,10 @@ class UserProfile(models.Model):
             self.address = encryption_util.encrypt(self.address)
         if self.emergency_contact and not self._is_encrypted(self.emergency_contact):
             self.emergency_contact = encryption_util.encrypt(self.emergency_contact)
+        if self.aadhaar_number and not self._is_encrypted(self.aadhaar_number):
+            self.aadhaar_number = encryption_util.encrypt(self.aadhaar_number)
+        if self.pan_number and not self._is_encrypted(self.pan_number):
+            self.pan_number = encryption_util.encrypt(self.pan_number)
         super().save(*args, **kwargs)
 
     def _is_encrypted(self, value):
@@ -130,3 +157,9 @@ class UserProfile(models.Model):
 
     def get_decrypted_emergency_contact(self):
         return encryption_util.decrypt(self.emergency_contact) if self.emergency_contact else ''
+
+    def get_decrypted_aadhaar(self):
+        return encryption_util.decrypt(self.aadhaar_number) if self.aadhaar_number else ''
+
+    def get_decrypted_pan(self):
+        return encryption_util.decrypt(self.pan_number) if self.pan_number else ''

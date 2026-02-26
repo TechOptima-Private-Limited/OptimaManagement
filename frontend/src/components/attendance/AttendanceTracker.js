@@ -1594,14 +1594,15 @@ const AttendanceTracker = () => {
     onTimePercent: 0
   });
   // Default date ranges: Start of current month to today
-  const getFirstDayOfMonth = () => {
+  const getLast30Days = () => {
     const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    now.setDate(now.getDate() - 30);
+    return now.toISOString().split('T')[0];
   };
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
   const [filters, setFilters] = useState({
-    start_date: getFirstDayOfMonth(),
+    start_date: getLast30Days(),
     end_date: getTodayDate(),
     status: '',
     employee_id: ''
@@ -1945,7 +1946,7 @@ const AttendanceTracker = () => {
 
   const clearFilters = () => {
     setFilters({
-      start_date: getFirstDayOfMonth(),
+      start_date: getLast30Days(),
       end_date: getTodayDate(),
       status: '',
       employee_id: ''
