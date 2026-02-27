@@ -317,6 +317,65 @@ class OnboardingLink(models.Model):
         verbose_name = 'Onboarding Link'
         verbose_name_plural = '3. Onboarding Links'
 
+
+class Candidate(models.Model):
+    """
+    Stores candidate/applicant information extracted from uploaded resume PDFs.
+
+    The PDF file is saved on local disk under MEDIA_ROOT/cvs/ and only
+    the relative path is stored in cv_file (Django FileField pattern).
+    All other fields are either auto-extracted from the PDF or filled
+    manually by HR staff via the admin panel.
+    """
+
+    # Auto-extracted from PDF
+    full_name = models.CharField(max_length=200, blank=True, verbose_name='Full Name')
+    first_name = models.CharField(max_length=100, blank=True, verbose_name='First Name')
+    last_name = models.CharField(max_length=100, blank=True, verbose_name='Last Name')
+    email = models.EmailField(blank=True, verbose_name='Email')
+    mobile = models.CharField(max_length=20, blank=True, verbose_name='Mobile')
+    exp_years = models.PositiveIntegerField(default=0, verbose_name='Experience (Years)')
+    tech_stack = models.TextField(
+        blank=True,
+        verbose_name='Tech Stack',
+        help_text='Comma-separated list of technical skills',
+    )
+    location = models.CharField(max_length=200, blank=True, verbose_name='Current Location')
+    preferred_location = models.CharField(
+        max_length=200, blank=True, verbose_name='Preferred Location'
+    )
+    experience = models.TextField(blank=True, verbose_name='Professional Summary')
+
+    # Resume file — stored under MEDIA_ROOT/cvs/, DB holds only the relative path
+    cv_file = models.FileField(
+        upload_to='cvs/',
+        blank=True,
+        null=True,
+        verbose_name='Resume (CV)',
+        help_text='PDF file stored locally; only the file path is saved in the database.',
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Uploaded At')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Last Updated')
+
+    class Meta:
+        verbose_name = 'Candidate Resume'
+        verbose_name_plural = '4. Resume Management'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.full_name or f'Candidate #{self.pk}'
+
+    @property
+    def cv_filename(self):
+        """Returns the base filename of the uploaded CV."""
+        if self.cv_file:
+            import os
+            return os.path.basename(self.cv_file.name)
+        return None
+
+
 # class DeletedEmployees(models.Model):
 #     # No fields needed - just a placeholder for admin
     

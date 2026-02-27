@@ -1871,3 +1871,112 @@ admin.site.register(OnboardingLink, OnboardingLinkAdmin)
 admin.site.site_header = "Techoptima HR Management"
 admin.site.site_title = "HR Admin"
 admin.site.index_title = "Welcome to HR Management Portal"
+
+
+# ============================================================================
+# RESUME MANAGEMENT (Candidate)
+# ============================================================================
+
+from .models import Candidate
+
+
+class CandidateAdmin(admin.ModelAdmin):
+    """
+    Admin for managing candidate resumes.
+
+    HR staff add candidates via the standard Django admin Add/Edit form.
+    The uploaded PDF is saved to local disk (MEDIA_ROOT/cvs/); only the
+    relative file path is stored in the database via Django's FileField.
+    """
+
+    # ---------- List view ----------
+    list_display = [
+        'full_name', 'email', 'mobile', 'exp_years_badge',
+        'tech_stack_short', 'location', 'cv_view_download_link', 'created_at',
+    ]
+    list_filter = ['exp_years', 'created_at']
+    search_fields = ['full_name', 'first_name', 'last_name', 'email', 'tech_stack', 'location']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+
+    # ---------- Detail / Edit view ----------
+    readonly_fields = ['created_at', 'updated_at', 'cv_view_download_link_detail']
+
+    fieldsets = (
+        ('Candidate Information', {
+            'fields': (
+                ('full_name', 'first_name', 'last_name'),
+                ('email', 'mobile'),
+                ('exp_years', 'tech_stack'),
+                ('location', 'preferred_location'),
+                'experience',
+            ),
+        }),
+        ('Resume / CV', {
+            'fields': ('cv_file', 'cv_view_download_link_detail'),
+            'description': (
+                'Upload the candidate\'s resume (PDF). '
+                'The file is saved on local disk (MEDIA_ROOT/cvs/); '
+                'only the file path is stored in the database.'
+            ),
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    # ---------- List-view column helpers ----------
+
+    def exp_years_badge(self, obj):
+        color = '#28a745' if obj.exp_years >= 3 else '#ffc107'
+        return format_html(
+            '<span style="background:{}; color:white; padding:2px 8px; '
+            'border-radius:12px; font-weight:bold;">{} yrs</span>',
+            color, obj.exp_years,
+        )
+    exp_years_badge.short_description = 'Experience'
+    exp_years_badge.admin_order_field = 'exp_years'
+
+    def tech_stack_short(self, obj):
+        ts = obj.tech_stack or ''
+        return ts[:60] + ('…' if len(ts) > 60 else '')
+    tech_stack_short.short_description = 'Tech Stack'
+
+    def cv_view_download_link(self, obj):
+        """View + Download buttons shown in the changelist."""
+        if obj.cv_file:
+            return format_html(
+                '<a href="{url}" target="_blank" '
+                'style="color:#007bff; font-weight:600; margin-right:8px;">👁 View</a>'
+                '<a href="{url}" download '
+                'style="color:#28a745; font-weight:600;">⬇ Download</a>',
+                url=obj.cv_file.url,
+            )
+        return format_html('<span style="color:#6c757d; font-style:italic;">No file</span>')
+    cv_view_download_link.short_description = 'CV'
+
+    # ---------- Detail-view helper (readonly field) ----------
+
+    def cv_view_download_link_detail(self, obj):
+        """View + Download links shown in the Add/Edit form."""
+        if obj.cv_file:
+            return format_html(
+                '<a href="{url}" target="_blank" '
+                'style="color:#007bff; font-size:14px; font-weight:600; margin-right:16px;">'
+                '👁 View CV</a>'
+                '<a href="{url}" download '
+                'style="color:#28a745; font-size:14px; font-weight:600;">'
+                '⬇ Download CV</a>'
+                '<br><small style="color:#6c757d; margin-top:4px; display:block;">'
+                'Stored at: <code>{path}</code></small>',
+                url=obj.cv_file.url,
+                path=obj.cv_file.name,
+            )
+        return format_html(
+            '<span style="color:#6c757d; font-style:italic;">No CV uploaded yet.</span>'
+        )
+    cv_view_download_link_detail.short_description = 'View / Download'
+
+
+admin.site.register(Candidate, CandidateAdmin)
