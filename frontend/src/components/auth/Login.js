@@ -19,11 +19,12 @@ const Login = () => {
     setFetchingCaptcha(true);
     try {
       const response = await authAPI.getCaptcha();
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api').replace(/\/api$/, '');
       setCaptcha({
         key: response.data.key,
         imageUrl: response.data.image_url.startsWith('http')
           ? response.data.image_url
-          : `${process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'}${response.data.image_url}`
+          : `${apiBase}${response.data.image_url}`
       });
     } catch (error) {
       console.error('Failed to fetch captcha:', error);

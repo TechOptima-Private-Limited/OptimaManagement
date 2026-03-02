@@ -28,7 +28,7 @@ const OnboardingLinkGenerator = () => {
       const encoded = btoa(data);
 
       // Get the current origin or use a default
-      const baseUrl = window.location.origin || 'http://localhost:3000';
+      const baseUrl = window.location.origin || 'http://localhost:3002';
       const link = `${baseUrl}/onboarding/form/${encoded}`;
 
       const createdDate = new Date(timestamp * 1000);
@@ -155,8 +155,8 @@ const OnboardingLinkGenerator = () => {
                 onClick={generateNewLink}
                 disabled={isGenerating}
                 className={`inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform ${isGenerating
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-105 hover:shadow-indigo-500/25'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-105 hover:shadow-indigo-500/25'
                   } text-white`}
               >
                 {isGenerating ? (
@@ -243,8 +243,8 @@ const OnboardingLinkGenerator = () => {
                     <button
                       onClick={copyToClipboard}
                       className={`inline-flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${copyStatus === 'success'
-                          ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white'
-                          : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
+                        ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white'
+                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
                         } shadow-lg`}
                     >
                       {copyStatus === 'success' ? (

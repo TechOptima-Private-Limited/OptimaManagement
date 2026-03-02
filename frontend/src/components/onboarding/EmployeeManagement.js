@@ -43,7 +43,8 @@ const EmployeeManagement = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      let url = 'http://127.0.0.1:8000/api/onboarding/employees/';
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      let url = `${apiBase}/onboarding/employees/`;
 
       // Add filter parameters based on filter type
       if (filter === 'active') {
@@ -76,7 +77,8 @@ const EmployeeManagement = () => {
 
   const softDeleteEmployee = async (employeeId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/soft_delete/`, {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const response = await fetch(`${apiBase}/onboarding/employees/${employeeId}/soft_delete/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -100,7 +102,8 @@ const EmployeeManagement = () => {
 
   const restoreEmployee = async (employeeId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/restore/`, {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const response = await fetch(`${apiBase}/onboarding/employees/${employeeId}/restore/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -317,8 +320,8 @@ const EmployeeManagement = () => {
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
                   className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
-                      ? 'bg-indigo-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-indigo-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
                   {tab.label} ({tab.count})

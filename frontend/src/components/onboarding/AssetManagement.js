@@ -128,7 +128,7 @@ const AssetManagement = () => {
       setExportingExcel(true);
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch('http://127.0.0.1:8000/api/assets/export/excel/', {
+      const response = await fetch('http://127.0.0.1:8080/api/assets/export/excel/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -756,7 +756,7 @@ const AssetManagement = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/employees/', {
+      const response = await fetch('http://127.0.0.1:8080/api/employees/', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json',
@@ -1098,7 +1098,7 @@ const AssetManagement = () => {
   const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    const baseUrl = 'http://127.0.0.1:8000';
+    const baseUrl = 'http://127.0.0.1:8080';
     return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
   };
 

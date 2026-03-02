@@ -281,7 +281,8 @@ const Dashboard = () => {
 
   const fetchBirthdayFestivalData = async () => {
     try {
-      const apiUrl = 'http://127.0.0.1:8000/api/employees/birthday-festival/';
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const apiUrl = `${apiBase}/employees/birthday-festival/`;
       console.log('🔍 Calling API:', apiUrl);
 
       const response = await fetch(apiUrl, {

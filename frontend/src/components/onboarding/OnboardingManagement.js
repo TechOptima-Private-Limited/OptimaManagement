@@ -55,7 +55,7 @@
 // //     try {
 // //       setLoading(true);
 // //       const queryParams = filter !== 'all' ? `?status=${filter}` : '';
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${queryParams}`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${queryParams}`, {
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 // //           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@
 
 // //   const createEmployee = async () => {
 // //     try {
-// //       const response = await fetch('http://127.0.0.1:8000/api/onboarding/employees/', {
+// //       const response = await fetch('http://127.0.0.1:8080/api/onboarding/employees/', {
 // //         method: 'POST',
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -155,7 +155,7 @@
 // //         }
 // //       });
 
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${uploadingEmployee.id}/upload_documents/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${uploadingEmployee.id}/upload_documents/`, {
 // //         method: 'POST',
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -192,7 +192,7 @@
 
 // //   const fetchDocumentsList = async (employeeId) => {
 // //     try {
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/list_documents/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/list_documents/`, {
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 // //           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@
 // //   };
 
 // //   const downloadDocument = (employeeId, docType, fileName) => {
-// //     const url = `http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/download_document/?doc_type=${encodeURIComponent(docType)}`;
+// //     const url = `http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/download_document/?doc_type=${encodeURIComponent(docType)}`;
 
 // //     // Create a temporary link and click it to download
 // //     const link = document.createElement('a');
@@ -225,13 +225,13 @@
 // //   };
 
 // //   const viewDocument = (employeeId, docType) => {
-// //     const url = `http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/view_document/?doc_type=${encodeURIComponent(docType)}`;
+// //     const url = `http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/view_document/?doc_type=${encodeURIComponent(docType)}`;
 // //     window.open(url, '_blank');
 // //   };
 
 // //   const fetchDocumentStatus = async (employeeId) => {
 // //     try {
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/documents_status/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/documents_status/`, {
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 // //           'Content-Type': 'application/json',
@@ -255,7 +255,7 @@
 // //     if (!editingEmployee) return;
 
 // //     try {
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${editingEmployee.id}/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${editingEmployee.id}/`, {
 // //         method: 'PUT',
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -283,7 +283,7 @@
 // //     if (!deletingEmployee) return;
 
 // //     try {
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${deletingEmployee.id}/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${deletingEmployee.id}/`, {
 // //         method: 'DELETE',
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -306,7 +306,7 @@
 
 // //   const updateEmployeeStatus = async (employeeId, status) => {
 // //     try {
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/update_status/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/update_status/`, {
 // //         method: 'POST',
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -330,7 +330,7 @@
 // //   // New function to check if employee has all documents uploaded
 // //   const checkDocumentCompletionStatus = async (employeeId) => {
 // //     try {
-// //       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/documents_status/`, {
+// //       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/documents_status/`, {
 // //         headers: {
 // //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 // //           'Content-Type': 'application/json',
@@ -1463,7 +1463,7 @@
 //     try {
 //       setLoading(true);
 //       const queryParams = filter !== 'all' ? `?status=${filter}` : '';
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${queryParams}`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${queryParams}`, {
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 //           'Content-Type': 'application/json',
@@ -1518,7 +1518,7 @@
 
 //   const createEmployee = async () => {
 //     try {
-//       const response = await fetch('http://127.0.0.1:8000/api/onboarding/employees/', {
+//       const response = await fetch('http://127.0.0.1:8080/api/onboarding/employees/', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -1563,7 +1563,7 @@
 //         }
 //       });
 
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${uploadingEmployee.id}/upload_documents/`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${uploadingEmployee.id}/upload_documents/`, {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -1597,7 +1597,7 @@
 
 //   const fetchDocumentStatus = async (employeeId) => {
 //     try {
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/documents_status/`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/documents_status/`, {
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 //           'Content-Type': 'application/json',
@@ -1621,7 +1621,7 @@
 //     if (!editingEmployee) return;
 
 //     try {
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${editingEmployee.id}/`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${editingEmployee.id}/`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -1649,7 +1649,7 @@
 //     if (!deletingEmployee) return;
 
 //     try {
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${deletingEmployee.id}/`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${deletingEmployee.id}/`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -1672,7 +1672,7 @@
 
 //   const updateEmployeeStatus = async (employeeId, status) => {
 //     try {
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/update_status/`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/update_status/`, {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -1695,7 +1695,7 @@
 
 //   const checkDocumentCompletionStatus = async (employeeId) => {
 //     try {
-//       const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/documents_status/`, {
+//       const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/documents_status/`, {
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 //           'Content-Type': 'application/json',
@@ -3137,7 +3137,7 @@ const OnboardingManagement = () => {
         if (payload[k] === undefined || payload[k] === '') delete payload[k];
       });
 
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${editingEmployee.id}/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${editingEmployee.id}/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -3169,7 +3169,7 @@ const OnboardingManagement = () => {
 
   const softDeleteEmployee = async (employeeId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/soft_delete/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/soft_delete/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -3193,7 +3193,7 @@ const OnboardingManagement = () => {
 
   const restoreEmployee = async (employeeId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/restore/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/restore/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -3217,7 +3217,7 @@ const OnboardingManagement = () => {
 
   const fetchDocumentStatus = async (employeeId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/documents_status/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/documents_status/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json',
@@ -3250,7 +3250,7 @@ const OnboardingManagement = () => {
 
   const updateEmployeeStatus = async (employeeId, status) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/update_status/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/update_status/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -3283,7 +3283,7 @@ const OnboardingManagement = () => {
         }
       });
 
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${uploadingEmployee.id}/upload_documents/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${uploadingEmployee.id}/upload_documents/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -3317,7 +3317,7 @@ const OnboardingManagement = () => {
 
   const checkDocumentCompletionStatus = async (employeeId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/documents_status/`, {
+      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/employees/${employeeId}/documents_status/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json',

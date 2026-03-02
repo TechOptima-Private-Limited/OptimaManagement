@@ -263,7 +263,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             print(f"📧 Preparing welcome email for: {employee.user.get_full_name()}")
             
             # Registration URL
-            registration_url = "http://localhost:3000/register"
+            registration_url = "http://localhost:3002/register"
             
             # Simple HTML email content
             subject = f"Welcome to Our Company - Complete Your Registration"

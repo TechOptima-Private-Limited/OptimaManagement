@@ -28,6 +28,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002', cast=Csv())
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -143,7 +145,7 @@ EMAIL_SUBJECT_PREFIX = config('EMAIL_SUBJECT_PREFIX', default='')
 EMAIL_THREAD_ID = config('EMAIL_THREAD_ID', default='1')
 
 # Site and email lists
-SITE_URL = config('SITE_URL', default='http://localhost:8000')
+SITE_URL = config('SITE_URL', default='http://localhost:8080')
 IT_SUPPORT_EMAIL = config('IT_SUPPORT_EMAIL', default='')
 PMO_EMAILS = config('PMO_EMAILS', default='', cast=Csv())
 TEAM_EMAILS = config('TEAM_EMAILS', default='', cast=Csv())

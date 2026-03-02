@@ -18,7 +18,7 @@ const ResourceDashboard = () => {
   // Fetch dashboard data
   const { data: dashboardData, isLoading } = useQuery(
     'resource-dashboard',
-    () => api.get('http://127.0.0.1:8000/api/resource-management/access-requests/dashboard/').then(res => res.data),
+    () => api.get('http://127.0.0.1:8080/api/resource-management/access-requests/dashboard/').then(res => res.data),
     {
       refetchInterval: 30000, // Refetch every 30 seconds
     }
@@ -27,7 +27,7 @@ const ResourceDashboard = () => {
   // Fetch recent requests
   const { data: recentRequests = [] } = useQuery(
     'recent-requests',
-    () => api.get('http://127.0.0.1:8000/api/resource-management/access-requests/?limit=5').then(res => res.data.results || res.data.slice(0, 5)),
+    () => api.get('http://127.0.0.1:8080/api/resource-management/access-requests/?limit=5').then(res => res.data.results || res.data.slice(0, 5)),
     {
       refetchInterval: 30000,
     }

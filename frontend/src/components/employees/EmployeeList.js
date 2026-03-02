@@ -21,7 +21,7 @@ import { isHRManager, isAdmin } from '../../utils/auth';
 import { formatDate } from '../../utils/formatters';
 import { useTheme } from '../../context/ThemeContext';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api';
 
 
 const EditEmployeeModal = ({ isOpen, onClose, onSuccess, employee }) => {

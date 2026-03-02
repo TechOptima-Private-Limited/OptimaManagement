@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   User,
   Mail,
   Phone,
@@ -55,7 +55,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
 
   const validateLink = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/validate-link/${encodedData}/`, {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const response = await fetch(`${apiBase}/onboarding/validate-link/${encodedData}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
         setLinkInfo(data.link_info);
         setEmployee(data.employee);
         setLinkStatus(data.status);
-        
+
         // Pre-fill form if employee exists
         if (data.employee && data.status === 'valid') {
           setFormData({
@@ -101,7 +102,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
-    
+
     if (file) {
       // Validate file size (10MB limit)
       if (file.size > 10 * 1024 * 1024) {
@@ -109,7 +110,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
         e.target.value = '';
         return;
       }
-      
+
       // Validate file type
       const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
       if (!allowedTypes.includes(file.type)) {
@@ -117,7 +118,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
         e.target.value = '';
         return;
       }
-      
+
       setFormData({ ...formData, [name]: file });
       // Clear error when file is selected
       if (errors[name]) {
@@ -128,7 +129,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Required text fields
     const requiredFields = ['first_name', 'last_name', 'email', 'phone_number', 'current_address', 'permanent_address'];
     requiredFields.forEach(field => {
@@ -154,23 +155,23 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
   };
 
   const handleSubmit = async () => {
-    
+
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
-    
+
     try {
       const formDataToSend = new FormData();
-      
+
       // Append text fields
       Object.keys(formData).forEach(key => {
         if (typeof formData[key] === 'string') {
           formDataToSend.append(key, formData[key]);
         }
       });
-      
+
       // Append files
       documentTypes.forEach(doc => {
         if (formData[doc.key]) {
@@ -178,9 +179,10 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
         }
       });
 
-      const submitUrl = encodedData 
-        ? `http://127.0.0.1:8000/api/onboarding/submit/${encodedData}/`
-        : 'http://127.0.0.1:8000/api/onboarding/submit/';
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const submitUrl = encodedData
+        ? `${apiBase}/onboarding/submit/${encodedData}/`
+        : `${apiBase}/onboarding/submit/`;
 
       const response = await fetch(submitUrl, {
         method: 'POST',
@@ -208,16 +210,16 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
 
   const getRemainingTime = () => {
     if (!linkInfo?.expires_at) return null;
-    
+
     const now = new Date();
     const expires = new Date(linkInfo.expires_at);
     const remaining = expires - now;
-    
+
     if (remaining <= 0) return { text: 'Expired', color: 'text-red-600' };
-    
+
     const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
     const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
+
     if (days > 1) {
       return { text: `${days} days, ${hours} hours`, color: 'text-green-600' };
     } else if (days === 1) {
@@ -239,11 +241,11 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
         <div className="absolute inset-0 bg-black opacity-10"></div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
-        
+
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <div className="flex items-center justify-center space-x-3 mb-6">
             <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
@@ -251,7 +253,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
             </div>
             <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
           </div>
-          
+
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Techoptima Pvt Ltd
           </h1>
@@ -259,10 +261,10 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
             Employee Onboarding Portal
           </h2>
           <p className="text-lg text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Welcome! Please fill out your personal information and upload required documents below. 
+            Welcome! Please fill out your personal information and upload required documents below.
             HR will complete your employment details once your submission is reviewed.
           </p>
-          
+
           {remainingTime && (
             <div className="mt-6 inline-flex items-center px-4 py-2 bg-white/20 rounded-xl backdrop-blur-sm">
               <Clock className="w-5 h-5 text-white mr-2" />
@@ -278,7 +280,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
           <div className="p-8 lg:p-12 space-y-8">
-            
+
             {/* Personal Information Section */}
             <div className="space-y-6">
               <div className="flex items-center space-x-3 pb-4 border-b border-indigo-200">
@@ -298,9 +300,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${
-                      errors.first_name ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                    }`}
+                    className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.first_name ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      }`}
                     placeholder="Enter your first name"
                   />
                   {errors.first_name && (
@@ -317,9 +318,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${
-                      errors.last_name ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                    }`}
+                    className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.last_name ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      }`}
                     placeholder="Enter your last name"
                   />
                   {errors.last_name && (
@@ -338,9 +338,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${
-                        errors.email ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                      }`}
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.email ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                        }`}
                       placeholder="your.email@company.com"
                     />
                   </div>
@@ -360,9 +359,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       name="phone_number"
                       value={formData.phone_number}
                       onChange={handleInputChange}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${
-                        errors.phone_number ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                      }`}
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.phone_number ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                        }`}
                       placeholder="+91 9876543210"
                     />
                   </div>
@@ -382,9 +380,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       value={formData.current_address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${
-                        errors.current_address ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                      }`}
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.current_address ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                        }`}
                       placeholder="Enter your current address including city, state, PIN code"
                     />
                   </div>
@@ -404,9 +401,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       value={formData.permanent_address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${
-                        errors.permanent_address ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                      }`}
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.permanent_address ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                        }`}
                       placeholder="Enter your permanent address including city, state, PIN code"
                     />
                   </div>
@@ -455,9 +451,8 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                         name={doc.key}
                         onChange={handleFileChange}
                         accept=".pdf,.jpg,.jpeg,.png"
-                        className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 ${
-                          errors[doc.key] ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
-                        }`}
+                        className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 ${errors[doc.key] ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                          }`}
                       />
                       {formData[doc.key] && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -478,11 +473,10 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className={`inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform ${
-                  loading
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-105'
-                } text-white`}
+                className={`inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform ${loading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-105'
+                  } text-white`}
               >
                 {loading ? (
                   <>
@@ -496,7 +490,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                   </>
                 )}
               </button>
-              
+
               <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                 <Shield className="w-4 h-4" />
                 <span>Your information is secure and will only be used for employment purposes</span>
@@ -558,12 +552,11 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
           </div>
 
           {/* Status Message */}
-          <h2 className={`text-2xl font-bold mb-4 ${
-            statusInfo.color === 'green' ? 'text-green-600' : 'text-red-600'
-          }`}>
+          <h2 className={`text-2xl font-bold mb-4 ${statusInfo.color === 'green' ? 'text-green-600' : 'text-red-600'
+            }`}>
             {statusInfo.title}
           </h2>
-          
+
           <p className="text-lg text-gray-600 mb-6">
             {statusInfo.subtitle}
           </p>

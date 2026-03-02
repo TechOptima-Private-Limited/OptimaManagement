@@ -31,14 +31,14 @@
 //   // Fetch resource types
 //   const { data: resourceTypes = [] } = useQuery(
 //     'resource-types',
-//     () => api.get('http://127.0.0.1:8000/api/resource-management/resource-types/').then(res => res.data.results || res.data)
+//     () => api.get('http://127.0.0.1:8080/api/resource-management/resource-types/').then(res => res.data.results || res.data)
 //   );
 
 //   // Fetch resources based on selected resource type
 //   const { data: resources = [] } = useQuery(
 //     ['resources', formData.resource_type],
 //     () => formData.resource_type 
-//       ? api.get(`http://127.0.0.1:8000/api/resource-management/resources/?resource_type=${formData.resource_type}`).then(res => res.data.results || res.data)
+//       ? api.get(`http://127.0.0.1:8080/api/resource-management/resources/?resource_type=${formData.resource_type}`).then(res => res.data.results || res.data)
 //       : Promise.resolve([]),
 //     {
 //       enabled: !!formData.resource_type
@@ -48,7 +48,7 @@
 //   // Fetch access levels
 //   const { data: accessLevels = [] } = useQuery(
 //     'access-levels',
-//     () => api.get('http://127.0.0.1:8000/api/resource-management/access-levels/').then(res => res.data)
+//     () => api.get('http://127.0.0.1:8080/api/resource-management/access-levels/').then(res => res.data)
 //       .catch(() => [
 //         { id: 1, name: 'Read', description: 'Read-only access' },
 //         { id: 2, name: 'Write', description: 'Read and write access' },
@@ -57,7 +57,7 @@
 //   );
 
 //   const createRequestMutation = useMutation(
-//     (requestData) => api.post('http://127.0.0.1:8000/api/resource-management/access-requests/', requestData),
+//     (requestData) => api.post('http://127.0.0.1:8080/api/resource-management/access-requests/', requestData),
 //     {
 //       onSuccess: () => {
 //         toast.success('Access request submitted successfully!');
@@ -126,7 +126,7 @@
 //         filename: image.file.name
 //       };
 
-//       const response = await api.post('http://127.0.0.1:8000/api/resource-management/access-requests/upload_image/', uploadData);
+//       const response = await api.post('http://127.0.0.1:8080/api/resource-management/access-requests/upload_image/', uploadData);
 //       return response.data.url;
 //     } catch (error) {
 //       console.error('Error uploading image:', error);

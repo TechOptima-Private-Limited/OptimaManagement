@@ -64,7 +64,7 @@
 
 //       // Fetch employee data
 //       // Fetch employee profile data (team, manager, employment details)
-//       const employeeProfileResponse = await fetch('http://127.0.0.1:8000/api/employees/profile-data/', {
+//       const employeeProfileResponse = await fetch('http://127.0.0.1:8080/api/employees/profile-data/', {
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
 //           'Content-Type': 'application/json'
@@ -577,7 +577,8 @@ const UserProfile = () => {
     try {
       setDocumentsLoading(true);
       setDocumentsError(null);
-      const response = await fetch(`http://127.0.0.1:8000/api/onboarding/employees/${employeeId}/list_documents/`, {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const response = await fetch(`${apiBase}/onboarding/employees/${employeeId}/list_documents/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -604,7 +605,7 @@ const UserProfile = () => {
   //     setLoading(true);
 
   //     // Fetch user profile
-  //     const profileResponse = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
+  //     const profileResponse = await fetch('http://127.0.0.1:8080/api/auth/profile/', {
   //       headers: {
   //         'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
   //         'Content-Type': 'application/json'
@@ -647,7 +648,8 @@ const UserProfile = () => {
       setLoading(true);
 
       // Fetch user profile
-      const profileResponse = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const profileResponse = await fetch(`${apiBase}/auth/profile/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -701,7 +703,8 @@ const UserProfile = () => {
 
   const fetchEmployeeProfileData = async () => {
     try {
-      const employeeProfileResponse = await fetch('http://127.0.0.1:8000/api/employees/profile-data/', {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const employeeProfileResponse = await fetch(`${apiBase}/employees/profile-data/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -734,7 +737,8 @@ const UserProfile = () => {
 
   const fetchManagerData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/employees/managers/profile-data/', {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const response = await fetch(`${apiBase}/employees/managers/profile-data/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -763,7 +767,8 @@ const UserProfile = () => {
       await fetchEmployeeProfileData();
 
       // Then get all managers with teams
-      const managersResponse = await fetch('http://127.0.0.1:8000/api/employees/managers-with-teams/', {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const managersResponse = await fetch(`${apiBase}/employees/managers-with-teams/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -785,7 +790,8 @@ const UserProfile = () => {
     try {
       setSaving(true);
 
-      const response = await fetch('http://127.0.0.1:8000/api/auth/profile/', {
+      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+      const response = await fetch(`${apiBase}/auth/profile/`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
