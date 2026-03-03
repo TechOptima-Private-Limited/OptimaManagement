@@ -40,8 +40,11 @@
           <td>{{ obj.purchased_date|date:"Y-m-d"|default:"—" }}</td>
         </tr>
         <tr>
-          <th>Age of Device</th>
-          <td>{{ age_years|default:"—" }}</td>
+          <th>Age</th>
+          <td>
+            {# if laptop_age is a timedelta, show days #}
+            {% if obj.laptop_age %}~{{ obj.laptop_age.days }} days{% else %}—{% endif %}
+          </td>
         </tr>
       </tbody>
     </table>
