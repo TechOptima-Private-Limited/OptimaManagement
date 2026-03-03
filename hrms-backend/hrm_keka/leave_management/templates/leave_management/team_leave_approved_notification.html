@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Team Leave Cancelled</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background-color: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .content { background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .notice { background-color: #ffeaa7; border-left: 4px solid #fdcb6e; padding: 15px; margin: 15px 0; }
+        .details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="color: #856404; margin: 0;">🚫 Team Leave Update</h2>
+        <p style="margin: 5px 0 0 0; color: #856404;">{{ company_name }}</p>
+    </div>
+    
+    <div class="content">
+        <div class="notice">
+            <p style="margin: 0;"><strong>{{ employee_name }}</strong> from {{ department_name }} department has cancelled their leave.</p>
+        </div>
+        
+        <h3 style="color: #495057;">Cancelled Leave Details</h3>
+        <div class="details">
+            <p><strong>Employee:</strong> {{ employee_name }} ({{ employee_position }})</p>
+            <p><strong>Leave Type:</strong> {{ leave_type }}</p>
+            <p><strong>Originally Scheduled:</strong> {{ start_date }} to {{ end_date }}</p>
+            <p><strong>Duration:</strong> {{ days_requested }} days</p>
+        </div>
+        
+        <div style="background-color: #d4edda; padding: 15px; border-radius: 5px;">
+            <p style="color: #155724; margin: 0;"><strong>Good news!</strong> {{ employee_name }} will be available during the originally scheduled leave period.</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p style="margin: 0; color: #6c757d;">Best regards,<br>{{ company_name }} HR System</p>
+    </div>
+</body>
+</html>

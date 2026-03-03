@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave Approved - HR Notification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background-color: #d4edda; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .content { background-color: white; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 15px 0; }
+        .details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="color: #155724; margin: 0;">Leave Request Approved</h2>
+        <p style="margin: 5px 0 0 0; color: #155724;">{{ company_name }}</p>
+    </div>
+    
+    <div class="content">
+        <div class="info">
+            <p style="margin: 0;"><strong>ℹ️ A leave request has been approved and leave balance has been updated.</strong></p>
+        </div>
+        
+        <h3 style="color: #495057;">Employee Details</h3>
+        <div class="details">
+            <p><strong>Name:</strong> {{ employee_name }}</p>
+            <p><strong>Employee ID:</strong> {{ employee_id }}</p>
+        </div>
+        
+        <h3 style="color: #495057;">Leave Details</h3>
+        <div class="details">
+            <p><strong>Leave Type:</strong> {{ leave_type }}</p>
+            <p><strong>Start Date:</strong> {{ start_date }}</p>
+            <p><strong>End Date:</strong> {{ end_date }}</p>
+            <p><strong>Total Days:</strong> {{ days_requested }} days</p>
+            <p><strong>Approved By:</strong> {{ approved_by }}</p>
+            <p><strong>Approved On:</strong> {{ approved_on }}</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p style="margin: 0; color: #6c757d;">Best regards,<br>{{ company_name }} HR System</p>
+    </div>
+</body>
+</html>
