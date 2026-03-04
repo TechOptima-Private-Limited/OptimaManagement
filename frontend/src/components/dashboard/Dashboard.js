@@ -281,66 +281,25 @@ const Dashboard = () => {
 
   const fetchBirthdayFestivalData = async () => {
     try {
-      const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
-      const apiUrl = `${apiBase}/employees/birthday-festival/`;
-      console.log('🔍 Calling API:', apiUrl);
+      const response = await employeeAPI.getBirthdayFestivalData();
+      const data = response.data;
 
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      console.log('✅ Birthday/Festival data received:', data);
 
-      console.log('📡 Response status:', response.status);
+      setBirthdayFestivalData(data);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Birthday/Festival data received:', data);
-        setBirthdayFestivalData(data);
-
-        // Show birthday toast messages
-        if (data.birthdays.has_birthdays_today) {
-          data.birthdays.todays_birthdays.forEach(birthday => {
-            toast.success(
-              `🎉 It's ${birthday.employee_name}'s birthday today! 🎂 
-               Wishing them a wonderful ${birthday.age_today}th birthday! 🎈`,
-              {
-                duration: 8000,
-                style: {
-                  background: 'linear-gradient(90deg, #E7473C 0%, #F87171 100%)',
-                  color: 'white'
-                }
-              }
-            );
-          });
-        }
-
-        // Show festival toast messages
-        if (data.festivals.has_festivals_today) {
-          data.festivals.todays_festivals.forEach(festival => {
-            toast.info(
-              `${festival.emoji} Happy ${festival.name}! ${festival.emoji}`,
-              {
-                duration: 6000,
-                style: {
-                  background: 'linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)',
-                  color: 'white'
-                }
-              }
-            );
-          });
-        }
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Failed to fetch birthday/festival data:', response.status, errorText);
-        setBirthdayFestivalData({
-          birthdays: { todays_birthdays: [], upcoming_birthdays: [], has_birthdays_today: false },
-          festivals: { todays_festivals: [], upcoming_festivals: [], has_festivals_today: false }
+      if (data.birthdays.has_birthdays_today) {
+        data.birthdays.todays_birthdays.forEach(birthday => {
+          toast.success(
+            `🎉 It's ${birthday.employee_name}'s birthday today! 🎂 
+           Wishing them a wonderful ${birthday.age_today}th birthday! 🎈`
+          );
         });
       }
+
     } catch (error) {
       console.error('❌ Network error fetching birthday/festival data:', error);
+
       setBirthdayFestivalData({
         birthdays: { todays_birthdays: [], upcoming_birthdays: [], has_birthdays_today: false },
         festivals: { todays_festivals: [], upcoming_festivals: [], has_festivals_today: false }

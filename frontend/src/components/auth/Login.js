@@ -19,7 +19,7 @@ const Login = () => {
     setFetchingCaptcha(true);
     try {
       const response = await authAPI.getCaptcha();
-      const apiBase = ('http://127.0.0.1:8080/api').replace(/\/api$/, '');
+      const apiBase = (process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api").replace(/\/api$/, "");
       setCaptcha({
         key: response.data.key,
         imageUrl: response.data.image_url.startsWith('http')

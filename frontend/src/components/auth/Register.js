@@ -1,244 +1,5 @@
-// import React, { useState } from 'react';
-// import { Link, useNavigate } from 'react-router-dom';
-// import { useForm } from 'react-hook-form';
-// import { toast } from 'react-toastify';
-// import { EyeIcon, EyeSlashIcon, UserPlusIcon } from '@heroicons/react/24/outline';
-// import { useAuth } from '../../context/AuthContext';
-
-// const Register = () => {
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-//   const { register: registerUser, loading } = useAuth();
-//   const navigate = useNavigate();
-//   const { register, handleSubmit, watch, formState: { errors } } = useForm();
-
-//   const password = watch('password');
-
-//   const onSubmit = async (data) => {
-//     const result = await registerUser(data);
-//     if (result.success) {
-//       toast.success('Account created successfully! Welcome aboard!');
-//       navigate('/dashboard');
-//     } else {
-//       toast.error(result.error);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100 py-12 px-4 sm:px-6 lg:px-8">
-//       <div className="max-w-md w-full space-y-8">
-//         <div className="text-center">
-//           <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-green-100">
-//             <UserPlusIcon className="h-8 w-8 text-green-600" />
-//           </div>
-//           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-//             Create your account
-//           </h2>
-//           <p className="mt-2 text-center text-sm text-gray-600">
-//             Or{' '}
-//             <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-//               sign in to your existing account
-//             </Link>
-//           </p>
-//         </div>
-
-//         <div className="bg-white shadow-xl rounded-lg p-8">
-//           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-//             <div className="grid grid-cols-2 gap-4">
-//               <div>
-//                 <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
-//                   First Name
-//                 </label>
-//                 <input
-//                   {...register('first_name', { required: 'First name is required' })}
-//                   type="text"
-//                   className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                   placeholder="John"
-//                 />
-//                 {errors.first_name && (
-//                   <p className="mt-1 text-sm text-red-600">{errors.first_name.message}</p>
-//                 )}
-//               </div>
-
-//               <div>
-//                 <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
-//                   Last Name
-//                 </label>
-//                 <input
-//                   {...register('last_name', { required: 'Last name is required' })}
-//                   type="text"
-//                   className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                   placeholder="Doe"
-//                 />
-//                 {errors.last_name && (
-//                   <p className="mt-1 text-sm text-red-600">{errors.last_name.message}</p>
-//                 )}
-//               </div>
-//             </div>
-
-//             <div>
-//               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-//                 Username
-//               </label>
-//               <input
-//                 {...register('username', { required: 'Username is required' })}
-//                 type="text"
-//                 className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                 placeholder="johndoe"
-//               />
-//               {errors.username && (
-//                 <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
-//               )}
-//             </div>
-
-//             <div>
-//               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-//                 Email address
-//               </label>
-//               <input
-//                 {...register('email', { 
-//                   required: 'Email is required',
-//                   pattern: {
-//                     value: /^\S+@\S+$/i,
-//                     message: 'Invalid email address'
-//                   }
-//                 })}
-//                 type="email"
-//                 autoComplete="email"
-//                 className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                 placeholder="john@example.com"
-//               />
-//               {errors.email && (
-//                 <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-//               )}
-//             </div>
-
-//             <div>
-//               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-//                 Password
-//               </label>
-//               <div className="mt-1 relative">
-//                 <input
-//                   {...register('password', { 
-//                     required: 'Password is required',
-//                     minLength: {
-//                       value: 8,
-//                       message: 'Password must be at least 8 characters'
-//                     }
-//                   })}
-//                   type={showPassword ? 'text' : 'password'}
-//                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                   placeholder="Create a strong password"
-//                 />
-//                 <button
-//                   type="button"
-//                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-//                   onClick={() => setShowPassword(!showPassword)}
-//                 >
-//                   {showPassword ? (
-//                     <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-//                   ) : (
-//                     <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-//                   )}
-//                 </button>
-//               </div>
-//               {errors.password && (
-//                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-//               )}
-//             </div>
-
-//             <div>
-//               <label htmlFor="password_confirm" className="block text-sm font-medium text-gray-700">
-//                 Confirm Password
-//               </label>
-//               <div className="mt-1 relative">
-//                 <input
-//                   {...register('password_confirm', { 
-//                     required: 'Please confirm your password',
-//                     validate: value => value === password || 'Passwords do not match'
-//                   })}
-//                   type={showConfirmPassword ? 'text' : 'password'}
-//                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                   placeholder="Confirm your password"
-//                 />
-//                 <button
-//                   type="button"
-//                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-//                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-//                 >
-//                   {showConfirmPassword ? (
-//                     <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-//                   ) : (
-//                     <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-//                   )}
-//                 </button>
-//               </div>
-//               {errors.password_confirm && (
-//                 <p className="mt-1 text-sm text-red-600">{errors.password_confirm.message}</p>
-//               )}
-//             </div>
-
-//             <div className="flex items-center">
-//               <input
-//                 id="terms"
-//                 name="terms"
-//                 type="checkbox"
-//                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-//                 required
-//               />
-//               <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-//                 I agree to the{' '}
-//                 <Link to="/terms" className="text-blue-600 hover:text-blue-500">
-//                   Terms and Conditions
-//                 </Link>{' '}
-//                 and{' '}
-//                 <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
-//                   Privacy Policy
-//                 </Link>
-//               </label>
-//             </div>
-
-//             <div>
-//               <button
-//                 type="submit"
-//                 disabled={loading}
-//                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//               >
-//                 {loading ? (
-//                   <div className="flex items-center">
-//                     <div className="animate-spin -ml-1 mr-3 h-5 w-5 text-white">
-//                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">
-//                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-//                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-//                       </svg>
-//                     </div>
-//                     Creating account...
-//                   </div>
-//                 ) : (
-//                   'Create account'
-//                 )}
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-
-//         <div className="text-center">
-//           <p className="text-sm text-gray-600">
-//             Already have an account?{' '}
-//             <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-//               Sign in here
-//             </Link>
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Register;
-
-
 import { useState } from 'react';
+import api from '../../services/api';
 
 const EmployeeRegistration = () => {
   const [formData, setFormData] = useState({
@@ -256,7 +17,6 @@ const EmployeeRegistration = () => {
       ...prev,
       [name]: value
     }));
-    // Clear errors when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -294,36 +54,54 @@ const EmployeeRegistration = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:8080/api/auth/employee-register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
 
-      const data = await response.json();
+      // 🔁 CHANGED: fetch → axios api instance
+      const response = await api.post("/auth/employee-register/", formData);
+      const data = response.data;
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setSuccess(true);
-        // Store tokens
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
 
-        // Redirect to dashboard
+        localStorage.setItem("access_token", data.access);
+        localStorage.setItem("refresh_token", data.refresh);
+
         setTimeout(() => {
-          window.location.href = '/dashboard';
+          window.location.href = "/dashboard";
         }, 2000);
       } else {
-        // Handle API errors
-        if (data.email) setErrors(prev => ({ ...prev, email: Array.isArray(data.email) ? data.email[0] : data.email }));
-        if (data.password) setErrors(prev => ({ ...prev, password: Array.isArray(data.password) ? data.password[0] : data.password }));
-        if (data.password_confirm) setErrors(prev => ({ ...prev, password_confirm: Array.isArray(data.password_confirm) ? data.password_confirm[0] : data.password_confirm }));
-        if (data.non_field_errors) setErrors(prev => ({ ...prev, general: Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors }));
+        if (data.email)
+          setErrors((prev) => ({
+            ...prev,
+            email: Array.isArray(data.email) ? data.email[0] : data.email,
+          }));
+
+        if (data.password)
+          setErrors((prev) => ({
+            ...prev,
+            password: Array.isArray(data.password)
+              ? data.password[0]
+              : data.password,
+          }));
+
+        if (data.password_confirm)
+          setErrors((prev) => ({
+            ...prev,
+            password_confirm: Array.isArray(data.password_confirm)
+              ? data.password_confirm[0]
+              : data.password_confirm,
+          }));
+
+        if (data.non_field_errors)
+          setErrors((prev) => ({
+            ...prev,
+            general: Array.isArray(data.non_field_errors)
+              ? data.non_field_errors[0]
+              : data.non_field_errors,
+          }));
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      setErrors({ general: 'Something went wrong. Please try again.' });
+      console.error("Registration error:", error);
+      setErrors({ general: "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
     }

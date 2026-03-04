@@ -35,7 +35,9 @@ const EmployeeOnboardingRouter = () => {
 
   const validateLink = async (encoded) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8080/api/onboarding/validate-link/${encoded}/`);
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api";
+
+      const response = await fetch(`${API_BASE_URL}/onboarding/validate-link/${encoded}/`);
       if (response.ok) {
         const data = await response.json();
         setLinkValidation(data);
@@ -178,6 +180,7 @@ const EmployeeOnboardingForm = ({ encodedData, onNavigate, validation }) => {
     setLoading(true);
 
     try {
+
       const formDataToSend = new FormData();
 
       Object.keys(formData).forEach(key => {
@@ -192,9 +195,11 @@ const EmployeeOnboardingForm = ({ encodedData, onNavigate, validation }) => {
         }
       });
 
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api";
+
       const submitUrl = encodedData
-        ? `http://127.0.0.1:8080/api/onboarding/submit/${encodedData}/`
-        : 'http://127.0.0.1:8080/api/onboarding/submit/';
+        ? `${API_BASE_URL}/onboarding/submit/${encodedData}/`
+        : `${API_BASE_URL}/onboarding/submit/`;
 
       const response = await fetch(submitUrl, {
         method: 'POST',

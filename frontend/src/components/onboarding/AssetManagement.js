@@ -128,7 +128,9 @@ const AssetManagement = () => {
       setExportingExcel(true);
       const token = localStorage.getItem('access_token');
 
-      const response = await fetch('http://127.0.0.1:8080/api/assets/export/excel/', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api";
+
+      const response = await fetch(`${API_BASE_URL}/assets/export/excel/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -756,7 +758,9 @@ const AssetManagement = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8080/api/employees/', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api";
+
+      const response = await fetch(`${API_BASE_URL}/employees/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json',
