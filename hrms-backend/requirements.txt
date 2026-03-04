@@ -59,3 +59,6 @@ sqlparse
 MarkupSafe
 olefile
 pyzk
+django-ckeditor-5
+beautifulsoup4
+whitenoise

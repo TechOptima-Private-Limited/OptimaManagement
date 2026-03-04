@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'resource_management',
     'dal',
     'dal_select2',
-    # 'django_ckeditor_5',
+    'django_ckeditor_5',
     'assets',
     'webpush',
     'captcha',
@@ -86,6 +86,7 @@ LOGGING = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
