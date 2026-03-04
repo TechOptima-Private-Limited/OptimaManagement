@@ -58,3 +58,4 @@ attrs
 sqlparse
 MarkupSafe
 olefile
+pyzk
