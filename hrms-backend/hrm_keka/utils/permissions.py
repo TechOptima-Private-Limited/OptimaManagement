@@ -86,6 +86,10 @@ class IsHRManager(permissions.BasePermission):
         if not (request.user and request.user.is_authenticated):
             return False
         
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
+            
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:
             return False
@@ -105,6 +109,10 @@ class IsManager(permissions.BasePermission):
         if not (request.user and request.user.is_authenticated):
             return False
         
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
+            
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:
             return False
@@ -116,13 +124,11 @@ class IsManager(permissions.BasePermission):
 
 
 class IsEmployee(permissions.BasePermission):
-    """Custom permission for authenticated users with profile"""
+    """Custom permission for authenticated users with profile or superusers"""
     def has_permission(self, request, view):
-        return (
-            request.user and 
-            request.user.is_authenticated and 
-            hasattr(request.user, 'profile')
-        )
+        if not (request.user and request.user.is_authenticated):
+            return False
+        return request.user.is_superuser or hasattr(request.user, 'profile')
 
 
 class IsAdmin(permissions.BasePermission):
@@ -217,6 +223,10 @@ class IsITSupport(permissions.BasePermission):
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
+            
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
         
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:
@@ -240,6 +250,10 @@ class HasLeadAccess(permissions.BasePermission):
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
+            
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
         
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:
@@ -255,6 +269,10 @@ class HasManagementAccess(permissions.BasePermission):
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
+            
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
         
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:
@@ -270,6 +288,10 @@ class HasExecutiveAccess(permissions.BasePermission):
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
+            
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
         
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:
@@ -285,6 +307,10 @@ class CanManageUsers(permissions.BasePermission):
     def has_permission(self, request, view):
         if not (request.user and request.user.is_authenticated):
             return False
+            
+        # Superuser always has access
+        if request.user.is_superuser:
+            return True
         
         user_profile = getattr(request.user, 'profile', None)
         if not user_profile:

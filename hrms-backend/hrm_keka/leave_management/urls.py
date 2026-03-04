@@ -95,4 +95,5 @@ urlpatterns = [
     # Analytics & Reports (HR Only)
     path('analytics/', views.leave_analytics, name='leave_analytics'),
     path('initialize-balances/', views.initialize_yearly_balances, name='initialize_yearly_balances'),
+    path('on-leave-today/', views.on_leave_today, name='on_leave_today'),
 ]

@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='fallback-dev-secret')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,192.168.1.3', cast=Csv())
 
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002', cast=Csv())
 
 
 # Application definition
@@ -246,6 +246,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002', cast=Csv())
+# If CORS_ALLOW_ALL_ORIGINS is True, CORS_ALLOWED_ORIGINS is ignored by the middleware, 
+# but it's good for documentation and if we want to switch off ALL_ORIGINS.
 
 # Webpush Settings
 WEBPUSH_SETTINGS = {

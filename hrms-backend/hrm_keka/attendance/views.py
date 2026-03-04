@@ -2458,3 +2458,31 @@ def send_wfh_approval_email(wfh_request, approved=True):
         
     except Exception as e:
         print(f"❌ Failed to send WFH approval email: {str(e)}")
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def wfh_today(request):
+    """Get employees who have approved WFH today"""
+    today = timezone.now().date()
+    
+    # Filter for approved WFH requests that cover today
+    wfh_requests = WorkFromHomeRequest.objects.filter(
+        status='APPROVED',
+        start_date__lte=today,
+        end_date__gte=today
+    ).select_related('employee', 'employee__user', 'employee__department')
+    
+    results = []
+    for wfh in wfh_requests:
+        emp = wfh.employee
+        user = emp.user
+        results.append({
+            'employee_id': emp.id,
+            'employee_name': f"{user.first_name} {user.last_name}",
+            'department': emp.department.name if emp.department else "N/A",
+            'start_date': wfh.start_date,
+            'end_date': wfh.end_date,
+            'initials': f"{user.first_name[0]}{user.last_name[0]}" if user.first_name and user.last_name else ""
+        })
+    
+    return Response(results)
