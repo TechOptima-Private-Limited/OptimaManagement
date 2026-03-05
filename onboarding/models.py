@@ -318,6 +318,21 @@ class OnboardingLink(models.Model):
         verbose_name_plural = '3. Onboarding Links'
 
 
+class TechStack(models.Model):
+    """
+    Predefined technical skills for filtering candidates.
+    """
+    name = models.CharField(max_length=100, unique=True, verbose_name='Tech Stack Name')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Tech Stack'
+        verbose_name_plural = 'Tech Stacks'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
 class Candidate(models.Model):
     """
     Stores candidate/applicant information extracted from uploaded resume PDFs.
@@ -334,11 +349,22 @@ class Candidate(models.Model):
     last_name = models.CharField(max_length=100, blank=True, verbose_name='Last Name')
     email = models.EmailField(blank=True, verbose_name='Email')
     mobile = models.CharField(max_length=20, blank=True, verbose_name='Mobile')
-    exp_years = models.PositiveIntegerField(default=0, verbose_name='Experience (Years)')
+    exp_years = models.DecimalField(
+        default=0.0, 
+        max_digits=4, 
+        decimal_places=1, 
+        verbose_name='Experience (Years)'
+    )
     tech_stack = models.TextField(
         blank=True,
-        verbose_name='Tech Stack',
-        help_text='Comma-separated list of technical skills',
+        verbose_name='Tech Stack (Raw)',
+        help_text='Comma-separated list of technical skills extracted from PDF',
+    )
+    tech_stacks = models.ManyToManyField(
+        TechStack, 
+        blank=True, 
+        related_name='candidates',
+        verbose_name='Predefined Tech Stacks'
     )
     location = models.CharField(max_length=200, blank=True, verbose_name='Current Location')
     preferred_location = models.CharField(
