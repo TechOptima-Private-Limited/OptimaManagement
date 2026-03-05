@@ -1,0 +1,12 @@
+User Details:
+  ID: 6
+  Username: TO-00095
+  Email: saipramodu.vedantam@techoptima.ai
+  Permissions: []
+Profile:
+  ID: 5
+  Role: JUNIOR_DEVELOPER
+Employee:
+  ID: 7
+  EmployeeID: TO-00095
+  Status: ACTIVE

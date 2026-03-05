@@ -1,0 +1,4 @@
+Simulating API call for User: TO-00095 (ID: 6)
+Status Code: 200
+Total results in list: 1
+  RecordID: 82, Date: 2026-03-05, Employee: None

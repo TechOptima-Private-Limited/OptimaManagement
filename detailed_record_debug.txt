@@ -1,0 +1,10 @@
+Details for Record 82:
+  Employee: Sai pramodu Vedantam (ID: 7)
+  Date: 2026-03-05
+  In: 09:52:49
+  Out: 15:09:02
+  Status: PRESENT
+  Attendance Type: BIOMETRIC
+  Is Pending Approval: False
+  Biometric User ID: TO-00095
+  Created At: 2026-03-05 10:01:20.877767+00:00

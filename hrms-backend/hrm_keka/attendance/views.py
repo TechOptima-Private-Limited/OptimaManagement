@@ -1208,6 +1208,7 @@ from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+import socket
 from datetime import datetime, date
 from .models import AttendanceRecord, BiometricDevice, WorkFromHomeRequest, AttendanceLocationPing, BiometricAttendanceLog
 from .serializers import (
@@ -1443,10 +1444,22 @@ def sync_biometric_logs(request):
             }
         }, status=status.HTTP_200_OK)
         
-    except Exception as e:
-        error_msg = f'Failed to connect to biometric device: {str(e)}'
-        logger.error(f"❌ {error_msg}", exc_info=True)
-        return Response({'error': error_msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except (socket.timeout, socket.error, Exception) as e:
+        error_msg = str(e)
+        logger.error(f"❌ Biometric sync failure for {device_ip}: {error_msg}")
+        
+        if "timeout" in error_msg.lower() or "timed out" in error_msg.lower():
+            return Response({
+                'error': f'Connection to biometric device {device_ip} timed out. This often happens if the device is busy or has a large number of logs to fetch.',
+                'code': 'TIMEOUT'
+            }, status=status.HTTP_504_GATEWAY_TIMEOUT)
+            
+        return Response({
+            'error': f'Failed to connect to biometric device: {error_msg}',
+            'code': 'CONNECTION_ERROR'
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
 
 
 @api_view(['POST'])

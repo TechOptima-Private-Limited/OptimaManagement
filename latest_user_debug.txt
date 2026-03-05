@@ -1,0 +1,2 @@
+Latest User in DB: 6 (TO-00095)
+No user newer than ID 6 found.

@@ -1640,10 +1640,12 @@ const AttendanceTracker = () => {
       // Sync immediately on mount
       syncAllBiometricDevices();
 
-      // Then sync every 1 minute
+      // Then sync every 5 minutes to avoid device overload
       const syncInterval = setInterval(() => {
+        console.log('🕒 Triggering scheduled biometric sync...');
         syncAllBiometricDevices();
-      }, 60000); // 60000ms = 1 minute
+      }, 300000); // 300000ms = 5 minutes
+
 
       return () => clearInterval(syncInterval);
     }
@@ -1709,8 +1711,16 @@ const AttendanceTracker = () => {
           const response = await attendanceAPI.syncBiometricLogs(device.ip_address, today);
           totalSynced += response.data.synced_count || 0;
         } catch (error) {
-          console.error(`Failed to sync device ${device.device_name}:`, error);
+          const status = error.response?.status;
+          const errorData = error.response?.data;
+
+          if (status === 504 || errorData?.code === 'TIMEOUT') {
+            console.warn(`⏳ Device ${device.device_name} sync timeout: The device is either offline or too busy.`);
+          } else {
+            console.error(`❌ Failed to sync device ${device.device_name}:`, errorData?.error || error.message);
+          }
         }
+
       }
 
       if (totalSynced > 0) {
