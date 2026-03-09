@@ -1,42 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
-import { 
-  SignalIcon, 
-  ComputerDesktopIcon, 
+import {
+  SignalIcon,
+  ComputerDesktopIcon,
   CloudArrowUpIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   XCircleIcon,
-  ClockIcon
+  ClockIcon,
+  ArrowPathIcon,
+  PlayIcon,
+  StopIcon,
+  CalendarDaysIcon,
+  PencilIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import { attendanceAPI } from '../../services/api';
 import { isHRManager, isAdmin } from '../../utils/auth';
-import { formatDate, formatDateTime } from '../../utils/formatters';
+import { formatDateTime } from '../../utils/formatters';
 import LoadingSpinner from '../common/LoadingSpinner';
-import Modal from '../common/Modal';
+
+// Auto-sync interval options (in minutes)
+const SYNC_INTERVALS = [
+  { label: '5 minutes', value: 5 },
+  { label: '10 minutes', value: 10 },
+  { label: '15 minutes', value: 15 },
+  { label: '30 minutes', value: 30 },
+  { label: '1 hour', value: 60 },
+];
 
 const BiometricIntegration = () => {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddDevice, setShowAddDevice] = useState(false);
-  const [showSyncModal, setShowSyncModal] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [syncLoading, setSyncLoading] = useState(false);
+  const [editingDevice, setEditingDevice] = useState(null);
+
+  // Per-device sync state
+  const [syncingDevice, setSyncingDevice] = useState(null); // device id being synced
+  const [syncResults, setSyncResults] = useState({}); // keyed by device.id
+
+  // Auto-sync state per device
+  const [autoSyncConfig, setAutoSyncConfig] = useState({}); // { [deviceId]: { enabled, interval } }
+  const autoSyncTimers = useRef({}); // { [deviceId]: intervalId }
+
+  // Manual sync date picker
+  const [syncDate, setSyncDate] = useState(new Date().toISOString().split('T')[0]);
+
   const [newDevice, setNewDevice] = useState({
     device_name: '',
     device_id: '',
     location: '',
-    ip_address: ''
-  });
-  const [syncData, setSyncData] = useState({
-    device_id: '',
-    attendance_data: []
+    ip_address: '',
   });
 
   useEffect(() => {
     if (isHRManager() || isAdmin()) {
       fetchBiometricDevices();
     }
+    // Cleanup timers on unmount
+    return () => {
+      Object.values(autoSyncTimers.current).forEach(clearInterval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchBiometricDevices = async () => {
@@ -54,435 +79,428 @@ const BiometricIntegration = () => {
   const handleAddDevice = async (e) => {
     e.preventDefault();
     try {
-      await attendanceAPI.createBiometricDevice(newDevice);
-      toast.success('Device added successfully!');
+      if (editingDevice) {
+        await attendanceAPI.updateBiometricDevice(editingDevice.id, newDevice);
+        toast.success('Device updated successfully!');
+      } else {
+        await attendanceAPI.createBiometricDevice(newDevice);
+        toast.success('Device added successfully!');
+      }
       setShowAddDevice(false);
+      setEditingDevice(null);
       setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
       fetchBiometricDevices();
     } catch (error) {
-      toast.error('Failed to add device');
+      toast.error(editingDevice ? 'Failed to update device' : 'Failed to add device');
     }
   };
 
-  const handleSync = async () => {
-    if (!syncData.device_id || syncData.attendance_data.length === 0) {
-      toast.error('Please select a device and provide attendance data');
-      return;
-    }
-
-    setSyncLoading(true);
-    try {
-      const response = await attendanceAPI.syncBiometricData(syncData);
-      toast.success(response.data.message || 'Data synced successfully!');
-      setSyncData({ device_id: '', attendance_data: [] });
-      setShowSyncModal(false);
-    } catch (error) {
-      toast.error('Failed to sync biometric data');
-    } finally {
-      setSyncLoading(false);
-    }
+  const handleEditDevice = (device) => {
+    setEditingDevice(device);
+    setNewDevice({
+      device_name: device.device_name,
+      device_id: device.device_id,
+      location: device.location,
+      ip_address: device.ip_address,
+    });
+    setShowAddDevice(true);
   };
 
-  const addSampleData = () => {
-    const sampleData = [
-      {
-        employee_id: 'EMP001',
-        date: new Date().toISOString().split('T')[0],
-        check_in_time: '09:00:00',
-        check_out_time: '17:30:00',
-        status: 'PRESENT'
-      },
-      {
-        employee_id: 'EMP002',
-        date: new Date().toISOString().split('T')[0],
-        check_in_time: '09:15:00',
-        check_out_time: '17:45:00',
-        status: 'LATE'
-      },
-      {
-        employee_id: 'EMP003',
-        date: new Date().toISOString().split('T')[0],
-        check_in_time: '09:30:00',
-        check_out_time: '13:30:00',
-        status: 'HALF_DAY'
+  const handleDeleteDevice = async (id) => {
+    if (window.confirm('Are you sure you want to delete this device? This action cannot be undone.')) {
+      try {
+        await attendanceAPI.deleteBiometricDevice(id);
+        toast.success('Device deleted successfully!');
+        fetchBiometricDevices();
+      } catch (error) {
+        toast.error('Failed to delete device');
       }
-    ];
-    
-    setSyncData(prev => ({
+    }
+  };
+
+  // Core sync function — called manually OR by the auto-sync timer
+  const syncDevice = useCallback(async (device, date = null) => {
+    const syncDateToUse = date || new Date().toISOString().split('T')[0];
+    setSyncingDevice(device.id);
+    try {
+      const response = await attendanceAPI.syncBiometricLogs(device.ip_address, syncDateToUse);
+      const data = response.data;
+      setSyncResults(prev => ({
+        ...prev,
+        [device.id]: {
+          success: true,
+          synced_count: data.synced_count,
+          total_logs: data.total_logs,
+          sync_date: data.sync_date,
+          attendance_records_created: data.attendance_records_created,
+          lastSyncAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        },
+      }));
+      toast.success(
+        `✅ Synced ${data.synced_count}/${data.total_logs} records for ${data.sync_date}`
+      );
+      // Refresh device list (updates last_sync on device)
+      fetchBiometricDevices();
+    } catch (error) {
+      const errMsg =
+        error.response?.data?.error ||
+        (error.response?.status === 503 ? 'Cannot reach biometric device' : 'Sync failed');
+      setSyncResults(prev => ({
+        ...prev,
+        [device.id]: {
+          success: false,
+          error: errMsg,
+          lastSyncAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        },
+      }));
+      toast.error(`❌ ${device.device_name}: ${errMsg}`);
+    } finally {
+      setSyncingDevice(null);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Toggle auto-sync for a device
+  const toggleAutoSync = (device) => {
+    const cfg = autoSyncConfig[device.id] || { enabled: false, interval: 15 };
+    if (cfg.enabled) {
+      // Disable
+      clearInterval(autoSyncTimers.current[device.id]);
+      delete autoSyncTimers.current[device.id];
+      setAutoSyncConfig(prev => ({
+        ...prev,
+        [device.id]: { ...cfg, enabled: false },
+      }));
+      toast.info(`⏹ Auto-sync stopped for ${device.device_name}`);
+    } else {
+      // Enable — run immediately, then on interval
+      syncDevice(device);
+      const intervalMs = cfg.interval * 60 * 1000;
+      const timer = setInterval(() => syncDevice(device), intervalMs);
+      autoSyncTimers.current[device.id] = timer;
+      setAutoSyncConfig(prev => ({
+        ...prev,
+        [device.id]: { ...cfg, enabled: true },
+      }));
+      toast.success(`▶ Auto-sync started for ${device.device_name} every ${cfg.interval} min`);
+    }
+  };
+
+  const setAutoSyncInterval = (deviceId, minutes) => {
+    setAutoSyncConfig(prev => ({
       ...prev,
-      attendance_data: [...prev.attendance_data, ...sampleData]
+      [deviceId]: { ...(prev[deviceId] || { enabled: false }), interval: minutes },
     }));
   };
 
   const getDeviceStatusIcon = (device) => {
-    if (!device.is_active) {
-      return <XCircleIcon className="h-5 w-5 text-red-500" />;
-    }
-    
+    if (!device.is_active) return <XCircleIcon className="h-5 w-5 text-red-500" />;
     const lastSync = device.last_sync ? new Date(device.last_sync) : null;
     const hoursSinceSync = lastSync ? (Date.now() - lastSync.getTime()) / (1000 * 60 * 60) : null;
-    
-    if (!lastSync || hoursSinceSync > 24) {
-      return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />;
-    }
-    
+    if (!lastSync || hoursSinceSync > 24) return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />;
     return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
   };
 
   const getDeviceStatusText = (device) => {
     if (!device.is_active) return 'Inactive';
-    
     const lastSync = device.last_sync ? new Date(device.last_sync) : null;
     const hoursSinceSync = lastSync ? (Date.now() - lastSync.getTime()) / (1000 * 60 * 60) : null;
-    
     if (!lastSync) return 'Never synced';
     if (hoursSinceSync > 24) return 'Sync overdue';
-    
     return 'Active';
   };
 
   if (!(isHRManager() || isAdmin())) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center py-12">
-          <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-red-500" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Access Denied</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Only HR Managers or Admins can access biometric integration.
-          </p>
+      <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black text-slate-300 flex items-center justify-center -mt-16">
+        <div className="text-center py-12 px-6 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl max-w-md w-full">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-rose-500/20 border border-rose-500/30 rounded-full mb-6 shadow-inner">
+            <ExclamationTriangleIcon className="h-10 w-10 text-rose-500" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-2">Access Denied</h3>
+          <p className="text-sm text-slate-400">Only HR Managers or Admins can access biometric integration.</p>
         </div>
       </div>
     );
   }
 
   if (loading) {
-    return <LoadingSpinner text="Loading biometric devices..." />;
+    return (
+      <div className="min-h-screen bg-slate-950 from-indigo-900/20 via-slate-900 to-black flex items-center justify-center">
+        <LoadingSpinner text="Loading biometric devices..." />
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black text-slate-300 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Biometric Integration</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage biometric devices and sync attendance data
-            </p>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Biometric Integration</h1>
+            <p className="mt-1 text-sm text-slate-400">Sync attendance from ZK biometric devices directly</p>
           </div>
-          <div className="flex space-x-3">
-            <button
-              onClick={() => setShowSyncModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-              Sync Data
-            </button>
-            <button
-              onClick={() => setShowAddDevice(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <ComputerDesktopIcon className="h-4 w-4 mr-2" />
-              Add Device
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              setEditingDevice(null);
+              setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
+              setShowAddDevice(true);
+            }}
+            className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 border border-indigo-500/50 rounded-xl shadow-lg text-sm font-bold text-white hover:from-indigo-400 hover:to-purple-500 transition-all duration-300 transform hover:-translate-y-0.5"
+          >
+            <ComputerDesktopIcon className="h-5 w-5 mr-2" />
+            Add Device
+          </button>
         </div>
-      </div>
 
-      {/* Device Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <ComputerDesktopIcon className="h-8 w-8 text-blue-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Devices</p>
-              <p className="text-2xl font-semibold text-gray-900">{devices.length}</p>
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {[
+            { label: 'Total Devices', value: devices.length, icon: ComputerDesktopIcon, color: 'indigo' },
+            { label: 'Active Devices', value: devices.filter(d => d.is_active).length, icon: CheckCircleIcon, color: 'emerald' },
+            {
+              label: 'Auto-Syncing',
+              value: Object.values(autoSyncConfig).filter(c => c.enabled).length,
+              icon: ArrowPathIcon,
+              color: 'violet',
+            },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-slate-900/80 transition-all group">
+              <div className="flex items-center">
+                <div className={`flex-shrink-0 p-3 rounded-xl bg-${color}-500/20 border border-${color}-500/30 text-${color}-400 group-hover:scale-110 transition-transform`}>
+                  <Icon className="h-8 w-8" />
+                </div>
+                <div className="ml-5">
+                  <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
+                  <p className="text-3xl font-bold text-white mt-1">{value}</p>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <CheckCircleIcon className="h-8 w-8 text-green-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Active Devices</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {devices.filter(d => d.is_active).length}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <ClockIcon className="h-8 w-8 text-yellow-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Recent Syncs</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {devices.filter(d => {
-                  const lastSync = d.last_sync ? new Date(d.last_sync) : null;
-                  const hoursSinceSync = lastSync ? (Date.now() - lastSync.getTime()) / (1000 * 60 * 60) : null;
-                  return lastSync && hoursSinceSync <= 24;
-                }).length}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Registered Devices */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Registered Devices</h3>
+        {/* Global sync date picker */}
+        <div className="mb-6 flex items-center space-x-4 bg-slate-900/50 border border-white/10 rounded-xl px-5 py-3">
+          <CalendarDaysIcon className="h-5 w-5 text-indigo-400 flex-shrink-0" />
+          <label className="text-sm font-semibold text-slate-300">Sync Date:</label>
+          <input
+            type="date"
+            value={syncDate}
+            onChange={e => setSyncDate(e.target.value)}
+            className="bg-black/30 border border-white/10 rounded-lg text-white px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+          />
+          <span className="text-xs text-slate-500 italic">Used for manual sync. Auto-sync always uses today.</span>
         </div>
-        
-        {devices.length === 0 ? (
-          <div className="text-center py-12">
-            <ComputerDesktopIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No devices registered</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Get started by adding your first biometric device.
-            </p>
-            <div className="mt-6">
+
+        {/* Devices List */}
+        <div className="bg-slate-900/60 backdrop-blur-xl shadow-xl overflow-hidden rounded-2xl border border-white/10 mb-8">
+          <div className="px-6 py-5 border-b border-white/10 bg-white/5">
+            <h3 className="text-xl font-bold text-white">Registered Devices</h3>
+          </div>
+
+          {devices.length === 0 ? (
+            <div className="text-center py-16">
+              <ComputerDesktopIcon className="h-12 w-12 text-slate-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-slate-300">No devices registered</h3>
+              <p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">Add your first ZK biometric device to start syncing attendance data.</p>
               <button
-                onClick={() => setShowAddDevice(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  setEditingDevice(null);
+                  setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
+                  setShowAddDevice(true);
+                }}
+                className="mt-6 inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 transition-all"
               >
-                <ComputerDesktopIcon className="h-4 w-4 mr-2" />
+                <ComputerDesktopIcon className="h-5 w-5 mr-2" />
                 Add Device
               </button>
             </div>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {devices.map((device) => (
-              <div key={device.id} className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      {getDeviceStatusIcon(device)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-medium text-gray-900">{device.device_name}</h4>
-                      <div className="mt-1 grid grid-cols-2 gap-4 text-sm text-gray-500">
-                        <div>
-                          <span className="font-medium">Device ID:</span> {device.device_id}
+          ) : (
+            <div className="divide-y divide-white/5">
+              {devices.map(device => {
+                const cfg = autoSyncConfig[device.id] || { enabled: false, interval: 15 };
+                const isSyncing = syncingDevice === device.id;
+                const result = syncResults[device.id];
+
+                return (
+                  <div key={device.id} className="p-6 hover:bg-white/5 transition-colors group">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors uppercase tracking-tight">{device.device_name}</h4>
+                          <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <button
+                              onClick={() => handleEditDevice(device)}
+                              className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors"
+                              title="Edit Device"
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteDevice(device.id)}
+                              className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 transition-colors"
+                              title="Delete Device"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
-                        <div>
-                          <span className="font-medium">Location:</span> {device.location}
+                        <div className="mt-2 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-400">
+                          <div><span className="font-semibold text-slate-500 mr-1">ID:</span><span className="font-mono text-slate-300 text-xs bg-black/20 px-1.5 py-0.5 rounded">{device.device_id}</span></div>
+                          <div><span className="font-semibold text-slate-500 mr-1">Status:</span><span className="text-slate-300">{getDeviceStatusText(device)}</span></div>
+                          <div><span className="font-semibold text-slate-500 mr-1">IP:</span><span className="font-mono text-slate-300 text-xs bg-black/20 px-1.5 py-0.5 rounded">{device.ip_address}</span></div>
+                          <div><span className="font-semibold text-slate-500 mr-1">Location:</span>{device.location}</div>
                         </div>
-                        <div>
-                          <span className="font-medium">IP Address:</span> {device.ip_address}
-                        </div>
-                        <div>
-                          <span className="font-medium">Status:</span> {getDeviceStatusText(device)}
-                        </div>
+                        {device.last_sync && (
+                          <p className="mt-2 text-xs text-slate-500 flex items-center">
+                            <ClockIcon className="w-3.5 h-3.5 mr-1" />
+                            Last synced: {formatDateTime(device.last_sync)}
+                          </p>
+                        )}
+
+                        {/* Last sync result */}
+                        {result && (
+                          <div className={`mt-3 text-xs px-3 py-2 rounded-lg border ${result.success ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-rose-500/10 border-rose-500/30 text-rose-300'}`}>
+                            {result.success ? (
+                              <>✅ Synced <strong>{result.synced_count}/{result.total_logs}</strong> logs for <strong>{result.sync_date}</strong> — <strong>{result.attendance_records_created}</strong> new records created &nbsp;·&nbsp; {result.lastSyncAt}</>
+                            ) : (
+                              <>❌ {result.error} &nbsp;·&nbsp; {result.lastSyncAt}</>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      {device.last_sync && (
-                        <p className="mt-2 text-sm text-gray-500">
-                          Last synced: {formatDateTime(device.last_sync)}
-                        </p>
-                      )}
+
+                      {/* Sync Controls */}
+                      <div className="flex flex-col gap-3 min-w-[230px]">
+                        <button
+                          onClick={() => syncDevice(device, syncDate)}
+                          disabled={isSyncing}
+                          className="inline-flex items-center justify-center px-4 py-2 border border-white/10 text-sm font-semibold rounded-xl text-slate-300 bg-black/20 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSyncing ? (
+                            <><ArrowPathIcon className="h-4 w-4 mr-2 animate-spin" /> Syncing...</>
+                          ) : (
+                            <><CloudArrowUpIcon className="h-4 w-4 mr-2" /> Sync Now ({syncDate})</>
+                          )}
+                        </button>
+
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={cfg.interval}
+                            disabled={cfg.enabled}
+                            onChange={e => setAutoSyncInterval(device.id, Number(e.target.value))}
+                            className="flex-1 bg-black/30 border border-white/10 rounded-lg text-slate-300 text-xs px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50"
+                          >
+                            {SYNC_INTERVALS.map(opt => (
+                              <option key={opt.value} value={opt.value} className="bg-slate-900">{opt.label}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => toggleAutoSync(device)}
+                            className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${cfg.enabled
+                              ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 hover:bg-rose-500/30'
+                              : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30'
+                              }`}
+                          >
+                            {cfg.enabled ? (
+                              <><StopIcon className="h-3.5 w-3.5 mr-1" /> Stop</>
+                            ) : (
+                              <><PlayIcon className="h-3.5 w-3.5 mr-1" /> Auto</>
+                            )}
+                          </button>
+                        </div>
+
+                        {cfg.enabled && (
+                          <div className="flex items-center text-xs text-emerald-400 animate-pulse">
+                            <ArrowPathIcon className="h-3.5 w-3.5 mr-1 animate-spin" />
+                            Auto-syncing every {cfg.interval} min (today)
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => {
-                        setSelectedDevice(device);
-                        setShowSyncModal(true);
-                        setSyncData(prev => ({ ...prev, device_id: device.device_id }));
-                      }}
-                      className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      <CloudArrowUpIcon className="h-4 w-4 mr-1" />
-                      Sync
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Info box */}
+        <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-6">
+          <div className="flex">
+            <SignalIcon className="h-6 w-6 text-indigo-400 flex-shrink-0" />
+            <div className="ml-4">
+              <h3 className="text-base font-bold text-indigo-300">How it works</h3>
+              <ul className="mt-2 text-sm text-indigo-200/80 space-y-1 list-disc list-inside">
+                <li><strong>Sync Now</strong> — pulls logs for the selected date from the ZK device IP and creates/updates attendance records instantly.</li>
+                <li><strong>Auto Sync</strong> — runs on a background timer. Always syncs <em>today's</em> data so checkout times stay updated automatically.</li>
+                <li>Times are stored in <strong>IST</strong>. Punch times from the device are converted to the correct local time before saving.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Add/Edit Device Modal */}
+        {showAddDevice && (
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+              <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm" onClick={() => {
+                setShowAddDevice(false);
+                setEditingDevice(null);
+                setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
+              }} />
+              <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full relative z-10">
+                <div className="px-8 pt-8 pb-6">
+                  <div className="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
+                    <h3 className="text-xl font-bold text-white">{editingDevice ? 'Edit' : 'Add'} Biometric Device</h3>
+                    <button onClick={() => {
+                      setShowAddDevice(false);
+                      setEditingDevice(null);
+                      setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
+                    }} className="text-slate-400 hover:text-white transition-colors">
+                      <XCircleIcon className="h-6 w-6" />
                     </button>
                   </div>
+                  <form onSubmit={handleAddDevice} className="space-y-5" id="addDeviceForm">
+                    {[
+                      { label: 'Device Name', key: 'device_name', placeholder: 'e.g. Main Entrance Scanner' },
+                      { label: 'Device ID', key: 'device_id', placeholder: 'e.g. BIOMETRIC_001' },
+                      { label: 'Location', key: 'location', placeholder: 'e.g. Building A - Main Entrance' },
+                      { label: 'IP Address', key: 'ip_address', placeholder: 'e.g. 192.168.1.100' },
+                    ].map(({ label, key, placeholder }) => (
+                      <div key={key}>
+                        <label className="block text-sm font-medium text-slate-300 mb-1.5">{label}</label>
+                        <input
+                          type="text"
+                          required
+                          value={newDevice[key]}
+                          onChange={e => setNewDevice(prev => ({ ...prev, [key]: e.target.value }))}
+                          className="block w-full bg-black/20 border border-white/10 rounded-xl py-2.5 px-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                          placeholder={placeholder}
+                        />
+                      </div>
+                    ))}
+                  </form>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* API Integration Guide */}
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <SignalIcon className="h-5 w-5 text-blue-400" />
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">API Integration Guide</h3>
-            <div className="mt-2 text-sm text-blue-700">
-              <p>To integrate your biometric devices, send a POST request to the sync endpoint:</p>
-              <div className="mt-3 bg-blue-100 p-3 rounded font-mono text-xs overflow-x-auto">
-                <div className="text-blue-900">POST /api/attendance/biometric-sync/</div>
-                <div className="mt-2 text-blue-800">
-                  Content-Type: application/json<br/>
-                  Authorization: Bearer YOUR_API_TOKEN
-                </div>
-                <div className="mt-2 text-blue-900">
-                  {JSON.stringify({
-                    device_id: "DEVICE_001",
-                    attendance_data: [
-                      {
-                        employee_id: "EMP001",
-                        date: "2024-01-15",
-                        check_in_time: "09:00:00",
-                        check_out_time: "17:30:00",
-                        status: "PRESENT"
-                      }
-                    ]
-                  }, null, 2)}
+                <div className="bg-white/5 border-t border-white/10 px-6 py-4 flex flex-row-reverse gap-3">
+                  <button type="submit" form="addDeviceForm" className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-sm font-bold text-white hover:from-indigo-400 hover:to-purple-500 transition-all">
+                    {editingDevice ? 'Save Changes' : 'Add Device'}
+                  </button>
+                  <button type="button" onClick={() => {
+                    setShowAddDevice(false);
+                    setEditingDevice(null);
+                    setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
+                  }} className="px-6 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-slate-300 hover:bg-white/10 transition-all">
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Add Device Modal */}
-      <Modal
-        isOpen={showAddDevice}
-        onClose={() => setShowAddDevice(false)}
-        title="Add Biometric Device"
-      >
-        <form onSubmit={handleAddDevice} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Device Name</label>
-            <input
-              type="text"
-              required
-              value={newDevice.device_name}
-              onChange={(e) => setNewDevice(prev => ({ ...prev, device_name: e.target.value }))}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g. Main Entrance Scanner"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Device ID</label>
-            <input
-              type="text"
-              required
-              value={newDevice.device_id}
-              onChange={(e) => setNewDevice(prev => ({ ...prev, device_id: e.target.value }))}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g. BIOMETRIC_001"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Location</label>
-            <input
-              type="text"
-              required
-              value={newDevice.location}
-              onChange={(e) => setNewDevice(prev => ({ ...prev, location: e.target.value }))}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g. Building A - Main Entrance"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">IP Address</label>
-            <input
-              type="text"
-              required
-              value={newDevice.ip_address}
-              onChange={(e) => setNewDevice(prev => ({ ...prev, ip_address: e.target.value }))}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g. 192.168.1.100"
-            />
-          </div>
-          
-          <div className="flex space-x-3 pt-4">
-            <button
-              type="submit"
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Add Device
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAddDevice(false)}
-              className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Sync Data Modal */}
-      <Modal
-        isOpen={showSyncModal}
-        onClose={() => setShowSyncModal(false)}
-        title="Sync Biometric Data"
-        size="large"
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Select Device</label>
-            <select
-              value={syncData.device_id}
-              onChange={(e) => setSyncData(prev => ({ ...prev, device_id: e.target.value }))}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select a device</option>
-              {devices.filter(d => d.is_active).map((device) => (
-                <option key={device.id} value={device.device_id}>
-                  {device.device_name} - {device.location}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Attendance Data (JSON)</label>
-            <textarea
-              value={JSON.stringify(syncData.attendance_data, null, 2)}
-              onChange={(e) => {
-                try {
-                  const data = JSON.parse(e.target.value);
-                  setSyncData(prev => ({ ...prev, attendance_data: data }));
-                } catch (error) {
-                  // Invalid JSON, don't update
-                }
-              }}
-              rows={10}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-              placeholder="Enter attendance data in JSON format..."
-            />
-            <p className="mt-1 text-sm text-gray-500">
-              Format: {`[{"employee_id": "EMP001", "date": "${new Date().toISOString().split('T')[0]}", "check_in_time": "09:00:00", "check_out_time": "17:30:00", "status": "PRESENT"}]`}
-            </p>
-          </div>
-
-          <div className="flex space-x-3">
-            <button
-              onClick={addSampleData}
-              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Add Sample Data
-            </button>
-            <button
-              onClick={handleSync}
-              disabled={syncLoading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {syncLoading ? (
-                <div className="flex items-center">
-                  <LoadingSpinner size="small" />
-                  <span className="ml-2">Syncing...</span>
-                </div>
-              ) : (
-                'Sync Data'
-              )}
-            </button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

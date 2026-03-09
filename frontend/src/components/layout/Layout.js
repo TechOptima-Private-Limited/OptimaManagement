@@ -54,29 +54,26 @@ const Layout = ({ children }) => {
           </div>
 
           {/* Footer */}
-          <footer className="bg-white border-t border-gray-200 mt-auto">
-            <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 md:px-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <span>© 2024 HR Management System</span>
-                  <span>•</span>
-                  <a href="/privacy" className="hover:text-gray-700 transition-colors">
-                    Privacy Policy
+          <footer className="bg-slate-900/80 backdrop-blur-md border-t border-white/5 mt-auto relative z-10">
+            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 md:px-8">
+              <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                <div className="flex items-center space-x-6 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span>© 2024 OptimaManagement</span>
+                  <span className="text-slate-700">•</span>
+                  <a href="/privacy" className="hover:text-indigo-400 transition-colors">
+                    Privacy
                   </a>
-                  <span>•</span>
-                  <a href="/terms" className="hover:text-gray-700 transition-colors">
-                    Terms of Service
+                  <span className="text-slate-700">•</span>
+                  <a href="/terms" className="hover:text-indigo-400 transition-colors">
+                    Terms
                   </a>
                 </div>
 
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <span>Need help?</span>
-                  <a
-                    href="/support"
-                    className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
-                  >
-                    Contact Support
-                  </a>
+                <div className="flex items-center space-x-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span>Powered by</span>
+                  <span className="text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                    Premium UI Engine
+                  </span>
                 </div>
               </div>
             </div>

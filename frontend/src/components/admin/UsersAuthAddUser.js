@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI, adminUserAPI } from '../../services/api';
 import { isAdmin } from '../../utils/auth';
 import { toast } from 'react-toastify';
+import { useTheme } from '../../context/ThemeContext';
+import { UserPlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 const UsersAuthAddUser = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -43,7 +46,6 @@ const UsersAuthAddUser = () => {
     submittingRef.current = true;
     setSaving(true);
     try {
-      // Build payload: trim fields, omit optional empties, include password2 alias
       const payload = {
         username: form.username.trim(),
         email: form.email.trim(),
@@ -61,7 +63,6 @@ const UsersAuthAddUser = () => {
     } catch (error) {
       console.error('Failed to create user', error);
       const resp = error.response?.data;
-      console.error('Create user error response:', resp);
       let message = null;
       if (Array.isArray(resp)) {
         message = resp.join(' | ');
@@ -79,23 +80,6 @@ const UsersAuthAddUser = () => {
       if (!message && error.response?.status === 500) {
         message = 'Server error (500). Please check backend logs.';
       }
-      if (!message && error.response?.statusText) {
-        message = `${error.response.status} ${error.response.statusText}`;
-      }
-      try {
-        const { data } = await adminUserAPI.getUsers();
-        const uname = form.username.trim();
-        const mail = form.email.trim();
-        const list = Array.isArray(data) ? data : (Array.isArray(data?.results) ? data.results : []);
-        const exists = list.some(u => u?.username === uname || u?.email === mail);
-        if (exists) {
-          toast.success('User created successfully');
-          navigate('/users-auth');
-          return;
-        }
-      } catch (verifyErr) {
-        console.warn('Could not verify user existence after error', verifyErr);
-      }
       toast.error(message || error.message || 'Failed to create user');
     } finally {
       setSaving(false);
@@ -103,110 +87,132 @@ const UsersAuthAddUser = () => {
     }
   };
 
-  // Render page and rely on backend permissions (403) instead of client-side blocking
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <button
-            type="button"
-            onClick={() => navigate('/users-auth')}
-            className="text-xs text-indigo-600 hover:text-indigo-800 mb-1"
-          >
-            ← Back to Users and Authentication
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">Add user</h1>
-          <p className="text-sm text-gray-500">
-            After you create a user, you can edit more options from the Users and Authentication page.
-          </p>
+    <div className="min-h-screen bg-[#070B14] p-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate('/users-auth')}
+              className="group flex items-center text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-all"
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2 transform group-hover:-translate-x-1 transition-transform" />
+              Back to Users and Authentication
+            </button>
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                <UserPlusIcon className="h-8 w-8 text-indigo-400" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-black text-white uppercase tracking-tight">Add new user</h1>
+                <p className="text-sm text-slate-500 font-medium tracking-tight">
+                  Configure core identity and security credentials for a new system user.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4 max-w-2xl">
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Username</label>
-          <input
-            type="text"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-            value={form.username}
-            onChange={(e) => handleChange('username', e.target.value)}
-          />
-          <p className="mt-1 text-[11px] text-gray-400">
-            Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-          </p>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-            value={form.email}
-            onChange={(e) => handleChange('email', e.target.value)}
-          />
-          <p className="mt-1 text-[11px] text-gray-400">Required. Enter a valid email address.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">First name</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-              value={form.first_name}
-              onChange={(e) => handleChange('first_name', e.target.value)}
-            />
+        <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="p-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                <input
+                  type="text"
+                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  value={form.username}
+                  onChange={(e) => handleChange('username', e.target.value)}
+                  placeholder="e.g. jdoe"
+                />
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter ml-1">
+                  Required. 150 chars max. Letters, digits and @/./+/-/_ only.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                <input
+                  type="email"
+                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  value={form.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  placeholder="jdoe@example.com"
+                />
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter ml-1">Required. Valid email address only.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">First Name</label>
+                <input
+                  type="text"
+                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  value={form.first_name}
+                  onChange={(e) => handleChange('first_name', e.target.value)}
+                  placeholder="John"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Last Name</label>
+                <input
+                  type="text"
+                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  value={form.last_name}
+                  onChange={(e) => handleChange('last_name', e.target.value)}
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Security Password</label>
+                <input
+                  type="password"
+                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  value={form.password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  placeholder="••••••••"
+                />
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter ml-1">
+                  Min 8 characters. Must not be entirely numeric.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Confirm Identity</label>
+                <input
+                  type="password"
+                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  value={form.password_confirm}
+                  onChange={(e) => handleChange('password_confirm', e.target.value)}
+                  placeholder="••••••••"
+                />
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter ml-1">Repeat the password exactly as above.</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Last name</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-              value={form.last_name}
-              onChange={(e) => handleChange('last_name', e.target.value)}
-            />
+
+          <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => navigate('/users-auth')}
+              className="px-8 py-3 text-xs font-black rounded-2xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
+            >
+              CANCEL
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className={`px-10 py-3 text-xs font-black rounded-2xl bg-gradient-to-r ${theme.primaryGradient} text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95`}
+            >
+              {saving ? 'CREATING USER...' : 'SAVE USER PROFILE'}
+            </button>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-              value={form.password}
-              onChange={(e) => handleChange('password', e.target.value)}
-            />
-            <p className="mt-1 text-[11px] text-gray-400">
-              Your password must contain at least 8 characters and cannot be entirely numeric.
-            </p>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Password confirmation</label>
-            <input
-              type="password"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-              value={form.password_confirm}
-              onChange={(e) => handleChange('password_confirm', e.target.value)}
-            />
-            <p className="mt-1 text-[11px] text-gray-400">Enter the same password as before, for verification.</p>
-          </div>
-        </div>
-        <div className="pt-4 border-t border-gray-200 flex justify-end space-x-2">
-          <button
-            type="button"
-            onClick={() => navigate('/users-auth')}
-            className="px-4 py-2 text-sm rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 text-sm rounded-md border border-transparent text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60"
-          >
-            {saving ? 'Saving...' : 'Save'}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

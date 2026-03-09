@@ -144,7 +144,7 @@ const Navbar = ({ onMenuToggle }) => {
   };
 
   return (
-    <nav className={`bg-gradient-to-r ${theme.navbarGradient} shadow-xl border-b border-white/20 sticky top-0 z-40 backdrop-blur-sm`}>
+    <nav className={`bg-[#0B1120]/80 shadow-2xl border-b border-white/5 sticky top-0 z-40 backdrop-blur-md`}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Left side */}
@@ -152,7 +152,7 @@ const Navbar = ({ onMenuToggle }) => {
             {/* Mobile menu button */}
             <button
               onClick={onMenuToggle}
-              className="p-2 rounded-md text-white/80 hover:text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 lg:hidden transition-all duration-300"
+              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-indigo-500 lg:hidden transition-all duration-300"
               aria-label="Open sidebar"
             >
               <Bars3Icon className="h-6 w-6" />
@@ -164,25 +164,25 @@ const Navbar = ({ onMenuToggle }) => {
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   {isSearching ? (
-                    <div className="h-4 w-4 border-2 border-white/30 border-t-white/80 rounded-full animate-spin"></div>
+                    <div className="h-4 w-4 border-2 border-slate-300 border-t-indigo-600 rounded-full animate-spin"></div>
                   ) : (
-                    <MagnifyingGlassIcon className="h-5 w-5 text-white/50" />
+                    <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" />
                   )}
                 </div>
                 <input
                   type="text"
-                  placeholder="Search employees, requests..."
+                  placeholder="Search employees, policies..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.trim() && setShowDropdown(true)}
                   onKeyDown={handleSearch}
-                  className="block w-full pl-11 pr-4 py-2.5 border border-white/20 rounded-2xl leading-5 bg-white/10 backdrop-blur-md placeholder-white/50 text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20 transition-all duration-300 shadow-inner"
+                  className="block w-full pl-11 pr-4 py-2 border border-white/10 rounded-lg leading-5 bg-white/5 placeholder-slate-500 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 transition-all duration-300"
                 />
               </div>
 
               {/* Dropdown Results */}
               {showDropdown && (searchQuery.trim()) && (
-                <div className="absolute mt-2 w-full bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute mt-2 w-full bg-[#0B1120]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="max-h-[min(80vh,500px)] overflow-y-auto custom-scrollbar px-3 py-3">
                     {/* Quick Links Section */}
                     {searchResults.links.length > 0 && (
@@ -192,10 +192,10 @@ const Navbar = ({ onMenuToggle }) => {
                           <button
                             key={link.path}
                             onClick={() => handleResultClick(link.path)}
-                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-600 transition-all group"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 transition-all group"
                           >
-                            <div className="p-2 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
-                              <link.icon className="h-4 w-4 text-red-500" />
+                            <div className="p-2 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
+                              <link.icon className="h-4 w-4 text-indigo-500" />
                             </div>
                             <span className="text-sm font-medium">{link.name}</span>
                           </button>
@@ -211,9 +211,9 @@ const Navbar = ({ onMenuToggle }) => {
                           <button
                             key={emp.id}
                             onClick={() => handleResultClick(`/employees/${emp.id}`)}
-                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-600 transition-all group"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 transition-all group"
                           >
-                            <div className="h-9 w-9 bg-gradient-to-br from-red-500 to-rose-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md border border-white/20">
+                            <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md border border-white/20">
                               {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
                             </div>
                             <div className="text-left overflow-hidden">
@@ -222,7 +222,7 @@ const Navbar = ({ onMenuToggle }) => {
                               </p>
                               <p className="text-[11px] text-gray-500 truncate">{emp.position || emp.department?.name || 'Employee'}</p>
                             </div>
-                            <div className="ml-auto text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 group-hover:bg-red-100 group-hover:text-red-600">
+                            <div className="ml-auto text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600">
                               {emp.employee_id}
                             </div>
                           </button>
@@ -250,30 +250,30 @@ const Navbar = ({ onMenuToggle }) => {
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-3 p-2.5 rounded-xl text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 backdrop-blur-sm border border-white/20"
+                className="flex items-center space-x-3 p-1.5 rounded-lg text-slate-300 hover:bg-white/5 focus:outline-none transition-all duration-300"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="h-9 w-9 bg-gradient-to-r from-white/30 to-white/20 rounded-full flex items-center justify-center shadow-lg border border-white/30">
-                    <span className="text-white font-bold text-sm">
-                      {getInitials(user?.first_name, user?.last_name)}
-                    </span>
-                  </div>
-                  <div className="hidden sm:block text-left">
+                  <div className="hidden sm:block text-right">
                     <div className="text-sm font-semibold text-white">
                       {user?.first_name} {user?.last_name}
                     </div>
-                    <div className="text-xs text-white/70">
+                    <div className="text-xs text-slate-400 text-right">
                       {user?.profile?.role?.replace('_', ' ')}
                     </div>
                   </div>
-                  <ChevronDownIcon className="h-4 w-4 text-white/70" />
+                  <div className="h-9 w-9 bg-slate-800 rounded-full flex items-center justify-center overflow-hidden border border-white/10 shadow-lg">
+                    <span className="text-gray-600 font-bold text-sm">
+                      {getInitials(user?.first_name, user?.last_name)}
+                    </span>
+                  </div>
+                  <ChevronDownIcon className="h-4 w-4 text-gray-400" />
                 </div>
               </button>
 
               {/* User dropdown */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl py-2 z-50 border border-white/30">
-                  <div className="px-4 py-4 border-b border-gray-200/50">
+                <div className="absolute right-0 mt-3 w-64 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl py-2 z-50 border border-white/10 overflow-hidden">
+                  <div className="px-4 py-4 border-b border-white/5 bg-slate-800/20">
                     <div className="flex items-center space-x-3 mb-3">
                       <div className={`h-12 w-12 bg-gradient-to-r ${theme.avatarGradient} rounded-full flex items-center justify-center shadow-lg`}>
                         <span className="text-white font-bold text-lg">
@@ -281,49 +281,35 @@ const Navbar = ({ onMenuToggle }) => {
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-sm font-semibold text-white">
                           {user?.first_name} {user?.last_name}
                         </p>
-                        <p className="text-sm text-gray-600">{user?.email}</p>
+                        <p className="text-sm text-slate-400">{user?.email}</p>
                       </div>
                     </div>
                     <div className="flex justify-center">
                       {getRoleBadge(user?.profile?.role)}
                     </div>
                   </div>
-                  <div className="px-4 py-3 border-b border-gray-200/50">
-                    <div className="text-xs font-semibold text-gray-500 mb-2">Theme</div>
-                    <div className="grid grid-cols-6 gap-2">
-                      {Object.values(themes).map(opt => (
-                        <button
-                          key={opt.id}
-                          onClick={() => setThemeId(opt.id)}
-                          className={`h-6 w-6 rounded-full border-2 bg-gradient-to-r ${opt.navbarGradient} ${themeId === opt.id ? 'border-gray-900' : 'border-white/70'}`}
-                          aria-label={opt.name}
-                          title={opt.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
 
                   <Link
                     to="/profile"
-                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 transition-all duration-300"
+                    className="block px-4 py-3 text-sm text-slate-300 hover:bg-white/5 transition-all duration-300"
                     onClick={() => setShowUserMenu(false)}
                   >
                     <div className="flex items-center space-x-3">
-                      <UserCircleIcon className="h-5 w-5 text-red-500" />
+                      <UserCircleIcon className="h-5 w-5 text-indigo-500" />
                       <span className="font-medium">Your Profile</span>
                     </div>
                   </Link>
 
                   <Link
                     to="/settings"
-                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 transition-all duration-300"
+                    className="block px-4 py-3 text-sm text-slate-300 hover:bg-white/5 transition-all duration-300"
                     onClick={() => setShowUserMenu(false)}
                   >
                     <div className="flex items-center space-x-3">
-                      <svg className="h-5 w-5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -333,27 +319,27 @@ const Navbar = ({ onMenuToggle }) => {
 
                   <Link
                     to="/resource-management"
-                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 transition-all duration-300"
+                    className="block px-4 py-3 text-sm text-slate-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 transition-all duration-300"
                     onClick={() => setShowUserMenu(false)}
                   >
                     <div className="flex items-center space-x-3">
-                      <svg className="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="font-medium">Help & Support</span>
                     </div>
                   </Link>
 
-                  <div className="border-t border-gray-200/50 mt-2 pt-2">
+                  <div className="border-t border-white/5 mt-2 pt-2">
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 transition-all duration-300"
+                      className="block w-full text-left px-4 py-3 text-sm text-indigo-400 hover:bg-white/5 transition-all duration-300"
                     >
                       <div className="flex items-center space-x-3">
-                        <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        <span className="font-medium">Sign out</span>
+                        <span className="font-medium text-indigo-300">Sign out</span>
                       </div>
                     </button>
                   </div>
@@ -377,7 +363,7 @@ const Navbar = ({ onMenuToggle }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => searchQuery.trim() && setShowDropdown(true)}
             onKeyDown={handleSearch}
-            className="block w-full pl-10 pr-3 py-2.5 border border-white/30 rounded-xl leading-5 bg-white/20 backdrop-blur-sm placeholder-white/70 text-white focus:outline-none focus:placeholder-white/50 focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-all duration-300"
+            className="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-xl leading-5 bg-white/5 placeholder-slate-500 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
           />
 
           {/* Mobile Search Dropdown */}
@@ -385,14 +371,14 @@ const Navbar = ({ onMenuToggle }) => {
             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
               <div className="max-h-64 overflow-y-auto p-2">
                 {searchResults.links.map(link => (
-                  <button key={link.path} onClick={() => handleResultClick(link.path)} className="w-full flex items-center space-x-3 p-3 hover:bg-red-50 rounded-lg text-gray-700">
-                    <link.icon className="h-5 w-5 text-red-500" />
+                  <button key={link.path} onClick={() => handleResultClick(link.path)} className="w-full flex items-center space-x-3 p-3 hover:bg-white/5 rounded-lg text-slate-300 transition-colors">
+                    <link.icon className="h-5 w-5 text-indigo-400" />
                     <span className="text-sm font-medium">{link.name}</span>
                   </button>
                 ))}
                 {searchResults.employees.map(emp => (
-                  <button key={emp.id} onClick={() => handleResultClick(`/employees/${emp.id}`)} className="w-full flex items-center space-x-3 p-3 hover:bg-red-50 rounded-lg text-gray-700">
-                    <div className="h-8 w-8 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white/20">
+                  <button key={emp.id} onClick={() => handleResultClick(`/employees/${emp.id}`)} className="w-full flex items-center space-x-3 p-3 hover:bg-white/5 rounded-lg text-slate-300 transition-colors">
+                    <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white/20">
                       {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
                     </div>
                     <div className="text-left">

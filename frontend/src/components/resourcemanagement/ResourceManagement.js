@@ -462,13 +462,13 @@ const ResourceManagement = () => {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+          <div className={`${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl border ${theme.cardBorder} p-6`}>
             <div className="flex items-center justify-between">
               <div>
                 <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent`}>
                   Support 24/7
                 </h1>
-                <p className="text-gray-600 mt-2">
+                <p className="text-gray-400 mt-2">
                   Manage access requests, resources, and permissions
                 </p>
                 {hasAdminAccess() && (
@@ -494,7 +494,7 @@ const ResourceManagement = () => {
 
         {/* Navigation Tabs */}
         <div className="mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-2">
+          <div className={`${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl border ${theme.cardBorder} p-2`}>
             <nav className="flex space-x-2 overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -509,7 +509,7 @@ const ResourceManagement = () => {
                       flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap
                       ${isActive
                         ? `bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg transform scale-105`
-                        : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:scale-105'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5 hover:scale-105'
                       }
                     `}
                     title={tab.description}
@@ -533,7 +533,7 @@ const ResourceManagement = () => {
         </div>
 
         {/* Content */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 min-h-[600px]">
+        <div className={`${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl border ${theme.cardBorder} min-h-[600px] overflow-hidden`}>
           <Routes>
             <Route path="/" element={<ResourceDashboard />} />
             <Route path="/request" element={<ResourceRequestForm />} />
@@ -553,9 +553,9 @@ const ResourceManagement = () => {
         {/* Footer Info */}
         {hasAdminAccess() && (
           <div className="mt-6 text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full shadow-sm border border-white/20">
+            <div className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full shadow-lg border border-white/10">
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-400">
                 Administrative privileges active for {getUserRoleDisplay()}
               </span>
             </div>

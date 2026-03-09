@@ -40,12 +40,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.login(credentials);
       const { user, access, refresh } = response.data;
-      
+
       setTokens(access, refresh);
       setCurrentUser(user);
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-      
-      return { success: true };
+
+      return { success: true, user };
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Login failed';
       dispatch({ type: 'LOGIN_FAILURE', payload: errorMessage });
@@ -58,11 +58,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.register(userData);
       const { user, access, refresh } = response.data;
-      
+
       setTokens(access, refresh);
       setCurrentUser(user);
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-      
+
       return { success: true };
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Registration failed';
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  
+
   const logout = () => {
     removeTokens();
     dispatch({ type: 'LOGOUT' });

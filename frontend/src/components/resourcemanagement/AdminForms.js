@@ -49,7 +49,7 @@
 //     return (
 //       <div className="bg-white rounded-lg border border-gray-200 p-6">
 //         <h3 className="text-lg font-semibold text-gray-900 mb-4">Add resource type</h3>
-        
+
 //         <div className="space-y-4">
 //           <div>
 //             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -145,7 +145,7 @@
 //     return (
 //       <div className="bg-white rounded-lg border border-gray-200 p-6">
 //         <h3 className="text-lg font-semibold text-gray-900 mb-4">Add access level</h3>
-        
+
 //         <div className="space-y-4">
 //           <div>
 //             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -258,7 +258,7 @@
 //     return (
 //       <div className="bg-white rounded-lg border border-gray-200 p-6">
 //         <h3 className="text-lg font-semibold text-gray-900 mb-4">Add resource</h3>
-        
+
 //         <div className="space-y-4">
 //           <div>
 //             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -473,15 +473,15 @@
 //         setAccessVerified(false);
 //         return;
 //       }
-      
+
 //       const userRole = user.role?.toLowerCase();
 //       const hasAccess = userRole === 'admin' || 
 //                        userRole === 'hr_manager' || 
 //                        userRole === 'hr_admin' ||
 //                        userRole === 'super_admin';
-      
+
 //       setAccessVerified(hasAccess);
-      
+
 //       if (!hasAccess) {
 //         toast.error('Access denied: Admin privileges required');
 //       }
@@ -558,7 +558,7 @@
 //             <span>Admin Only</span>
 //           </div>
 //         </div>
-        
+
 //         <form onSubmit={handleSubmit} className="space-y-4">
 //           <div>
 //             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -664,7 +664,7 @@
 //             <span>Admin Only</span>
 //           </div>
 //         </div>
-        
+
 //         <form onSubmit={handleSubmit} className="space-y-4">
 //           <div>
 //             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -787,7 +787,7 @@
 //             <span>Admin Only</span>
 //           </div>
 //         </div>
-        
+
 //         <form onSubmit={handleSubmit} className="space-y-4">
 //           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //             <div>
@@ -1032,8 +1032,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { getCurrentUser, hasAdminPrivileges } from '../../utils/auth';
 import api from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
 
 const AdminForms = () => {
+  const { theme } = useTheme();
   const [activeForm, setActiveForm] = useState('resource-type');
   const [accessVerified, setAccessVerified] = useState(false);
   const queryClient = useQueryClient();
@@ -1046,20 +1048,20 @@ const AdminForms = () => {
         setAccessVerified(false);
         return;
       }
-      
+
       // Check for Admin, HR Manager, or IT Supporter roles
       const userRole = user.role?.toLowerCase() || user.profile?.role?.toLowerCase();
-      const hasAccess = userRole === 'admin' || 
-                       userRole === 'hr_manager' || 
-                       userRole === 'hr_admin' ||
-                       userRole === 'it_supporter';
-      
+      const hasAccess = userRole === 'admin' ||
+        userRole === 'hr_manager' ||
+        userRole === 'hr_admin' ||
+        userRole === 'it_supporter';
+
       // Alternative using utility function
       const hasAccessAlt = hasAdminPrivileges();
-      
+
       const finalAccess = hasAccess || hasAccessAlt;
       setAccessVerified(finalAccess);
-      
+
       if (!finalAccess) {
         toast.error('Access denied: Admin, HR Manager, or IT Supporter privileges required');
       }
@@ -1088,21 +1090,25 @@ const AdminForms = () => {
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-            <ShieldCheckIcon className="mx-auto h-16 w-16 text-red-400 mb-4" />
-            <h2 className="text-xl font-semibold text-red-900 mb-2">Access Denied</h2>
-            <p className="text-red-700 mb-4">
+          <div className={`bg-red-500/10 border border-red-500/20 backdrop-blur-sm rounded-2xl p-8 text-center`}>
+            <div className="inline-flex p-4 rounded-full bg-red-500/20 mb-4">
+              <ShieldCheckIcon className="h-12 w-12 text-red-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
+            <p className="text-red-200 mb-6">
               You don't have permission to access the Admin Forms. This section is restricted to administrators, HR managers, and IT supporters.
             </p>
-            <div className="bg-red-100 rounded-lg p-4 mb-4">
-              <p className="text-sm text-red-800">
-                <strong>Current Role:</strong> {getUserRoleDisplay()}
+            <div className="bg-black/20 rounded-xl p-5 mb-6 border border-red-500/10 inline-block text-left w-full max-w-md mx-auto">
+              <p className="text-sm text-red-200 flex justify-between border-b border-red-500/10 pb-2 mb-2">
+                <strong className="text-red-300">Current Role:</strong>
+                <span className="text-white font-medium">{getUserRoleDisplay()}</span>
               </p>
-              <p className="text-sm text-red-800 mt-1">
-                <strong>Required Roles:</strong> Administrator, HR Manager, or IT Supporter
+              <p className="text-sm text-red-200 flex justify-between">
+                <strong className="text-red-300">Required Roles:</strong>
+                <span className="text-white font-medium">Administrator, HR Manager, or IT Supporter</span>
               </p>
             </div>
-            <p className="text-sm text-red-600">
+            <p className="text-sm text-gray-400">
               Please contact your system administrator if you believe you should have access to this section.
             </p>
           </div>
@@ -1129,9 +1135,9 @@ const AdminForms = () => {
         },
         onError: (error) => {
           console.error('Error creating resource type:', error);
-          const errorMessage = error?.response?.data?.detail || 
-                             error?.response?.data?.message || 
-                             'Failed to create resource type';
+          const errorMessage = error?.response?.data?.detail ||
+            error?.response?.data?.message ||
+            'Failed to create resource type';
           toast.error(errorMessage);
         }
       }
@@ -1143,18 +1149,18 @@ const AdminForms = () => {
     };
 
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Add Resource Type</h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+          <h3 className="text-lg font-bold text-white">Add Resource Type</h3>
+          <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
-            <span>Admin Access Required</span>
+            <span className="uppercase tracking-wider">Admin Access Required</span>
           </div>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
               Name *
             </label>
             <input
@@ -1162,53 +1168,53 @@ const AdminForms = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="e.g., Database, Application, Server"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Describe this resource type..."
             />
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center bg-black/20 p-4 rounded-xl border border-white/5">
             <input
               type="checkbox"
               id="is_active_rt"
               checked={formData.is_active}
               onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-5 w-5 bg-black/40 border-white/20 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900 rounded"
             />
-            <label htmlFor="is_active_rt" className="ml-2 block text-sm text-gray-900">
+            <label htmlFor="is_active_rt" className="ml-3 block text-sm font-medium text-white">
               Is active
             </label>
           </div>
 
-          <div className="flex space-x-3 pt-4 border-t">
+          <div className="flex space-x-3 pt-6 border-t border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+              className={`bg-gradient-to-r ${theme.primaryGradient} text-white px-6 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 font-bold tracking-wide transition-all shadow-lg hover:shadow-indigo-500/25`}
             >
               {createMutation.isLoading ? 'Saving...' : 'SAVE'}
             </button>
             <button
               type="button"
               onClick={() => {
-                handleSubmit({ preventDefault: () => {} });
+                handleSubmit({ preventDefault: () => { } });
                 setFormData({ name: '', description: '', is_active: true });
               }}
               disabled={createMutation.isLoading}
-              className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 font-medium transition-colors"
+              className="bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-white/20 font-bold tracking-wide transition-colors border border-white/10"
             >
               Save and add another
             </button>
@@ -1235,9 +1241,9 @@ const AdminForms = () => {
         },
         onError: (error) => {
           console.error('Error creating access level:', error);
-          const errorMessage = error?.response?.data?.detail || 
-                             error?.response?.data?.message || 
-                             'Failed to create access level';
+          const errorMessage = error?.response?.data?.detail ||
+            error?.response?.data?.message ||
+            'Failed to create access level';
           toast.error(errorMessage);
         }
       }
@@ -1253,18 +1259,18 @@ const AdminForms = () => {
     };
 
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Add Access Level</h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+          <h3 className="text-lg font-bold text-white">Add Access Level</h3>
+          <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
-            <span>Admin Access Required</span>
+            <span className="uppercase tracking-wider">Admin Access Required</span>
           </div>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
               Name *
             </label>
             <input
@@ -1272,40 +1278,40 @@ const AdminForms = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="e.g., Read, Write, Admin"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Describe the permissions for this access level..."
             />
           </div>
 
-          <div className="flex space-x-3 pt-4 border-t">
+          <div className="flex space-x-3 pt-6 border-t border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+              className={`bg-gradient-to-r ${theme.primaryGradient} text-white px-6 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 font-bold tracking-wide transition-all shadow-lg hover:shadow-indigo-500/25`}
             >
               {createMutation.isLoading ? 'Saving...' : 'SAVE'}
             </button>
             <button
               type="button"
               onClick={() => {
-                handleSubmit({ preventDefault: () => {} });
+                handleSubmit({ preventDefault: () => { } });
                 setFormData({ name: '', description: '' });
               }}
               disabled={createMutation.isLoading}
-              className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 font-medium transition-colors"
+              className="bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-white/20 font-bold tracking-wide transition-colors border border-white/10"
             >
               Save and add another
             </button>
@@ -1385,19 +1391,19 @@ const AdminForms = () => {
     ];
 
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Add Resource</h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+          <h3 className="text-lg font-bold text-white">Add Resource</h3>
+          <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
-            <span>Admin Access Required</span>
+            <span className="uppercase tracking-wider">Admin Access Required</span>
           </div>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
                 Name *
               </label>
               <input
@@ -1405,31 +1411,31 @@ const AdminForms = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
                 placeholder="Resource name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
                 Resource Type *
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <select
                   value={formData.resource_type}
                   onChange={(e) => setFormData({ ...formData, resource_type: e.target.value })}
                   required
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="flex-1 px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800"
                 >
                   <option value="">--------</option>
                   {resourceTypes.map(type => (
                     <option key={type.id} value={type.id}>{type.name}</option>
                   ))}
                 </select>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setActiveForm('resource-type')}
-                  className="text-green-600 hover:text-green-700 p-1 rounded transition-colors"
+                  className="text-indigo-400 hover:text-indigo-300 p-3 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-xl transition-all"
                   title="Add new resource type"
                 >
                   <PlusIcon className="h-5 w-5" />
@@ -1439,40 +1445,40 @@ const AdminForms = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Resource description..."
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
                 Endpoint
               </label>
               <input
                 type="url"
                 value={formData.endpoint}
                 onChange={(e) => setFormData({ ...formData, endpoint: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
                 placeholder="https://example.com/api"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
                 Environment
               </label>
               <select
                 value={formData.environment}
                 onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800"
                 required
               >
                 {environments.map(env => (
@@ -1483,58 +1489,58 @@ const AdminForms = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
               Resource Team Email
             </label>
             <input
               type="email"
               value={formData.resource_team_email}
               onChange={(e) => setFormData({ ...formData, resource_team_email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="team@example.com"
             />
           </div>
 
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-6 bg-black/20 p-4 rounded-xl border border-white/5">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="requires_approval"
                 checked={formData.requires_approval}
                 onChange={(e) => setFormData({ ...formData, requires_approval: e.target.checked })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 bg-black/40 border-white/20 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900 rounded"
               />
-              <label htmlFor="requires_approval" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="requires_approval" className="ml-3 block text-sm font-medium text-white">
                 Requires approval
               </label>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center pl-6 border-l border-white/10">
               <input
                 type="checkbox"
                 id="is_active_resource"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 bg-black/40 border-white/20 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900 rounded"
               />
-              <label htmlFor="is_active_resource" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="is_active_resource" className="ml-3 block text-sm font-medium text-white">
                 Is active
               </label>
             </div>
           </div>
 
-          <div className="flex space-x-3 pt-4 border-t">
+          <div className="flex space-x-3 pt-6 border-t border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+              className={`bg-gradient-to-r ${theme.primaryGradient} text-white px-6 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 font-bold tracking-wide transition-all shadow-lg hover:shadow-indigo-500/25`}
             >
               {createMutation.isLoading ? 'Saving...' : 'SAVE'}
             </button>
             <button
               type="button"
               onClick={() => {
-                handleSubmit({ preventDefault: () => {} });
+                handleSubmit({ preventDefault: () => { } });
                 setFormData({
                   name: '',
                   resource_type: '',
@@ -1547,7 +1553,7 @@ const AdminForms = () => {
                 });
               }}
               disabled={createMutation.isLoading}
-              className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 font-medium transition-colors"
+              className="bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-white/20 font-bold tracking-wide transition-colors border border-white/10"
             >
               Save and add another
             </button>
@@ -1566,21 +1572,24 @@ const AdminForms = () => {
   const ActiveFormComponent = adminForms.find(f => f.id === activeForm)?.component || ResourceTypeForm;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-8">
       {/* Admin Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 text-white">
-        <div className="flex items-center justify-between">
+      <div className={`bg-gradient-to-r ${theme.primaryGradient} border ${theme.cardBorder} rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden shadow-2xl`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="flex items-center justify-between relative z-10">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Administration Panel</h2>
-            <p className="text-purple-100">
+            <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Administration Panel</h2>
+            <p className="text-indigo-100/80 text-lg">
               Manage resource types, access levels, and system resources
             </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <ShieldCheckIcon className="h-8 w-8" />
+          <div className="flex items-center space-x-4 bg-black/20 px-6 py-4 rounded-2xl border border-white/10 backdrop-blur-md">
+            <div className="p-3 bg-white/10 rounded-xl">
+              <ShieldCheckIcon className="h-8 w-8 text-white" />
+            </div>
             <div className="text-right">
-              <div className="font-medium">{user?.name || user?.username}</div>
-              <div className="text-sm text-purple-200">
+              <div className="font-bold text-white text-lg">{user?.name || user?.username}</div>
+              <div className="text-sm font-semibold text-indigo-300 tracking-wide uppercase">
                 {getUserRoleDisplay()}
               </div>
             </div>
@@ -1589,22 +1598,21 @@ const AdminForms = () => {
       </div>
 
       {/* Form Selector */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Admin Forms</h3>
-        <div className="flex flex-wrap gap-2">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-5 shadow-xl backdrop-blur-sm`}>
+        <h3 className="text-xl font-bold text-white mb-4">Admin Forms</h3>
+        <div className="flex flex-wrap gap-3">
           {adminForms.map((form) => {
             const Icon = form.icon;
             return (
               <button
                 key={form.id}
                 onClick={() => setActiveForm(form.id)}
-                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeForm === form.id
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`flex items-center px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 border ${activeForm === form.id
+                    ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-lg shadow-indigo-500/10'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-transparent'
+                  }`}
               >
-                <Icon className="h-4 w-4 mr-2" />
+                <Icon className={`h-5 w-5 mr-2.5 ${activeForm === form.id ? 'text-indigo-400' : 'text-gray-500'}`} />
                 {form.name}
               </button>
             );

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ArrowPathIcon, ShieldCheckIcon, SparklesIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI } from '../../services/api';
 
@@ -46,180 +46,238 @@ const Login = () => {
       captcha_key: captcha.key,
       captcha_value: data.captcha
     };
-
     const result = await login(loginData);
     if (result.success) {
-      toast.success('Welcome back!');
-      navigate(from, { replace: true });
+      toast.success('Access Granted. Welcome back.');
+      if (result.user?.must_change_password) {
+        navigate('/force-change-password', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } else {
       toast.error(result.error);
-      // Refresh captcha on failure
       fetchCaptcha();
       resetField('captcha');
     }
   };
 
+  const inputClass =
+    'appearance-none block w-full px-4 py-4 rounded-xl border border-white/5 bg-black/40 text-white placeholder-gray-600 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 transition-all duration-300 text-sm font-medium';
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-blue-100">
-            <LockClosedIcon className="h-8 w-8 text-blue-600" />
+    <div className="min-h-screen flex bg-[#070B14] overflow-hidden relative font-sans selection:bg-indigo-500/30">
+
+      {/* ── Background Architecture ── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
+        <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-violet-700/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-blue-600/5 rounded-full blur-[100px]" />
+
+        {/* Abstract Grid */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(#ffffff 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }} />
+      </div>
+
+      {/* ── Left Decorative Section (hidden on mobile) ── */}
+      <div className="hidden lg:flex lg:w-[55%] flex-col justify-between p-16 relative z-10">
+        {/* Navigation / Brand */}
+        <div className="flex items-center space-x-4 group cursor-default">
+          <div className="w-12 h-12 rounded-[1.25rem] bg-gradient-to-br from-indigo-500 to-violet-700 flex items-center justify-center shadow-2xl shadow-indigo-500/40 group-hover:scale-110 transition-transform duration-500">
+            <BuildingOfficeIcon className="h-6 w-6 text-white" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              create a new account
-            </Link>
-          </p>
+          <div>
+            <span className="text-white font-black text-2xl tracking-tighter uppercase block leading-none">Optima</span>
+            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] block">Management</span>
+          </div>
         </div>
 
-        <div className="bg-white shadow-xl rounded-lg p-8">
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        {/* Hero Text */}
+        <div className="max-w-xl">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-10">
+            <SparklesIcon className="h-4 w-4 text-indigo-400" />
+            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Next-Gen Workforce OS</span>
+          </div>
+
+          <h2 className="text-7xl font-black text-white leading-[1.05] tracking-tighter mb-8">
+            Elevate your <br />
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-blue-400 bg-clip-text text-transparent italic">
+              efficiency.
+            </span>
+          </h2>
+
+          <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-lg mb-12">
+            Experience a seamless, high-performance ecosystem for attendance, biometric sync, and intelligent resource scaling.
+          </p>
+
+          {/* Quick Stats / Features */}
+          <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <div className="mt-1">
-                <input
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: 'Invalid email address'
-                    }
-                  })}
-                  type="email"
-                  autoComplete="email"
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter your email"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                )}
-              </div>
+              <p className="text-3xl font-black text-white leading-none mb-2 tracking-tighter">99.9%</p>
+              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest leading-none">Sync Reliability</p>
+            </div>
+            <div>
+              <p className="text-3xl font-black text-white leading-none mb-2 tracking-tighter">RealTime</p>
+              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest legacy text-indigo-400">Biometric Delta</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Meta */}
+        <div className="flex items-center space-x-6">
+          <p className="text-[10px] font-black text-gray-700 uppercase tracking-widest">© 2026 TechOptima Global</p>
+          <div className="h-px flex-1 bg-white/5" />
+        </div>
+      </div>
+
+      {/* ── Right: Authentication Card ── */}
+      <div className="w-full lg:w-[45%] flex items-center justify-center p-6 relative z-10">
+        <div className="w-full max-w-[440px]">
+
+          <div className="bg-slate-900/40 backdrop-blur-[40px] rounded-[3rem] border border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
+
+            {/* Inner Glow */}
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+
+            {/* Header */}
+            <div className="mb-10 text-center sm:text-left">
+              <h1 className="text-4xl font-black text-white tracking-tight mb-2">Systems Online.</h1>
+              <p className="text-gray-500 font-medium text-sm">Secure authorization required for access.</p>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  {...register('password', { required: 'Password is required' })}
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="captcha" className="block text-sm font-medium text-gray-700">
-                Security Verification
-              </label>
-              <div className="flex items-center space-x-4">
-                <div className="bg-gray-100 rounded-lg p-1 flex items-center justify-center min-w-[120px] h-[48px] overflow-hidden">
-                  {fetchingCaptcha ? (
-                    <div className="animate-pulse flex space-x-4">
-                      <div className="h-8 w-24 bg-gray-300 rounded"></div>
-                    </div>
-                  ) : (
-                    <img
-                      src={captcha.imageUrl}
-                      alt="Captcha"
-                      className="h-full object-contain mix-blend-multiply"
-                    />
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              {/* Email */}
+              <div>
+                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">
+                  Work Credentials
+                </label>
+                <div className="relative">
+                  <input
+                    {...register('email', {
+                      required: 'Email identity required',
+                      pattern: { value: /^\S+@\S+$/i, message: 'Invalid identity format' }
+                    })}
+                    type="email"
+                    autoComplete="email"
+                    className={inputClass}
+                    placeholder="Enter system email"
+                  />
+                  {errors.email && (
+                    <p className="mt-2 text-[10px] font-black text-rose-500 uppercase tracking-wider">{errors.email.message}</p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={fetchCaptcha}
-                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                  title="Refresh security code"
-                >
-                  <ArrowPathIcon className={`h-6 w-6 ${fetchingCaptcha ? 'animate-spin' : ''}`} />
-                </button>
               </div>
-              <input
-                {...register('captcha', { required: 'Security verification is required' })}
-                type="text"
-                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the code shown above"
-              />
-              {errors.captcha && (
-                <p className="mt-1 text-sm text-red-600">{errors.captcha.message}</p>
-              )}
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
+              {/* Password */}
+              <div>
+                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">
+                  Security Token
                 </label>
+                <div className="relative">
+                  <input
+                    {...register('password', { required: 'Password token required' })}
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    className={`${inputClass} pr-12`}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-4 flex items-center text-gray-600 hover:text-indigo-400 transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword
+                      ? <EyeSlashIcon className="h-5 w-5" />
+                      : <EyeIcon className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="mt-2 text-[10px] font-black text-rose-500 uppercase tracking-wider">{errors.password.message}</p>
+                )}
               </div>
 
-              <div className="text-sm">
-                <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot your password?
+              {/* Captcha */}
+              <div className="bg-black/20 rounded-[2rem] p-6 border border-white/5 space-y-4">
+                <label className="block text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
+                  Human Verification
+                </label>
+
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1 h-14 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center justify-center p-2 relative overflow-hidden group/captcha">
+                    {fetchingCaptcha ? (
+                      <div className="flex space-x-1.5">
+                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" />
+                      </div>
+                    ) : (
+                      <img src={captcha.imageUrl} alt="Captcha" className="h-full object-contain mix-blend-screen opacity-90 transition-opacity hover:opacity-100" />
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={fetchCaptcha}
+                    className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-gray-500 hover:text-indigo-400 hover:border-indigo-500/30 transition-all duration-300"
+                  >
+                    <ArrowPathIcon className={`h-6 w-6 ${fetchingCaptcha ? 'animate-spin' : ''}`} />
+                  </button>
+                </div>
+
+                <input
+                  {...register('captcha', { required: 'Verification code required' })}
+                  type="text"
+                  className={`${inputClass} text-center tracking-[0.3em] font-black uppercase placeholder:tracking-normal placeholder:font-medium`}
+                  placeholder="CODE"
+                />
+                {errors.captcha && (
+                  <p className="text-[10px] font-black text-rose-500 uppercase tracking-wider text-center">{errors.captcha.message}</p>
+                )}
+              </div>
+
+              {/* Auth Meta */}
+              <div className="flex items-center justify-between pb-4">
+                <label className="flex items-center space-x-3 cursor-pointer group">
+                  <div className="relative flex items-center">
+                    <input
+                      type="checkbox"
+                      className="peer h-5 w-5 bg-white/5 border-white/10 rounded-lg text-indigo-600 focus:ring-indigo-500/30 transition-all cursor-pointer"
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-gray-500 group-hover:text-gray-400 transition-colors uppercase tracking-widest">Persist Session</span>
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-colors"
+                >
+                  Reset Token
                 </Link>
               </div>
-            </div>
 
-            <div>
+              {/* Actions */}
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-5 px-6 rounded-[1.5rem] bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-700 text-white font-black text-sm uppercase tracking-[0.25em] shadow-[0_20px_40px_-10px_rgba(79,70,229,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(79,70,229,0.4)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:translate-y-0"
               >
-                {loading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin -ml-1 mr-3 h-5 w-5 text-white">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    </div>
-                    Signing in...
-                  </div>
-                ) : (
-                  'Sign in'
-                )}
+                {loading ? 'Initializing Access...' : 'Authenticate'}
               </button>
-            </div>
-          </form>
-        </div>
+            </form>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign up for free
-            </Link>
+            {/* Post Auth Link */}
+            <div className="mt-10 pt-8 border-t border-white/5 text-center">
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Unauthorized?</span>{' '}
+              <Link to="/register" className="ml-2 text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-colors">
+                Request Access
+              </Link>
+            </div>
+
+            <div className="mt-8 flex items-center justify-center space-x-3 opacity-20 group cursor-default">
+              <ShieldCheckIcon className="h-4 w-4 text-gray-400 group-hover:text-indigo-400 transition-colors" />
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] group-hover:text-indigo-400 transition-colors">Secured by OptimaGuard</span>
+            </div>
+
+          </div>
+
+          <p className="mt-8 text-center text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] lg:hidden">
+            © 2026 TechOptima Global
           </p>
         </div>
       </div>

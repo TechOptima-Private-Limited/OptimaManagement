@@ -4,30 +4,30 @@ const StatusBadge = ({ status, type = 'default' }) => {
   const getStatusColor = () => {
     const colors = {
       // Leave statuses
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      APPROVED: 'bg-green-100 text-green-800',
-      REJECTED: 'bg-red-100 text-red-800',
-      CANCELLED: 'bg-gray-100 text-gray-800',
+      PENDING: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+      APPROVED: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+      REJECTED: 'bg-rose-500/20 text-rose-400 border border-rose-500/30',
+      CANCELLED: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
 
       // Attendance statuses
-      PRESENT: 'bg-green-100 text-green-800',
-      ABSENT: 'bg-red-100 text-red-800',
-      LATE: 'bg-yellow-100 text-yellow-800',
-      HALF_DAY: 'bg-blue-100 text-blue-800',
-      WEEK_OFF: 'bg-purple-100 text-purple-800',
-      ON_LEAVE: 'bg-teal-100 text-teal-800',
+      PRESENT: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+      ABSENT: 'bg-rose-500/20 text-rose-400 border border-rose-500/30',
+      LATE: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+      HALF_DAY: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+      WEEK_OFF: 'bg-violet-500/20 text-violet-400 border border-violet-500/30',
+      ON_LEAVE: 'bg-teal-500/20 text-teal-400 border border-teal-500/30',
 
       // Employee statuses
-      ACTIVE: 'bg-green-100 text-green-800',
-      INACTIVE: 'bg-yellow-100 text-yellow-800',
-      TERMINATED: 'bg-red-100 text-red-800',
+      ACTIVE: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+      INACTIVE: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+      TERMINATED: 'bg-rose-500/20 text-rose-400 border border-rose-500/30',
 
       // Onboarding statuses
-      COMPLETED: 'bg-green-100 text-green-800',
-      IN_PROGRESS: 'bg-blue-100 text-blue-800',
+      COMPLETED: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+      IN_PROGRESS: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
     };
 
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-slate-500/20 text-slate-400 border border-slate-500/30';
   };
 
   const formatStatus = (s) => {

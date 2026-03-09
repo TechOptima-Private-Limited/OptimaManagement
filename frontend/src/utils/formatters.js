@@ -20,6 +20,23 @@ export const formatDateTime = (datetime, formatString = 'MMM dd, yyyy HH:mm') =>
   }
 };
 
+export const formatTime = (time, formatString = 'hh:mm:ss a') => {
+  if (!time) return '';
+  try {
+    const timeObj = typeof time === 'string' ? parseISO(time) : time;
+    if (isNaN(timeObj.getTime())) {
+      // Fallback for just time strings like "10:00:00"
+      const now = new Date();
+      const [h, m, s] = String(time).split(':');
+      now.setHours(parseInt(h) || 0, parseInt(m) || 0, parseInt(s) || 0);
+      return format(now, formatString);
+    }
+    return format(timeObj, formatString);
+  } catch (error) {
+    return '';
+  }
+};
+
 export const formatCurrency = (amount) => {
   if (!amount) return '$0.00';
   return new Intl.NumberFormat('en-US', {

@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminPermissionAPI } from '../../services/api';
 import { toast } from 'react-toastify';
+import { useTheme } from '../../context/ThemeContext';
+import { ShieldCheckIcon, ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const PermissionsManagement = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [permissions, setPermissions] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,62 +37,75 @@ const PermissionsManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-[#070B14] p-8 space-y-8">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="space-y-2">
           <button
             type="button"
             onClick={() => navigate('/users-auth')}
-            className="text-xs text-indigo-600 hover:text-indigo-800 mb-1"
+            className="group flex items-center text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-all"
           >
-             Back to Users and Authentication
+            <ArrowLeftIcon className="h-4 w-4 mr-2 transform group-hover:-translate-x-1 transition-transform" />
+            Back to Users and Authentication
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Permissions</h1>
-          <p className="text-sm text-gray-500">All system permissions.</p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+              <ShieldCheckIcon className="h-8 w-8 text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">System Permissions</h1>
+              <p className="text-sm text-slate-500 font-medium tracking-tight">Granular control oversight for all application access nodes.</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="flex items-center space-x-2 max-w-md">
+      <form onSubmit={handleSearch} className="flex items-center space-x-4 max-w-xl">
         <div className="relative flex-1">
+          <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
           <input
             type="text"
-            placeholder="Search permissions"
-            className="block w-full rounded-md border-gray-300 shadow-sm pl-3 pr-10 text-sm"
+            placeholder="Search permissions..."
+            className="block w-full bg-white/5 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <button
           type="submit"
-          className="px-3 py-2 rounded-md border border-gray-300 text-sm bg-white text-gray-700 hover:bg-gray-50"
+          className="px-8 py-4 rounded-2xl bg-white/5 border border-white/5 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
         >
-          Search
+          SEARCH
         </button>
       </form>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between text-xs text-gray-500">
-          <span>PERMISSION</span>
-          <span>{loading ? 'Loading…' : `${permissions.length} permissions`}</span>
+      <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
+        <div className="px-8 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">REGISTRY ENTRY</span>
+          <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{loading ? 'SCANNING…' : `${permissions.length} NODES IDENTIFIED`}</span>
         </div>
-        <div className="divide-y divide-gray-100 max-h-[520px] overflow-y-auto">
+        <div className="divide-y divide-white/5 max-h-[600px] overflow-y-auto custom-scrollbar">
           {permissions.map((p) => {
             const label = [p.content_type, p.name].filter(Boolean).join(' | ');
             return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => navigate(`/users-auth/permissions/${p.id}`)}
-              className="w-full px-4 py-2 text-sm flex items-center justify-between hover:bg-gray-50 text-left"
-            >
-              <div>
-                <div className="text-gray-900">{label}</div>
-                <div className="text-[11px] text-gray-500">{p.codename}</div>
-              </div>
-            </button>
-          );})}
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => navigate(`/users-auth/permissions/${p.id}`)}
+                className="group w-full px-8 py-4 text-sm flex items-center justify-between hover:bg-white/5 text-left transition-all duration-300"
+              >
+                <div>
+                  <div className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{label}</div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1 opacity-70">{p.codename}</div>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                  <ArrowLeftIcon className="h-4 w-4 text-slate-600 rotate-180" />
+                </div>
+              </button>
+            );
+          })}
           {!loading && permissions.length === 0 && (
-            <div className="px-4 py-4 text-sm text-gray-500">No permissions found.</div>
+            <div className="px-8 py-12 text-center text-sm text-slate-500 font-medium italic opacity-50">No access nodes detected in search results.</div>
           )}
         </div>
       </div>

@@ -32,6 +32,7 @@ urlpatterns = [
     path('biometric/fetch/', views.fetch_biometric_logs, name='fetch_biometric_logs'),
     path('biometric-sync/', views.biometric_sync, name='biometric_sync'),  # Legacy endpoint
     path('devices/', views.BiometricDeviceListView.as_view(), name='biometric_devices'),
+    path('devices/<int:pk>/', views.BiometricDeviceDetailView.as_view(), name='biometric_device_detail'),
     
     # Approval Workflow
     path('pending-edits/', views.get_pending_edits, name='pending_edits'),

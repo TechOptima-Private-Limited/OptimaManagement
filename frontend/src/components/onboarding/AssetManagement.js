@@ -23,12 +23,29 @@ import {
   WrenchScrewdriverIcon,
   MagnifyingGlassIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
+  CommandLineIcon,
+  ChevronRightIcon,
+  UserGroupIcon,
+  XMarkIcon,
+  DevicePhoneMobileIcon,
+  CreditCardIcon,
+  ArrowPathIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 import { getCurrentUser } from '../../utils/auth';
 import api from '../../services/api';
+import { formatDateTime } from '../../utils/formatters';
+
+
+const theme = {
+  primaryGradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+  surfaceGradient: 'rgba(255, 255, 255, 0.05)',
+  headerGradient: 'rgba(255, 255, 255, 0.02)'
+};
 
 const AssetManagement = () => {
+
   const [assets, setAssets] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -927,26 +944,26 @@ const AssetManagement = () => {
   const getAssetTypeColor = (type) => {
     switch (type) {
       case 'laptop':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
       case 'mouse':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
       case 'id_card':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-violet-500/10 text-violet-400 border border-violet-500/20';
       case 'keyboard':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
     }
   };
 
   const getAssetStatusColor = (status) => {
     const s = String(status || '').toUpperCase();
-    if (s === 'AVAILABLE') return 'bg-green-100 text-green-800';
-    if (s === 'ASSIGNED') return 'bg-blue-100 text-blue-800';
-    if (s === 'DAMAGED') return 'bg-red-100 text-red-800';
-    if (s === 'LOST') return 'bg-gray-200 text-gray-700';
-    if (s === 'DISPOSED') return 'bg-gray-400 text-white';
-    return 'bg-gray-100 text-gray-800';
+    if (s === 'AVAILABLE') return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+    if (s === 'ASSIGNED') return 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+    if (s === 'DAMAGED' || s === 'REPAIR') return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+    if (s === 'LOST') return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+    if (s === 'DISPOSED') return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
+    return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
   };
 
   const getCategoryFor = (asset) => {
@@ -1033,7 +1050,7 @@ const AssetManagement = () => {
     related.forEach(a => {
       const empId = a.employee;
       if (!empId || (currentId && empId === currentId)) return;
-      const emp = (employees || []).find(e => e.id == empId) || a.employee_info;
+      const emp = (employees || []).find(e => e.id === Number(empId)) || a.employee_info;
       const name = emp?.name;
       if (name && !names.includes(name)) names.push(name);
     });
@@ -1046,7 +1063,7 @@ const AssetManagement = () => {
     if (!asset) return '';
     const id = asset._employeeId;
     if (id && Array.isArray(employees)) {
-      const emp = employees.find(e => e.id == id);
+      const emp = employees.find(e => e.id === Number(id));
       if (emp?.name) return emp.name;
     }
     return asset.employee_name || '';
@@ -1107,23 +1124,26 @@ const AssetManagement = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#070B14] text-slate-100 p-4 lg:p-8 transition-colors duration-500">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Asset Management</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+            Asset Management
+          </h1>
+          <p className="text-lg text-slate-400 font-medium">
             Manage and track company assets assigned to employees
           </p>
         </div>
         <button
           onClick={handleExportToExcel}
           disabled={exportingExcel}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ background: theme.primaryGradient }}
+          className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-lg text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105"
         >
           {exportingExcel ? (
             <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -1131,7 +1151,7 @@ const AssetManagement = () => {
             </>
           ) : (
             <>
-              <svg className="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Export to Excel
@@ -1142,7 +1162,7 @@ const AssetManagement = () => {
 
 
       {isAssetManager && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
             { key: 'asset_types', label: 'Asset Types', route: 'types' },
             { key: 'hardware_assets', label: 'Hardware Assets', route: 'hardware' },
@@ -1160,18 +1180,24 @@ const AssetManagement = () => {
                 tabIndex={0}
                 key={item.key}
                 onClick={() => setActiveSection(item.route)}
-                className={`text-left bg-white rounded-lg shadow p-4 border transition flex items-center justify-between ${selected ? 'border-blue-500 ring-1 ring-blue-200' : 'border-gray-200 hover:shadow-md'}`}
+                style={{
+                  background: selected ? 'rgba(99, 102, 241, 0.1)' : theme.surfaceGradient,
+                  borderColor: selected ? '#6366f1' : 'rgba(255, 255, 255, 0.1)'
+                }}
+                className={`text-left rounded-2xl p-6 transition-all duration-300 backdrop-blur-xl border flex flex-col justify-between group h-full ${selected ? 'shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'hover:bg-white/10 hover:border-white/20'}`}
               >
-                <div className="font-semibold text-gray-800">{item.label}</div>
-                <div className="flex items-center gap-2">
+                <div className="font-bold text-lg text-white mb-4 group-hover:text-indigo-400 transition-colors uppercase tracking-wider">{item.label}</div>
+                <div className="flex items-center justify-end gap-3">
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleAdminTileAdd(item.route); }}
-                    className="text-xs px-2 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                    className="text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/40 transition-all"
                   >
                     Add
                   </button>
-                  <span className={`text-xs px-2 py-0.5 rounded-full border ${selected ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>Manage</span>
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${selected ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/5 text-slate-400 border-white/10 group-hover:border-white/20'}`}>
+                    Manage
+                  </span>
                 </div>
               </div>
             );
@@ -1180,29 +1206,29 @@ const AssetManagement = () => {
       )}
 
       {isAssetManager && activeSection === 'types' && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl p-6">
           {assetTypes.length === 0 ? (
-            <div className="text-center py-8 text-sm text-gray-500">No asset types yet</div>
+            <div className="text-center py-12 text-slate-500">No asset types yet</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-white/10">
+                <thead style={{ background: theme.headerGradient }}>
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tag Prefix</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Team Email</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Is Active</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Name</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Category</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Tag Prefix</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Description</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Team Email</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Status</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-white/5">
                   {assetTypes.map(t => (
-                    <tr key={t.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm font-medium">
+                    <tr key={t.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium">
                         <button
                           type="button"
-                          className="text-blue-700 hover:underline"
+                          className="text-indigo-400 hover:text-indigo-300 hover:underline transition-colors"
                           onClick={() => {
                             const cat = (t.category === 'HARDWARE' || t.category === 'Hardware')
                               ? 'Hardware'
@@ -1224,11 +1250,11 @@ const AssetManagement = () => {
                           {t.name}
                         </button>
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">{(t.category === 'HARDWARE' && 'Hardware') || (t.category === 'SOFTWARE' && 'Software') || t.category}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">{t.tag_prefix}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">{t.description || '(None)'}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">{t.asset_team_email || ''}</td>
-                      <td className="px-4 py-2 text-sm">{t.is_active ? '✅' : '—'}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400">{(t.category === 'HARDWARE' && 'Hardware') || (t.category === 'SOFTWARE' && 'Software') || t.category}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-slate-500">{t.tag_prefix}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400">{t.description || '(None)'}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400">{t.asset_team_email || ''}</td>
+                      <td className="px-6 py-4 text-sm">{t.is_active ? '✅' : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1239,18 +1265,45 @@ const AssetManagement = () => {
       )}
 
       {isAssetManager && activeSection === 'software' && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto">
           {(() => {
             const sw = (assets || []).filter(a => a._assetTypeCategory === 'SOFTWARE');
-            if (sw.length === 0) return <div className="text-center py-8 text-sm text-gray-500">No software assets yet</div>;
+            if (sw.length === 0) return (
+              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+                <RectangleStackIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
+                <h3 className="text-xl font-bold text-white">No software assets yet</h3>
+              </div>
+            );
             return (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sw.map(s => (
-                  <div key={s.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="text-gray-900 font-medium">{s.description || s.asset_type}</div>
-                    {s.asset_tag && <div className="text-xs text-gray-600 mt-1">Tag: {s.asset_tag}</div>}
-                    {s.serial_number && <div className="text-xs text-gray-600 mt-1">Serial: {s.serial_number}</div>}
-                    <div className="text-xs text-gray-600 mt-1 capitalize">Category: Software</div>
+                  <div key={s.id} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-white/10 transition-all group border-l-4 border-l-indigo-500 shadow-xl">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400">
+                        <CommandLineIcon className="h-6 w-6" />
+                      </div>
+                      <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase tracking-wider border border-indigo-500/20">Software</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">{s.description || s.asset_type}</h3>
+                    <div className="space-y-2">
+                      {s.asset_tag && (
+                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                          <span className="font-semibold text-slate-500">TAG:</span>
+                          <span className="font-mono">{s.asset_tag}</span>
+                        </div>
+                      )}
+                      {s.serial_number && (
+                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                          <span className="font-semibold text-slate-500">LICENSE:</span>
+                          <span className="font-mono text-indigo-400/80 truncate">{s.serial_number}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-white/5 flex justify-end">
+                      <button onClick={() => openAssetDetails(s)} className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                        View Details <ChevronRightIcon className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1260,7 +1313,7 @@ const AssetManagement = () => {
       )}
 
       {isAssetManager && activeSection === 'assignments' && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto">
           {(() => {
             const typeNameById = new Map((assetTypes || []).map(t => [t.id, t.name]));
             const grouped = (() => {
@@ -1285,23 +1338,71 @@ const AssetManagement = () => {
               }));
             })();
 
-            if (grouped.length === 0) return <div className="text-center py-8 text-sm text-gray-500">No assignments yet</div>;
+            if (grouped.length === 0) return (
+              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+                <UserGroupIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
+                <h3 className="text-xl font-bold text-white">No active assignments</h3>
+              </div>
+            );
             return (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {grouped.map(g => {
-                  const emp = (employees || []).find(e => e.id == g.employee) || g.employee_info;
-                  const assetLabels = (g.assets || []).map(id => {
-                    const as = (assets || []).find(x => x.id == id);
-                    return as ? `${as.asset_type} • ${as.serial_number || as.description || as.id}` : `Asset ${id}`;
-                  });
-                  const typesLabel = (g.asset_types || []).map(id => typeNameById.get(id) || id).join(', ');
+                  const emp = (employees || []).find(e => e.id === Number(g.employee)) || g.employee_info;
+                  const assetsFiltered = (g.assets || []).map(id => (assets || []).find(x => x.id === Number(id))).filter(Boolean);
+                  const typesLabel = (g.asset_types || []).map(id => typeNameById.get(id) || id);
+
                   return (
-                    <div key={g.employee} className="border border-gray-200 rounded-lg p-4">
-                      <div className="text-gray-900 font-medium">{emp?.name || emp?.username || 'Employee'}</div>
-                      {typesLabel && <div className="text-xs text-gray-600 mt-1">Types: {typesLabel}</div>}
-                      {assetLabels.length > 0 && <div className="text-xs text-gray-600 mt-1">Assets: {assetLabels.join(', ')}</div>}
-                      {g.manager_email && <div className="text-xs text-gray-600 mt-1">Manager: {g.manager_email}</div>}
-                      {g.notes && <div className="text-xs text-gray-500 mt-1">{g.notes}</div>}
+                    <div key={g.employee} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-white/10 transition-all shadow-xl group">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-indigo-500/20">
+                          {emp?.name?.charAt(0) || emp?.username?.charAt(0) || 'E'}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">{emp?.name || emp?.username || 'Employee'}</h3>
+                          <p className="text-xs text-slate-400">{g.manager_email || 'General Assignment'}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {typesLabel.length > 0 && (
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Requested Types</p>
+                            <div className="flex flex-wrap gap-2">
+                              {typesLabel.map((t, idx) => (
+                                <span key={idx} className="px-2 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-[10px] font-bold border border-white/5">
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {assetsFiltered.length > 0 && (
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Assigned Assets</p>
+                            <div className="space-y-2">
+                              {assetsFiltered.map((as, idx) => (
+                                <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+                                  <div className="text-indigo-400 bg-indigo-500/10 p-1.5 rounded-lg">
+                                    {getAssetIcon(as.asset_type)}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-semibold text-white truncate">{as.asset_type}</p>
+                                    <p className="text-[10px] text-slate-500 font-mono truncate">{as.asset_tag || as.serial_number || as.id}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {g.notes && (
+                          <div className="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                            <p className="text-[10px] font-bold text-amber-500/60 uppercase tracking-widest mb-1 italic">Notes</p>
+                            <p className="text-xs text-slate-400 leading-relaxed italic line-clamp-2">{g.notes}</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -1312,23 +1413,58 @@ const AssetManagement = () => {
       )}
 
       {isAssetManager && activeSection === 'returns' && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto">
           {returnsList.length === 0 ? (
-            <div className="text-center py-8 text-sm text-gray-500">No returns recorded</div>
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+              <ArrowPathIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
+              <h3 className="text-xl font-bold text-white">No returns recorded</h3>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {returnsList.map(r => {
                 const emp = (employees || []).find(e => e.id == r.user);
                 const labels = (r.returned_assets || []).map(id => {
                   const a = (assets || []).find(x => x.id == id);
-                  return a ? `${a.asset_type} • ${a.serial_number || a.description || a.id}` : `Asset ${id}`;
+                  return a ? { type: a.asset_type, info: a.serial_number || a.description || a.id } : { type: 'Unknown', info: `Asset ${id}` };
                 });
                 return (
-                  <div key={r.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="text-gray-900 font-medium">{emp?.name || 'User'}</div>
-                    {labels.length > 0 && <div className="text-xs text-gray-600 mt-1">Returned: {labels.join(', ')}</div>}
-                    {r.remarks && <div className="text-xs text-gray-500 mt-1">{r.remarks}</div>}
-                    <div className={`text-xs mt-1 ${r.is_offboarded ? 'text-green-600' : 'text-gray-500'}`}>{r.is_offboarded ? 'Offboarded' : 'In progress'}</div>
+                  <div key={r.id} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-white/10 transition-all shadow-xl group">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-sm font-bold border border-orange-500/20">
+                          {emp?.name?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-white">{emp?.name || 'User'}</h3>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-widest">{new Date(r.created_at || Date.now()).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <span className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${r.is_offboarded ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                        {r.is_offboarded ? 'OFFBOARDED' : 'IN PROGRESS'}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Returned Assets</p>
+                      {labels.map((l, idx) => (
+                        <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+                          <div className="p-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg">
+                            {getAssetIcon(l.type)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-white truncate">{l.type}</p>
+                            <p className="text-[10px] text-slate-500 font-mono truncate">{l.info}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {r.remarks && (
+                      <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 italic">Remarks</p>
+                        <p className="text-xs text-slate-400 italic line-clamp-2">{r.remarks}</p>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -1337,366 +1473,442 @@ const AssetManagement = () => {
         </div>
       )}
 
-      {isAssetManager && activeSection === 'statuses' && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
-          {employeeStatuses.length === 0 ? (
-            <div className="text-center py-8 text-sm text-gray-500">No statuses added</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {employeeStatuses.map(s => {
-                const emp = (employees || []).find(e => e.id == s.employee);
-                return (
-                  <div key={s.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="text-gray-900 font-medium">{emp?.name || 'Employee'}</div>
-                    <div className="text-xs text-gray-600 mt-1">{s.status}</div>
-                    {s.notes && <div className="text-xs text-gray-500 mt-1">{s.notes}</div>}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {isAssetManager && activeSection === 'repairs' && (
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
-          {repairsList.length === 0 ? (
-            <div className="text-center py-8 text-sm text-gray-500">No repairs reported yet</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported By</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor/Cost</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estimated</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {repairsList.map(r => (
-                    <tr
-                      key={r.id}
-                      id={`repair-${r.id}`}
-                      className={`hover:bg-gray-50 transition-colors duration-500 ${Number(repairIdParam) === r.id ? 'bg-blue-50' : ''}`}
-                    >
-                      <td className="px-4 py-2 text-sm">
-                        <div className="font-medium text-gray-900">{r.asset_info?.asset_tag}</div>
-                        <div className="text-xs text-gray-500">{r.asset_info?.name}</div>
-                      </td>
-                      <td className="px-4 py-2 text-sm text-gray-700 max-w-xs truncate" title={r.issue_description}>
-                        {r.issue_description}
-                      </td>
-                      <td className="px-4 py-2 text-sm">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${r.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                          (r.status === 'PENDING' || r.status === 'REPORTED') ? 'bg-blue-100 text-blue-800' :
-                            r.status === 'FAILED' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                          }`}>
-                          {r.status_display || r.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
-                        {r.reported_by_info?.name || 'Unknown'}
-                        <div className="text-xs text-gray-500">{new Date(r.reported_at).toLocaleDateString()}</div>
-                      </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
-                        <div>{r.repair_vendor || 'N/A'}</div>
-                        {r.repair_cost && <div className="text-xs text-gray-500">₹{r.repair_cost}</div>}
-                      </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
-                        {r.estimated_completion ? new Date(r.estimated_completion).toLocaleDateString() : 'N/A'}
-                      </td>
-                      <td className="px-4 py-2 text-sm space-x-2">
-                        <select
-                          className="text-xs border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          value={r.status}
-                          onChange={(e) => handleRepairUpdate(r.id, e.target.value)}
-                        >
-                          <option value="PENDING">Pending</option>
-                          <option value="PICKED_UP">Picked Up</option>
-                          <option value="AT_VENDOR">At Vendor</option>
-                          <option value="IN_PROGRESS">In Progress</option>
-                          <option value="COMPLETED">Completed</option>
-                          <option value="FAILED">Failed</option>
-                          <option value="CANCELLED">Cancelled</option>
-                        </select>
-                        <button
-                          onClick={() => handleEditRepair(r)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                          title="Edit Details"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
 
 
 
-      {
-        showAddHardwareModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowAddHardwareModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Add Hardware Asset</h3>
-                  <div className="space-y-4">
+
+      {showAddHardwareModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddHardwareModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Add Hardware Asset</h3>
+                  <button onClick={() => setShowAddHardwareModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset type *</label>
-                      <select value={hardwareForm.asset_type} onChange={(e) => setHardwareForm({ ...hardwareForm, asset_type: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Type *</label>
+                      <select
+                        value={hardwareForm.asset_type}
+                        onChange={(e) => setHardwareForm({ ...hardwareForm, asset_type: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      >
+                        <option value="" className="bg-[#1a1c2e]">Select Type</option>
                         {(assetTypes || [])
                           .filter(t => (t.category === 'HARDWARE' || t.category === 'Hardware'))
                           .map(t => (
-                            <option key={t.id} value={t.name}>{t.name}</option>
+                            <option key={t.id} value={t.name} className="bg-[#1a1c2e]">{t.name}</option>
                           ))}
-                        {(!(assetTypes || []).some(t => (t.category === 'HARDWARE' || t.category === 'Hardware'))) && (
-                          <option value="">No hardware types defined</option>
-                        )}
                       </select>
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Name *</label>
-                      <input type="text" value={hardwareForm.name} onChange={(e) => setHardwareForm({ ...hardwareForm, name: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset tag</label>
-                      <input type="text" value={hardwareForm.asset_tag} onChange={(e) => setHardwareForm({ ...hardwareForm, asset_tag: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Serial number</label>
-                      <input type="text" value={hardwareForm.serial_number} onChange={(e) => setHardwareForm({ ...hardwareForm, serial_number: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Status</label>
-                      <select value={hardwareForm.status} onChange={(e) => setHardwareForm({ ...hardwareForm, status: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="available">Available</option>
-                        <option value="assigned">Assigned</option>
-                        <option value="repair">Repair</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center">
-                      <input id="hw_is_active" type="checkbox" checked={hardwareForm.is_active} onChange={(e) => setHardwareForm({ ...hardwareForm, is_active: e.target.checked })} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="hw_is_active" className="ml-2 block text-sm text-gray-700">Is active</label>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Custom attributes</label>
-                      <textarea rows={4} value={hardwareForm.custom_attributes} onChange={(e) => setHardwareForm({ ...hardwareForm, custom_attributes: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Purchased date</label>
-                      <input type="date" value={hardwareForm.purchased_date} onChange={(e) => setHardwareForm({ ...hardwareForm, purchased_date: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Upload image (before)</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Name / Model *</label>
                       <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setHardwareForm({ ...hardwareForm, image_before: e.target.files && e.target.files[0] ? e.target.files[0] : null })}
-                        className="mt-1 block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        type="text"
+                        placeholder="e.g. MacBook Pro M3"
+                        value={hardwareForm.name}
+                        onChange={(e) => setHardwareForm({ ...hardwareForm, name: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Upload image (after)</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Tag</label>
                       <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setHardwareForm({ ...hardwareForm, image_after: e.target.files && e.target.files[0] ? e.target.files[0] : null })}
-                        className="mt-1 block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        type="text"
+                        placeholder="OPT-HW-001"
+                        value={hardwareForm.asset_tag}
+                        onChange={(e) => setHardwareForm({ ...hardwareForm, asset_tag: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                   </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
-                  <button onClick={() => submitHardware('save')} disabled={!hardwareForm.asset_type || !hardwareForm.name} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm disabled:opacity-50">Save</button>
-                  <button onClick={() => submitHardware('add_another')} disabled={!hardwareForm.asset_type || !hardwareForm.name} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and add another</button>
-                  <button onClick={() => submitHardware('continue')} disabled={!hardwareForm.asset_type || !hardwareForm.name} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and continue editing</button>
-                  <button onClick={() => setShowAddHardwareModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
 
-      {
-        showAddTypeModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowAddTypeModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">{typeForm?.id ? 'Edit Asset Type' : 'Add Asset Type'}</h3>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Name *</label>
-                      <input type="text" value={typeForm.name} onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Serial Number</label>
+                      <input
+                        type="text"
+                        placeholder="S/N: XXXXXXXX"
+                        value={hardwareForm.serial_number}
+                        onChange={(e) => setHardwareForm({ ...hardwareForm, serial_number: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                      />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Category</label>
-                      <select value={typeForm.category} onChange={(e) => setTypeForm({ ...typeForm, category: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="Hardware">Hardware</option>
-                        <option value="Software">Software</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Tag prefix</label>
-                      <input type="text" value={typeForm.tag_prefix} onChange={(e) => setTypeForm({ ...typeForm, tag_prefix: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Description</label>
-                      <textarea rows={3} value={typeForm.description} onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset team email</label>
-                      <input type="email" value={typeForm.asset_team_email} onChange={(e) => setTypeForm({ ...typeForm, asset_team_email: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div className="flex items-center">
-                      <input id="type_is_active" type="checkbox" checked={typeForm.is_active} onChange={(e) => setTypeForm({ ...typeForm, is_active: e.target.checked })} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="type_is_active" className="ml-2 block text-sm text-gray-700">Is active</label>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
-                  <button onClick={() => submitType('save')} disabled={!typeForm.name} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm disabled:opacity-50">Save</button>
-                  <button onClick={() => submitType('add_another')} disabled={!typeForm.name} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and add another</button>
-                  <button onClick={() => submitType('continue')} disabled={!typeForm.name} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and continue editing</button>
-                  <button onClick={() => setShowAddTypeModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
 
-      {
-        showAddSoftwareModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowAddSoftwareModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Add Software Asset</h3>
-                  <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset type *</label>
-                      <select value={softwareForm.asset_type} onChange={(e) => setSoftwareForm({ ...softwareForm, asset_type: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        {(assetTypes || [])
-                          .filter(t => (t.category === 'SOFTWARE' || t.category === 'Software'))
-                          .map(t => (
-                            <option key={t.id} value={t.name}>{t.name}</option>
-                          ))}
-                        {(!(assetTypes || []).some(t => (t.category === 'SOFTWARE' || t.category === 'Software'))) && (
-                          <option value="">No software types defined</option>
-                        )}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Name *</label>
-                      <input type="text" value={softwareForm.name} onChange={(e) => setSoftwareForm({ ...softwareForm, name: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset tag</label>
-                      <input type="text" value={softwareForm.asset_tag} onChange={(e) => setSoftwareForm({ ...softwareForm, asset_tag: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Serial number</label>
-                      <input type="text" value={softwareForm.serial_number} onChange={(e) => setSoftwareForm({ ...softwareForm, serial_number: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Status</label>
-                      <select value={softwareForm.status} onChange={(e) => setSoftwareForm({ ...softwareForm, status: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="available">Available</option>
-                        <option value="assigned">Assigned</option>
-                        <option value="disabled">Disabled</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center">
-                      <input id="sw_is_active" type="checkbox" checked={softwareForm.is_active} onChange={(e) => setSoftwareForm({ ...softwareForm, is_active: e.target.checked })} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="sw_is_active" className="ml-2 block text-sm text-gray-700">Is active</label>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Custom attributes</label>
-                      <textarea rows={4} value={softwareForm.custom_attributes} onChange={(e) => setSoftwareForm({ ...softwareForm, custom_attributes: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
-                  <button onClick={() => submitSoftware('save')} disabled={!softwareForm.asset_type || !softwareForm.name} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm disabled:opacity-50">Save</button>
-                  <button onClick={() => submitSoftware('add_another')} disabled={!softwareForm.asset_type || !softwareForm.name} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and add another</button>
-                  <button onClick={() => submitSoftware('continue')} disabled={!softwareForm.asset_type || !softwareForm.name} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and continue editing</button>
-                  <button onClick={() => setShowAddSoftwareModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
-
-      {
-        showAssignmentModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowAssignmentModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Create Assignment</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Employee *</label>
-                      <select value={assignmentForm.employee} onChange={(e) => setAssignmentForm({ ...assignmentForm, employee: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select Employee</option>
-                        {(employees || []).map(emp => (<option key={emp.id} value={emp.id}>{emp.name}</option>))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset Type</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Status</label>
                       <select
-                        value={assignmentForm.asset_type || ''}
-                        onChange={(e) => {
-                          const selectedId = e.target.value ? Number(e.target.value) : null;
-                          const selectedTypeData = assetTypes.find(t => t.id === selectedId);
-                          const isSoftware = selectedTypeData ? selectedTypeData.category === 'SOFTWARE' : false;
-
-                          setAssignmentForm(prev => ({
-                            ...prev,
-                            asset_type: selectedId,
-                            asset: isSoftware ? null : (prev.asset || null),
-                            assets: isSoftware ? (prev.assets || []) : [],
-                            isSoftware: isSoftware
-                          }));
-                        }}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        value={hardwareForm.status}
+                        onChange={(e) => setHardwareForm({ ...hardwareForm, status: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="">Select Asset Type</option>
-                        {(assetTypes.length ? assetTypes : []).map(type => (
-                          <option key={type.id} value={type.id}>
-                            {type.name} ({type.category})
-                          </option>
-                        ))}
+                        <option value="available" className="bg-[#1a1c2e]">Available</option>
+                        <option value="assigned" className="bg-[#1a1c2e]">Assigned</option>
+                        <option value="repair" className="bg-[#1a1c2e]">Repair</option>
                       </select>
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Available Asset</label>
-                      {assignmentForm.isSoftware ? (
-                        <div className="mt-1">
-                          <div className="text-sm font-medium text-gray-700 mb-1">Available Software Assets (Select multiple)</div>
-                          <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
-                            {!assignmentForm.asset_type ? (
-                              <div className="text-sm text-gray-500 p-2">Select an asset type first</div>
-                            ) : (
-                              (assets || [])
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Purchased Date</label>
+                      <input
+                        type="date"
+                        value={hardwareForm.purchased_date}
+                        onChange={(e) => setHardwareForm({ ...hardwareForm, purchased_date: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Custom Attributes / Description</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Technical specifications, damage reports, etc."
+                    value={hardwareForm.custom_attributes}
+                    onChange={(e) => setHardwareForm({ ...hardwareForm, custom_attributes: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  />
+                </div>
+
+                <div className="mt-6 flex items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                  <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
+                    <input
+                      type="checkbox"
+                      className="peer absolute inset-0 h-full w-full opacity-0 cursor-pointer"
+                      checked={hardwareForm.is_active}
+                      onChange={(e) => setHardwareForm({ ...hardwareForm, is_active: e.target.checked })}
+                    />
+                    <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hardwareForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                    <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${hardwareForm.is_active ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                  </div>
+                  <label className="ml-3 block text-sm font-medium text-slate-300">Active Asset</label>
+                </div>
+              </div>
+
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={() => submitHardware('save')}
+                  disabled={!hardwareForm.asset_type || !hardwareForm.name}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                >
+                  Save Asset
+                </button>
+                <button
+                  onClick={() => setShowAddHardwareModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddTypeModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddTypeModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">{typeForm?.id ? 'Edit Asset Type' : 'Add Asset Type'}</h3>
+                  <button onClick={() => setShowAddTypeModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Type Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Workstation, Cloud Subscription"
+                      value={typeForm.name}
+                      onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-semibold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Category</label>
+                    <select
+                      value={typeForm.category}
+                      onChange={(e) => setTypeForm({ ...typeForm, category: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="Hardware" className="bg-[#1a1c2e]">Hardware</option>
+                      <option value="Software" className="bg-[#1a1c2e]">Software</option>
+                      <option value="Other" className="bg-[#1a1c2e]">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Tag Prefix</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. HW-, SW-"
+                      value={typeForm.tag_prefix}
+                      onChange={(e) => setTypeForm({ ...typeForm, tag_prefix: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Description</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Briefly describe this asset category"
+                      value={typeForm.description}
+                      onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Team Email</label>
+                    <input
+                      type="email"
+                      placeholder="it-support@company.com"
+                      value={typeForm.asset_team_email}
+                      onChange={(e) => setTypeForm({ ...typeForm, asset_team_email: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
+                  </div>
+
+                  <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
+                      <input
+                        type="checkbox"
+                        className="peer absolute inset-0 h-full w-full opacity-0 cursor-pointer"
+                        checked={typeForm.is_active}
+                        onChange={(e) => setTypeForm({ ...typeForm, is_active: e.target.checked })}
+                      />
+                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${typeForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                      <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${typeForm.is_active ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                    </div>
+                    <label className="ml-3 block text-sm font-medium text-slate-300">Active Type</label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={() => submitType('save')}
+                  disabled={!typeForm.name}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                >
+                  {typeForm?.id ? 'Update Type' : 'Create Type'}
+                </button>
+                <button
+                  onClick={() => setShowAddTypeModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddSoftwareModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddSoftwareModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Add Software Asset</h3>
+                  <button onClick={() => setShowAddSoftwareModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Software Type *</label>
+                    <select
+                      value={softwareForm.asset_type}
+                      onChange={(e) => setSoftwareForm({ ...softwareForm, asset_type: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#1a1c2e]">Select Type</option>
+                      {(assetTypes || [])
+                        .filter(t => (t.category === 'SOFTWARE' || t.category === 'Software'))
+                        .map(t => (
+                          <option key={t.id} value={t.name} className="bg-[#1a1c2e]">{t.name}</option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Product Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Adobe Creative Cloud"
+                      value={softwareForm.name}
+                      onChange={(e) => setSoftwareForm({ ...softwareForm, name: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-semibold"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Tag</label>
+                      <input
+                        type="text"
+                        placeholder="OPT-SW-001"
+                        value={softwareForm.asset_tag}
+                        onChange={(e) => setSoftwareForm({ ...softwareForm, asset_tag: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">License Key</label>
+                      <input
+                        type="text"
+                        placeholder="XXXX-XXXX-XXXX"
+                        value={softwareForm.serial_number}
+                        onChange={(e) => setSoftwareForm({ ...softwareForm, serial_number: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Status</label>
+                    <select
+                      value={softwareForm.status}
+                      onChange={(e) => setSoftwareForm({ ...softwareForm, status: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="available" className="bg-[#1a1c2e]">Available</option>
+                      <option value="assigned" className="bg-[#1a1c2e]">Assigned</option>
+                      <option value="disabled" className="bg-[#1a1c2e]">Disabled</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Notes / Terms</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Renewal dates, user limits, etc."
+                      value={softwareForm.custom_attributes}
+                      onChange={(e) => setSoftwareForm({ ...softwareForm, custom_attributes: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
+                  </div>
+
+                  <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
+                      <input
+                        type="checkbox"
+                        className="peer absolute inset-0 h-full w-full opacity-0 cursor-pointer"
+                        checked={softwareForm.is_active}
+                        onChange={(e) => setSoftwareForm({ ...softwareForm, is_active: e.target.checked })}
+                      />
+                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${softwareForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                      <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${softwareForm.is_active ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                    </div>
+                    <label className="ml-3 block text-sm font-medium text-slate-300">Active License</label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={() => submitSoftware('save')}
+                  disabled={!softwareForm.asset_type || !softwareForm.name}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                >
+                  Save License
+                </button>
+                <button
+                  onClick={() => setShowAddSoftwareModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAssignmentModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAssignmentModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Create Assignment</h3>
+                  <button onClick={() => setShowAssignmentModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Employee *</label>
+                    <select
+                      value={assignmentForm.employee}
+                      onChange={(e) => setAssignmentForm({ ...assignmentForm, employee: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#1a1c2e]">Select Employee</option>
+                      {(employees || []).map(emp => (<option key={emp.id} value={emp.id} className="bg-[#1a1c2e]">{emp.name}</option>))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Type</label>
+                    <select
+                      value={assignmentForm.asset_type || ''}
+                      onChange={(e) => {
+                        const selectedId = e.target.value ? Number(e.target.value) : null;
+                        const selectedTypeData = assetTypes.find(t => t.id === selectedId);
+                        const isSoftware = selectedTypeData ? selectedTypeData.category === 'SOFTWARE' : false;
+
+                        setAssignmentForm(prev => ({
+                          ...prev,
+                          asset_type: selectedId,
+                          asset: isSoftware ? null : (prev.asset || null),
+                          assets: isSoftware ? (prev.assets || []) : [],
+                          isSoftware: isSoftware
+                        }));
+                      }}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#1a1c2e]">Select Asset Type</option>
+                      {(assetTypes.length ? assetTypes : []).map(type => (
+                        <option key={type.id} value={type.id} className="bg-[#1a1c2e]">
+                          {type.name} ({type.category})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Available Asset</label>
+                    {assignmentForm.isSoftware ? (
+                      <div className="mt-1 space-y-2">
+                        <div className="max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-3 scrollbar-none">
+                          {!assignmentForm.asset_type ? (
+                            <div className="text-sm text-slate-500 italic p-2">Select an asset type first</div>
+                          ) : (
+                            <div className="space-y-1">
+                              {(assets || [])
                                 .filter(asset => {
                                   return (
                                     !!assignmentForm.asset_type &&
@@ -1705,247 +1917,257 @@ const AssetManagement = () => {
                                   );
                                 })
                                 .map(a => {
-                                  // Get all assignments for this asset
                                   const assetAssignments = assignments.filter(aa =>
                                     aa.assets && aa.assets.includes(a.id)
                                   );
                                   const assignedTo = assetAssignments.map(aa => {
-                                    const emp = employees.find(e => e.id == aa.employee) || aa.employee_info;
+                                    const emp = employees.find(e => e.id === Number(aa.employee)) || aa.employee_info;
                                     return emp ? emp.name : 'Unknown';
                                   });
 
                                   return (
-                                    <div key={a.id} className="flex items-start p-1 hover:bg-gray-50 rounded">
-                                      <input
-                                        id={`asset-${a.id}`}
-                                        type="checkbox"
-                                        checked={assignmentForm.assets.includes(a.id)}
-                                        onChange={(e) => {
-                                          const isChecked = e.target.checked;
-                                          setAssignmentForm(prev => ({
-                                            ...prev,
-                                            assets: isChecked
-                                              ? [...prev.assets, a.id]
-                                              : prev.assets.filter(id => id !== a.id)
-                                          }));
-                                        }}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
-                                      />
-                                      <div className="ml-2">
-                                        <label htmlFor={`asset-${a.id}`} className="block text-sm text-gray-700">
+                                    <label key={a.id} className="flex items-start gap-3 p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer group">
+                                      <div className="relative flex items-center h-5">
+                                        <input
+                                          type="checkbox"
+                                          checked={assignmentForm.assets.includes(a.id)}
+                                          onChange={(e) => {
+                                            const isChecked = e.target.checked;
+                                            setAssignmentForm(prev => ({
+                                              ...prev,
+                                              assets: isChecked
+                                                ? [...prev.assets, a.id]
+                                                : prev.assets.filter(id => id !== a.id)
+                                            }));
+                                          }}
+                                          className="h-4 w-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500/50 transition-all"
+                                        />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-sm text-slate-200 font-medium group-hover:text-white transition-colors">
                                           {a.asset_type} • {a.serial_number || a.description || a.id}
-                                        </label>
+                                        </p>
                                         {assignedTo.length > 0 && (
-                                          <div className="text-xs text-gray-500 mt-0.5">
-                                            Currently assigned to: {assignedTo.join(', ')}
-                                          </div>
+                                          <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                                            Currently with: {assignedTo.join(', ')}
+                                          </p>
                                         )}
                                       </div>
-                                    </div>
+                                    </label>
                                   );
                                 })
-                            )}
-                          </div>
+                              }
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <select
-                          value={assignmentForm.asset || ''}
-                          onChange={(e) => setAssignmentForm(prev => ({
-                            ...prev,
-                            asset: e.target.value ? Number(e.target.value) : null
-                          }))}
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          disabled={!assignmentForm.asset_type}
-                        >
-                          <option value="">
-                            {!assignmentForm.asset_type
-                              ? 'Select an asset type first'
-                              : 'Select Asset'}
-                          </option>
-                          {(assets || [])
-                            .filter(asset => {
-                              return (
-                                !!assignmentForm.asset_type &&
-                                asset._assetTypeId === assignmentForm.asset_type &&
-                                asset._assetTypeCategory === 'HARDWARE'
-                              );
-                            })
-                            // For hardware, only show unassigned assets
-                            .filter(asset => !asset.employee_name)
-                            .map(a => (
-                              <option key={a.id} value={a.id}>
-                                {a.asset_type} • {a.serial_number || a.description || a.id}
-                                {a.employee_name ? ` (Assigned to ${a.employee_name})` : ''}
-                              </option>
-                            ))}
-                        </select>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Manager email</label>
-                      <input type="email" value={assignmentForm.manager_email} onChange={(e) => setAssignmentForm({ ...assignmentForm, manager_email: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Notes</label>
-                      <textarea rows={4} value={assignmentForm.notes} onChange={(e) => setAssignmentForm({ ...assignmentForm, notes: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
-                  <button
-                    onClick={() => submitAssignment('save')}
-                    disabled={!assignmentForm.employee || (assignmentForm.isSoftware ? !assignmentForm.assets.length : !assignmentForm.asset)}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm disabled:opacity-50"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => submitAssignment('add_another')}
-                    disabled={!assignmentForm.employee || (assignmentForm.isSoftware ? !assignmentForm.assets.length : !assignmentForm.asset)}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                  >
-                    Save and add another
-                  </button>
-                  <button
-                    onClick={() => submitAssignment('continue')}
-                    disabled={!assignmentForm.employee || (assignmentForm.isSoftware ? !assignmentForm.assets.length : !assignmentForm.asset)}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                  >
-                    Save and continue editing
-                  </button>
-                  <button onClick={() => setShowAssignmentModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
-
-      {
-        showReturnModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowReturnModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Record Offboarding Return</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">User *</label>
-                      {(() => {
-                        // Eligible only when HR created an Offboarding record
-                        // Map to the IDs used by employees state (to keep submission compatible)
-                        const employeesArr = (employees || []);
-                        const eligibleUsers = (offboardings || []).map(o => {
-                          const byEmail = employeesArr.find(e => (e.email || e.user?.email) && (e.email === o.employee_email || e.user?.email === o.employee_email));
-                          const byName = byEmail || employeesArr.find(e => (e.name || '').toLowerCase() === String(o.employee_name || '').toLowerCase());
-                          const match = byName;
-                          if (!match) return null;
-                          const id = String(match.id ?? match.user_id ?? match.user?.id ?? '');
-                          const name = match.name || o.employee_name || `User ${id}`;
-                          if (!id) return null;
-                          return { id, name };
-                        }).filter(Boolean);
-                        const hasEligible = eligibleUsers.length > 0;
-                        return (
-                          <>
-                            <select
-                              value={returnForm.user}
-                              onChange={(e) => setReturnForm({ ...returnForm, user: e.target.value, returned_assets: [] })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                              disabled={!hasEligible}
-                            >
-                              <option value="">{hasEligible ? 'Select User' : 'No users pending offboarding'}</option>
-                              {eligibleUsers.map(u => (<option key={u.id} value={u.id}>{u.name}</option>))}
-                            </select>
-                            {!hasEligible && (
-                              <p className="mt-1 text-xs text-gray-500">Ask HR Manager to add the employee to Offboarding to enable returns.</p>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Returned Assets</label>
-                      <select multiple value={(returnForm.returned_assets || []).map(String)} onChange={(e) => setReturnForm({ ...returnForm, returned_assets: Array.from(e.target.selectedOptions).map(o => Number(o.value)) })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 min-h-[120px]">
-                        {(() => {
-                          // Match selected user against the display list computed above
-                          const employeesArr = (employees || []);
-                          const eligibleUsers = (offboardings || []).map(o => {
-                            const byEmail = employeesArr.find(e => (e.email || e.user?.email) && (e.email === o.employee_email || e.user?.email === o.employee_email));
-                            const byName = byEmail || employeesArr.find(e => (e.name || '').toLowerCase() === String(o.employee_name || '').toLowerCase());
-                            const match = byName;
-                            if (!match) return null;
-                            const id = String(match.id ?? match.user_id ?? match.user?.id ?? '');
-                            const name = match.name || o.employee_name || `User ${id}`;
-                            if (!id) return null;
-                            return { id, name };
-                          }).filter(Boolean);
-                          const selected = eligibleUsers.find(u => u.id == returnForm.user);
-                          const list = (assets || []).filter(a => selected && a.employee_name === selected.name);
-                          if (!selected) return [<option key="hint" value="" disabled>Select a user to load assigned assets</option>];
-                          if (list.length === 0) return [<option key="none" value="" disabled>No assigned assets</option>];
-                          return list.map(a => (
-                            <option key={a.id} value={a.id}>{a.asset_type} • {a.serial_number || a.description || a.id}</option>
-                          ));
-                        })()}
+                      </div>
+                    ) : (
+                      <select
+                        value={assignmentForm.asset || ''}
+                        onChange={(e) => setAssignmentForm(prev => ({
+                          ...prev,
+                          asset: e.target.value ? Number(e.target.value) : null
+                        }))}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        disabled={!assignmentForm.asset_type}
+                      >
+                        <option value="" className="bg-[#1a1c2e]">
+                          {!assignmentForm.asset_type
+                            ? 'Select an asset type first'
+                            : 'Select Asset Instance'}
+                        </option>
+                        {(assets || [])
+                          .filter(asset => {
+                            return (
+                              !!assignmentForm.asset_type &&
+                              asset._assetTypeId === assignmentForm.asset_type &&
+                              asset._assetTypeCategory === 'HARDWARE'
+                            );
+                          })
+                          .filter(asset => !asset.employee_name)
+                          .map(a => (
+                            <option key={a.id} value={a.id} className="bg-[#1a1c2e]">
+                              {a.asset_type} • {a.serial_number || a.description || a.id}
+                            </option>
+                          ))}
                       </select>
-                    </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Damaged Assets File</label>
-                      <input type="file" onChange={(e) => setReturnForm({ ...returnForm, damaged_file: (e.target.files && e.target.files[0]) || null })} className="mt-1 block w-full text-sm text-gray-700" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Remarks</label>
-                      <textarea rows={4} value={returnForm.remarks} onChange={(e) => setReturnForm({ ...returnForm, remarks: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <div className="flex items-center">
-                      <input id="ret_is_offboarded" type="checkbox" checked={returnForm.is_offboarded} onChange={(e) => setReturnForm({ ...returnForm, is_offboarded: e.target.checked })} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                      <label htmlFor="ret_is_offboarded" className="ml-2 block text-sm text-gray-700">Is offboarded</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Manager Email</label>
+                      <input
+                        type="email"
+                        placeholder="reporting@company.com"
+                        value={assignmentForm.manager_email}
+                        onChange={(e) => setAssignmentForm({ ...assignmentForm, manager_email: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      />
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Assignment Notes</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Special instructions or delivery notes..."
+                      value={assignmentForm.notes}
+                      onChange={(e) => setAssignmentForm({ ...assignmentForm, notes: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
+                  </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
-                  <button onClick={() => submitReturn('save')} disabled={!returnForm.user || !(returnForm.returned_assets && returnForm.returned_assets.length)} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm disabled:opacity-50">Save</button>
-                  <button onClick={() => submitReturn('add_another')} disabled={!returnForm.user || !(returnForm.returned_assets && returnForm.returned_assets.length)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and add another</button>
-                  <button onClick={() => submitReturn('continue')} disabled={!returnForm.user || !(returnForm.returned_assets && returnForm.returned_assets.length)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Save and continue editing</button>
-                  <button onClick={() => setShowReturnModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
+              </div>
+
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={() => submitAssignment('save')}
+                  disabled={!assignmentForm.employee || (assignmentForm.isSoftware ? !assignmentForm.assets.length : !assignmentForm.asset)}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                >
+                  Create Assignment
+                </button>
+                <button
+                  onClick={() => setShowAssignmentModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
-        )
-      }
+        </div>
+      )}
+
+      {showReturnModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowReturnModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Return Asset</h3>
+                  <button onClick={() => setShowReturnModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset *</label>
+                    <select
+                      value={returnForm.asset}
+                      onChange={(e) => setReturnForm({ ...returnForm, asset: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#1a1c2e]">Select Assigned Asset</option>
+                      {(assets || [])
+                        .filter(a => !!a.employee_name)
+                        .map(a => (
+                          <option key={a.id} value={a.id} className="bg-[#1a1c2e]">
+                            {a.asset_type} • {a.serial_number || a.id} (Assigned to {a.employee_name})
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Return Status</label>
+                    <select
+                      value={returnForm.status}
+                      onChange={(e) => setReturnForm({ ...returnForm, status: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="available" className="bg-[#1a1c2e]">Available (Good Condition)</option>
+                      <option value="damaged" className="bg-[#1a1c2e]">Damaged / Need Repair</option>
+                      <option value="lost" className="bg-[#1a1c2e]">Lost / Stolen</option>
+                      <option value="retired" className="bg-[#1a1c2e]">Retired / End of Life</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Return Remarks</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Condition upon return, missing cables, etc."
+                      value={returnForm.remarks}
+                      onChange={(e) => setReturnForm({ ...returnForm, remarks: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={() => submitReturn()}
+                  disabled={!returnForm.asset}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl font-bold shadow-lg shadow-red-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                >
+                  Process Return
+                </button>
+                <button
+                  onClick={() => setShowReturnModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {
         showStatusModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowStatusModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Add Employee Status</h3>
-                  <div className="space-y-4">
+          <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowStatusModal(false)}></div>
+              <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+                <div className="px-8 pt-8 pb-6">
+                  <div className="flex justify-between items-center mb-8">
+                    <h3 className="text-2xl font-bold text-white tracking-tight">Add Employee Status</h3>
+                    <button onClick={() => setShowStatusModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                      <XMarkIcon className="h-6 w-6" />
+                    </button>
+                  </div>
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Employee *</label>
-                      <select value={statusForm.employee} onChange={(e) => setStatusForm({ ...statusForm, employee: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select Employee</option>
-                        {(employees || []).map(emp => (<option key={emp.id} value={emp.id}>{emp.name}</option>))}
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Employee *</label>
+                      <select
+                        value={statusForm.employee}
+                        onChange={(e) => setStatusForm({ ...statusForm, employee: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      >
+                        <option value="" className="bg-[#1a1c2e]">Select Employee</option>
+                        {(employees || []).map(emp => (<option key={emp.id} value={emp.id} className="bg-[#1a1c2e]">{emp.name}</option>))}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Status *</label>
-                      <input type="text" value={statusForm.status} onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Status *</label>
+                      <input
+                        type="text"
+                        value={statusForm.status}
+                        onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Notes</label>
-                      <textarea rows={3} value={statusForm.notes} onChange={(e) => setStatusForm({ ...statusForm, notes: e.target.value })} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Notes</label>
+                      <textarea
+                        rows={3}
+                        value={statusForm.notes}
+                        onChange={(e) => setStatusForm({ ...statusForm, notes: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      />
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button onClick={submitStatus} disabled={!statusForm.employee || !statusForm.status} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">Add</button>
-                  <button onClick={() => setShowStatusModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                  <button onClick={submitStatus} disabled={!statusForm.employee || !statusForm.status} className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100">Add</button>
+                  <button onClick={() => setShowStatusModal(false)} className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all">Cancel</button>
                 </div>
               </div>
             </div>
@@ -1956,8 +2178,8 @@ const AssetManagement = () => {
 
       {
         activeSection === 'hardware' && (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-6 mb-10">
               {[
                 { key: 'all', label: 'Total', count: assetTypeCounts.all, icon: WrenchScrewdriverIcon },
                 { key: 'laptop', label: 'Laptops', count: assetTypeCounts.laptop, icon: ComputerDesktopIcon },
@@ -1968,14 +2190,14 @@ const AssetManagement = () => {
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={stat.key} className="bg-white rounded-lg shadow p-4">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 p-2 rounded-md bg-blue-500 text-white">
-                        <Icon className="h-5 w-5" />
+                  <div key={stat.key} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 transition-all duration-300 hover:bg-white/10 hover:border-white/20 group">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 mb-3 group-hover:scale-110 transition-transform">
+                        <Icon className="h-6 w-6" />
                       </div>
-                      <div className="ml-3">
-                        <h3 className="text-lg font-bold text-gray-900">{stat.count}</h3>
-                        <p className="text-xs text-gray-500">{stat.label}</p>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-1">{stat.count}</h3>
+                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</p>
                       </div>
                     </div>
                   </div>
@@ -1983,119 +2205,132 @@ const AssetManagement = () => {
               })}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-6 mb-8 items-end">
               <div className="flex-1">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Search Assets</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-slate-500" />
                   </div>
                   <input
                     type="text"
-                    placeholder="Search assets..."
+                    placeholder="Search serial, tag, description..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl leading-5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-md"
                   />
                 </div>
               </div>
-              <div>
+              <div className="w-full sm:w-64">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Status Filter</label>
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-md appearance-none"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="AVAILABLE">Available</option>
-                  <option value="ASSIGNED">Assigned</option>
-                  {/* "Repair" and "Damaged" both map to the DAMAGED backend status */}
-                  <option value="DAMAGED">Repair</option>
-                  <option value="DAMAGED">Damaged</option>
-                  <option value="LOST">Lost</option>
+                  <option value="all" className="bg-[#1a1c2e]">All Statuses</option>
+                  <option value="AVAILABLE" className="bg-[#1a1c2e]">Available</option>
+                  <option value="ASSIGNED" className="bg-[#1a1c2e]">Assigned</option>
+                  <option value="DAMAGED" className="bg-[#1a1c2e]">Repair</option>
+                  <option value="DAMAGED" className="bg-[#1a1c2e]">Damaged</option>
+                  <option value="LOST" className="bg-[#1a1c2e]">Lost</option>
                 </select>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
               {filteredAssets.length === 0 ? (
-                <div className="text-center py-12">
-                  <WrenchScrewdriverIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No assets found</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                <div className="text-center py-20">
+                  <WrenchScrewdriverIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
+                  <h3 className="text-xl font-bold text-white">No assets found</h3>
+                  <p className="mt-2 text-slate-400 max-w-xs mx-auto">
                     No assets match your current search and filter criteria.
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-white/10">
+                    <thead style={{ background: theme.headerGradient }}>
                       <tr>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Tag</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Previously Used Employee</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial Number</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchased Date</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age (years)</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issued Date</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Type</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Asset Tag</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Status</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Employee</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">History</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Serial #</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Description</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Purchased</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Age</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Issued</th>
                         {isAssetAdmin && (
-                          <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-widest">Actions</th>
                         )}
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-white/5">
                       {filteredAssets.map((asset) => (
                         <tr
                           key={asset.id}
-                          className="hover:bg-gray-50 cursor-pointer"
+                          className="hover:bg-white/5 cursor-pointer transition-colors group/row border-b border-white/5 last:border-0"
                           onClick={() => openAssetDetails(asset)}
                         >
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                            <div className="flex items-center gap-2">
-                              <div className="flex-shrink-0 p-1.5 bg-blue-100 rounded-lg text-blue-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 p-2 bg-indigo-500/10 rounded-xl text-indigo-400 group-hover/row:bg-indigo-500/20 transition-all">
                                 {getAssetIcon(asset.asset_type)}
                               </div>
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAssetTypeColor(asset.asset_type)}`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getAssetTypeColor(asset.asset_type)} border border-white/10 shadow-sm`}>
                                 {asset.asset_type.replace('_', ' ')}
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-400">
                             {asset.asset_tag || '-'}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
                             {asset.status && (
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAssetStatusColor(asset.status)}`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getAssetStatusColor(asset.status)} border border-white/10 shadow-sm`}>
                                 {String(asset.status).toUpperCase()}
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                             {getCurrentEmployeeNameFor(asset) || '-'}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                             {(() => {
                               const prev = getPreviousEmployeesFor(asset);
-                              return prev.length ? prev.join(', ') : '-';
+                              return prev.length ? (
+                                <div className="flex -space-x-2">
+                                  {prev.map((p, i) => (
+                                    <div key={i} className="h-6 w-6 rounded-full bg-indigo-600 border-2 border-[#070B14] flex items-center justify-center text-[8px] font-bold text-white shadow-lg" title={p}>
+                                      {p.charAt(0)}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : '-';
                             })()}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-400">
                             {asset.serial_number || '-'}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">
+                          <td className="px-6 py-4 text-sm text-slate-400 max-w-xs truncate">
                             {asset.description || '-'}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                             {asset.purchased_date ? new Date(asset.purchased_date).toLocaleDateString() : '-'}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                             {(() => {
                               const age = getAssetAgeYears(asset);
-                              return age !== null && age !== undefined ? age : '-';
+                              return age !== null && age !== undefined ? (
+                                <span className={`px-2 py-0.5 rounded-lg border border-white/10 bg-white/5 text-xs font-bold ${age > 3 ? 'text-orange-400' : 'text-emerald-400'}`}>
+                                  {age}y
+                                </span>
+                              ) : '-';
                             })()}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                             {(() => {
                               const issued = getIssuedDateFor(asset);
                               return issued ? new Date(issued).toLocaleDateString() : '-';
@@ -2103,30 +2338,30 @@ const AssetManagement = () => {
                           </td>
                           {isAssetAdmin && (
                             <td
-                              className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
+                              className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <div className="flex justify-end gap-2">
+                              <div className="flex justify-end gap-3">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); openEditModal(asset); }}
-                                  className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded"
+                                  className="p-2 text-indigo-400 hover:bg-indigo-500/20 rounded-xl transition-all"
                                   title="Edit"
                                 >
-                                  Edit
+                                  <PencilIcon className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleReportRepair(asset); }}
-                                  className="p-1 px-2 text-orange-600 hover:bg-orange-50 rounded"
+                                  className="p-2 text-orange-400 hover:bg-orange-500/20 rounded-xl transition-all"
                                   title="Report Repair"
                                 >
-                                  Repair
+                                  <WrenchScrewdriverIcon className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); disposeAsset(asset.id); }}
-                                  className="p-1 px-2 text-red-600 hover:bg-red-50 rounded"
+                                  className="p-2 text-rose-400 hover:bg-rose-500/20 rounded-xl transition-all"
                                   title="Dispose"
                                 >
-                                  Trash
+                                  <TrashIcon className="h-4 w-4" />
                                 </button>
                               </div>
                             </td>
@@ -2138,88 +2373,88 @@ const AssetManagement = () => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         )
       }
 
       {
         activeSection === 'disposed' && (
-          <>
+          <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="flex-1">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
                   </div>
                   <input
                     type="text"
                     placeholder="Search disposed assets..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-xl"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
               {filteredAssets.length === 0 ? (
-                <div className="text-center py-12">
-                  <TrashIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No disposed assets</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Assets you dispose of will appear here.
+                <div className="text-center py-24">
+                  <div className="h-20 w-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-white/10">
+                    <TrashIcon className="h-10 w-10 text-slate-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">No disposed assets</h3>
+                  <p className="text-slate-500 max-w-xs mx-auto">
+                    Assets you dispose of will appear here for archival or restoration.
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-white/10">
+                    <thead style={{ background: theme.headerGradient }}>
                       <tr>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Tag</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial Number</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchased Date</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Type</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Asset Tag</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Serial Number</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Description</th>
+                        <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-widest">Purchased</th>
+                        <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-widest">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-white/5">
                       {filteredAssets.map((asset) => (
                         <tr
                           key={asset.id}
-                          className="hover:bg-gray-50 cursor-pointer"
+                          className="hover:bg-white/5 cursor-pointer transition-colors group"
                           onClick={() => openAssetDetails(asset)}
                         >
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                            <div className="flex items-center gap-2">
-                              <div className="flex-shrink-0 p-1.5 bg-gray-100 rounded-lg text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-white/5 rounded-xl text-slate-400 group-hover:text-indigo-400 transition-colors">
                                 {getAssetIcon(asset.asset_type)}
                               </div>
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAssetTypeColor(asset.asset_type)}`}>
-                                {asset.asset_type.replace('_', ' ')}
-                              </span>
+                              <span className="text-sm font-bold text-white">{asset.asset_type.replace('_', ' ')}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-400">
                             {asset.asset_tag || '-'}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-400">
                             {asset.serial_number || '-'}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">
+                          <td className="px-6 py-4 text-sm text-slate-400 max-w-xs truncate">
                             {asset.description || '-'}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                             {asset.purchased_date ? new Date(asset.purchased_date).toLocaleDateString() : '-'}
                           </td>
                           <td
-                            className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
+                            className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <button
                               onClick={() => restoreAsset(asset.id)}
-                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              className="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
                             >
                               Restore
                             </button>
@@ -2231,114 +2466,151 @@ const AssetManagement = () => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         )
       }
 
       {
         showDetailsModal && detailsAsset && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowDetailsModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Asset Details</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      {detailsAsset.status && (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAssetStatusColor(detailsAsset.status)}`}>{String(detailsAsset.status || '').toUpperCase()}</span>
-                      )}
-                      {(() => {
-                        const typeRec = (assetTypes || []).find(t => t.id === (detailsAsset.asset_type || detailsAsset.asset_type_id));
-                        const tname = typeRec?.name ? String(typeRec.name).toLowerCase().replace(/\s+/g, '_') : '';
-                        return (
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAssetTypeColor(tname)}`}>{typeRec?.name || 'Asset'}</span>
-                        );
-                      })()}
+          <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="fixed inset-0 transition-opacity bg-[#070B14]/90 backdrop-blur-md" onClick={() => setShowDetailsModal(false)}></div>
+              <div className="relative inline-block align-bottom bg-[#0B1120] rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-white/10">
+                {/* Header Gradient */}
+                <div className="h-32 bg-gradient-to-br from-indigo-600/20 via-violet-600/20 to-transparent relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent)]"></div>
+                  <div className="absolute top-8 right-8">
+                    <button onClick={() => setShowDetailsModal(false)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-slate-400 hover:text-white transition-all backdrop-blur-xl border border-white/10">
+                      <XMarkIcon className="h-6 w-6" />
+                    </button>
+                  </div>
+                  <div className="absolute bottom-6 left-10">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+                        {getAssetIcon(detailsAsset.asset_type, 'h-8 w-8 text-indigo-400')}
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-bold text-white tracking-tight">{detailsAsset.asset_type}</h2>
+                        <p className="text-indigo-400 font-mono text-sm uppercase tracking-wider mt-1">{detailsAsset.asset_tag || 'No Asset Tag'}</p>
+                      </div>
                     </div>
-
-                    {detailsAsset.name && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{detailsAsset.name}</p>
-                        <p className="text-xs text-gray-500">Name</p>
-                      </div>
-                    )}
-
-                    {detailsAsset.asset_tag && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{detailsAsset.asset_tag}</p>
-                        <p className="text-xs text-gray-500">Asset Tag</p>
-                      </div>
-                    )}
-
-                    {detailsAsset.serial_number && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{detailsAsset.serial_number}</p>
-                        <p className="text-xs text-gray-500">Serial Number</p>
-                      </div>
-                    )}
-
-                    {detailsAsset.purchased_date && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{new Date(detailsAsset.purchased_date).toLocaleDateString()}</p>
-                        <p className="text-xs text-gray-500">Purchased Date</p>
-                      </div>
-                    )}
-
-                    {detailsAsset.laptop_age_pretty && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{detailsAsset.laptop_age_pretty}</p>
-                        <p className="text-xs text-gray-500">Laptop Age</p>
-                      </div>
-                    )}
-
-                    {detailsAsset.current_employee?.name && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{detailsAsset.current_employee.name}</p>
-                        <p className="text-xs text-gray-500">Current Employee</p>
-                      </div>
-                    )}
-
-                    {detailsAsset.previously_used_by_info?.name && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{detailsAsset.previously_used_by_info.name}</p>
-                        <p className="text-xs text-gray-500">Previously Used By</p>
-                      </div>
-                    )}
-
-                    {(detailsAsset.image_before || detailsAsset.image_after) && (
-                      <div className="grid grid-cols-2 gap-3">
-                        {detailsAsset.image_before && (
-                          <div>
-                            <img src={getImageUrl(detailsAsset.image_before)} alt="Before" className="w-full h-32 object-cover rounded" />
-                            <p className="text-xs text-gray-500 mt-1">Before</p>
-                          </div>
-                        )}
-                        {detailsAsset.image_after && (
-                          <div>
-                            <img src={getImageUrl(detailsAsset.image_after)} alt="After" className="w-full h-32 object-cover rounded" />
-                            <p className="text-xs text-gray-500 mt-1">After</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {detailsAsset.custom_attributes && (
-                      <div>
-                        <pre className="text-xs bg-gray-50 p-2 rounded border border-gray-200 overflow-auto max-h-40">{(() => { try { return JSON.stringify(detailsAsset.custom_attributes, null, 2); } catch (_) { return String(detailsAsset.custom_attributes); } })()}</pre>
-                        <p className="text-xs text-gray-500 mt-1">Custom Attributes</p>
-                      </div>
-                    )}
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
-                  <button onClick={() => setShowDetailsModal(false)} className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">Close</button>
-                  <button
-                    onClick={() => { setShowDetailsModal(false); handleReportRepair(detailsAsset); }}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:w-auto sm:text-sm"
-                  >
-                    Report Repair
-                  </button>
+
+                <div className="px-10 py-10">
+                  <div className="grid grid-cols-2 gap-10">
+                    {/* Primary Details */}
+                    <div className="space-y-8">
+                      <div>
+                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Core Specifications</h4>
+                        <div className="space-y-5">
+                          <div className="flex justify-between items-center group">
+                            <span className="text-slate-400 text-sm">Serial Number</span>
+                            <span className="text-white font-mono text-sm bg-white/5 px-2 py-0.5 rounded border border-white/5">{detailsAsset.serial_number || 'N/A'}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-400 text-sm">Model/Description</span>
+                            <span className="text-white text-sm font-semibold">{detailsAsset.description || 'N/A'}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-400 text-sm">Category</span>
+                            <span className="px-2.5 py-1 bg-white/5 rounded-lg text-xs font-bold text-indigo-300 border border-white/10">{detailsAsset.category}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Lifecycle Status</h4>
+                        <div className="space-y-3">
+                          <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2.5 h-2.5 rounded-full ${detailsAsset.status === 'AVAILABLE' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
+                                detailsAsset.status === 'ASSIGNED' ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' :
+                                  'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                                }`}></div>
+                              <span className="text-slate-200 font-bold uppercase text-xs tracking-widest">{detailsAsset.status}</span>
+                            </div>
+                            {detailsAsset.is_active ? (
+                              <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-md border border-emerald-500/20">ACTIVE</span>
+                            ) : (
+                              <span className="px-2 py-1 bg-red-500/10 text-red-400 text-[10px] font-bold rounded-md border border-red-500/20">INACTIVE</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Assignment Info */}
+                    <div className="space-y-8">
+                      <div>
+                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Current Custody</h4>
+                        <div className="p-6 bg-white/5 rounded-[2rem] border border-white/10 relative group overflow-hidden">
+                          <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
+                          {detailsAsset.employee_name ? (
+                            <div className="relative">
+                              <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/20">
+                                  {detailsAsset.employee_name.charAt(0)}
+                                </div>
+                                <div>
+                                  <p className="text-white font-bold text-lg">{detailsAsset.employee_name}</p>
+                                  <p className="text-indigo-400 text-xs font-medium">Assigned Personnel</p>
+                                </div>
+                              </div>
+                              <div className="space-y-2 pt-4 border-t border-white/5">
+                                <div className="flex justify-between text-xs">
+                                  <span className="text-slate-500 font-medium tracking-wide">ASSIGNED ON</span>
+                                  <span className="text-slate-300 font-mono italic">{formatDateTime(detailsAsset.assigned_date)}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center py-4 text-center">
+                              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mb-3">
+                                <UserIcon className="h-8 w-8 text-slate-600" />
+                              </div>
+                              <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Unassigned</p>
+                              <p className="text-slate-600 text-xs mt-1 italic">Available in inventory</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {detailsAsset.custom_attributes && (
+                        <div>
+                          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Notes & Metadata</h4>
+                          <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-slate-300 text-sm leading-relaxed italic">
+                            "{detailsAsset.custom_attributes}"
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-12 pt-8 border-t border-white/5 flex justify-between items-center">
+                    <div className="text-[10px] text-slate-600 font-mono flex flex-col gap-1">
+                      <span>CREATED: {formatDateTime(detailsAsset.created_at)}</span>
+                      <span>LAST UPDATED: {formatDateTime(detailsAsset.updated_at)}</span>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setShowDetailsModal(false);
+                          openEditModal(detailsAsset);
+                        }}
+                        className="px-6 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold border border-white/10 transition-all flex items-center gap-2"
+                      >
+                        <PencilIcon className="h-4 w-4 text-indigo-400" />
+                        Edit Details
+                      </button>
+                      <button
+                        onClick={() => setShowDetailsModal(false)}
+                        className="px-8 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-[1.02] transition-all"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2347,291 +2619,320 @@ const AssetManagement = () => {
       }
 
       {/* Create Asset Modal */}
-      {
-        showCreateModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowCreateModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    Add New Asset
-                  </h3>
-                  <div className="space-y-4">
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Add New Asset</h3>
+                  <button onClick={() => setShowCreateModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Employee *</label>
+                    <select
+                      value={newAsset.employee}
+                      onChange={(e) => setNewAsset({ ...newAsset, employee: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#1a1c2e]">Select Employee</option>
+                      {(employees || []).map((employee) => (
+                        <option key={employee.id} value={employee.id} className="bg-[#1a1c2e]">
+                          {employee.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Type *</label>
+                    <select
+                      value={newAsset.asset_type}
+                      onChange={(e) => setNewAsset({ ...newAsset, asset_type: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="laptop" className="bg-[#1a1c2e]">Laptop</option>
+                      <option value="phone" className="bg-[#1a1c2e]">Phone</option>
+                      <option value="id_card" className="bg-[#1a1c2e]">ID Card</option>
+                      <option value="access_card" className="bg-[#1a1c2e]">Access Card</option>
+                      <option value="other" className="bg-[#1a1c2e]">Other</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Employee *</label>
-                      <select
-                        value={newAsset.employee}
-                        onChange={(e) => setNewAsset({ ...newAsset, employee: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">Select Employee</option>
-                        {(employees || []).map((employee) => (
-                          <option key={employee.id} value={employee.id}>
-                            {employee.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset Type *</label>
-                      <select
-                        value={newAsset.asset_type}
-                        onChange={(e) => setNewAsset({ ...newAsset, asset_type: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="laptop">Laptop</option>
-                        <option value="phone">Phone</option>
-                        <option value="id_card">ID Card</option>
-                        <option value="access_card">Access Card</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Serial Number</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Serial Number</label>
                       <input
                         type="text"
                         value={newAsset.serial_number}
+                        placeholder="S/N: XXXXX"
                         onChange={(e) => setNewAsset({ ...newAsset, serial_number: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Description</label>
-                      <textarea
-                        value={newAsset.description}
-                        onChange={(e) => setNewAsset({ ...newAsset, description: e.target.value })}
-                        rows={3}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Issued Date</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Issued Date</label>
                       <input
                         type="date"
                         value={newAsset.issued_date}
                         onChange={(e) => setNewAsset({ ...newAsset, issued_date: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
                       />
                     </div>
                   </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Description</label>
+                    <textarea
+                      value={newAsset.description}
+                      onChange={(e) => setNewAsset({ ...newAsset, description: e.target.value })}
+                      rows={3}
+                      placeholder="Notes or technical details..."
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
+                  </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    onClick={createAsset}
-                    disabled={!newAsset.employee || !newAsset.asset_type}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-                  >
-                    Create Asset
-                  </button>
-                  <button
-                    onClick={() => setShowCreateModal(false)}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  >
-                    Cancel
-                  </button>
-                </div>
+              </div>
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={createAsset}
+                  disabled={!newAsset.employee || !newAsset.asset_type}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold hover:scale-[1.02] transition-all disabled:opacity-50"
+                >
+                  Create Asset
+                </button>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 transition-all"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
-        )
-      }
+        </div>
+      )}
 
       {/* Edit Asset Modal */}
-      {
-        showEditModal && selectedAsset && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowEditModal(false)}></div>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    Edit Asset
-                  </h3>
-                  <div className="space-y-4">
+      {showEditModal && selectedAsset && (
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowEditModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Edit Asset</h3>
+                  <button onClick={() => setShowEditModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Employee *</label>
+                    <select
+                      value={selectedAsset.employee}
+                      onChange={(e) => setSelectedAsset({ ...selectedAsset, employee: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#1a1c2e]">Select Employee</option>
+                      {(employees || []).map((employee) => (
+                        <option key={employee.id} value={employee.id} className="bg-[#1a1c2e]">
+                          {employee.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Type *</label>
+                    <select
+                      value={selectedAsset.asset_type}
+                      onChange={(e) => setSelectedAsset({ ...selectedAsset, asset_type: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                    >
+                      <option value="laptop" className="bg-[#1a1c2e]">Laptop</option>
+                      <option value="phone" className="bg-[#1a1c2e]">Phone</option>
+                      <option value="id_card" className="bg-[#1a1c2e]">ID Card</option>
+                      <option value="access_card" className="bg-[#1a1c2e]">Access Card</option>
+                      <option value="other" className="bg-[#1a1c2e]">Other</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Employee *</label>
-                      <select
-                        value={selectedAsset.employee}
-                        onChange={(e) => setSelectedAsset({ ...selectedAsset, employee: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">Select Employee</option>
-                        {(employees || []).map((employee) => (
-                          <option key={employee.id} value={employee.id}>
-                            {employee.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset Type *</label>
-                      <select
-                        value={selectedAsset.asset_type}
-                        onChange={(e) => setSelectedAsset({ ...selectedAsset, asset_type: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="laptop">Laptop</option>
-                        <option value="phone">Phone</option>
-                        <option value="id_card">ID Card</option>
-                        <option value="access_card">Access Card</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Serial Number</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Serial Number</label>
                       <input
                         type="text"
                         value={selectedAsset.serial_number || ''}
                         onChange={(e) => setSelectedAsset({ ...selectedAsset, serial_number: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Description</label>
-                      <textarea
-                        value={selectedAsset.description || ''}
-                        onChange={(e) => setSelectedAsset({ ...selectedAsset, description: e.target.value })}
-                        rows={3}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Laptop Condition</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Status</label>
                       <select
                         value={selectedAsset.status || 'AVAILABLE'}
                         onChange={(e) => setSelectedAsset({ ...selectedAsset, status: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="AVAILABLE">Available</option>
-                        <option value="ASSIGNED">Assigned</option>
-                        <option value="DAMAGED">Repair</option>
-                        <option value="DAMAGED">Damaged</option>
-                        <option value="LOST">Lost</option>
+                        <option value="AVAILABLE" className="bg-[#1a1c2e]">Available</option>
+                        <option value="ASSIGNED" className="bg-[#1a1c2e]">Assigned</option>
+                        <option value="DAMAGED" className="bg-[#1a1c2e]">Repair / Damaged</option>
+                        <option value="LOST" className="bg-[#1a1c2e]">Lost</option>
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Purchased Date</label>
-                      <input
-                        type="date"
-                        value={selectedAsset.purchased_date || ''}
-                        onChange={(e) => setSelectedAsset({ ...selectedAsset, purchased_date: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Purchased Date</label>
+                    <input
+                      type="date"
+                      value={selectedAsset.purchased_date || ''}
+                      onChange={(e) => setSelectedAsset({ ...selectedAsset, purchased_date: e.target.value })}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Description</label>
+                    <textarea
+                      value={selectedAsset.description || ''}
+                      onChange={(e) => setSelectedAsset({ ...selectedAsset, description: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    />
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    onClick={updateAsset}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  >
-                    Update Asset
-                  </button>
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  >
-                    Cancel
-                  </button>
-                </div>
+              </div>
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={updateAsset}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold hover:scale-[1.02] transition-all"
+                >
+                  Update Asset
+                </button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 transition-all"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
-        )
-      }
-
+        </div>
+      )}
       {/* Repair Modal */}
       {showRepairModal && repairForm.asset && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={() => setShowRepairModal(false)}></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">{repairForm.id ? 'Edit Asset Repair' : 'Report Asset Repair'}</h3>
-                <div className="space-y-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowRepairModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">{repairForm.id ? 'Edit Asset Repair' : 'Report Asset Repair'}</h3>
+                  <button onClick={() => setShowRepairModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Asset</label>
-                    <div className="mt-1 p-2 bg-gray-50 rounded-md text-sm text-gray-700">
-                      <strong>{repairForm.asset.asset_tag}</strong> - {repairForm.asset.description || repairForm.asset.name}
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset</label>
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm">
+                      <div className="text-indigo-400 font-mono font-bold mb-1">{repairForm.asset.asset_tag}</div>
+                      <div className="text-slate-300">{repairForm.asset.description || repairForm.asset.name}</div>
                     </div>
                   </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Issue Description *</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Issue Description *</label>
                     <textarea
                       rows={3}
                       value={repairForm.issue_description}
                       onChange={(e) => setRepairForm({ ...repairForm, issue_description: e.target.value })}
                       placeholder="Describe the issue with the asset..."
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-medium"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Status</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Status</label>
                       <select
                         value={repairForm.status}
                         onChange={(e) => setRepairForm({ ...repairForm, status: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="PENDING">Pending</option>
-                        <option value="PICKED_UP">Picked Up</option>
-                        <option value="AT_VENDOR">At Vendor</option>
-                        <option value="IN_PROGRESS">In Progress</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="FAILED">Failed</option>
-                        <option value="CANCELLED">Cancelled</option>
+                        <option value="PENDING" className="bg-[#1a1c2e]">Pending</option>
+                        <option value="PICKED_UP" className="bg-[#1a1c2e]">Picked Up</option>
+                        <option value="AT_VENDOR" className="bg-[#1a1c2e]">At Vendor</option>
+                        <option value="IN_PROGRESS" className="bg-[#1a1c2e]">In Progress</option>
+                        <option value="COMPLETED" className="bg-[#1a1c2e]">Completed</option>
+                        <option value="FAILED" className="bg-[#1a1c2e]">Failed</option>
+                        <option value="CANCELLED" className="bg-[#1a1c2e]">Cancelled</option>
                       </select>
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Estimated Completion</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Estimated Completion</label>
                       <input
                         type="date"
                         value={repairForm.estimated_completion}
                         onChange={(e) => setRepairForm({ ...repairForm, estimated_completion: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Vendor</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Vendor</label>
                       <input
                         type="text"
                         value={repairForm.repair_vendor}
                         onChange={(e) => setRepairForm({ ...repairForm, repair_vendor: e.target.value })}
-                        placeholder="Repair shop or company name"
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Repair shop name"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Repair Cost (₹)</label>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Repair Cost (₹)</label>
                       <input
                         type="number"
                         value={repairForm.repair_cost}
                         onChange={(e) => setRepairForm({ ...repairForm, repair_cost: e.target.value })}
                         placeholder="0.00"
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                   </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Repair Notes</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Repair Notes</label>
                     <textarea
                       rows={2}
                       value={repairForm.repair_notes}
                       onChange={(e) => setRepairForm({ ...repairForm, repair_notes: e.target.value })}
                       placeholder="Additional notes for IT/Finance..."
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse space-x-reverse space-x-3">
-                <button onClick={handleRepairSubmit} disabled={!repairForm.issue_description} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+
+              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <button
+                  onClick={handleRepairSubmit}
+                  disabled={!repairForm.issue_description}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl font-bold shadow-lg shadow-orange-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                >
                   {repairForm.id ? 'Update Repair' : 'Report Repair'}
                 </button>
-                <button onClick={() => setShowRepairModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                <button
+                  onClick={() => setShowRepairModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>

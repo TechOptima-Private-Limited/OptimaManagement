@@ -51,6 +51,9 @@ def register(request):
     serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        # Force password change on first login for admin-created users
+        user.must_change_password = True
+        user.save()
         # Ensure an Employee exists and is ACTIVE for admin-created users.
         Employee.objects.update_or_create(
             user=user,
@@ -175,11 +178,15 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         profile_data = {
             'phone_number': request.data.get('phone_number', ''),
             'address': request.data.get('address', ''),
-            'date_of_birth': request.data.get('date_of_birth'),
+            'date_of_birth': request.data.get('date_of_birth') or None,  # convert empty string to None
             'emergency_contact': request.data.get('emergency_contact', ''),
+            'gender': request.data.get('gender', ''),
+            'blood_group': request.data.get('blood_group', ''),
+            'aadhaar_number': request.data.get('aadhaar_number', ''),
+            'pan_number': request.data.get('pan_number', ''),
         }
         
-        # Remove None values
+        # Remove None values from user_data; remove None from profile_data (keep empty strings - they're valid clears)
         user_data = {k: v for k, v in user_data.items() if v is not None}
         profile_data = {k: v for k, v in profile_data.items() if v is not None}
         
@@ -313,6 +320,7 @@ def change_password(request):
         return Response({'detail': 'Password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
 
     user.set_password(new_password)
+    user.must_change_password = False  # Reset the flag after change
     user.save()
     return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
 

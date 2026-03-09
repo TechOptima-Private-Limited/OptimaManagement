@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ChevronLeftIcon, 
+import {
+  ChevronLeftIcon,
   ChevronRightIcon,
   CalendarDaysIcon,
   ClockIcon
@@ -38,7 +38,7 @@ const AttendanceCalendar = () => {
 
       const records = response.data.results || response.data;
       const attendanceMap = {};
-      
+
       records.forEach(record => {
         const dateKey = record.date;
         if (!attendanceMap[dateKey]) {
@@ -64,17 +64,17 @@ const AttendanceCalendar = () => {
     const startingDayOfWeek = firstDay.getDay();
 
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
-    
+
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
-    
+
     return days;
   };
 
@@ -94,19 +94,19 @@ const AttendanceCalendar = () => {
 
   const getDateStatusColor = (date) => {
     const attendance = getAttendanceForDate(date);
-    if (!attendance.length) return 'bg-gray-100 text-gray-400';
-    
+    if (!attendance.length) return 'bg-slate-800/50 text-slate-500';
+
     const hasPresent = attendance.some(a => a.status === 'PRESENT');
     const hasLate = attendance.some(a => a.status === 'LATE');
     const hasAbsent = attendance.some(a => a.status === 'ABSENT');
     const hasHalfDay = attendance.some(a => a.status === 'HALF_DAY');
-    
-    if (hasPresent && !hasLate && !hasAbsent) return 'bg-green-100 text-green-800';
-    if (hasLate) return 'bg-yellow-100 text-yellow-800';
-    if (hasAbsent) return 'bg-red-100 text-red-800';
-    if (hasHalfDay) return 'bg-blue-100 text-blue-800';
-    
-    return 'bg-gray-100 text-gray-400';
+
+    if (hasPresent && !hasLate && !hasAbsent) return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+    if (hasLate) return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+    if (hasAbsent) return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+    if (hasHalfDay) return 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+
+    return 'bg-slate-800/50 text-slate-500';
   };
 
   const handleDateClick = (date) => {
@@ -137,220 +137,211 @@ const AttendanceCalendar = () => {
   const days = getDaysInMonth(currentDate);
 
   if (loading) {
-    return <LoadingSpinner text="Loading calendar..." />;
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <LoadingSpinner text="Consulting the logs..." />
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Attendance Calendar</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          {isHRManager() ? 'View attendance calendar for all employees' : 'View your attendance calendar'}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 text-slate-300">
+      {/* Header */}
+      <div className="mb-10 text-center lg:text-left">
+        <div className="inline-flex items-center space-x-2 px-3 py-1 bg-indigo-500/10 rounded-full border border-indigo-500/20 mb-4">
+          <CalendarDaysIcon className="w-4 h-4 text-indigo-400" />
+          <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Chronicle Viewer</span>
+        </div>
+        <h1 className="text-4xl font-black text-white tracking-tight uppercase">Attendance Calendar</h1>
+        <p className="mt-2 text-slate-400 font-medium">
+          {isHRManager() ? 'Global organization attendance timeline.' : 'Personal attendance history and schedule.'}
         </p>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        {/* Calendar Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </h2>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => navigateMonth(-1)}
-                className="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
-              </button>
-              <button
-                onClick={() => setCurrentDate(new Date())}
-                className="px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-500"
-              >
-                Today
-              </button>
-              <button
-                onClick={() => navigateMonth(1)}
-                className="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <ChevronRightIcon className="h-5 w-5 text-gray-600" />
-              </button>
-            </div>
+      <div className="bg-slate-900/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+        {/* Calendar Navigation */}
+        <div className="px-8 py-6 border-b border-white/5 bg-slate-900/40 flex items-center justify-between">
+          <h2 className="text-2xl font-black text-white tracking-tight uppercase">
+            {monthNames[currentDate.getMonth()]} <span className="text-indigo-500">{currentDate.getFullYear()}</span>
+          </h2>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => navigateMonth(-1)}
+              className="p-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all shadow-lg"
+            >
+              <ChevronLeftIcon className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setCurrentDate(new Date())}
+              className="px-6 py-2.5 text-xs font-black text-indigo-400 border border-indigo-500/20 rounded-xl hover:bg-indigo-500/10 transition-all uppercase tracking-widest"
+            >
+              Current
+            </button>
+            <button
+              onClick={() => navigateMonth(1)}
+              className="p-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all shadow-lg"
+            >
+              <ChevronRightIcon className="h-5 w-5" />
+            </button>
           </div>
         </div>
 
         {/* Calendar Grid */}
-        <div className="p-6">
-          {/* Day headers */}
-          <div className="grid grid-cols-7 gap-px mb-2">
+        <div className="p-8">
+          <div className="grid grid-cols-7 gap-4 mb-4">
             {dayNames.map((day) => (
-              <div key={day} className="py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div key={day} className="text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
                 {day}
               </div>
             ))}
           </div>
 
-          {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden">
-            {days.map((date, index) => (
-              <div
-                key={index}
-                className={`
-                  min-h-[80px] bg-white p-2 cursor-pointer hover:bg-gray-50 transition-colors
-                  ${date ? 'border-b border-gray-200' : ''}
-                `}
-                onClick={() => handleDateClick(date)}
-              >
-                {date && (
-                  <div className="h-full">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`
-                        text-sm font-medium
-                        ${isToday(date) ? 'text-blue-600' : 'text-gray-900'}
-                        ${isWeekend(date) ? 'text-gray-400' : ''}
-                      `}>
-                        {date.getDate()}
-                      </span>
-                      {isToday(date) && (
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      )}
+          <div className="grid grid-cols-7 gap-4">
+            {days.map((date, index) => {
+              const attendance = getAttendanceForDate(date);
+              const isTodayDate = isToday(date);
+              const isWeekendDay = isWeekend(date);
+
+              return (
+                <div
+                  key={index}
+                  className={`
+                    min-h-[120px] rounded-3xl p-3 cursor-pointer transition-all duration-300 border relative overflow-hidden group
+                    ${!date ? 'opacity-0 pointer-events-none' : ''}
+                    ${selectedDate?.toDateString() === date?.toDateString()
+                      ? 'bg-indigo-500/20 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
+                      : 'bg-slate-900/60 border-white/5 hover:border-white/10 hover:translate-y-[-2px]'}
+                  `}
+                  onClick={() => handleDateClick(date)}
+                >
+                  {date && (
+                    <div className="h-full flex flex-col">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className={`
+                          text-sm font-black tracking-tighter
+                          ${isTodayDate ? 'text-indigo-400' : isWeekendDay ? 'text-slate-600' : 'text-slate-300'}
+                        `}>
+                          {date.getDate()}
+                        </span>
+                        {isTodayDate && (
+                          <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-pulse"></div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-1.5 overflow-hidden">
+                        {attendance?.slice(0, 2).map((a, idx) => (
+                          <div
+                            key={idx}
+                            className={`
+                              px-2.5 py-1 text-[9px] font-black uppercase tracking-tight rounded-lg truncate transition-all
+                              ${getDateStatusColor(date)}
+                            `}
+                          >
+                            {isHRManager() ? `${a.employee?.user?.first_name}` : a.status}
+                          </div>
+                        ))}
+                        {attendance?.length > 2 && (
+                          <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                            +{attendance.length - 2} more
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    
-                    {/* Attendance indicators */}
-                    <div className="space-y-1">
-                      {getAttendanceForDate(date).slice(0, 2).map((attendance, idx) => (
-                        <div
-                          key={idx}
-                          className={`
-                            px-1 py-0.5 text-xs rounded-sm truncate
-                            ${getDateStatusColor(date)}
-                          `}
-                        >
-                          {isHRManager() ? (
-                            `${attendance.employee?.user?.first_name} ${attendance.employee?.user?.last_name}`
-                          ) : (
-                            attendance.status
-                          )}
-                        </div>
-                      ))}
-                      {getAttendanceForDate(date).length > 2 && (
-                        <div className="text-xs text-gray-500">
-                          +{getAttendanceForDate(date).length - 2} more
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Dynamic Legend */}
+        <div className="px-8 py-6 border-t border-white/5 bg-slate-900/40">
+          <div className="flex flex-wrap items-center gap-8 justify-center">
+            {[
+              { label: 'Present', color: 'bg-emerald-500' },
+              { label: 'Late Arrival', color: 'bg-amber-500' },
+              { label: 'Absent', color: 'bg-rose-500' },
+              { label: 'Half Day', color: 'bg-indigo-500' }
+            ].map((item) => (
+              <div key={item.label} className="flex items-center space-x-2">
+                <div className={`w-2 h-2 ${item.color} rounded-full`}></div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</span>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Legend */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <h4 className="text-sm font-medium text-gray-900 mb-2">Legend</h4>
-          <div className="flex flex-wrap gap-4 text-xs">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-100 rounded-sm mr-2"></div>
-              <span className="text-gray-600">Present</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-yellow-100 rounded-sm mr-2"></div>
-              <span className="text-gray-600">Late</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-red-100 rounded-sm mr-2"></div>
-              <span className="text-gray-600">Absent</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-blue-100 rounded-sm mr-2"></div>
-              <span className="text-gray-600">Half Day</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-gray-100 rounded-sm mr-2"></div>
-              <span className="text-gray-600">No Data</span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Selected Date Details */}
+      {/* Detail Inspector Sidebar/Overlay */}
       {selectedDate && (
-        <div className="mt-6 bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+        <div className="mt-8 bg-slate-900/60 backdrop-blur-3xl rounded-[2.5rem] border border-indigo-500/20 overflow-hidden shadow-2xl animate-in slide-in-from-bottom-5 duration-500">
+          <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Chronicle Detail</p>
+              <h3 className="text-2xl font-black text-white tracking-tight uppercase">
                 {formatDate(selectedDate)}
               </h3>
-              <button
-                onClick={() => {
-                  setSelectedDate(null);
-                  setSelectedDateData(null);
-                }}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <span className="sr-only">Close</span>
-                ×
-              </button>
             </div>
+            <button
+              onClick={() => { setSelectedDate(null); setSelectedDateData(null); }}
+              className="p-2 rounded-full bg-white/5 text-slate-400 hover:text-white transition-colors border border-white/5"
+            >
+              <XCircleIcon className="w-8 h-8" />
+            </button>
           </div>
-          
-          <div className="p-6">
+
+          <div className="p-8">
             {selectedDateData && selectedDateData.length > 0 ? (
-              <div className="space-y-4">
-                {selectedDateData.map((attendance, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {selectedDateData.map((a, index) => (
+                  <div key={index} className="bg-slate-950/40 p-6 rounded-[2rem] border border-white/5 relative group hover:border-indigo-500/20 transition-all text-slate-300">
                     {isHRManager() && (
-                      <div className="flex items-center mb-3">
-                        <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white text-xs font-medium">
-                            {attendance.employee?.user?.first_name?.[0]}{attendance.employee?.user?.last_name?.[0]}
-                          </span>
+                      <div className="flex items-center mb-6">
+                        <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-xl flex items-center justify-center mr-4 shadow-lg text-white font-black uppercase border border-white/10">
+                          {a.employee?.user?.first_name?.[0]}{a.employee?.user?.last_name?.[0]}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {attendance.employee?.user?.first_name} {attendance.employee?.user?.last_name}
+                          <div className="text-lg font-black text-white tracking-tight">
+                            {a.employee?.user?.first_name} {a.employee?.user?.last_name}
                           </div>
-                          <div className="text-sm text-gray-500">{attendance.employee?.employee_id}</div>
+                          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{a.employee?.employee_id}</div>
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">Check In:</span>
-                        <div className="font-medium">{attendance.check_in_time || 'Not recorded'}</div>
+                        <span className="text-slate-500">Check In:</span>
+                        <div className="font-medium text-white">{a.check_in_time || 'Not recorded'}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Check Out:</span>
-                        <div className="font-medium">{attendance.check_out_time || 'Not recorded'}</div>
+                        <span className="text-slate-500">Check Out:</span>
+                        <div className="font-medium text-white">{a.check_out_time || 'Not recorded'}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Status:</span>
-                        <div><StatusBadge status={attendance.status} /></div>
+                        <span className="text-slate-500">Status:</span>
+                        <div><StatusBadge status={a.status} /></div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Type:</span>
-                        <div className="font-medium">{attendance.attendance_type}</div>
+                        <span className="text-slate-500">Type:</span>
+                        <div className="font-medium text-white">{a.attendance_type}</div>
                       </div>
                     </div>
-                    
-                    {attendance.notes && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <span className="text-gray-500 text-sm">Notes:</span>
-                        <div className="text-sm text-gray-900 mt-1">{attendance.notes}</div>
+
+                    {a.notes && (
+                      <div className="mt-6 pt-6 border-t border-white/5">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 text-slate-500">Observations</p>
+                        <p className="text-sm text-slate-300 italic font-medium leading-relaxed">"{a.notes}"</p>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <CalendarDaysIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No attendance data</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  No attendance records found for this date.
-                </p>
+              <div className="text-center py-20 opacity-50">
+                <CalendarDaysIcon className="mx-auto h-20 w-20 text-slate-700 mb-6" />
+                <h3 className="text-xl font-black text-white uppercase tracking-tight">Timeline Void</h3>
+                <p className="text-slate-500 font-medium mt-2 max-w-xs mx-auto">No telemetry data recorded for this specific coordinate on the timeline.</p>
               </div>
             )}
           </div>

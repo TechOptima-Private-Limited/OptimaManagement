@@ -1305,9 +1305,22 @@ def sync_biometric_logs(request):
         # Fetch all attendance logs
         logs = conn.get_attendance()
         logger.info(f"📊 Fetched {len(logs)} total logs from device")
-        
-        # Filter logs for the specified date
-        filtered_logs = [log for log in logs if log.timestamp.date() == sync_date]
+
+        # Setup IST timezone for correct date/time conversion
+        # ZK devices return naive datetimes in device-local time (IST).
+        # We must localize before filtering by date to avoid off-by-one at midnight.
+        import pytz
+        tz_ist = pytz.timezone('Asia/Kolkata')
+
+        def log_date_ist(log):
+            """Return the IST date for a raw ZK log entry."""
+            ts = log.timestamp
+            if ts.tzinfo is None:
+                ts = tz_ist.localize(ts)
+            return ts.astimezone(tz_ist).date()
+
+        # Filter logs for the specified date using IST-converted timestamps
+        filtered_logs = [log for log in logs if log_date_ist(log) == sync_date]
         logger.info(f"📅 Filtered to {len(filtered_logs)} logs for date {sync_date}")
         
         conn.enable_device()
@@ -1316,13 +1329,24 @@ def sync_biometric_logs(request):
         # Process and store ALL logs
         synced_count = 0
         attendance_records_created = []
-        
+
         for log in filtered_logs:
             try:
                 biometric_user_id = str(log.user_id)
                 biometric_user_name = user_names.get(biometric_user_id, '')
-                attendance_date = log.timestamp.date()
-                attendance_time = log.timestamp.time()
+
+                # ZK device returns naive datetimes in device-local time (IST).
+                # Make them timezone-aware so Django stores the correct time.
+                raw_ts = log.timestamp
+                if raw_ts.tzinfo is None:
+                    # Naive — treat as IST (device-local time)
+                    aware_ts = tz_ist.localize(raw_ts)
+                else:
+                    # Already aware — convert to IST just in case
+                    aware_ts = raw_ts.astimezone(tz_ist)
+
+                attendance_date = aware_ts.date()
+                attendance_time = aware_ts.time().replace(tzinfo=None)  # store as plain time
                 
                 logger.info(f"🔍 Processing: {biometric_user_id} ({biometric_user_name}) at {log.timestamp}")
                 
@@ -2057,6 +2081,13 @@ def biometric_sync(request):
 
 
 class BiometricDeviceListView(generics.ListCreateAPIView):
+    queryset = BiometricDevice.objects.all()
+    serializer_class = BiometricDeviceSerializer
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+
+
+class BiometricDeviceDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """View to retrieve, update or delete a biometric device"""
     queryset = BiometricDevice.objects.all()
     serializer_class = BiometricDeviceSerializer
     permission_classes = [IsAuthenticated, DjangoModelPermissions]

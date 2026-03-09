@@ -290,138 +290,123 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b ${theme.sidebarGradient} 
+        fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b ${theme.sidebarGradient}
         transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        shadow-2xl border-r border-white/10
+        shadow-2xl border-r border-white/10 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex flex-col h-full relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-20 left-10 w-32 h-32 bg-red-500 rounded-full blur-3xl"></div>
-            <div className="absolute top-60 right-8 w-24 h-24 bg-rose-500 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-40 left-6 w-28 h-28 bg-orange-500 rounded-full blur-3xl"></div>
-          </div>
-
-          {/* Logo and brand */}
-          <div className={`relative z-10 flex items-center justify-center h-20 px-4 bg-gradient-to-r ${theme.headerGradient} backdrop-blur-sm border-b border-white/10`}>
-            <div className="flex items-center">
-              <div className={`h-10 w-10 bg-gradient-to-r ${theme.primaryGradient} rounded-xl flex items-center justify-center shadow-lg border border-white/20`}>
-                <span className="text-white font-bold text-sm">OMH</span>
-              </div>
-              <h1 className="ml-3 text-white text-xl font-bold bg-gradient-to-r from-red-100 to-rose-100 bg-clip-text text-transparent">
-                Optima managementHub
+        {/* Logo and brand */}
+        <div className="relative z-10 flex items-center justify-start h-20 px-6 bg-slate-900/50 backdrop-blur-md border-b border-white/5">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 border border-indigo-400/30">
+              <span className="text-white font-bold text-sm tracking-tighter">OMH</span>
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-white text-lg font-black leading-tight tracking-tight">
+                Optima
               </h1>
+              <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest leading-none">
+                ManagementHub
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto relative z-10 custom-scrollbar">
-            {filteredNavigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = isActiveLink(item.href);
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto relative z-10 custom-scrollbar">
+          {filteredNavigation.map((item) => {
+            const Icon = item.icon;
+            const isActive = isActiveLink(item.href);
 
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={onClose}
-                  className={`
-                    group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 ease-in-out
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={onClose}
+                className={`
+                    group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 ease-in-out
                     relative overflow-hidden
                     ${isActive
-                      ? `bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg shadow-red-500/25 scale-105 border border-white/20`
-                      : 'text-gray-300 hover:bg-white/10 hover:text-white hover:scale-105 hover:shadow-lg hover:border-white/20 border border-transparent'
-                    }
+                    ? `bg-indigo-500/10 text-white shadow-xl scale-[1.02] border border-indigo-500/20`
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white hover:scale-[1.02] border border-transparent'
+                  }
                   `}
-                  title={item.description}
-                >
-                  {/* Active item background effect */}
-                  {isActive && (
-                    <div className={`absolute inset-0 bg-gradient-to-r ${theme.primaryGradient} opacity-20 animate-pulse`}></div>
-                  )}
+                title={item.description}
+              >
+                {/* Active item background effect */}
+                {isActive && (
+                  <div className={`absolute inset-0 bg-gradient-to-r ${theme.primaryGradient} opacity-30 animate-pulse`}></div>
+                )}
 
-                  <div className={`
+                <div className={`
                     relative z-10 w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-300
                     ${isActive
-                      ? 'bg-white/20 shadow-md border border-white/30'
-                      : `bg-gradient-to-r ${item.color} opacity-80 group-hover:opacity-100 group-hover:shadow-md group-hover:scale-110`
-                    }
+                    ? 'bg-white/20 shadow-md border border-white/30'
+                    : `bg-gradient-to-r ${item.color} opacity-80 group-hover:opacity-100 group-hover:shadow-md group-hover:scale-110`
+                  }
                   `}>
-                    <Icon className="h-4 w-4 text-white" />
-                  </div>
+                  <Icon className="h-4 w-4 text-white" />
+                </div>
 
-                  <div className="flex-1 relative z-10">
-                    <div className="font-semibold">{item.name}</div>
-                    <div className={`
-                      text-xs mt-0.5 transition-colors duration-300
-                      ${isActive ? 'text-red-100' : 'text-gray-400 group-hover:text-gray-200'}
+                <div className="flex-1 relative z-10">
+                  <div className="font-semibold text-sm">{item.name}</div>
+                  <div className={`
+                      text-[11px] mt-0.5 transition-colors duration-300
+                      ${isActive ? 'text-indigo-100' : 'text-slate-500 group-hover:text-slate-300'}
                     `}>
-                      {item.description}
-                    </div>
-                  </div>
-
-                  {isActive && (
-                    <div className="relative z-10 flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                      <div className="w-1 h-1 bg-white/60 rounded-full"></div>
-                    </div>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Enhanced stats footer */}
-          <div className={`relative z-10 p-3 border-t border-white/10 bg-gradient-to-r ${theme.sidebarGradient} backdrop-blur-sm`}>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-300 font-medium">System Status</span>
-                <span className="text-green-400 flex items-center font-semibold">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse shadow-lg shadow-green-400/50"></div>
-                  Online
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-300 font-medium">Version</span>
-                <span className="text-red-300 font-semibold bg-red-500/20 px-2 py-0.5 rounded-full border border-red-500/30">
-                  v1.0.0
-                </span>
-              </div>
-
-              <div className="pt-1 border-t border-white/10">
-                <div className="flex items-center justify-center">
-                  <div className="flex space-x-1">
-                    <div className="w-1 h-1 bg-red-400 rounded-full animate-pulse"></div>
-                    <div className="w-1 h-1 bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-1 h-1 bg-rose-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    {item.description}
                   </div>
                 </div>
-              </div>
+
+                {isActive && (
+                  <div className="relative z-10 flex items-center space-x-1">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Enhanced stats footer */}
+        <div className={`relative z-10 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-sm`}>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest">
+              <span className="text-slate-500 font-bold">System Status</span>
+              <span className="text-emerald-400 flex items-center font-bold">
+                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2 animate-pulse"></div>
+                Online
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest">
+              <span className="text-slate-500 font-bold">Version</span>
+              <span className="text-indigo-300 font-bold bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
+                v1.0.0
+              </span>
+            </div>
+
+            <div className="pt-2 flex justify-center space-x-1.5">
+              <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+              <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-1 h-1 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Custom Styles */}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
+          background: rgba(15, 23, 42, 0.1);
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(45deg, #E7473C, #ff6b5b);
+          background: rgba(99, 102, 241, 0.3);
           border-radius: 10px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(45deg, #d32f2f, #e53935);
+          background: rgba(99, 102, 241, 0.5);
         }
       `}</style>
     </>

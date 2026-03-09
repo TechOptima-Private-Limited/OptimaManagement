@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
+import { useTheme } from '../../context/ThemeContext';
 import {
   ClockIcon,
   CheckCircleIcon,
@@ -14,6 +15,7 @@ import api, { employeeAPI } from '../../services/api';
 import { getCurrentUser, hasAdminPrivileges } from '../../utils/auth';
 
 const AccessRequestList = () => {
+  const { theme } = useTheme();
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -127,34 +129,34 @@ const AccessRequestList = () => {
   };
 
   const getStatusBadge = (status) => {
-    const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium";
+    const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border";
     switch (status) {
       case 'PENDING':
-        return `${baseClasses} bg-yellow-100 text-yellow-800 border border-yellow-200`;
+        return `${baseClasses} bg-amber-500/10 text-amber-400 border-amber-500/30`;
       case 'APPROVAL_REQUIRED':
-        return `${baseClasses} bg-orange-100 text-orange-800 border border-orange-200`;
+        return `${baseClasses} bg-orange-500/10 text-orange-400 border-orange-500/30`;
       case 'APPROVED':
-        return `${baseClasses} bg-green-100 text-green-800 border border-green-200`;
+        return `${baseClasses} bg-emerald-500/10 text-emerald-400 border-emerald-500/30`;
       case 'REJECTED':
-        return `${baseClasses} bg-red-100 text-red-800 border border-red-200`;
+        return `${baseClasses} bg-rose-500/10 text-rose-400 border-rose-500/30`;
       default:
-        return `${baseClasses} bg-gray-100 text-gray-800 border border-gray-200`;
+        return `${baseClasses} bg-gray-500/10 text-gray-400 border-gray-500/30`;
     }
   };
 
   const getPriorityBadge = (priority) => {
-    const baseClasses = "inline-flex items-center px-2 py-1 rounded text-xs font-medium";
+    const baseClasses = "inline-flex items-center px-2 py-1.5 rounded-lg text-xs font-bold shadow-sm";
     switch (priority) {
       case 'LOW':
-        return `${baseClasses} bg-green-100 text-green-800`;
+        return `${baseClasses} bg-emerald-500/10 text-emerald-400 border border-emerald-500/20`;
       case 'MEDIUM':
-        return `${baseClasses} bg-yellow-100 text-yellow-800`;
+        return `${baseClasses} bg-amber-500/10 text-amber-400 border border-amber-500/20`;
       case 'HIGH':
-        return `${baseClasses} bg-orange-100 text-orange-800`;
+        return `${baseClasses} bg-orange-500/10 text-orange-400 border border-orange-500/20`;
       case 'URGENT':
-        return `${baseClasses} bg-red-100 text-red-800`;
+        return `${baseClasses} bg-rose-500/10 text-rose-400 border border-rose-500/20`;
       default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+        return `${baseClasses} bg-gray-500/10 text-gray-400 border border-gray-500/20`;
     }
   };
 
@@ -195,33 +197,35 @@ const AccessRequestList = () => {
     if (!request) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className={`bg-slate-900 border ${theme.cardBorder} rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto`}>
+          <div className={`sticky top-0 bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-6 py-4 rounded-t-2xl z-10`}>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Request Details</h3>
-                <p className="text-sm text-gray-500">Ticket #{request.ticket_number}</p>
+                <h3 className={`text-xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent`}>Request Details</h3>
+                <p className="text-sm text-gray-400 mt-1">Ticket #{request.ticket_number}</p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors group"
               >
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-8">
             {/* Request Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <div className="flex items-center space-x-2">
-                    {getStatusIcon(request.status)}
+                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Status</label>
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-white/5 rounded-lg border border-white/5">
+                      {getStatusIcon(request.status)}
+                    </div>
                     <span className={getStatusBadge(request.status)}>
                       {request.status_display || request.status}
                     </span>
@@ -229,33 +233,33 @@ const AccessRequestList = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Priority</label>
                   <span className={getPriorityBadge(request.priority)}>
                     {request.priority_display || request.priority}
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Request Type</label>
-                  <p className="text-gray-900">{request.request_type === 'IT' ? 'IT Support' : 'New Access'}</p>
+                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Request Type</label>
+                  <p className="text-white font-medium text-lg">{request.request_type === 'IT' ? 'IT Support' : 'New Access'}</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Requested At</label>
-                  <p className="text-gray-900">{formatDate(request.requested_at)}</p>
+                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Requested At</label>
+                  <p className="text-white font-mono">{formatDate(request.requested_at)}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                  <p className="text-gray-900">{request.duration} days</p>
+                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Duration</label>
+                  <p className="text-white font-medium">{request.duration} days</p>
                 </div>
 
                 {request.expires_at && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expires At</label>
-                    <p className="text-gray-900">{formatDate(request.expires_at)}</p>
+                    <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Expires At</label>
+                    <p className="text-rose-200 font-mono">{formatDate(request.expires_at)}</p>
                   </div>
                 )}
               </div>
@@ -263,53 +267,53 @@ const AccessRequestList = () => {
 
             {/* Resource Info (if not IT request) */}
             {request.request_type !== 'IT' && (
-              <div className="border-t pt-6">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Resource Information</h4>
+              <div className="border-t border-white/10 pt-8">
+                <h4 className="text-lg font-bold text-white mb-6">Resource Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Resource</label>
-                    <p className="text-gray-900">{request.resource_name || 'N/A'}</p>
+                    <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Resource</label>
+                    <p className="text-white text-lg font-medium">{request.resource_name || 'N/A'}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Access Level</label>
-                    <p className="text-gray-900">{request.access_level_name || 'N/A'}</p>
+                    <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Access Level</label>
+                    <p className="text-white text-lg font-medium">{request.access_level_name || 'N/A'}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Justification */}
-            <div className="border-t pt-6">
-              <label className="block text-lg font-medium text-gray-900 mb-4">Justification</label>
+            <div className="border-t border-white/10 pt-8">
+              <label className="block text-lg font-bold text-white mb-4">Justification</label>
               <div
-                className="prose max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
-                dangerouslySetInnerHTML={{ __html: request.justification || 'No justification provided.' }}
+                className="prose prose-invert max-w-none text-gray-300 bg-white/5 rounded-xl p-6 border border-white/10 italic"
+                dangerouslySetInnerHTML={{ __html: request.justification || '<span class="text-gray-500">No justification provided.</span>' }}
               />
             </div>
 
             {/* Additional Info */}
             {(request.approved_by || request.approved_at || request.status === 'REJECTED') && (
-              <div className="border-t pt-6">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Approval Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border-t border-white/10 pt-8">
+                <h4 className="text-lg font-bold text-white mb-6">Approval Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-xl bg-black/20 border border-white/5">
                   {request.status === 'REJECTED' && request.rejected_by_name && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Rejected By</label>
-                      <p className="text-gray-900">{request.rejected_by_name}</p>
+                      <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Rejected By</label>
+                      <p className="text-rose-200">{request.rejected_by_name}</p>
                     </div>
                   )}
                   {request.status !== 'REJECTED' && request.approved_by && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Approved By</label>
-                      <p className="text-gray-900">{request.approved_by_name || request.approved_by}</p>
+                      <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Approved By</label>
+                      <p className="text-emerald-200">{request.approved_by_name || request.approved_by}</p>
                     </div>
                   )}
 
                   {request.approved_at && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Approved At</label>
-                      <p className="text-gray-900">{formatDate(request.approved_at)}</p>
+                      <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Approved At</label>
+                      <p className="text-white font-mono">{formatDate(request.approved_at)}</p>
                     </div>
                   )}
                 </div>
@@ -318,120 +322,141 @@ const AccessRequestList = () => {
 
             {/* Admin Actions */}
             {isAdminLike && (
-              <div className="border-t pt-6">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Admin Actions</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-gray-700">Assigned To</label>
-                    <select
-                      value={assignedTo || ''}
-                      onChange={(e) => setAssignedTo(e.target.value ? Number(e.target.value) : null)}
-                      className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              <div className="border-t border-white/10 pt-8 pb-4">
+                <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-6 shadow-inner">
+                  <h4 className="text-lg font-bold text-indigo-300 mb-6 flex items-center">
+                    <CheckCircleIcon className="w-5 h-5 mr-3" />
+                    Admin Actions
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-bold text-indigo-200">Assigned To</label>
+                      <select
+                        value={assignedTo || ''}
+                        onChange={(e) => setAssignedTo(e.target.value ? Number(e.target.value) : null)}
+                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-colors hover:bg-white/10 hover:border-white/20"
+                      >
+                        <option value="" className="bg-slate-800 text-white">Unassigned</option>
+                        {users.map(u => (
+                          <option key={u.id} value={u.id} className="bg-slate-800 text-white">
+                            {u.full_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username || u.email}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 mt-7 border border-white/10 bg-white/5 px-5 py-3 rounded-xl hover:bg-white/10 hover:border-white/20 transition-colors shadow-sm">
+                      <input
+                        id="requiresApproval"
+                        type="checkbox"
+                        checked={requiresApproval}
+                        onChange={(e) => setRequiresApproval(e.target.checked)}
+                        className="h-5 w-5 text-indigo-500 border-white/20 rounded bg-white/5 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
+                      />
+                      <label htmlFor="requiresApproval" className="text-sm font-bold text-white cursor-pointer select-none">Requires Manager Approval</label>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-bold text-indigo-200">Status</label>
+                      <input
+                        value={request.status_display || request.status}
+                        disabled
+                        className="px-4 py-3 border border-white/5 rounded-xl bg-black/20 text-gray-400 cursor-not-allowed font-medium"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-bold text-indigo-200">{request.status === 'REJECTED' ? 'Rejected By' : 'Approved By'}</label>
+                      <input
+                        value={(request.status === 'REJECTED' ? (request.rejected_by_name || '') : (request.approved_by_name || ''))}
+                        disabled
+                        className="px-4 py-3 border border-white/5 rounded-xl bg-black/20 text-gray-400 cursor-not-allowed placeholder-gray-600 font-medium"
+                        placeholder="Pending..."
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2 flex flex-col gap-2 mt-2">
+                      <label className="text-sm font-bold text-indigo-200">Admin Notes</label>
+                      <textarea
+                        rows={3}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Add internal notes or comments..."
+                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-white/10 hover:border-white/20 placeholder-gray-500 resize-none shadow-sm"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-4 items-center pt-6 border-t border-indigo-500/20">
+                    <button
+                      onClick={async () => {
+                        await approveMutation.mutateAsync(request.id);
+                        onClose();
+                      }}
+                      disabled={approveMutation.isLoading || request.status === 'APPROVED'}
+                      className="px-6 py-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/50 transition-all disabled:opacity-50 shadow-sm"
                     >
-                      <option value="">Unassigned</option>
-                      {users.map(u => (
-                        <option key={u.id} value={u.id}>
-                          {u.full_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username || u.email}
-                        </option>
-                      ))}
-                    </select>
+                      Approve Request
+                    </button>
+                    
+                    <button
+                      onClick={async () => {
+                        await rejectMutation.mutateAsync(request.id);
+                        onClose();
+                      }}
+                      disabled={rejectMutation.isLoading || request.status === 'REJECTED'}
+                      className="px-6 py-3 bg-rose-500/10 text-rose-400 border border-rose-500/30 font-bold rounded-xl hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/50 transition-all disabled:opacity-50 shadow-sm"
+                    >
+                      Reject Request
+                    </button>
+                    
+                    <div className="w-px h-10 bg-indigo-500/20 mx-2 hidden md:block"></div>
+                    
+                    <div className="flex gap-2 flex-grow flex-wrap">
+                      <input
+                        type="email"
+                        value={approverEmail}
+                        onChange={(e) => setApproverEmail(e.target.value)}
+                        placeholder="Manager email..."
+                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-w-[200px] flex-grow placeholder-gray-500 shadow-sm"
+                      />
+                      <button
+                        onClick={async () => {
+                          const email = (approverEmail || '').trim();
+                          if (!email) {
+                            toast.error('Please enter approver email');
+                            return;
+                          }
+                          await requestApprovalMutation.mutateAsync({ id: request.id, approver_email: email });
+                          onClose();
+                        }}
+                        disabled={requestApprovalMutation.isLoading || !approverEmail}
+                        className="px-6 py-3 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold rounded-xl hover:bg-indigo-500/30 hover:border-indigo-500/50 hover:text-indigo-200 transition-all disabled:opacity-50 whitespace-nowrap shadow-sm"
+                      >
+                        Request Approval
+                      </button>
+                    </div>
+                    
+                    <div className="w-full mt-2 md:mt-0 md:w-auto">
+                      <button
+                        onClick={async () => {
+                          const payload = {
+                            assigned_to: assignedTo,
+                            requires_approval: requiresApproval,
+                            notes: notes,
+                            approver_email: approverEmail || null,
+                          };
+                          await updateRequestMutation.mutateAsync({ id: request.id, data: payload });
+                          onClose();
+                        }}
+                        disabled={updateRequestMutation.isLoading}
+                        className="w-full px-8 py-3 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-6 md:mt-8">
-                    <input
-                      id="requiresApproval"
-                      type="checkbox"
-                      checked={requiresApproval}
-                      onChange={(e) => setRequiresApproval(e.target.checked)}
-                      className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                    <label htmlFor="requiresApproval" className="text-sm text-gray-700">Requires Approval</label>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-gray-700">Status</label>
-                    <input
-                      value={request.status_display || request.status}
-                      disabled
-                      className="px-3 py-2 border border-gray-200 rounded bg-gray-50 text-gray-700"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm font-medium text-gray-700">{request.status === 'REJECTED' ? 'Rejected By' : 'Approved By'}</label>
-                    <input
-                      value={(request.status === 'REJECTED' ? (request.rejected_by_name || '') : (request.approved_by_name || ''))}
-                      disabled
-                      className="px-3 py-2 border border-gray-200 rounded bg-gray-50 text-gray-700"
-                    />
-                  </div>
-                  <div className="md:col-span-2 flex flex-col gap-1">
-                    <label className="text-sm font-medium text-gray-700">Notes</label>
-                    <textarea
-                      rows={4}
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Additional notes or comments"
-                      className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-3 items-center">
-                  <button
-                    onClick={async () => {
-                      await approveMutation.mutateAsync(request.id);
-                      onClose();
-                    }}
-                    disabled={approveMutation.isLoading}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={async () => {
-                      await rejectMutation.mutateAsync(request.id);
-                      onClose();
-                    }}
-                    disabled={rejectMutation.isLoading}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                  >
-                    Reject
-                  </button>
-                  <input
-                    type="email"
-                    value={approverEmail}
-                    onChange={(e) => setApproverEmail(e.target.value)}
-                    placeholder="Approver email"
-                    className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[240px]"
-                  />
-                  <button
-                    onClick={async () => {
-                      const payload = {
-                        assigned_to: assignedTo,
-                        requires_approval: requiresApproval,
-                        notes: notes,
-                        approver_email: approverEmail || null,
-                      };
-                      await updateRequestMutation.mutateAsync({ id: request.id, data: payload });
-                      onClose();
-                    }}
-                    disabled={updateRequestMutation.isLoading}
-                    className="px-4 py-2 bg-gray-200 text-gray-900 rounded hover:bg-gray-300 disabled:opacity-50"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={async () => {
-                      const email = (approverEmail || '').trim();
-                      if (!email) {
-                        toast.error('Please enter approver email');
-                        return;
-                      }
-                      await requestApprovalMutation.mutateAsync({ id: request.id, approver_email: email });
-                      onClose();
-                    }}
-                    disabled={requestApprovalMutation.isLoading || !approverEmail}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    Send Approval To Manager
-                  </button>
                 </div>
               </div>
             )}
@@ -445,7 +470,7 @@ const AccessRequestList = () => {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
         </div>
       </div>
     );
@@ -454,10 +479,10 @@ const AccessRequestList = () => {
   if (error) {
     return (
       <div className="p-6">
-        <div className="text-center py-12">
-          <XCircleIcon className="mx-auto h-12 w-12 text-red-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Error loading requests</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="text-center py-12 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+          <XCircleIcon className="mx-auto h-12 w-12 text-rose-400" />
+          <h3 className="mt-4 text-lg font-bold text-rose-400">Error loading requests</h3>
+          <p className="mt-2 text-sm text-gray-400">
             There was a problem loading your access requests. Please try again.
           </p>
         </div>
@@ -467,9 +492,9 @@ const AccessRequestList = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">My Access Requests</h2>
-        <p className="text-gray-600">Track the status of your resource access requests</p>
+      <div className="mb-8">
+        <h2 className={`text-2xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent mb-2`}>My Access Requests</h2>
+        <p className="text-gray-400">Track the status of your resource access requests</p>
       </div>
 
       {/* Filters and Search */}
@@ -481,19 +506,19 @@ const AccessRequestList = () => {
               key={option.value}
               onClick={() => setStatusFilter(option.value)}
               className={`
-                px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2
+                px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center space-x-2
                 ${statusFilter === option.value
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? `bg-indigo-500/20 text-indigo-400 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]`
+                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:border-white/20'
                 }
               `}
             >
               <span>{option.label}</span>
               <span className={`
-                px-2 py-0.5 rounded-full text-xs
+                px-2 py-0.5 rounded-full text-xs font-bold
                 ${statusFilter === option.value
-                  ? 'bg-white/20 text-white'
-                  : 'bg-gray-100 text-gray-600'
+                  ? 'bg-indigo-500/30 text-indigo-300'
+                  : 'bg-white/10 text-gray-500'
                 }
               `}>
                 {option.count}
@@ -504,23 +529,23 @@ const AccessRequestList = () => {
 
         {/* Search */}
         <div className="relative max-w-md">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by ticket number, resource, or description..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search by ticket number, resource..."
+            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-500"
           />
         </div>
       </div>
 
       {/* Requests List */}
       {filteredRequests.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-xl">
-          <ClockIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No requests found</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="text-center py-16 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+          <ClockIcon className="mx-auto h-16 w-16 text-gray-500" />
+          <h3 className="mt-4 text-lg font-bold text-white">No requests found</h3>
+          <p className="mt-2 text-sm text-gray-400 flex items-center justify-center">
             {searchTerm || statusFilter !== 'ALL'
               ? 'Try adjusting your filters or search term.'
               : 'You haven\'t submitted any access requests yet.'
@@ -532,16 +557,18 @@ const AccessRequestList = () => {
           {filteredRequests.map((request) => (
             <div
               key={request.id}
-              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all duration-200"
+              className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group`}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  {getStatusIcon(request.status)}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-white/5 rounded-xl group-hover:bg-white/10 transition-colors">
+                    {getStatusIcon(request.status)}
+                  </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
                       #{request.ticket_number}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-400 mt-1">
                       {request.request_type === 'IT' ? 'IT Support Request' : `Access to ${request.resource_name || 'Resource'}`}
                     </p>
                   </div>
@@ -556,7 +583,7 @@ const AccessRequestList = () => {
                   </span>
                   <button
                     onClick={() => setSelectedRequest(request)}
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2.5 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
                     title="View details"
                   >
                     <EyeIcon className="h-5 w-5" />
@@ -564,29 +591,29 @@ const AccessRequestList = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm bg-black/20 p-5 rounded-xl border border-white/5">
                 <div>
-                  <span className="text-gray-500">Requested:</span>
-                  <span className="ml-2 text-gray-900">{formatDate(request.requested_at)}</span>
+                  <span className="text-gray-500 block mb-1">Requested</span>
+                  <span className="text-indigo-100 font-medium font-mono">{formatDate(request.requested_at)}</span>
                 </div>
 
                 <div>
-                  <span className="text-gray-500">Duration:</span>
-                  <span className="ml-2 text-gray-900">{request.duration} days</span>
+                  <span className="text-gray-500 block mb-1">Duration</span>
+                  <span className="text-indigo-100 font-medium">{request.duration} days</span>
                 </div>
 
                 {request.expires_at && (
                   <div>
-                    <span className="text-gray-500">Expires:</span>
-                    <span className="ml-2 text-gray-900">{formatDate(request.expires_at)}</span>
+                    <span className="text-gray-500 block mb-1">Expires</span>
+                    <span className="text-rose-200 font-medium font-mono">{formatDate(request.expires_at)}</span>
                   </div>
                 )}
               </div>
 
               {request.justification && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {request.justification.replace(/<[^>]*>/g, '').substring(0, 150)}...
+                <div className="mt-5 pt-5 border-t border-white/10">
+                  <p className="text-sm text-gray-400 line-clamp-2 italic">
+                    "{request.justification.replace(/<[^>]*>/g, '').substring(0, 150)}..."
                   </p>
                 </div>
               )}

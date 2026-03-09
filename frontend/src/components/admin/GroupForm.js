@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminGroupAPI, adminPermissionAPI } from '../../services/api';
 import { toast } from 'react-toastify';
+import { useTheme } from '../../context/ThemeContext';
+import { UserGroupIcon, ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
 
 const GroupForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { theme } = useTheme();
   const isEdit = Boolean(id);
 
   const [name, setName] = useState('');
@@ -71,8 +74,8 @@ const GroupForm = () => {
       const fieldErrors =
         resp && typeof resp === 'object'
           ? Object.entries(resp)
-              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-              .join(' | ')
+            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+            .join(' | ')
           : null;
       toast.error(fieldErrors || 'Failed to save group');
     } finally {
@@ -89,123 +92,136 @@ const GroupForm = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-[#070B14] p-8 space-y-8">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="space-y-2">
           <button
             type="button"
             onClick={() => navigate('/users-auth/groups')}
-            className="text-xs text-indigo-600 hover:text-indigo-800 mb-1"
+            className="group flex items-center text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-all"
           >
-             Back to groups
+            <ArrowLeftIcon className="h-4 w-4 mr-2 transform group-hover:-translate-x-1 transition-transform" />
+            Back to security groups
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">{isEdit ? 'Change group' : 'Add group'}</h1>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+              <UserGroupIcon className="h-8 w-8 text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">{isEdit ? 'Configure Group' : 'Initialize Group'}</h1>
+              <p className="text-sm text-slate-500 font-medium tracking-tight">Define group title and inherit system permissions across its nodes.</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
-          <input
-            type="text"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
+        <div className="p-8 space-y-8">
+          <div className="max-w-xl space-y-2">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Group Title</label>
+            <input
+              type="text"
+              className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner font-bold"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Senior Developers"
+            />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-2">Permissions</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            {/* Available */}
-            <div className="border border-gray-200 rounded-md overflow-hidden">
-              <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-                <span className="font-semibold text-gray-800">Available permissions</span>
+          <div className="space-y-4">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Permissions Strategy</label>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Available */}
+              <div className="bg-white/5 rounded-3xl border border-white/5 overflow-hidden flex flex-col">
+                <div className="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available Registry</span>
+                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{filteredAvailable.length} NODES</span>
+                </div>
+                <div className="p-4 bg-white/5 border-b border-white/5">
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Filter nodes..."
+                      className="block w-full bg-white/5 border border-white/5 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium"
+                      value={filterAvailable}
+                      onChange={(e) => setFilterAvailable(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 max-h-96 overflow-y-auto custom-scrollbar divide-y divide-white/5">
+                  {filteredAvailable.map((p) => {
+                    const label = [p.content_type, p.name].filter(Boolean).join(' | ');
+                    return (
+                      <div key={p.id} className="group flex items-center px-6 py-3 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleMove('available', [p.id])}>
+                        <div className="flex-1">
+                          <div className="text-[11px] font-bold text-slate-200 group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{label}</div>
+                          <div className="text-[10px] font-black text-slate-600 tracking-tighter uppercase">{p.codename}</div>
+                        </div>
+                        <PlusIcon className="h-4 w-4 text-slate-600 group-hover:text-indigo-500 transition-all transform group-hover:rotate-90" />
+                      </div>
+                    );
+                  })}
+                  {!loading && filteredAvailable.length === 0 && (
+                    <div className="px-6 py-12 text-center text-xs text-slate-600 font-bold uppercase tracking-widest italic opacity-50">Empty Registry</div>
+                  )}
+                </div>
               </div>
-              <div className="px-3 py-2 border-b border-gray-100">
-                <input
-                  type="text"
-                  placeholder="Filter"
-                  className="block w-full rounded-md border-gray-300 shadow-sm text-xs"
-                  value={filterAvailable}
-                  onChange={(e) => setFilterAvailable(e.target.value)}
-                />
-              </div>
-              <div className="max-h-64 overflow-y-auto">
-                {filteredAvailable.map((p) => {
-                  const label = [p.content_type, p.name].filter(Boolean).join(' | ');
-                  return (
-                    <label key={p.id} className="flex items-center px-3 py-1 space-x-2 cursor-pointer hover:bg-gray-50">
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        onChange={(e) =>
-                          handleMove('available', e.target.checked ? [p.id] : [])
-                        }
-                      />
-                      <span>{label}</span>
-                    </label>
-                  );
-                })}
-                {!loading && filteredAvailable.length === 0 && (
-                  <div className="px-3 py-2 text-gray-400">No permissions</div>
-                )}
-              </div>
-            </div>
 
-            {/* Chosen */}
-            <div className="border border-gray-200 rounded-md overflow-hidden">
-              <div className="px-3 py-2 bg-teal-700 text-white border-b border-gray-200 flex items-center justify-between">
-                <span className="font-semibold">Chosen permissions</span>
-              </div>
-              <div className="px-3 py-2 border-b border-gray-100">
-                <input
-                  type="text"
-                  placeholder="Filter"
-                  className="block w-full rounded-md border-gray-300 shadow-sm text-xs"
-                  value={filterChosen}
-                  onChange={(e) => setFilterChosen(e.target.value)}
-                />
-              </div>
-              <div className="max-h-64 overflow-y-auto">
-                {filteredChosen.map((p) => {
-                  const label = [p.content_type, p.name].filter(Boolean).join(' | ');
-                  return (
-                    <label key={p.id} className="flex items-center px-3 py-1 space-x-2 cursor-pointer hover:bg-gray-50">
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        defaultChecked
-                        onChange={(e) =>
-                          handleMove('chosen', e.target.checked ? [p.id] : [])
-                        }
-                      />
-                      <span>{label}</span>
-                    </label>
-                  );
-                })}
-                {!loading && filteredChosen.length === 0 && (
-                  <div className="px-3 py-2 text-gray-400">No chosen permissions</div>
-                )}
+              {/* Chosen */}
+              <div className="bg-indigo-500/5 rounded-3xl border border-indigo-500/20 overflow-hidden flex flex-col">
+                <div className="px-6 py-4 bg-indigo-500/10 border-b border-indigo-500/20 flex items-center justify-between">
+                  <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Active Permissions</span>
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest bg-indigo-500 px-2 py-0.5 rounded-full">{filteredChosen.length} ACTIVE</span>
+                </div>
+                <div className="p-4 bg-white/5 border-b border-white/5">
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Filter active..."
+                      className="block w-full bg-white/5 border border-white/5 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium"
+                      value={filterChosen}
+                      onChange={(e) => setFilterChosen(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 max-h-96 overflow-y-auto custom-scrollbar divide-y divide-white/5">
+                  {filteredChosen.map((p) => {
+                    const label = [p.content_type, p.name].filter(Boolean).join(' | ');
+                    return (
+                      <div key={p.id} className="group flex items-center px-6 py-3 hover:bg-red-500/5 transition-colors cursor-pointer" onClick={() => handleMove('chosen', [p.id])}>
+                        <div className="flex-1">
+                          <div className="text-[11px] font-bold text-white group-hover:text-red-400 transition-colors uppercase tracking-tight">{label}</div>
+                          <div className="text-[10px] font-black text-slate-500 tracking-tighter uppercase">{p.codename}</div>
+                        </div>
+                        <MinusIcon className="h-4 w-4 text-slate-600 group-hover:text-red-500 transition-all transform group-hover:scale-125" />
+                      </div>
+                    );
+                  })}
+                  {!loading && filteredChosen.length === 0 && (
+                    <div className="px-6 py-12 text-center text-xs text-slate-600 font-bold uppercase tracking-widest italic opacity-50">Zero Active Nodes</div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-200 flex justify-end space-x-2">
+        <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex justify-end space-x-4">
           <button
             type="button"
             onClick={() => navigate('/users-auth/groups')}
-            className="px-4 py-2 text-sm rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+            className="px-8 py-3 text-xs font-black rounded-2xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all transform active:scale-95 uppercase tracking-widest"
           >
-            Cancel
+            DISCARD CHANGES
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="px-4 py-2 text-sm rounded-md border border-transparent text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60"
+            className={`px-10 py-3 text-xs font-black rounded-2xl bg-gradient-to-r ${theme.primaryGradient} text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95 uppercase tracking-widest`}
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'SYNCHRONIZING…' : 'DEPLOY GROUP CONFIG'}
           </button>
         </div>
       </form>

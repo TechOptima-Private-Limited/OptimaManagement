@@ -83,7 +83,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
     setLoading(true);
     try {
       // Use the workFromHomeAPI service - it returns response.data directly
-      const response = await workFromHomeAPI.applyWFH(formData);
+      await workFromHomeAPI.applyWFH(formData);
 
       // Since your API service likely returns response.data directly
       toast.success('Work from home request submitted successfully! HR has been notified.');
@@ -133,35 +133,34 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
   // Get max date (30 days from today)
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30);
-  const maxDateString = maxDate.toISOString().split('T')[0];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+          className="fixed inset-0 transition-opacity bg-gray-900/75 backdrop-blur-sm"
           onClick={onClose}
         ></div>
 
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div className="bg-white px-6 pt-6 pb-4">
+        <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div className="bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 px-6 pt-6 pb-4">
             <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-800">Apply for Work From Home</h2>
-                <p className="text-sm text-gray-600">Submit your request to work remotely</p>
+                <h2 className="text-xl font-semibold text-white">Apply for Work From Home</h2>
+                <p className="text-sm text-gray-400">Submit your request to work remotely</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Start Date <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="date"
@@ -169,18 +168,18 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                     value={formData.start_date}
                     onChange={handleInputChange}
                     min={today}
-                    className={`w-full px-3 py-2 border ${errors.start_date ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
+                    className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.start_date ? 'border-red-500' : 'border-white/20'
+                      } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 [color-scheme:dark]`}
                     required
                   />
                   {errors.start_date && (
-                    <p className="text-red-500 text-xs mt-1">{errors.start_date}</p>
+                    <p className="text-red-400 text-xs mt-1">{errors.start_date}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    End Date <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="date"
@@ -188,46 +187,46 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                     value={formData.end_date}
                     onChange={handleInputChange}
                     min={formData.start_date || today}
-                    className={`w-full px-3 py-2 border ${errors.end_date ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
+                    className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.end_date ? 'border-red-500' : 'border-white/20'
+                      } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 [color-scheme:dark]`}
                     required
                   />
                   {errors.end_date && (
-                    <p className="text-red-500 text-xs mt-1">{errors.end_date}</p>
+                    <p className="text-red-400 text-xs mt-1">{errors.end_date}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reason <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Reason <span className="text-red-400">*</span>
                 </label>
                 <textarea
                   name="reason"
                   value={formData.reason}
                   onChange={handleInputChange}
                   rows="4"
-                  className={`w-full px-3 py-2 border ${errors.reason ? 'border-red-500' : 'border-gray-300'
-                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500`}
+                  className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.reason ? 'border-red-500' : 'border-white/20'
+                    } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 resize-none`}
                   placeholder="Please provide a reason for working from home (e.g., medical appointment, family emergency, etc.)"
                   required
                 />
                 {errors.reason && (
-                  <p className="text-red-500 text-xs mt-1">{errors.reason}</p>
+                  <p className="text-red-400 text-xs mt-1">{errors.reason}</p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
                   Minimum 10 characters required
                 </p>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4">
                 <div className="flex">
-                  <svg className="w-5 h-5 text-blue-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-indigo-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <div className="text-sm text-blue-700">
-                    <p className="font-medium">Important Notes:</p>
-                    <ul className="mt-1 list-disc list-inside text-xs space-y-1">
+                  <div className="text-sm text-gray-300">
+                    <p className="font-medium text-white">Important Notes:</p>
+                    <ul className="mt-2 list-disc list-inside text-xs space-y-1 text-gray-400">
                       <li>Your request will be sent to HR for approval</li>
                       <li>You'll receive an email notification once approved/rejected</li>
                       <li>Only approved requests allow work from home check-in</li>
@@ -238,12 +237,12 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          <div className="bg-gray-50 px-6 py-3 sm:flex sm:flex-row-reverse">
+          <div className="bg-[#05080f] px-6 py-4 border-t border-white/5 sm:flex sm:flex-row-reverse rounded-b-2xl">
             <button
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto sm:text-sm"
+              className="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-base font-medium text-white hover:shadow-lg hover:shadow-indigo-500/25 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
             >
               {loading ? (
                 <div className="flex items-center">
@@ -260,7 +259,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 shadow-sm px-6 py-3 bg-white/10 text-base font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
             >
               Cancel
             </button>

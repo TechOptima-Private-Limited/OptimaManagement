@@ -1,252 +1,205 @@
 import React from 'react';
-import { 
-  CheckCircle,
-  Building,
-  Shield,
-  Clock,
-  Star,
-  Sparkles,
-  CheckSquare,
-  FileText,
-  Users,
-  Calendar
-} from 'lucide-react';
+import {
+  CheckCircleIcon,
+  BuildingOfficeIcon,
+  ShieldCheckIcon,
+  ClockIcon,
+  StarIcon,
+  SparklesIcon,
+  CheckBadgeIcon,
+  DocumentTextIcon,
+  UsersIcon,
+  CalendarIcon,
+  ArrowRightIcon,
+  EnvelopeIcon,
+  PhoneIcon
+} from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 const OnboardingSuccessPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-          
-          {/* Header with gradient */}
-          <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-8 py-12 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-black opacity-10"></div>
-            <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-16 -translate-y-16"></div>
-            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full translate-x-24 translate-y-24"></div>
-            
+    <div className="min-h-screen bg-[#070B14] overflow-hidden relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+
+      {/* ── Ambient glow orbs ── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="max-w-3xl w-full relative z-10">
+        <div className="bg-slate-900/60 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/10 overflow-hidden">
+
+          {/* Header Section */}
+          <div className="bg-gradient-to-br from-emerald-500/20 via-teal-500/10 to-transparent px-8 py-14 text-center border-b border-white/5 relative">
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <SparklesIcon className="h-24 w-24 text-white" />
+            </div>
+
             <div className="relative">
-              {/* Success Icon with Animation */}
-              <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-white/20 rounded-full backdrop-blur-sm animate-pulse">
-                  <CheckCircle className="h-16 w-16 text-white animate-bounce" />
+              {/* Animated Success Mark */}
+              <div className="mb-8 relative inline-block">
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl animate-pulse" />
+                <div className="relative flex items-center justify-center w-24 h-24 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
+                  <CheckCircleIcon className="h-14 w-14 text-emerald-400" />
                 </div>
               </div>
-              
-              {/* Company Header */}
+
               <div className="flex items-center justify-center space-x-3 mb-4">
-                <Building className="h-10 w-10 text-white" />
-                <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
+                <BuildingOfficeIcon className="h-6 w-6 text-emerald-400/70" />
+                <span className="text-sm font-bold text-emerald-400/80 uppercase tracking-[0.2em]">Techoptima Pvt Ltd</span>
               </div>
-              
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Techoptima Pvt Ltd
+
+              <h1 className="text-4xl font-black text-white tracking-tight mb-4">
+                Submission Received!
               </h1>
-              
-              <h2 className="text-xl text-green-100 mb-4">
-                Onboarding Information Submitted Successfully!
-              </h2>
-              
-              <p className="text-lg text-green-100 leading-relaxed">
-                Thank you for completing your onboarding information. Your details have been received and will be reviewed by our HR team.
+
+              <p className="text-lg text-emerald-100/60 max-w-lg mx-auto leading-relaxed">
+                Thank you for completing your onboarding profile. Our team will now review your records and prepare your workstation.
               </p>
             </div>
           </div>
 
-          {/* Content Section */}
-          <div className="p-8 lg:p-12 space-y-8">
-            
-            {/* What Happens Next Section */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-              <h3 className="text-xl font-bold text-blue-800 mb-4 flex items-center">
-                <Clock className="h-6 w-6 mr-2" />
+          {/* Body Content */}
+          <div className="p-8 lg:p-12 space-y-10">
+
+            {/* Steps Timeline */}
+            <div>
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 flex items-center">
+                <ClockIcon className="h-4 w-4 mr-2 text-indigo-400" />
                 What Happens Next?
               </h3>
-              
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  {
+                    step: '01',
+                    title: 'HR Review',
+                    desc: 'Our HR team will verify your submitted documents within 48 hours.',
+                    icon: ShieldCheckIcon,
+                    color: 'indigo'
+                  },
+                  {
+                    step: '02',
+                    title: 'System Setup',
+                    desc: 'Your profile, department access, and mail will be configured.',
+                    icon: UsersIcon,
+                    color: 'violet'
+                  },
+                  {
+                    step: '03',
+                    title: 'Asset Prep',
+                    desc: 'IT will prepare your laptop and hardware resources.',
+                    icon: SparklesIcon,
+                    color: 'emerald'
+                  },
+                  {
+                    step: '04',
+                    title: 'Welcome Kit',
+                    desc: "You'll receive joining instructions and portal access via email.",
+                    icon: EnvelopeIcon,
+                    color: 'blue'
+                  }
+                ].map((item, idx) => (
+                  <div key={idx} className="group relative p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/[0.08] hover:border-white/10 transition-all duration-300">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`p-2 rounded-xl bg-${item.color}-500/20 text-${item.color}-400 group-hover:scale-110 transition-transform`}>
+                        <item.icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-xs font-black text-gray-600 group-hover:text-gray-400 transition-colors tracking-tighter">{item.step}</span>
+                    </div>
+                    <h4 className="font-bold text-white mb-1">{item.title}</h4>
+                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Summary Box */}
               <div className="space-y-4">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">1</span>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center">
+                  <CheckBadgeIcon className="h-4 w-4 mr-2 text-emerald-400" />
+                  Submission Summary
+                </h3>
+                <div className="p-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                      <UsersIcon className="h-4 w-4 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Profile Data</p>
+                      <p className="text-xs text-emerald-400/60 font-medium">Personal & Contact Info</p>
+                    </div>
+                    <CheckCircleIcon className="h-5 w-5 text-emerald-400 ml-auto" />
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-1">HR Review</h4>
-                    <p className="text-blue-700 text-sm">
-                      Our HR team will review your submitted information and documents within 1-2 business days.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">2</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-1">Employment Details</h4>
-                    <p className="text-blue-700 text-sm">
-                      HR will complete your employment details including department, position, and other job-specific information.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-1">IT Setup & Assets</h4>
-                    <p className="text-blue-700 text-sm">
-                      Our IT team will be notified to prepare your laptop, access cards, and other required assets.
-                    </p>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                      <DocumentTextIcon className="h-4 w-4 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Documents</p>
+                      <p className="text-xs text-emerald-400/60 font-medium">All 6 files uploaded</p>
+                    </div>
+                    <CheckCircleIcon className="h-5 w-5 text-emerald-400 ml-auto" />
                   </div>
                 </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">4</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-1">Welcome Communication</h4>
-                    <p className="text-blue-700 text-sm">
-                      You'll receive a welcome email with further instructions and your joining date confirmation.
-                    </p>
-                  </div>
+              </div>
+
+              {/* Stats/Timeline Box */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center">
+                  <CalendarIcon className="h-4 w-4 mr-2 text-indigo-400" />
+                  Standard Timeline
+                </h3>
+                <div className="p-4 bg-white/5 border border-white/5 rounded-2xl space-y-3">
+                  {[
+                    { label: 'Review', time: '1-2 Days' },
+                    { label: 'Setup', time: '2-3 Days' },
+                    { label: 'Joining', time: '5-7 Days' }
+                  ].map((t, i) => (
+                    <div key={i} className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400 font-medium">{t.label}</span>
+                      <span className="text-indigo-400 font-bold bg-indigo-500/10 px-3 py-1 rounded-full text-xs">{t.time}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Submitted Information Summary */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
-              <h3 className="text-xl font-bold text-green-800 mb-4 flex items-center">
-                <CheckSquare className="h-6 w-6 mr-2" />
-                Successfully Submitted
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-lg">
-                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                    <Users className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-green-800">Personal Information</h4>
-                    <p className="text-green-600 text-sm">Name, contact details, and addresses</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-lg">
-                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-green-800">Required Documents</h4>
-                    <p className="text-green-600 text-sm">All 6 required documents uploaded</p>
-                  </div>
+            {/* Footer / Support */}
+            <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center space-x-4">
+                <div className="text-left text-xs space-y-1">
+                  <p className="text-gray-400 flex items-center">
+                    <EnvelopeIcon className="h-3 w-3 mr-1" /> hr@techoptima.com
+                  </p>
+                  <p className="text-gray-400 flex items-center">
+                    <PhoneIcon className="h-3 w-3 mr-1" /> +91 XXX XXX XXXX
+                  </p>
                 </div>
               </div>
-              
-              <div className="mt-4 p-3 bg-green-100 rounded-lg">
-                <div className="flex items-center text-green-800">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  <span className="font-medium">Submission Complete - No further action required from you</span>
-                </div>
+
+              <div className="flex space-x-4">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-gray-300 transition-all hover:text-white"
+                >
+                  Go to Login
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-700 hover:shadow-lg hover:shadow-indigo-500/20 rounded-xl text-sm font-bold text-white transition-all transform hover:scale-105"
+                >
+                  Dashboard
+                  <ArrowRightIcon className="h-4 w-4 ml-2" />
+                </Link>
               </div>
             </div>
 
-            {/* Important Notes */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200">
-              <h3 className="text-xl font-bold text-amber-800 mb-4 flex items-center">
-                <Star className="h-6 w-6 mr-2" />
-                Important Notes
-              </h3>
-              
-              <div className="space-y-3 text-amber-700">
-                <div className="flex items-start space-x-2">
-                  <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <p className="text-sm">
-                    You will receive a confirmation email shortly with your submission details
-                  </p>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <p className="text-sm">
-                    HR will contact you within 1-2 business days regarding next steps
-                  </p>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <p className="text-sm">
-                    Please keep your phone and email accessible for any follow-up communication
-                  </p>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <p className="text-sm">
-                    If you have any urgent questions, contact HR at hr@techoptima.com
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Information */}
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200">
-              <h3 className="text-xl font-bold text-indigo-800 mb-4 flex items-center">
-                <Building className="h-6 w-6 mr-2" />
-                Contact Information
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-indigo-800">HR Department</h4>
-                  <p className="text-indigo-700 text-sm">
-                    <strong>Email:</strong> hr@techoptima.com
-                  </p>
-                  <p className="text-indigo-700 text-sm">
-                    <strong>Phone:</strong> +91 XXX XXX XXXX
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-indigo-800">Office Hours</h4>
-                  <p className="text-indigo-700 text-sm">
-                    Monday - Friday: 9:00 AM - 6:00 PM
-                  </p>
-                  <p className="text-indigo-700 text-sm">
-                    Saturday: 9:00 AM - 1:00 PM
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Timeline Expectations */}
-            <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <Calendar className="h-6 w-6 mr-2" />
-                Expected Timeline
-              </h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/70 rounded-lg">
-                  <span className="font-medium text-gray-800">Document Review</span>
-                  <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">1-2 days</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-white/70 rounded-lg">
-                  <span className="font-medium text-gray-800">Employment Setup</span>
-                  <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">2-3 days</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-white/70 rounded-lg">
-                  <span className="font-medium text-gray-800">Asset Preparation</span>
-                  <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">3-5 days</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-white/70 rounded-lg">
-                  <span className="font-medium text-gray-800">Joining Confirmation</span>
-                  <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">5-7 days</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Security Note */}
-            <div className="text-center pt-6 border-t border-gray-200">
-              <div className="inline-flex items-center text-sm text-gray-600">
-                <Shield className="w-4 h-4 mr-2" />
-                <span>Your information is secure and will only be used for employment purposes</span>
-              </div>
+            {/* Security Bottom Note */}
+            <div className="flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-gray-600 mt-4">
+              <ShieldCheckIcon className="h-3 w-3" />
+              <span>Secure End-to-End Encryption Enabled</span>
             </div>
           </div>
         </div>

@@ -14,8 +14,8 @@ const Table = ({
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-white/5">
+        <thead className="bg-slate-900/80">
           <tr>
             {columns.map((column, index) => (
               <th
@@ -28,7 +28,7 @@ const Table = ({
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-transparent divide-y divide-white/5">
           {data.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="px-6 py-4 text-center text-gray-500">
@@ -39,7 +39,7 @@ const Table = ({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`hover:bg-white/5 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick && onRowClick(row)}
               >
                 {columns.map((column, colIndex) => (

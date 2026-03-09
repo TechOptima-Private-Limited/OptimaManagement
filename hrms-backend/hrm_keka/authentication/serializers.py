@@ -465,6 +465,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email',
             'first_name', 'last_name',
             'is_superuser',
+            'must_change_password',
             'role',
             'profile',
             'groups',

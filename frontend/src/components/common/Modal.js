@@ -26,19 +26,19 @@ const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose}></div>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
 
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-        <div className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle ${sizeClasses[size]} sm:w-full`}>
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div className={`inline-block align-bottom bg-slate-900 border border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle ${sizeClasses[size]} sm:w-full`}>
+          <div className="bg-transparent px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-start justify-between">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-xl leading-6 font-bold text-white">
                 {title}
               </h3>
               <button
                 onClick={onClose}
-                className="ml-3 flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="ml-3 flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
               >
                 <XMarkIcon className="h-5 w-5 text-gray-400" />
               </button>

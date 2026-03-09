@@ -538,8 +538,11 @@ const MyTeam = () => {
 
   if (loading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-screen">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-[#070B14] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto shadow-[0_0_15px_rgba(99,102,241,0.2)]"></div>
+          <p className="mt-4 text-slate-400 font-bold tracking-wide animate-pulse uppercase text-xs">Loading team data...</p>
+        </div>
       </div>
     );
   }
@@ -548,286 +551,350 @@ const MyTeam = () => {
   const userRole = profile?.profile?.role;
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-full">
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900">My Team</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {userRole === 'MANAGER'
-            ? `Overview of your team's attendance today and calendar. You have ${teamSize} team ${teamSize === 1 ? 'member' : 'members'}.`
-            : userRole === 'EMPLOYEE' || userRole === 'IT_SUPPORTER' || userRole === 'ADMIN'
-              ? teamSize > 0
-                ? `You have ${teamSize} colleague${teamSize === 1 ? '' : 's'} on your team.`
-                : 'You don\'t have any team members assigned.'
-              : `Overview of your team's attendance today and calendar.`
-          }
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#070B14] py-8 transition-colors duration-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* Title Section */}
+        <div className="pl-1">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">My Team</h1>
+          <p className="text-lg text-slate-400 font-medium max-w-3xl leading-relaxed">
+            {userRole === 'MANAGER'
+              ? `Overview of your team's attendance today and calendar. You have ${teamSize} team ${teamSize === 1 ? 'member' : 'members'}.`
+              : userRole === 'EMPLOYEE' || userRole === 'IT_SUPPORTER' || userRole === 'ADMIN'
+                ? teamSize > 0
+                  ? `You have ${teamSize} colleague${teamSize === 1 ? '' : 's'} on your team.`
+                  : 'You don\'t have any team members assigned.'
+                : `Overview of your team's attendance today and calendar.`
+            }
+          </p>
+        </div>
 
-      {/* Top row: who is off / not arrived */}
-      {teamSize > 0 && (
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-              <div className="text-sm font-semibold text-gray-800 mb-2">Who is off today</div>
-              {attendanceStats.onLeave.length > 0 ? (
-                <div className="space-y-1">
-                  {attendanceStats.onLeave.map(member => (
-                    <p key={member.id} className="text-xs text-gray-600">
-                      • {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
-                    </p>
-                  ))}
+        {/* Top row: who is off / not arrived */}
+        {teamSize > 0 && (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl group hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 right-0 h-24 w-24 bg-rose-500/10 rounded-full blur-3xl group-hover:bg-rose-500/20 transition-all duration-500 -mr-12 -mt-12"></div>
+                <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center">
+                  <div className="w-1.5 h-6 bg-rose-500 rounded-full mr-3"></div>
+                  Who is off today
                 </div>
-              ) : (
-                <p className="text-xs text-gray-400">No team members are on leave today.</p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-              <div className="text-sm font-semibold text-gray-800 mb-2">Not yet arrived today</div>
-              {(() => {
-                // Include all checked-in categories for accurate exclusion
-                const checkedInIds = new Set([
-                  ...attendanceStats.onTime.map(m => String(m.id)),
-                  ...attendanceStats.late.map(m => String(m.id)),
-                  ...attendanceStats.workFromHome.map(m => String(m.id)),
-                  ...attendanceStats.remoteLogin.map(m => String(m.id))
-                ]);
-
-                const notArrived = team.filter(member => {
-                  const memberIdStr = String(member.id);
-                  const isCheckedIn = checkedInIds.has(memberIdStr);
-                  const isOnLeave = attendanceStats.onLeave.some(m => String(m.id) === memberIdStr);
-                  return !isCheckedIn && !isOnLeave;
-                });
-
-                return notArrived.length > 0 ? (
-                  <div className="space-y-1">
-                    {notArrived.map(member => (
-                      <p key={member.id} className="text-xs text-gray-600">
-                        • {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
-                      </p>
+                {attendanceStats.onLeave.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {attendanceStats.onLeave.map(member => (
+                      <div key={member.id} className="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                        <div className="w-8 h-8 bg-rose-500/10 rounded-lg flex items-center justify-center text-rose-400 font-bold text-[10px] border border-rose-500/20">
+                          {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+                        </div>
+                        <span className="text-xs font-bold text-slate-200">
+                          {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400">Everyone has checked in.</p>
-                );
-              })()}
-            </div>
-          </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-gray-500">On time employees</div>
-                <div className="mt-2 text-2xl font-bold text-red-700">{attendanceStats.onTime.length}</div>
+                  <div className="py-6 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
+                    <p className="text-xs text-slate-500 font-bold italic opacity-60">No team members are on leave today.</p>
+                  </div>
+                )}
               </div>
-              {attendanceStats.onTime.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleViewEmployees('on_time')}
-                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
-                >
-                  View employees
-                </button>
-              )}
-            </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-gray-500">Late arrivals</div>
-                <div className="mt-2 text-2xl font-bold text-rose-600">{attendanceStats.late.length}</div>
-              </div>
-              {attendanceStats.late.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleViewEmployees('late')}
-                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
-                >
-                  View employees
-                </button>
-              )}
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-gray-500">Work from home</div>
-                <div className="mt-2 text-2xl font-bold text-rose-600">{attendanceStats.workFromHome.length}</div>
-              </div>
-              {attendanceStats.workFromHome.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleViewEmployees('wfh')}
-                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
-                >
-                  View employees
-                </button>
-              )}
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-gray-500">Remote login</div>
-                <div className="mt-2 text-2xl font-bold text-red-600">{attendanceStats.remoteLogin.length}</div>
-              </div>
-              {attendanceStats.remoteLogin.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleViewEmployees('remote')}
-                  className="text-xs text-red-600 font-medium cursor-pointer hover:underline"
-                >
-                  View employees
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Team calendar */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-800">Team calendar</h2>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-              <div className="px-4 py-2 flex items-center justify-between border-b border-gray-200 bg-gray-50">
-                <button
-                  onClick={() => navigateMonth(-1)}
-                  className="px-2 py-1 text-xs rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
-                >
-                  ‹
-                </button>
-                <div className="text-sm font-semibold text-gray-800">
-                  {calendarDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl group hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 right-0 h-24 w-24 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-500 -mr-12 -mt-12"></div>
+                <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center">
+                  <div className="w-1.5 h-6 bg-amber-500 rounded-full mr-3"></div>
+                  Not yet arrived today
                 </div>
-                <button
-                  onClick={() => navigateMonth(1)}
-                  className="px-2 py-1 text-xs rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
-                >
-                  ›
-                </button>
-              </div>
+                {(() => {
+                  const checkedInIds = new Set([
+                    ...attendanceStats.onTime.map(m => String(m.id)),
+                    ...attendanceStats.late.map(m => String(m.id)),
+                    ...attendanceStats.workFromHome.map(m => String(m.id)),
+                    ...attendanceStats.remoteLogin.map(m => String(m.id))
+                  ]);
 
-              {calendarLoading ? (
-                <div className="text-center py-8">
-                  <LoadingSpinner />
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-gray-50 border-b border-gray-100">
-                        <th className="sticky left-0 bg-gray-50 px-4 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-r border-gray-100 min-w-[200px] z-10">
-                          Employee
-                        </th>
-                        {getDaysInMonth(calendarDate).map(({ day, weekday }) => (
-                          <th key={day} className="px-2 py-2 text-center min-w-[36px]">
-                            <div className="flex flex-col items-center">
-                              <span className="text-[10px] text-gray-400 font-medium uppercase">{weekday}</span>
-                              <span className="text-xs font-bold text-gray-600">{day}</span>
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {team.map(member => (
-                        <tr key={member.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                          <td className="sticky left-0 bg-white px-4 py-2 border-r border-gray-100 z-10">
-                            <div className="flex items-center space-x-2">
-                              <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center text-[10px] font-bold text-red-600">
-                                {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
-                              </div>
-                              <span className="text-xs font-medium text-gray-700 truncate max-w-[140px]">
-                                {member.user_info?.full_name || member.user_info?.first_name}
-                              </span>
-                            </div>
-                          </td>
-                          {getDaysInMonth(calendarDate).map(({ day }) => {
-                            const status = getStatusForDate(member.id, day);
-                            return (
-                              <td key={day} className="px-1 py-2 text-center">
-                                <div className={`w-6 h-6 mx-auto rounded-full flex items-center justify-center text-[9px] font-bold transition-all duration-200
-                                  ${status === 'PRESENT' ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200' :
-                                    status === 'WFH' ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-100' :
-                                      status === 'LEAVE' ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-200' :
-                                        status === 'ABSENT' ? 'bg-red-100 text-red-700 ring-1 ring-red-200' :
-                                          status === 'HALF_DAY' ? 'bg-red-50 text-red-700 ring-1 ring-red-100' :
-                                            status === 'WEEKOFF' ? 'bg-gray-100 text-gray-500 ring-1 ring-gray-200' :
-                                              'bg-gray-50 text-gray-300'}
-                                `}>
-                                  {status === 'PRESENT' ? 'P' :
-                                    status === 'WFH' ? 'W' :
-                                      status === 'LEAVE' ? 'L' :
-                                        status === 'ABSENT' ? 'A' :
-                                          status === 'HALF_DAY' ? 'H' :
-                                            status === 'WEEKOFF' ? 'WO' : ''}
-                                </div>
-                              </td>
-                            );
-                          })}
-                        </tr>
+                  const notArrived = team.filter(member => {
+                    const memberIdStr = String(member.id);
+                    const isCheckedIn = checkedInIds.has(memberIdStr);
+                    const isOnLeave = attendanceStats.onLeave.some(m => String(m.id) === memberIdStr);
+                    return !isCheckedIn && !isOnLeave;
+                  });
+
+                  return notArrived.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {notArrived.map(member => (
+                        <div key={member.id} className="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                          <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-400 font-bold text-[10px] border border-amber-500/20">
+                            {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+                          </div>
+                          <span className="text-xs font-bold text-slate-200">
+                            {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
+                          </span>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                    </div>
+                  ) : (
+                    <div className="py-6 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
+                      <p className="text-xs text-slate-500 font-bold italic opacity-60 uppercase tracking-widest">Everyone has checked in</p>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
 
-              <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex flex-wrap gap-x-6 gap-y-2 items-center">
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-emerald-100 ring-1 ring-emerald-200 rounded flex items-center justify-center text-[9px] font-bold text-emerald-700">P</div>
-                  <span className="text-[10px] text-gray-500 font-medium">Present</span>
+            {/* Stats row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+                <div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">On Time</div>
+                  <div className="text-4xl font-black text-emerald-400 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.onTime.length}</div>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-rose-50 ring-1 ring-rose-100 rounded flex items-center justify-center text-[9px] font-bold text-rose-700">W</div>
-                  <span className="text-[10px] text-gray-500 font-medium">WFH</span>
+                {attendanceStats.onTime.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleViewEmployees('on_time')}
+                    className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-lg text-emerald-400 text-[10px] font-black uppercase tracking-widest transition-all border border-emerald-500/20 active:scale-95 shadow-lg"
+                  >
+                    View List
+                  </button>
+                )}
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+                <div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Late Arrival</div>
+                  <div className="text-4xl font-black text-rose-500 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.late.length}</div>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-orange-100 ring-1 ring-orange-200 rounded flex items-center justify-center text-[9px] font-bold text-orange-700">L</div>
-                  <span className="text-[10px] text-gray-500 font-medium">Leave (Vacation)</span>
+                {attendanceStats.late.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleViewEmployees('late')}
+                    className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 rounded-lg text-rose-400 text-[10px] font-black uppercase tracking-widest transition-all border border-rose-500/20 active:scale-95 shadow-lg"
+                  >
+                    View List
+                  </button>
+                )}
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+                <div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Work from Home</div>
+                  <div className="text-4xl font-black text-indigo-400 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.workFromHome.length}</div>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-red-100 ring-1 ring-red-200 rounded flex items-center justify-center text-[9px] font-bold text-red-700">A</div>
-                  <span className="text-[10px] text-gray-500 font-medium">Absent</span>
+                {attendanceStats.workFromHome.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleViewEmployees('wfh')}
+                    className="px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-lg text-indigo-400 text-[10px] font-black uppercase tracking-widest transition-all border border-indigo-500/20 active:scale-95 shadow-lg"
+                  >
+                    View List
+                  </button>
+                )}
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+                <div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Remote Login</div>
+                  <div className="text-4xl font-black text-purple-400 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.remoteLogin.length}</div>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-red-50 ring-1 ring-red-100 rounded flex items-center justify-center text-[9px] font-bold text-red-700">H</div>
-                  <span className="text-[10px] text-gray-500 font-medium">Half Day</span>
+                {attendanceStats.remoteLogin.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => handleViewEmployees('remote')}
+                    className="px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 rounded-lg text-purple-400 text-[10px] font-black uppercase tracking-widest transition-all border border-purple-500/20 active:scale-95 shadow-lg"
+                  >
+                    View List
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Team calendar */}
+            <div className="space-y-6 pt-4">
+              <div className="flex items-center justify-between pl-1">
+                <h2 className="text-2xl font-black text-white tracking-tight uppercase flex items-center">
+                  <div className="w-2 h-8 bg-indigo-500 rounded-full mr-4"></div>
+                  Team calendar
+                </h2>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
+                <div className="px-8 py-6 flex items-center justify-between border-b border-white/10 bg-white/5">
+                  <button
+                    onClick={() => navigateMonth(-1)}
+                    className="p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-lg active:scale-95"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <div className="text-2xl font-black text-white tracking-widest uppercase italic">
+                    {calendarDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                  </div>
+                  <button
+                    onClick={() => navigateMonth(1)}
+                    className="p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-lg active:scale-95"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+                  </button>
                 </div>
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-gray-100 ring-1 ring-gray-200 rounded flex items-center justify-center text-[9px] font-bold text-gray-500">WO</div>
-                  <span className="text-[10px] text-gray-500 font-medium">Week Off</span>
-                </div>
-                <div className="flex items-center space-x-1.5">
-                  <div className="w-4 h-4 bg-gray-50 border border-gray-200 border-dashed rounded"></div>
-                  <span className="text-[10px] text-gray-500 font-medium">No Data</span>
+
+                {calendarLoading ? (
+                  <div className="text-center py-8">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-white/5 border-b border-white/10">
+                          <th className="sticky left-0 bg-[#0d1420] px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 min-w-[220px] z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">
+                            Employee
+                          </th>
+                          {getDaysInMonth(calendarDate).map(({ day, weekday }) => (
+                            <th key={day} className="px-3 py-4 text-center min-w-[48px] border-r border-white/5 last:border-r-0">
+                              <div className="flex flex-col items-center">
+                                <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">{weekday}</span>
+                                <span className="text-sm font-black text-slate-200">{day}</span>
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {team.map(member => (
+                          <tr key={member.id} className="hover:bg-white/5 transition-colors group">
+                            <td className="sticky left-0 bg-[#0d1420] px-6 py-4 border-r border-white/10 z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-indigo-500 rounded-xl flex items-center justify-center text-[10px] font-black text-white shadow-lg ring-1 ring-white/20 group-hover:scale-110 transition-transform">
+                                  {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+                                </div>
+                                <span className="text-xs font-bold text-slate-300 truncate max-w-[140px] group-hover:text-white transition-colors">
+                                  {member.user_info?.full_name || member.user_info?.first_name}
+                                </span>
+                              </div>
+                            </td>
+                            {getDaysInMonth(calendarDate).map(({ day }) => {
+                              const status = getStatusForDate(member.id, day);
+                              return (
+                                <td key={day} className="px-1 py-4 text-center border-r border-white/5 last:border-r-0">
+                                  <div className={`w-8 h-8 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black transition-all duration-300 shadow-md transform hover:scale-125 hover:z-20 relative
+                                ${status === 'PRESENT' ? 'bg-emerald-500 text-white ring-2 ring-emerald-500/50 shadow-emerald-500/20' :
+                                      status === 'WFH' ? 'bg-indigo-500 text-white ring-2 ring-indigo-500/50 shadow-indigo-500/20' :
+                                        status === 'LEAVE' ? 'bg-amber-500 text-white ring-2 ring-amber-500/50 shadow-amber-500/20' :
+                                          status === 'ABSENT' ? 'bg-rose-500 text-white ring-2 ring-rose-500/50 shadow-rose-500/20' :
+                                            status === 'HALF_DAY' ? 'bg-rose-500/50 text-white ring-2 ring-rose-500/30' :
+                                              status === 'WEEKOFF' ? 'bg-slate-700/50 text-slate-400 opacity-40 shadow-none' :
+                                                'bg-white/5 text-slate-600 border border-white/5 opacity-20 shadow-none'}
+                              `}>
+                                    {status === 'PRESENT' ? 'P' :
+                                      status === 'WFH' ? 'W' :
+                                        status === 'LEAVE' ? 'L' :
+                                          status === 'ABSENT' ? 'A' :
+                                            status === 'HALF_DAY' ? 'H' :
+                                              status === 'WEEKOFF' ? '•' : ''}
+                                  </div>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <div className="px-8 py-5 bg-white/5 border-t border-white/10 flex flex-wrap gap-x-10 gap-y-4 items-center">
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 bg-emerald-500 ring-2 ring-emerald-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">P</div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Present</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 bg-indigo-500 ring-2 ring-indigo-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">W</div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">WFH</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 bg-amber-500 ring-2 ring-amber-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">L</div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Leave</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 bg-rose-500 ring-2 ring-rose-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">A</div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Absent</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 bg-rose-500/50 ring-2 ring-rose-500/30 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">H</div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Half Day</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 bg-slate-700/50 border border-white/10 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-400 group-hover:scale-125 transition-transform">•</div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Week Off</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="w-6 h-6 border border-white/5 rounded-lg opacity-20"></div>
+                    <span className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">No Data</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {/* Team Members List */}
-      {teamSize > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 space-y-4 md:space-y-0">
-            <h2 className="text-lg font-semibold text-gray-800">
-              {userRole === 'MANAGER' ? 'Direct Reports' : 'Team Members'} ({teamSize})
-            </h2>
-            <div className="relative w-full md:w-72">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
+        {/* Team Members List */}
+        {teamSize > 0 && (
+          <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-30 group-hover:opacity-100 transition-opacity"></div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 space-y-6 md:space-y-0 relative z-10">
+              <h2 className="text-3xl font-black text-white tracking-tight flex items-center">
+                <UserGroupIcon className="h-10 w-10 text-indigo-500 mr-4" />
+                {userRole === 'MANAGER' ? 'Direct Reports' : 'Team Members'}
+                <span className="ml-4 px-3 py-1 bg-white/10 rounded-xl text-sm font-black text-indigo-400 border border-white/10">{teamSize}</span>
+              </h2>
+              <div className="relative w-full md:w-80">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-slate-500" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search team..."
+                  value={teamSearchTerm}
+                  onChange={(e) => setTeamSearchTerm(e.target.value)}
+                  className="block w-full pl-12 pr-4 py-3 border border-white/10 rounded-[1.25rem] leading-5 bg-white/5 placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 text-sm transition-all shadow-inner"
+                />
               </div>
-              <input
-                type="text"
-                placeholder="Search team members..."
-                value={teamSearchTerm}
-                onChange={(e) => setTeamSearchTerm(e.target.value)}
-                className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-              />
             </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+              {team.filter(member => {
+                if (!teamSearchTerm) return true;
+                const search = teamSearchTerm.toLowerCase();
+                return (
+                  (member.user_info?.full_name || '').toLowerCase().includes(search) ||
+                  (member.employee_id || '').toLowerCase().includes(search) ||
+                  (member.department?.name || '').toLowerCase().includes(search) ||
+                  (member.position || '').toLowerCase().includes(search)
+                );
+              }).map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center space-x-5 p-6 bg-white/5 rounded-[2rem] border border-white/5 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] transform transition-all duration-300 group shadow-lg"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-2xl flex-shrink-0 ring-4 ring-white/5 group-hover:rotate-6 transition-transform">
+                    {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-lg font-black text-white truncate tracking-tight group-hover:text-indigo-400 transition-colors">
+                      {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
+                    </h4>
+                    <div className="flex flex-col mt-1 space-y-0.5">
+                      <p className="text-xs font-bold text-slate-400 truncate uppercase tracking-widest">{member.position || 'Position not specified'}</p>
+                      <p className="text-[10px] font-black text-slate-500 truncate uppercase tracking-[0.2em]">{member.employee_id}</p>
+                      <p className="text-[11px] text-indigo-400/70 truncate mt-1 italic">{member.user_info?.email}</p>
+                    </div>
+                    {member.department && (
+                      <div className="mt-3 inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                        {member.department.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
             {team.filter(member => {
               if (!teamSearchTerm) return true;
               const search = teamSearchTerm.toLowerCase();
@@ -837,218 +904,187 @@ const MyTeam = () => {
                 (member.department?.name || '').toLowerCase().includes(search) ||
                 (member.position || '').toLowerCase().includes(search)
               );
-            }).map((member) => (
-              <div
-                key={member.id}
-                className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
-                  {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+            }).length === 0 && (
+                <div className="py-12 text-center">
+                  <p className="text-slate-500 font-bold italic opacity-60">No team members found matching your search.</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-gray-900 truncate">
-                    {member.user_info?.full_name || `${member.user_info?.first_name || ''} ${member.user_info?.last_name || ''}`.trim()}
-                  </h4>
-                  <p className="text-xs text-gray-600 truncate">{member.position || 'Position not specified'}</p>
-                  <p className="text-xs text-gray-500 truncate">ID: {member.employee_id}</p>
-                  <p className="text-xs text-gray-500 truncate">{member.user_info?.email}</p>
-                  {member.department && (
-                    <p className="text-xs text-gray-500 truncate">{member.department.name}</p>
-                  )}
-                </div>
-              </div>
-            ))}
+              )}
           </div>
-          {team.filter(member => {
-            if (!teamSearchTerm) return true;
-            const search = teamSearchTerm.toLowerCase();
-            return (
-              (member.user_info?.full_name || '').toLowerCase().includes(search) ||
-              (member.employee_id || '').toLowerCase().includes(search) ||
-              (member.department?.name || '').toLowerCase().includes(search) ||
-              (member.position || '').toLowerCase().includes(search)
-            );
-          }).length === 0 && (
-              <div className="py-12 text-center">
-                <p className="text-gray-400 text-sm">No team members found matching your search.</p>
-              </div>
-            )}
-        </div>
-      )}
+        )}
 
-      {teamSize === 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 shadow-sm text-center">
-          <UserGroupIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg font-medium">No team members found</p>
-          <p className="text-sm text-gray-400 mt-2">
-            {userRole === 'MANAGER'
-              ? 'You don\'t have any direct reports assigned to you.'
-              : 'You don\'t have any team members assigned.'}
-          </p>
-        </div>
-      )}
+        {teamSize === 0 && (
+          <div className="bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 p-24 shadow-2xl text-center relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-all duration-700 group-hover:bg-indigo-500/10"></div>
+            <UserGroupIcon className="w-24 h-24 text-white/5 mx-auto mb-8 animate-pulse" />
+            <p className="text-3xl font-black text-white tracking-tight">No team members found</p>
+            <p className="text-lg text-slate-400 mt-4 max-w-md mx-auto leading-relaxed">
+              {userRole === 'MANAGER'
+                ? 'You don\'t have any direct reports assigned to you.'
+                : 'You don\'t have any team members assigned.'}
+            </p>
+          </div>
+        )}
 
-      {/* Side Panel for viewing employees by category */}
-      {selectedCategory && (
-        <div className="fixed inset-0 z-[150] flex justify-end">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-            onClick={closePanel}
-          ></div>
+        {/* Side Panel for viewing employees by category */}
+        {selectedCategory && (
+          <div className="fixed inset-0 z-[150] flex justify-end">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity"
+              onClick={closePanel}
+            ></div>
 
-          {/* Side Panel */}
-          <div className="relative bg-[#0b121e] w-full max-w-[90%] md:max-w-6xl h-full shadow-2xl border-l border-gray-800 flex flex-col animate-slide-in-right">
-            <div className="px-6 py-5 border-b border-gray-800 flex items-center justify-between bg-[#0b121e]">
-              <h3 className="text-xl font-medium text-gray-200">
-                View Employees
-              </h3>
-              <button
-                type="button"
-                onClick={closePanel}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <XMarkIcon className="w-7 h-7" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-hidden flex flex-col">
-              <div className="p-6 pb-0">
-                <div className="mb-6 relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <div className="relative bg-[#070B14] w-full max-w-[95%] md:max-w-6xl h-full shadow-2xl border-l border-white/10 flex flex-col animate-slide-in-right">
+              <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between bg-white/5 backdrop-blur-xl">
+                <div>
+                  <h3 className="text-2xl font-black text-white tracking-tight uppercase">
+                    View Employees
+                  </h3>
+                  <div className="flex items-center mt-1">
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{selectedCategory.replace('_', ' ')}</span>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search by name, ID, or department"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3 border border-gray-700/50 rounded-md leading-5 bg-[#161f2e] text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all duration-200"
-                  />
                 </div>
+                <button
+                  type="button"
+                  onClick={closePanel}
+                  className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all shadow-lg active:scale-95"
+                >
+                  <XMarkIcon className="w-7 h-7" />
+                </button>
               </div>
 
-              <div className="flex-1 overflow-auto custom-scrollbar px-6 pb-6">
-                <div className="border border-gray-800 rounded-lg bg-[#161f2e] overflow-x-auto custom-scrollbar">
-                  {selectedCategory === 'late' ? (
-                    <div className="inline-block min-w-full align-middle">
-                      <table className="min-w-full border-separate border-spacing-0">
-                        <thead>
-                          <tr className="bg-[#1c2636]">
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider sticky left-0 bg-[#1c2636] z-20 border-b border-gray-800 min-w-[220px]">Employee</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[150px]">Department</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[150px]">Team (Manager)</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[120px]">Location</th>
-                            <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[150px]">Job Title</th>
-                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[120px]">Clock-in Time</th>
-                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[200px]">Assigned Shift</th>
-                            <th className="px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800 min-w-[100px]">Delay</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-[#0f172a] divide-y divide-gray-800">
-                          {getFilteredTeamMembers().map((member) => {
-                            const record = member.attendanceRecord;
+              <div className="flex-1 overflow-hidden flex flex-col">
+                <div className="p-8 pb-0">
+                  <div className="mb-8 relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <MagnifyingGlassIcon className="h-5 w-5 text-slate-500" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search by name, ID, or department"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="block w-full pl-12 pr-4 py-3 border border-white/10 rounded-2xl leading-5 bg-white/5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 text-sm transition-all shadow-inner"
+                    />
+                  </div>
+                </div>
 
-                            // Calculate delay
-                            let delayStr = "0h 0m 0s";
-                            if (record?.check_in_time) {
-                              const [h, m, s] = record.check_in_time.split(':').map(Number);
-                              const checkInSec = h * 3600 + m * 60 + s;
-                              const thresholdSec = 10 * 3600; // 10:00 AM
-
-                              if (checkInSec > thresholdSec) {
-                                const diff = checkInSec - thresholdSec;
-                                const dh = Math.floor(diff / 3600);
-                                const dm = Math.floor((diff % 3600) / 60);
-                                const ds = diff % 60;
-                                delayStr = `${dh}h ${dm}m ${ds}s`;
+                <div className="flex-1 overflow-auto custom-scrollbar px-8 pb-8">
+                  <div className="bg-white/5 rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl">
+                    {selectedCategory === 'late' ? (
+                      <div className="overflow-x-auto custom-scrollbar">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="bg-white/5 border-b border-white/10 text-left">
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] sticky left-0 bg-[#0d1420] z-20 border-r border-white/10 min-w-[220px]">Employee</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[150px]">Department</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[150px]">Team (Manager)</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[120px]">Location</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[150px]">Job Title</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[120px]">Clock-in</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[200px]">Assigned Shift</th>
+                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center min-w-[100px]">Delay</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                            {getFilteredTeamMembers().map((member) => {
+                              const record = member.attendanceRecord;
+                              let delayStr = "0h 0m 0s";
+                              if (record?.check_in_time) {
+                                const [h, m, s] = record.check_in_time.split(':').map(Number);
+                                const checkInSec = h * 3600 + m * 60 + s;
+                                const thresholdSec = 10 * 3600; // 10:00 AM
+                                if (checkInSec > thresholdSec) {
+                                  const diff = checkInSec - thresholdSec;
+                                  const dh = Math.floor(diff / 3600);
+                                  const dm = Math.floor((diff % 3600) / 60);
+                                  const ds = diff % 60;
+                                  delayStr = `${dh}h ${dm}m ${ds}s`;
+                                }
                               }
-                            }
 
-                            return (
-                              <tr key={member.id} className="hover:bg-gray-800/20 transition-colors">
-                                <td className="px-6 py-5 whitespace-nowrap sticky left-0 bg-[#161f2e] z-10 border-b border-gray-800/50 min-w-[220px]">
-                                  <div className="flex flex-col">
-                                    <span className="text-[13.5px] font-semibold text-pink-400/90">{member.user_info?.full_name}</span>
-                                    <span className="text-[11px] text-gray-500 font-medium">{member.employee_id}</span>
-                                  </div>
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-300 font-medium border-b border-gray-800/50">
-                                  {member.department?.name || 'N/A'}
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-400 font-medium border-b border-gray-800/50">
-                                  {member.manager?.user_info?.full_name || 'Individual'}
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-400 font-medium border-b border-gray-800/50">
-                                  {member.location || 'Hyderabad'}
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-400 font-medium border-b border-gray-800/50">
-                                  {member.position || 'Software Developer'}
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-200 font-bold text-center border-b border-gray-800/50">
-                                  {record?.check_in_time ? formatTime(record.check_in_time) : 'N/A'}
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-center border-b border-gray-800/50">
-                                  <div className="flex flex-col items-center">
-                                    <span className="text-[12px] font-bold text-gray-300">10AM - 7PM</span>
-                                    <span className="text-[10px] text-gray-500 font-medium">(10:00 AM - 07:00 PM)</span>
-                                  </div>
-                                </td>
-                                <td className="px-6 py-5 whitespace-nowrap text-[13px] text-gray-300 font-bold text-center border-b border-gray-800/50">
-                                  {delayStr}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                      {getFilteredTeamMembers().length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-8">No late arrivals found.</p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-gray-800/50">
-                      {getFilteredTeamMembers().map((member) => (
-                        <div key={member.id} className="flex items-center space-x-4 p-4 hover:bg-gray-800/20 transition-colors">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-full flex items-center justify-center text-blue-400 text-sm font-bold border border-blue-500/20">
-                            {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+                              return (
+                                <tr key={member.id} className="hover:bg-white/5 transition-colors group">
+                                  <td className="px-6 py-5 sticky left-0 bg-[#0d1420] z-10 border-r border-white/10">
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight">{member.user_info?.full_name}</span>
+                                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{member.employee_id}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-5 text-[13px] text-slate-300 font-bold border-r border-white/5 italic">
+                                    {member.department?.name || 'N/A'}
+                                  </td>
+                                  <td className="px-6 py-5 text-[13px] text-slate-400 font-medium border-r border-white/5">
+                                    {member.manager?.user_info?.full_name || 'Individual'}
+                                  </td>
+                                  <td className="px-6 py-5 text-[13px] text-slate-400 font-medium border-r border-white/5">
+                                    {member.location || 'Hyderabad'}
+                                  </td>
+                                  <td className="px-6 py-5 text-[13px] text-slate-400 font-medium border-r border-white/5 italic">
+                                    {member.position || 'Software Developer'}
+                                  </td>
+                                  <td className="px-6 py-5 text-[13px] text-emerald-400 font-black text-center border-r border-white/5">
+                                    {record?.check_in_time ? formatTime(record.check_in_time) : 'N/A'}
+                                  </td>
+                                  <td className="px-6 py-5 text-center border-r border-white/5">
+                                    <div className="flex flex-col items-center">
+                                      <span className="text-[12px] font-black text-slate-300 tracking-widest">10AM - 7PM</span>
+                                      <span className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">(10:00 AM - 07:00 PM)</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-5 text-[13px] text-rose-500 font-black text-center">
+                                    {delayStr}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
+                        {getFilteredTeamMembers().map((member) => (
+                          <div key={member.id} className="flex items-center space-x-5 p-6 bg-white/5 rounded-3xl border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all group shadow-xl">
+                            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg group-hover:rotate-6 transition-transform">
+                              {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-base font-black text-white truncate tracking-tight group-hover:text-indigo-400 transition-colors">
+                                {member.user_info?.full_name}
+                              </p>
+                              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest truncate">{member.position || 'Position not specified'}</p>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <p className="text-[14px] font-semibold text-gray-200">
-                              {member.user_info?.full_name}
-                            </p>
-                            <p className="text-[12px] text-gray-500">{member.position || 'Position not specified'}</p>
-                          </div>
-                        </div>
-                      ))}
-                      {getFilteredTeamMembers().length === 0 && (
-                        <p className="text-sm text-gray-500 text-center py-12">No employees found.</p>
-                      )}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                    {getFilteredTeamMembers().length === 0 && (
+                      <p className="text-sm text-slate-500 font-bold italic opacity-60 text-center py-16 uppercase tracking-widest">No employees found.</p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="px-6 py-4 bg-[#0b121e] border-t border-gray-800 flex justify-between items-center mt-auto">
-                <div className="text-[12px] text-gray-500 font-medium">
-                  1 to {getFilteredTeamMembers().length} of {getFilteredTeamMembers().length}
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="flex space-x-1">
-                    <button className="p-1 text-gray-600 hover:text-gray-400 disabled:opacity-30" disabled>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                    </button>
-                    <span className="text-[12px] text-white bg-blue-600/80 px-2.5 py-1 rounded">Page 1 of 1</span>
-                    <button className="p-1 text-gray-600 hover:text-gray-400 disabled:opacity-30" disabled>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                    </button>
+                <div className="px-8 py-5 bg-white/5 border-t border-white/10 flex justify-between items-center mt-auto backdrop-blur-xl">
+                  <div className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    Showing 1 to {getFilteredTeamMembers().length} of {getFilteredTeamMembers().length} employees
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex space-x-2">
+                      <button className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-600 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                      </button>
+                      <span className="text-[11px] font-black text-white bg-indigo-500/80 px-4 py-2 rounded-xl shadow-lg shadow-indigo-500/20 border border-white/10 flex items-center">PAGE 1 OF 1</span>
+                      <button className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-600 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

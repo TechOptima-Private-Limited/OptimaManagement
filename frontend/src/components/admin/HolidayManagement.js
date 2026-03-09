@@ -6,14 +6,18 @@ import {
     TrashIcon,
     CheckCircleIcon,
     XCircleIcon,
-    InformationCircleIcon
+    InformationCircleIcon,
+    ArrowLeftIcon,
+    CalendarIcon
 } from '@heroicons/react/24/outline';
 import { holidayAPI } from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const HolidayManagement = () => {
     const { theme } = useTheme();
+    const navigate = useNavigate();
     const [holidays, setHolidays] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,99 +120,121 @@ const HolidayManagement = () => {
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent`}>
-                        Holiday Management
-                    </h1>
-                    <p className="text-gray-500 mt-2">Manage company holidays and festivals</p>
+        <div className="min-h-screen bg-[#070B14] p-8 space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-2">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/dashboard')}
+                        className="group flex items-center text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-all"
+                    >
+                        <ArrowLeftIcon className="h-4 w-4 mr-2 transform group-hover:-translate-x-1 transition-transform" />
+                        Back to Dashboard
+                    </button>
+                    <div className="flex items-center space-x-4">
+                        <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+                            <CalendarIcon className="h-8 w-8 text-indigo-400" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-black text-white uppercase tracking-tight leading-none mb-1">Holiday Registry</h1>
+                            <p className="text-sm text-slate-500 font-medium tracking-tight">Configure company-wide observational periods and festival events.</p>
+                        </div>
+                    </div>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className={`flex items-center px-4 py-2 bg-gradient-to-r ${theme.primaryGradient} text-white rounded-xl shadow-lg hover:scale-105 transition-all duration-300 font-medium`}
+                    className={`flex items-center justify-center px-6 py-3 bg-gradient-to-r ${theme.primaryGradient} text-white rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 text-xs font-black uppercase tracking-widest`}
                 >
-                    <PlusIcon className="h-5 w-5 mr-2" />
-                    Add Holiday
+                    <PlusIcon className="h-4 w-4 mr-2 stroke-[3]" />
+                    Initialize Holiday
                 </button>
             </div>
 
             {isLoading ? (
-                <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+                <div className="flex flex-col justify-center items-center h-96 space-y-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+                    <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest animate-pulse">Syncing Calendar Data…</div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {holidays.map((holiday) => (
                         <div
                             key={holiday.id}
-                            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300 relative overflow-hidden group"
+                            className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 p-8 hover:border-white/20 hover:bg-white/10 transition-all duration-500 relative overflow-hidden group shadow-2xl"
                         >
                             {/* Card Background Decoration */}
-                            <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${theme.primaryGradient} opacity-5 rounded-bl-full translate-x-12 -translate-y-12 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-500`}></div>
+                            <div className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${theme.primaryGradient} opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity duration-500`}></div>
 
-                            <div className="flex justify-between items-start mb-4">
+                            <div className="flex justify-between items-start mb-6 relative z-10">
                                 <div className="flex items-center">
-                                    <div className="text-3xl mr-3">{holiday.emoji || '📅'}</div>
+                                    <div className="text-4xl mr-4 filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{holiday.emoji || '📅'}</div>
                                     <div>
-                                        <h3 className="font-bold text-gray-900 text-lg leading-tight">{holiday.name}</h3>
-                                        <p className="text-sm text-gray-500">{new Date(holiday.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                        <h3 className="font-bold text-white text-lg leading-tight uppercase tracking-tight">{holiday.name}</h3>
+                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-1 opacity-70">
+                                            {new Date(holiday.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="flex space-x-1">
+                                <div className="flex space-x-2">
                                     <button
                                         onClick={() => handleOpenModal(holiday)}
-                                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                                     >
                                         <PencilSquareIcon className="h-5 w-5" />
                                     </button>
                                     <button
                                         onClick={() => handleDelete(holiday.id)}
-                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
                                     >
                                         <TrashIcon className="h-5 w-5" />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="space-y-3 mb-4">
-                                <p className="text-gray-600 text-sm line-clamp-2 min-h-[2.5rem]">
-                                    {holiday.description || 'No description provided.'}
+                            <div className="space-y-6 mb-2 relative z-10">
+                                <p className="text-slate-400 text-xs font-medium leading-relaxed line-clamp-2 min-h-[3rem]">
+                                    {holiday.description || 'No descriptive metadata provided in registry.'}
                                 </p>
-                                <div className="flex flex-wrap gap-2">
-                                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-md">
+                                <div className="flex flex-wrap gap-3">
+                                    <span className="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-widest rounded-full border border-white/5 whitespace-nowrap">
                                         {holiday.festival_type.replace('_', ' ')}
                                     </span>
                                     {holiday.is_holiday ? (
-                                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-md flex items-center">
-                                            <CheckCircleIcon className="h-3 w-3 mr-1" /> Holiday
+                                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[9px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20 flex items-center whitespace-nowrap">
+                                            <CheckCircleIcon className="h-3 w-3 mr-1" /> FULL HOLIDAY
                                         </span>
                                     ) : (
-                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-md flex items-center">
-                                            <InformationCircleIcon className="h-3 w-3 mr-1" /> Event
+                                        <span className="px-3 py-1 bg-blue-500/10 text-blue-500 text-[9px] font-black uppercase tracking-widest rounded-full border border-blue-500/20 flex items-center whitespace-nowrap">
+                                            <InformationCircleIcon className="h-3 w-3 mr-1" /> EVENT ONLY
                                         </span>
                                     )}
                                     {holiday.is_recurring && (
-                                        <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-md">
-                                            Recurring
+                                        <span className="px-3 py-1 bg-purple-500/10 text-purple-500 text-[9px] font-black uppercase tracking-widest rounded-full border border-purple-500/20 whitespace-nowrap">
+                                            RECURRING
                                         </span>
                                     )}
                                 </div>
                             </div>
 
                             {holiday.is_today && (
-                                <div className={`mt-2 py-1 px-3 bg-gradient-to-r ${theme.primaryGradient} text-white text-xs font-bold rounded-full inline-block animate-pulse`}>
-                                    TODAY! 🎉
+                                <div className={`absolute bottom-0 right-0 py-2 px-6 bg-gradient-to-l ${theme.primaryGradient} text-white text-[10px] font-black uppercase tracking-widest rounded-tl-3xl shadow-2xl animate-pulse`}>
+                                    ACTIVE TODAY! 🎉
                                 </div>
                             )}
                         </div>
                     ))}
 
                     {holidays.length === 0 && (
-                        <div className="col-span-full py-20 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                            <CalendarDaysIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-medium text-gray-900">No holidays found</h3>
-                            <p className="text-gray-500 mt-2">Get started by adding your first company holiday.</p>
+                        <div className="col-span-full py-32 text-center bg-white/5 rounded-3xl border-2 border-dashed border-white/10">
+                            <CalendarDaysIcon className="h-20 w-20 text-slate-700 mx-auto mb-6 opacity-50" />
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tight">Zero Registry Entries</h3>
+                            <p className="text-slate-500 mt-2 font-medium tracking-tight">Initiate the company calendar by adding the first organizational event.</p>
+                            <button
+                                onClick={() => handleOpenModal()}
+                                className="mt-8 px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all"
+                            >
+                                START REGISTRY
+                            </button>
                         </div>
                     )}
                 </div>
@@ -216,50 +242,54 @@ const HolidayManagement = () => {
 
             {/* Modal Overlay */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform animate-in slide-in-from-bottom-8 duration-300">
-                        <div className={`p-6 bg-gradient-to-r ${theme.primaryGradient} text-white`}>
-                            <div className="flex justify-between items-center">
-                                <h2 className="text-2xl font-bold">{editingHoliday ? 'Edit Holiday' : 'Add New Holiday'}</h2>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="relative bg-[#0B1120] rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full max-w-lg overflow-hidden transform animate-in zoom-in-95 duration-200">
+                        <div className={`p-10 bg-gradient-to-br ${theme.primaryGradient} relative overflow-hidden`}>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/3"></div>
+                            <div className="relative z-10 flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{editingHoliday ? 'Modify Entry' : 'New Registry'}</h2>
+                                    <p className="text-white/60 text-xs font-black uppercase tracking-widest mt-2">Calendar Configuration Protocol</p>
+                                </div>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
-                                    className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                                    className="p-3 hover:bg-white/20 rounded-2xl transition-all"
                                 >
-                                    <XCircleIcon className="h-6 w-6" />
+                                    <XCircleIcon className="h-7 w-7 text-white" />
                                 </button>
                             </div>
-                            <p className="text-white/80 text-sm mt-1">Set the details for your company holiday or event</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Holiday Name*</label>
+                        <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Holiday Title</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none"
+                                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 shadow-inner outline-none font-bold"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="e.g. Independence Day"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Date*</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Effective Date</label>
                                     <input
                                         type="date"
                                         required
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none"
+                                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 shadow-inner outline-none font-bold [color-scheme:dark]"
                                         value={formData.date}
                                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Emoji</label>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Icon/Emoji Token</label>
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none text-center text-xl"
+                                        className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-center text-2xl focus:ring-2 focus:ring-indigo-500/50 shadow-inner outline-none"
                                         value={formData.emoji}
                                         onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
                                         placeholder="🎉"
@@ -268,101 +298,72 @@ const HolidayManagement = () => {
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Registry Description</label>
                                 <textarea
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none min-h-[80px]"
+                                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 shadow-inner outline-none min-h-[120px] font-medium leading-relaxed"
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Tell employees about this holiday..."
+                                    placeholder="Tell employees about the context of this observational period..."
                                 ></textarea>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Type</label>
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Functional Classification</label>
                                 <select
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke-width=\'1.5\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M19.5 8.25l-7.5 7.5-7.5-7.5\' /%3E%3C/svg%3E")' }}
+                                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 shadow-inner outline-none appearance-none font-bold bg-no-repeat bg-[right_1.5rem_center] bg-[length:1em_1em]"
+                                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke-width=\'2.5\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M19.5 8.25l-7.5 7.5-7.5-7.5\' /%3E%3C/svg%3E")' }}
                                     value={formData.festival_type}
                                     onChange={(e) => setFormData({ ...formData, festival_type: e.target.value })}
                                 >
                                     {FESTIVAL_TYPES.map(type => (
-                                        <option key={type.value} value={type.value}>{type.label}</option>
+                                        <option key={type.value} value={type.value} className="bg-[#0B1120]">{type.label}</option>
                                     ))}
                                 </select>
                             </div>
 
-                            <div className="space-y-3 pt-2">
-                                <label className="flex items-center group cursor-pointer">
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={formData.is_holiday}
-                                            onChange={(e) => setFormData({ ...formData, is_holiday: e.target.checked })}
-                                        />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                                    </div>
-                                    <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Is Company Holiday</span>
-                                </label>
-
-                                <label className="flex items-center group cursor-pointer">
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={formData.is_recurring}
-                                            onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                                        />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                                    </div>
-                                    <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Repeats Yearly</span>
-                                </label>
-
-                                <label className="flex items-center group cursor-pointer">
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={formData.notify_employees}
-                                            onChange={(e) => setFormData({ ...formData, notify_employees: e.target.checked })}
-                                        />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                                    </div>
-                                    <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Notify Employees</span>
-                                </label>
+                            <div className="grid grid-cols-1 gap-6 pt-4">
+                                <Toggle label="Full Organizational Holiday" checked={formData.is_holiday} onChange={(v) => setFormData({ ...formData, is_holiday: v })} />
+                                <Toggle label="Recursive Yearly Registry" checked={formData.is_recurring} onChange={(v) => setFormData({ ...formData, is_recurring: v })} />
+                                <Toggle label="Broadcast Notification to All Employees" checked={formData.notify_employees} onChange={(v) => setFormData({ ...formData, notify_employees: v })} />
                             </div>
 
-                            <div className="flex space-x-3 pt-4">
+                            <div className="flex gap-4 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-gray-200 transition-colors"
+                                    className="flex-1 px-6 py-4 bg-white/5 border border-white/10 text-slate-400 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
                                 >
-                                    Cancel
+                                    Discard
                                 </button>
                                 <button
                                     type="submit"
-                                    className={`flex-1 px-4 py-3 bg-gradient-to-r ${theme.primaryGradient} text-white rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]`}
+                                    className={`flex-[2] px-6 py-4 bg-gradient-to-r ${theme.primaryGradient} text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] transition-all transform hover:scale-[1.02] active:scale-[0.98]`}
                                 >
-                                    {editingHoliday ? 'Update' : 'Save'} Holiday
+                                    {editingHoliday ? 'Update Registry' : 'Commit to Registry'}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-
-            {/* Glassmorphism Styles */}
-            <style jsx>{`
-        .bg-glass {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-        }
-      `}</style>
         </div>
     );
 };
+
+const Toggle = ({ label, checked, onChange }) => (
+    <label className="flex items-center group cursor-pointer justify-between bg-white/5 px-6 py-4 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
+        <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest group-hover:text-white transition-colors">{label}</span>
+        <div className="relative flex items-center">
+            <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={checked}
+                onChange={(e) => onChange(e.target.checked)}
+            />
+            <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500 peer-checked:after:bg-white"></div>
+        </div>
+    </label>
+);
 
 export default HolidayManagement;

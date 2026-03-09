@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminUserAPI, employeeAPI } from '../../services/api';
-import { isAdmin } from '../../utils/auth';
 import { toast } from 'react-toastify';
+import { ClockIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getRoleDisplayName } from '../../utils/roleConfig';
+import { useTheme } from '../../context/ThemeContext';
+
 const UsersAuthHome = () => {
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmUser, setConfirmUser] = useState(null);
-;
+  ;
   // const getUserRoleLabel = (user) => {
   //   if (!user) return 'Employee';
   //   if (user.is_superuser) return 'ADMIN';
@@ -30,11 +33,11 @@ const UsersAuthHome = () => {
   //   }
   // };
   const getUserRoleLabel = (user) => {
-  if (!user) return '—';
-  return user.profile?.role
-    ? getRoleDisplayName(user.profile.role)
-    : '—';
-};
+    if (!user) return '—';
+    return user.profile?.role
+      ? getRoleDisplayName(user.profile.role)
+      : '—';
+  };
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -137,115 +140,138 @@ const UsersAuthHome = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Users and Authentication</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-white tracking-tight">Users and Authentication</h1>
+          <p className="mt-1 text-sm text-slate-400">
             Manage application users, basic permissions and roles.
           </p>
         </div>
         <Link
           to="/users-auth/add"
-          className="inline-flex items-center px-3 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium shadow-sm hover:bg-indigo-700"
+          className={`inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white text-sm font-bold shadow-lg hover:shadow-indigo-500/20 transition-all transform hover:scale-105 active:scale-95`}
         >
-          + Add user
+          <span className="mr-2 text-lg">+</span> Add user
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Groups card */}
         <Link
           to="/users-auth/groups"
-          className="border border-indigo-200 rounded-xl p-4 hover:border-indigo-400 hover:shadow-sm transition bg-white flex flex-col justify-between"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/5 backdrop-blur-xl hover:border-white/20 hover:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
         >
-          <div>
-            <div className="text-xs font-semibold text-indigo-600 mb-1">Groups</div>
-            <div className="text-sm text-gray-800 font-medium">Manage role-based access</div>
-            <div className="mt-1 text-[11px] text-gray-500">
-              Add and edit groups and the permissions they contain.
+          <div className="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">Groups</div>
+              <div className="text-lg text-white font-bold mb-2">Manage role-based access</div>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Add and edit groups and the permissions they contain.
+              </p>
+            </div>
+            <div className="mt-6 flex items-center text-sm font-bold text-indigo-400 group-hover:text-indigo-300 transition-colors">
+              Open Dashboard <span className="ml-2 transform group-hover:translate-x-1 transition-transform">&rarr;</span>
             </div>
           </div>
-          <div className="mt-3 text-xs font-semibold text-indigo-600">Open &rarr;</div>
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
         </Link>
 
         {/* Permissions card */}
         <Link
           to="/users-auth/permissions"
-          className="border border-indigo-200 rounded-xl p-4 hover:border-indigo-400 hover:shadow-sm transition bg-white flex flex-col justify-between"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/5 backdrop-blur-xl hover:border-white/20 hover:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
         >
-          <div>
-            <div className="text-xs font-semibold text-indigo-600 mb-1">Permissions</div>
-            <div className="text-sm text-gray-800 font-medium">System permissions</div>
-            <div className="mt-1 text-[11px] text-gray-500">
-              Review and edit individual permission definitions.
+          <div className="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div className="text-xs font-black text-purple-400 uppercase tracking-widest mb-2">Permissions</div>
+              <div className="text-lg text-white font-bold mb-2">System permissions</div>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Review and edit individual permission definitions.
+              </p>
+            </div>
+            <div className="mt-6 flex items-center text-sm font-bold text-purple-400 group-hover:text-purple-300 transition-colors">
+              Review Permissions <span className="ml-2 transform group-hover:translate-x-1 transition-transform">&rarr;</span>
             </div>
           </div>
-          <div className="mt-3 text-xs font-semibold text-indigo-600">Open &rarr;</div>
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-colors"></div>
         </Link>
       </div>
 
       {/* User list below groups/permissions */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700">User Profiles</h2>
-          {loading && <span className="text-xs text-gray-400">Loading...</span>}
+      <div className="bg-white/5 rounded-2xl border border-white/5 shadow-2xl overflow-hidden backdrop-blur-xl">
+        <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-widest">User Profiles</h2>
+          {loading && (
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-slate-400 font-medium">Loading...</span>
+            </div>
+          )}
         </div>
-        <div className="max-h-[480px] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <div className="max-h-[600px] overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="bg-white/5 border-b border-white/5">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
                   Username
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
                   Email
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
                   First name
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
                   Last name
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
                   Role
                 </th>
-                <th className="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Staff status
+                <th className="px-6 py-4 text-center text-xs font-black text-slate-500 uppercase tracking-widest">
+                  Status
                 </th>
-                <th className="px-4 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-right text-xs font-black text-slate-500 uppercase tracking-widest">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="divide-y divide-white/5">
               {users.map((user) => (
                 <tr
                   key={user.id}
                   onClick={() => handleUserClick(user.id)}
-                  className="hover:bg-gray-50 cursor-pointer"
+                  className="group hover:bg-white/5 cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-2 text-indigo-600 font-medium truncate max-w-[160px]">
+                  <td className="px-6 py-4 text-indigo-400 font-bold truncate max-w-[160px]">
                     {user.username || '—'}
                   </td>
-                  <td className="px-4 py-2 text-gray-900 truncate max-w-[220px]">{user.email}</td>
-                  <td className="px-4 py-2 text-gray-700">{user.first_name || '—'}</td>
-                  <td className="px-4 py-2 text-gray-700">{user.last_name || '—'}</td>
-                  <td className="px-4 py-2 text-gray-700 text-xs font-medium">{getUserRoleLabel(user)}</td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-6 py-4 text-slate-300 font-medium truncate max-w-[220px]">{user.email}</td>
+                  <td className="px-6 py-4 text-slate-400">{user.first_name || '—'}</td>
+                  <td className="px-6 py-4 text-slate-400">{user.last_name || '—'}</td>
+                  <td className="px-6 py-4">
+                    <span className="px-2 py-1 rounded-md bg-indigo-500/10 text-indigo-300 text-[10px] font-black uppercase tracking-widest border border-indigo-500/20">
+                      {getUserRoleLabel(user)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
                     {user.is_staff ? (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-xs font-bold">
-                        ✓
-                      </span>
+                      <div className="flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-inner border border-emerald-500/20">
+                          <CheckIcon className="h-4 w-4" />
+                        </div>
+                      </div>
                     ) : (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-600 text-xs font-bold">
-                        ✕
-                      </span>
+                      <div className="flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-slate-500/10 flex items-center justify-center text-slate-500 border border-white/5">
+                          <XMarkIcon className="h-4 w-4" />
+                        </div>
+                      </div>
                     )}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-6 py-4 text-right">
                     <button
                       type="button"
                       onClick={(e) => openConfirm(user, e)}
                       disabled={deletingId === user.id}
-                      className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-60"
+                      className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold border border-white/5 bg-white/5 text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 disabled:opacity-50 transform hover:scale-105"
                     >
                       Delete
                     </button>
@@ -256,9 +282,9 @@ const UsersAuthHome = () => {
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-4 py-6 text-sm text-gray-500 text-center"
+                    className="px-6 py-12 text-sm text-slate-500 text-center font-medium italic"
                   >
-                    No users found.
+                    No users found in the system.
                   </td>
                 </tr>
               )}
@@ -267,20 +293,24 @@ const UsersAuthHome = () => {
         </div>
       </div>
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={closeConfirm}></div>
-          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-sm mx-4">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-800">Delete user</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#070B14]/80 backdrop-blur-sm" onClick={closeConfirm}></div>
+          <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl w-full max-w-sm border border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
+            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/5">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest">Delete user</h3>
+              <button onClick={closeConfirm} className="text-slate-400 hover:text-white transition-colors">
+                <XMarkIcon className="h-5 w-5" />
+              </button>
             </div>
-            <div className="px-6 py-4 text-sm text-gray-700">
+            <div className="px-6 py-8 text-sm text-slate-300 leading-relaxed">
               Are you sure you want to delete
-              <span className="font-semibold"> {confirmUser?.username || confirmUser?.email}</span>? This action cannot be undone.
+              <span className="font-black text-white mx-1"> {confirmUser?.username || confirmUser?.email}</span>?
+              <p className="mt-2 text-red-400 font-bold">This action cannot be undone.</p>
             </div>
-            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+            <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex justify-end space-x-3">
               <button
                 type="button"
-                className="px-3 py-1.5 text-xs rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100"
+                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
                 onClick={closeConfirm}
                 disabled={!!deletingId}
               >
@@ -288,11 +318,11 @@ const UsersAuthHome = () => {
               </button>
               <button
                 type="button"
-                className="px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+                className="px-6 py-2 text-xs font-black rounded-xl bg-red-600 text-white hover:bg-red-500 shadow-lg shadow-red-900/20 transition-all disabled:opacity-60 transform hover:scale-105 active:scale-95"
                 onClick={() => handleDelete(confirmUser)}
                 disabled={!!deletingId}
               >
-                {deletingId ? 'Deleting…' : 'Delete'}
+                {deletingId ? 'Deleting…' : 'Delete User'}
               </button>
             </div>
           </div>

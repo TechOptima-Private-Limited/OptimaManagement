@@ -5,7 +5,6 @@ import {
   XMarkIcon,
   CheckIcon,
   TrashIcon,
-  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import { notificationAPI } from '../../services/api';
@@ -25,13 +24,10 @@ const NotificationCenter = () => {
     fetchNotifications();
     fetchUnreadCount();
 
-    // Set up polling for real-time updates
     const interval = setInterval(() => {
       fetchUnreadCount();
-      if (showDropdown) {
-        fetchNotifications();
-      }
-    }, 30000); // Check every 30 seconds
+      if (showDropdown) fetchNotifications();
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [filter, showDropdown]);
@@ -41,14 +37,12 @@ const NotificationCenter = () => {
       setLoading(true);
       const params = filter === 'unread' ? { unread_only: true } : {};
       const response = await notificationAPI.getNotifications(params);
-
       setNotifications(response.data.results || []);
       if (response.data.unread_count !== undefined) {
         setUnreadCount(response.data.unread_count);
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
-      // For development, show some static data if API fails
       setNotifications([]);
       setUnreadCount(0);
     } finally {
@@ -69,19 +63,10 @@ const NotificationCenter = () => {
   const markAsRead = async (notificationId) => {
     try {
       await notificationAPI.markAsRead(notificationId);
-
-      // Update local state
       setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === notificationId
-            ? { ...notif, is_read: true }
-            : notif
-        )
+        prev.map(notif => notif.id === notificationId ? { ...notif, is_read: true } : notif)
       );
-
-      // Update unread count
       setUnreadCount(prev => Math.max(0, prev - 1));
-
     } catch (error) {
       toast.error('Failed to mark notification as read');
     }
@@ -90,13 +75,8 @@ const NotificationCenter = () => {
   const markAllAsRead = async () => {
     try {
       await notificationAPI.markAllAsRead();
-
-      // Update local state
-      setNotifications(prev =>
-        prev.map(notif => ({ ...notif, is_read: true }))
-      );
+      setNotifications(prev => prev.map(notif => ({ ...notif, is_read: true })));
       setUnreadCount(0);
-
       toast.success('All notifications marked as read');
     } catch (error) {
       toast.error('Failed to mark all notifications as read');
@@ -106,16 +86,9 @@ const NotificationCenter = () => {
   const deleteNotification = async (notificationId) => {
     try {
       await notificationAPI.deleteNotification(notificationId);
-
-      // Update local state
-      const deletedNotification = notifications.find(n => n.id === notificationId);
+      const deleted = notifications.find(n => n.id === notificationId);
       setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
-
-      // Update unread count if deleted notification was unread
-      if (deletedNotification && !deletedNotification.is_read) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-
+      if (deleted && !deleted.is_read) setUnreadCount(prev => Math.max(0, prev - 1));
       toast.success('Notification deleted');
     } catch (error) {
       toast.error('Failed to delete notification');
@@ -123,31 +96,18 @@ const NotificationCenter = () => {
   };
 
   const handleNotificationClick = async (notification) => {
-    // Mark as read if unread
-    if (!notification.is_read) {
-      await markAsRead(notification.id);
-    }
-
-    // Navigate to action URL if available
+    if (!notification.is_read) await markAsRead(notification.id);
     if (notification.action_url) {
-      if (notification.action_url.startsWith('/')) {
-        navigate(notification.action_url);
-      } else {
-        window.location.href = notification.action_url;
-      }
+      if (notification.action_url.startsWith('/')) navigate(notification.action_url);
+      else window.location.href = notification.action_url;
     }
-
-    // Close dropdown
     setShowDropdown(false);
   };
 
   const handleEnableNotifications = async () => {
     try {
       const registration = await registerServiceWorker();
-      if (!registration) {
-        toast.error('Service Worker registration failed');
-        return;
-      }
+      if (!registration) { toast.error('Service Worker registration failed'); return; }
 
       let subscription;
       try {
@@ -162,12 +122,8 @@ const NotificationCenter = () => {
         return;
       }
 
-      console.log('Sending subscription to backend:', subscription);
-
-      // Send subscription to backend using our standard api client
-      // NEW: Pointing to our custom JWT-aware endpoint
       const response = await api.post('/notifications/save-webpush/', {
-        subscription: subscription,
+        subscription,
         browser: navigator.userAgent,
         status: true
       });
@@ -182,148 +138,103 @@ const NotificationCenter = () => {
     }
   };
 
-  const NotificationItem = ({ notification }) => {
-    const getNotificationIcon = (type) => {
-      switch (type) {
-        case 'ATTENDANCE_EDIT_REQUEST':
-          return '🕐';
-        case 'ATTENDANCE_EDIT_APPROVED':
-          return '✅';
-        case 'ATTENDANCE_EDIT_REJECTED':
-          return '❌';
-        case 'LEAVE_REQUEST':
-          return '📅';
-        case 'LEAVE_APPROVED':
-          return '✅';
-        case 'LEAVE_REJECTED':
-          return '❌';
-        case 'WFH_REQUEST':
-          return '🏠';
-        case 'WFH_APPROVED':
-          return '✅';
-        case 'WFH_REJECTED':
-          return '❌';
-        case 'RESOURCE_REQUEST':
-          return '📦';
-        case 'RESOURCE_APPROVED':
-          return '✅';
-        case 'RESOURCE_REJECTED':
-          return '❌';
-        case 'RESOURCE_ASSIGNED':
-          return '👤';
-        case 'RESOURCE_APPROVAL_REQUIRED':
-          return '⏳';
-        default:
-          return '🔔';
-      }
+  // --- Notification type helpers ---
+  const getNotificationIcon = (type) => {
+    const map = {
+      ATTENDANCE_EDIT_REQUEST: '🕐',
+      ATTENDANCE_EDIT_APPROVED: '✅',
+      ATTENDANCE_EDIT_REJECTED: '❌',
+      LEAVE_REQUEST: '📅',
+      LEAVE_APPROVED: '✅',
+      LEAVE_REJECTED: '❌',
+      WFH_REQUEST: '🏠',
+      WFH_APPROVED: '✅',
+      WFH_REJECTED: '❌',
+      RESOURCE_REQUEST: '📦',
+      RESOURCE_APPROVED: '✅',
+      RESOURCE_REJECTED: '❌',
+      RESOURCE_ASSIGNED: '👤',
+      RESOURCE_APPROVAL_REQUIRED: '⏳',
     };
+    return map[type] || '🔔';
+  };
 
-    const getNotificationColor = (type) => {
-      switch (type) {
-        case 'ATTENDANCE_EDIT_REQUEST':
-          return 'border-l-blue-500 bg-blue-50';
-        case 'ATTENDANCE_EDIT_APPROVED':
-          return 'border-l-green-500 bg-green-50';
-        case 'ATTENDANCE_EDIT_REJECTED':
-          return 'border-l-red-500 bg-red-50';
-        case 'LEAVE_REQUEST':
-          return 'border-l-purple-500 bg-purple-50';
-        case 'LEAVE_APPROVED':
-          return 'border-l-green-500 bg-green-50';
-        case 'LEAVE_REJECTED':
-          return 'border-l-red-500 bg-red-50';
-        case 'WFH_REQUEST':
-          return 'border-l-indigo-500 bg-indigo-50';
-        case 'WFH_APPROVED':
-          return 'border-l-green-500 bg-green-50';
-        case 'WFH_REJECTED':
-          return 'border-l-red-500 bg-red-50';
-        case 'RESOURCE_REQUEST':
-          return 'border-l-orange-500 bg-orange-50';
-        case 'RESOURCE_APPROVED':
-          return 'border-l-green-500 bg-green-50';
-        case 'RESOURCE_REJECTED':
-          return 'border-l-red-500 bg-red-50';
-        case 'RESOURCE_ASSIGNED':
-          return 'border-l-blue-500 bg-blue-50';
-        case 'RESOURCE_APPROVAL_REQUIRED':
-          return 'border-l-yellow-500 bg-yellow-50';
-        default:
-          return 'border-l-gray-500 bg-gray-50';
-      }
-    };
+  const getAccentColor = (type) => {
+    if (!type) return 'border-l-gray-500';
+    if (type.includes('APPROVED')) return 'border-l-emerald-500';
+    if (type.includes('REJECTED')) return 'border-l-rose-500';
+    if (type.includes('LEAVE')) return 'border-l-violet-500';
+    if (type.includes('WFH')) return 'border-l-indigo-500';
+    if (type.includes('RESOURCE')) return 'border-l-amber-500';
+    if (type.includes('ATTENDANCE')) return 'border-l-blue-500';
+    return 'border-l-gray-500';
+  };
 
-    return (
-      <div
-        className={`
-          p-3 border-l-4 cursor-pointer hover:bg-gray-50 transition-colors
-          ${notification.is_read ? 'opacity-75' : 'bg-white'}
-          ${getNotificationColor(notification.notification_type)}
-        `}
-        onClick={() => handleNotificationClick(notification)}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-1">
-              <span className="text-lg">{getNotificationIcon(notification.notification_type)}</span>
-              <h4 className={`text-sm font-medium ${notification.is_read ? 'text-gray-600' : 'text-gray-900'}`}>
-                {notification.title}
-              </h4>
-              {!notification.is_read && (
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              )}
-            </div>
-
-            <p className={`text-xs ${notification.is_read ? 'text-gray-500' : 'text-gray-700'} mb-2 line-clamp-2`}>
-              {notification.message}
-            </p>
-
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>From: {notification.sender_name || 'System'}</span>
-              <span>{notification.time_since || 'Just now'}</span>
-            </div>
-
-            {notification.action_text && (
-              <div className="mt-2">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {notification.action_text}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-1 ml-2">
+  const NotificationItem = ({ notification }) => (
+    <div
+      className={`
+        p-3 border-l-4 cursor-pointer transition-all duration-200
+        hover:bg-white/5
+        ${notification.is_read ? 'opacity-60' : 'bg-white/3'}
+        ${getAccentColor(notification.notification_type)}
+      `}
+      onClick={() => handleNotificationClick(notification)}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center space-x-2 mb-1">
+            <span className="text-base flex-shrink-0">{getNotificationIcon(notification.notification_type)}</span>
+            <h4 className={`text-xs font-semibold truncate ${notification.is_read ? 'text-gray-400' : 'text-white'}`}>
+              {notification.title}
+            </h4>
             {!notification.is_read && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  markAsRead(notification.id);
-                }}
-                className="p-1 text-gray-400 hover:text-green-600"
-                title="Mark as read"
-              >
-                <CheckIcon className="h-4 w-4" />
-              </button>
+              <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full flex-shrink-0 animate-pulse" />
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteNotification(notification.id);
-              }}
-              className="p-1 text-gray-400 hover:text-red-600"
-              title="Delete"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </button>
           </div>
+
+          <p className="text-xs text-gray-400 mb-2 line-clamp-2 leading-relaxed">
+            {notification.message}
+          </p>
+
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span>From: {notification.sender_name || 'System'}</span>
+            <span>{notification.time_since || 'Just now'}</span>
+          </div>
+
+          {notification.action_text && (
+            <div className="mt-2">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 border border-indigo-500/30 text-indigo-300">
+                {notification.action_text}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center space-x-1 ml-2 flex-shrink-0">
+          {!notification.is_read && (
+            <button
+              onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
+              className="p-1 text-gray-500 hover:text-emerald-400 transition-colors duration-200"
+              title="Mark as read"
+            >
+              <CheckIcon className="h-3.5 w-3.5" />
+            </button>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}
+            className="p-1 text-gray-500 hover:text-rose-400 transition-colors duration-200"
+            title="Delete"
+          >
+            <TrashIcon className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
 
   return (
     <div className="relative">
-      {/* Notification Bell Icon - Glassmorphism style to match Navbar */}
+      {/* Bell Button */}
       <button
         onClick={() => setShowDropdown(!showDropdown)}
         className="p-2.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl relative focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 backdrop-blur-sm border border-white/20"
@@ -331,59 +242,57 @@ const NotificationCenter = () => {
       >
         <BellIcon className="h-6 w-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center border-2 border-white shadow-lg font-bold">
+          <span className="absolute -top-1 -right-1 h-5 w-5 bg-indigo-500 text-white text-xs rounded-full flex items-center justify-center border-2 border-[#0B1120] shadow-lg font-bold animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
-      {/* Notification Dropdown */}
+      {/* Dropdown */}
       {showDropdown && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-30"
-            onClick={() => setShowDropdown(false)}
-          />
+          <div className="fixed inset-0 z-30" onClick={() => setShowDropdown(false)} />
 
-          {/* Dropdown Content - Premium glassmorphism */}
-          <div className="absolute right-0 mt-3 w-80 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl py-1 z-50 border border-white/30 max-h-96 overflow-hidden transition-all duration-300">
+          {/* Panel */}
+          <div className="absolute right-0 mt-3 w-80 bg-[#0d1226]/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 z-50 border border-white/10 max-h-[30rem] overflow-hidden transition-all duration-300">
+
             {/* Header */}
-            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="px-4 py-3 border-b border-white/10 bg-white/5">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  Notifications
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-sm font-semibold text-white">Notifications</h3>
                   {unreadCount > 0 && (
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 border border-indigo-500/30 text-indigo-300">
                       {unreadCount} new
                     </span>
                   )}
-                </h3>
+                </div>
                 <button
                   onClick={() => setShowDropdown(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-500 hover:text-white transition-colors duration-200"
                 >
                   <XMarkIcon className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* Filter and Actions */}
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex space-x-2">
+              {/* Filter Tabs */}
+              <div className="flex items-center justify-between mt-2.5">
+                <div className="flex space-x-1">
                   <button
                     onClick={() => setFilter('all')}
-                    className={`px-2 py-1 text-xs rounded-full ${filter === 'all'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    className={`px-3 py-1 text-xs rounded-lg font-medium transition-all duration-200 ${filter === 'all'
+                      ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                   >
                     All
                   </button>
                   <button
                     onClick={() => setFilter('unread')}
-                    className={`px-2 py-1 text-xs rounded-full ${filter === 'unread'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    className={`px-3 py-1 text-xs rounded-lg font-medium transition-all duration-200 ${filter === 'unread'
+                      ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                   >
                     Unread ({unreadCount})
@@ -393,41 +302,44 @@ const NotificationCenter = () => {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
                   >
                     Mark all read
                   </button>
                 )}
               </div>
 
+              {/* Enable Desktop Notifications */}
               <div className="mt-3">
                 <button
                   onClick={handleEnableNotifications}
-                  className="w-full flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-xs font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-700 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/20"
                 >
-                  <BellIcon className="h-4 w-4 mr-2" />
+                  <BellIcon className="h-3.5 w-3.5 mr-2" />
                   Enable Desktop Notifications
                 </button>
               </div>
             </div>
 
             {/* Notifications List */}
-            <div className="max-h-72 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
               {loading ? (
                 <div className="p-6 text-center">
                   <LoadingSpinner size="small" />
                   <p className="text-xs text-gray-500 mt-2">Loading notifications...</p>
                 </div>
               ) : notifications.length === 0 ? (
-                <div className="p-6 text-center">
-                  <BellIcon className="mx-auto h-8 w-8 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
+                <div className="p-8 text-center">
+                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3">
+                    <BellIcon className="h-6 w-6 text-gray-500" />
+                  </div>
+                  <h3 className="text-sm font-medium text-gray-300">No notifications</h3>
                   <p className="mt-1 text-xs text-gray-500">
-                    {filter === 'unread' ? 'You have no unread notifications' : 'You have no notifications yet'}
+                    {filter === 'unread' ? 'No unread notifications' : "You're all caught up!"}
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-white/5">
                   {Array.isArray(notifications) && notifications.map((notification) => (
                     <NotificationItem key={notification.id} notification={notification} />
                   ))}
@@ -437,16 +349,15 @@ const NotificationCenter = () => {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
+              <div className="px-4 py-2.5 border-t border-white/10 bg-white/5">
                 <button
                   onClick={() => {
                     setShowDropdown(false);
-                    // Navigate to attendance page to see all requests
                     navigate('/attendance');
                   }}
-                  className="w-full text-center text-xs text-blue-600 hover:text-blue-800"
+                  className="w-full text-center text-xs text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
                 >
-                  View all in Attendance
+                  View all in Attendance →
                 </button>
               </div>
             )}
