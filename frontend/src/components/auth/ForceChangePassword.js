@@ -2,9 +2,24 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon, SparklesIcon, BuildingOfficeIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon, SparklesIcon, BuildingOfficeIcon, KeyIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI } from '../../services/api';
+
+// ── Password complexity rules (same as Settings.js) ──────────────────────
+const RULES = [
+    { id: 'length', label: 'At least 8 characters', test: (p) => p.length >= 8 },
+    { id: 'upper', label: 'One uppercase letter (A-Z)', test: (p) => /[A-Z]/.test(p) },
+    { id: 'lower', label: 'One lowercase letter (a-z)', test: (p) => /[a-z]/.test(p) },
+    { id: 'number', label: 'One number (0-9)', test: (p) => /[0-9]/.test(p) },
+    { id: 'special', label: 'One special character (!@#$%^&*…)', test: (p) => /[^A-Za-z0-9]/.test(p) },
+];
+
+const validatePassword = (password) => {
+    const failed = RULES.filter((r) => !r.test(password));
+    return failed.length === 0 ? null : failed.map((r) => r.label).join(', ');
+};
+// ─────────────────────────────────────────────────────────────────────────
 
 const ForceChangePassword = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -14,7 +29,9 @@ const ForceChangePassword = () => {
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
-    const password = watch('new_password');
+    const password = watch('new_password') || '';
+    const rulesStatus = RULES.map((r) => ({ ...r, passed: r.test(password) }));
+    const allPassed = rulesStatus.every((r) => r.passed);
 
     const onSubmit = async (data) => {
         setLoading(true);
@@ -128,7 +145,10 @@ const ForceChangePassword = () => {
                                     <input
                                         {...register('new_password', {
                                             required: 'New password required',
-                                            minLength: { value: 8, message: 'Minimum 8 characters required' }
+                                            validate: (v) => {
+                                                const err = validatePassword(v);
+                                                return err ? `Missing: ${err}` : true;
+                                            }
                                         })}
                                         type={showPassword ? 'text' : 'password'}
                                         className={`${inputClass} pr-12`}
@@ -144,6 +164,21 @@ const ForceChangePassword = () => {
                                 </div>
                                 {errors.new_password && (
                                     <p className="mt-2 text-[10px] font-black text-rose-500 uppercase tracking-wider">{errors.new_password.message}</p>
+                                )}
+                                {/* Live complexity checklist */}
+                                {password && password.length > 0 && (
+                                    <div className="mt-3 space-y-1.5 p-3 rounded-xl bg-white/5 border border-white/5">
+                                        {rulesStatus.map((rule) => (
+                                            <div key={rule.id} className="flex items-center space-x-2">
+                                                {rule.passed
+                                                    ? <CheckCircleIcon className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                                                    : <XCircleIcon className="h-3.5 w-3.5 text-gray-600 flex-shrink-0" />}
+                                                <span className={`text-[10px] font-medium ${rule.passed ? 'text-emerald-400' : 'text-gray-500'}`}>
+                                                    {rule.label}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
 
@@ -177,7 +212,7 @@ const ForceChangePassword = () => {
 
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || !allPassed}
                                 className="w-full py-5 px-6 rounded-[1.5rem] bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-700 text-white font-black text-sm uppercase tracking-[0.25em] shadow-[0_20px_40px_-10px_rgba(79,70,229,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(79,70,229,0.4)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:translate-y-0"
                             >
                                 {loading ? 'Updating Credentials...' : 'Update & Secure'}

@@ -31,6 +31,25 @@ from utils.roles import (
     ROLE_CATEGORIES,
     get_role_category
 )
+import re
+
+
+def validate_password_complexity(password):
+    """Return an error string if password does not meet complexity requirements, else None."""
+    errors = []
+    if len(password) < 8:
+        errors.append('at least 8 characters')
+    if not re.search(r'[A-Z]', password):
+        errors.append('one uppercase letter (A-Z)')
+    if not re.search(r'[a-z]', password):
+        errors.append('one lowercase letter (a-z)')
+    if not re.search(r'[0-9]', password):
+        errors.append('one number (0-9)')
+    if not re.search(r'[^A-Za-z0-9]', password):
+        errors.append('one special character (!@#$%^&* etc.)')
+    if errors:
+        return f"Password must include: {', '.join(errors)}."
+    return None
 
 
 @api_view(['POST'])
@@ -293,8 +312,9 @@ def admin_set_user_password(request, user_id):
         return Response({'detail': 'Password and confirmation are required.'}, status=status.HTTP_400_BAD_REQUEST)
     if password != password_confirm:
         return Response({'detail': "Passwords don't match."}, status=status.HTTP_400_BAD_REQUEST)
-    if len(password) < 8:
-        return Response({'detail': 'Password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+    complexity_error = validate_password_complexity(password)
+    if complexity_error:
+        return Response({'detail': complexity_error}, status=status.HTTP_400_BAD_REQUEST)
 
     user.set_password(password)
     user.save()
@@ -316,8 +336,9 @@ def change_password(request):
         return Response({'detail': 'Current password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
     if new_password != new_password_confirm:
         return Response({'detail': "Passwords don't match."}, status=status.HTTP_400_BAD_REQUEST)
-    if len(new_password) < 8:
-        return Response({'detail': 'Password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+    complexity_error = validate_password_complexity(new_password)
+    if complexity_error:
+        return Response({'detail': complexity_error}, status=status.HTTP_400_BAD_REQUEST)
 
     user.set_password(new_password)
     user.must_change_password = False  # Reset the flag after change

@@ -39,10 +39,6 @@ const BiometricIntegration = () => {
   const [syncingDevice, setSyncingDevice] = useState(null); // device id being synced
   const [syncResults, setSyncResults] = useState({}); // keyed by device.id
 
-  // Auto-sync state per device
-  const [autoSyncConfig, setAutoSyncConfig] = useState({}); // { [deviceId]: { enabled, interval } }
-  const autoSyncTimers = useRef({}); // { [deviceId]: intervalId }
-
   // Manual sync date picker
   const [syncDate, setSyncDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -57,10 +53,6 @@ const BiometricIntegration = () => {
     if (isHRManager() || isAdmin()) {
       fetchBiometricDevices();
     }
-    // Cleanup timers on unmount
-    return () => {
-      Object.values(autoSyncTimers.current).forEach(clearInterval);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -160,36 +152,39 @@ const BiometricIntegration = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Toggle auto-sync for a device
-  const toggleAutoSync = (device) => {
-    const cfg = autoSyncConfig[device.id] || { enabled: false, interval: 15 };
-    if (cfg.enabled) {
-      // Disable
-      clearInterval(autoSyncTimers.current[device.id]);
-      delete autoSyncTimers.current[device.id];
-      setAutoSyncConfig(prev => ({
-        ...prev,
-        [device.id]: { ...cfg, enabled: false },
-      }));
-      toast.info(`⏹ Auto-sync stopped for ${device.device_name}`);
-    } else {
-      // Enable — run immediately, then on interval
-      syncDevice(device);
-      const intervalMs = cfg.interval * 60 * 1000;
-      const timer = setInterval(() => syncDevice(device), intervalMs);
-      autoSyncTimers.current[device.id] = timer;
-      setAutoSyncConfig(prev => ({
-        ...prev,
-        [device.id]: { ...cfg, enabled: true },
-      }));
-      toast.success(`▶ Auto-sync started for ${device.device_name} every ${cfg.interval} min`);
+  const toggleAutoSync = async (device) => {
+    try {
+      const isEnabling = !device.auto_sync_enabled;
+
+      // Call API to patch
+      await attendanceAPI.updateBiometricDevice(device.id, {
+        auto_sync_enabled: isEnabling,
+        sync_interval_minutes: device.sync_interval_minutes || 15
+      });
+
+      // Refresh local list
+      await fetchBiometricDevices();
+
+      if (isEnabling) {
+        toast.success(`▶ Auto-sync started for ${device.device_name} (every ${device.sync_interval_minutes || 15} min)`);
+      } else {
+        toast.info(`⏹ Auto-sync stopped for ${device.device_name}`);
+      }
+    } catch (error) {
+      toast.error(`❌ Failed to ${!device.auto_sync_enabled ? 'enable' : 'disable'} auto sync for ${device.device_name}`);
     }
   };
 
-  const setAutoSyncInterval = (deviceId, minutes) => {
-    setAutoSyncConfig(prev => ({
-      ...prev,
-      [deviceId]: { ...(prev[deviceId] || { enabled: false }), interval: minutes },
-    }));
+  const setAutoSyncInterval = async (device, minutes) => {
+    try {
+      await attendanceAPI.updateBiometricDevice(device.id, {
+        sync_interval_minutes: minutes
+      });
+      fetchBiometricDevices();
+      toast.success(`Interval set to ${minutes} mins for ${device.device_name}`);
+    } catch (error) {
+      toast.error('Failed to update sync interval');
+    }
   };
 
   const getDeviceStatusIcon = (device) => {
@@ -261,7 +256,7 @@ const BiometricIntegration = () => {
             { label: 'Active Devices', value: devices.filter(d => d.is_active).length, icon: CheckCircleIcon, color: 'emerald' },
             {
               label: 'Auto-Syncing',
-              value: Object.values(autoSyncConfig).filter(c => c.enabled).length,
+              value: devices.filter(d => d.auto_sync_enabled).length,
               icon: ArrowPathIcon,
               color: 'violet',
             },
@@ -319,7 +314,6 @@ const BiometricIntegration = () => {
           ) : (
             <div className="divide-y divide-white/5">
               {devices.map(device => {
-                const cfg = autoSyncConfig[device.id] || { enabled: false, interval: 15 };
                 const isSyncing = syncingDevice === device.id;
                 const result = syncResults[device.id];
 
@@ -388,9 +382,9 @@ const BiometricIntegration = () => {
 
                         <div className="flex items-center gap-2">
                           <select
-                            value={cfg.interval}
-                            disabled={cfg.enabled}
-                            onChange={e => setAutoSyncInterval(device.id, Number(e.target.value))}
+                            value={device.sync_interval_minutes || 15}
+                            disabled={device.auto_sync_enabled}
+                            onChange={e => setAutoSyncInterval(device, Number(e.target.value))}
                             className="flex-1 bg-black/30 border border-white/10 rounded-lg text-slate-300 text-xs px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50"
                           >
                             {SYNC_INTERVALS.map(opt => (
@@ -399,12 +393,12 @@ const BiometricIntegration = () => {
                           </select>
                           <button
                             onClick={() => toggleAutoSync(device)}
-                            className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${cfg.enabled
+                            className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${device.auto_sync_enabled
                               ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 hover:bg-rose-500/30'
                               : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30'
                               }`}
                           >
-                            {cfg.enabled ? (
+                            {device.auto_sync_enabled ? (
                               <><StopIcon className="h-3.5 w-3.5 mr-1" /> Stop</>
                             ) : (
                               <><PlayIcon className="h-3.5 w-3.5 mr-1" /> Auto</>
@@ -412,10 +406,10 @@ const BiometricIntegration = () => {
                           </button>
                         </div>
 
-                        {cfg.enabled && (
+                        {device.auto_sync_enabled && (
                           <div className="flex items-center text-xs text-emerald-400 animate-pulse">
                             <ArrowPathIcon className="h-3.5 w-3.5 mr-1 animate-spin" />
-                            Auto-syncing every {cfg.interval} min (today)
+                            Auto-syncing every {device.sync_interval_minutes || 15} min (bg)
                           </div>
                         )}
                       </div>

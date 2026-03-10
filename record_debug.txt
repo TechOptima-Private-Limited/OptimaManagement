@@ -1,8 +1,0 @@
-Checking AttendanceRecord for TO-00095 on 2026-03-05
-Employee found: Sai pramodu Vedantam (ID: 7)
-Records by employee object: 1
-  Record ID: 82, Date: 2026-03-05, In: 09:52:49, Out: 15:09:02, EmpLink: 7
-
-Records by biometric_user_id: 2
-  Record ID: 48, Date: 2026-03-05, In: 09:52:49, Out: 10:36:24, EmpLink: NONE
-  Record ID: 82, Date: 2026-03-05, In: 09:52:49, Out: 15:09:02, EmpLink: 7

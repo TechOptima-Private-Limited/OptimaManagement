@@ -97,8 +97,6 @@ const AttendanceTracker = () => {
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [userPendingRequests, setUserPendingRequests] = useState([]);
   const [biometricDevices, setBiometricDevices] = useState([]);
-  const [lastSyncTime, setLastSyncTime] = useState(null);
-  const [isSyncing, setIsSyncing] = useState(false);
 
   const [stats, setStats] = useState({
     totalDays: 0,
@@ -147,31 +145,14 @@ const AttendanceTracker = () => {
     }
   }, [isManagementRole]);
 
-  // Auto-sync or auto-poll biometric data every 1 minute
+  // Auto-poll database for updates every 1 minute
   useEffect(() => {
-    // Management roles trigger the actual device sync
-    if (isManagementRole && biometricDevices.length > 0) {
-      // Sync immediately on mount
-      syncAllBiometricDevices();
+    const pollInterval = setInterval(() => {
+      fetchAttendanceRecords(true);
+    }, 60000);
 
-      // Then sync every 5 minutes to avoid device overload
-      const syncInterval = setInterval(() => {
-        console.log('🕒 Triggering scheduled biometric sync...');
-        syncAllBiometricDevices();
-      }, 300000); // 300000ms = 5 minutes
-
-
-      return () => clearInterval(syncInterval);
-    }
-    // Regular employees just poll the database for updates
-    else if (!isManagementRole) {
-      const pollInterval = setInterval(() => {
-        fetchAttendanceRecords(true);
-      }, 60000);
-
-      return () => clearInterval(pollInterval);
-    }
-  }, [isManagementRole, biometricDevices.length]);
+    return () => clearInterval(pollInterval);
+  }, []);
 
   useEffect(() => {
     fetchAttendanceRecords();
@@ -211,51 +192,6 @@ const AttendanceTracker = () => {
     }
   };
 
-  const syncAllBiometricDevices = async () => {
-    if (isSyncing || biometricDevices.length === 0) return;
-
-    setIsSyncing(true);
-    const today = new Date().toISOString().split('T')[0];
-    let totalSynced = 0;
-
-    try {
-      // Sync all active devices
-      for (const device of biometricDevices) {
-        try {
-          const response = await attendanceAPI.syncBiometricLogs(device.ip_address, today);
-          totalSynced += response.data.synced_count || 0;
-        } catch (error) {
-          const status = error.response?.status;
-          const errorData = error.response?.data;
-
-          if (status === 504 || errorData?.code === 'TIMEOUT') {
-            console.warn(`⏳ Device ${device.device_name} sync timeout: The device is either offline or too busy.`);
-          } else {
-            console.error(`❌ Failed to sync device ${device.device_name}:`, errorData?.error || error.message);
-          }
-        }
-
-      }
-
-      if (totalSynced > 0) {
-        setLastSyncTime(new Date());
-        // Show subtle notification
-        toast.success(`🔄 Auto-synced ${totalSynced} biometric records`, {
-          position: "bottom-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-        });
-      }
-
-      setLastSyncTime(new Date());
-      // Always refresh attendance records after a sync attempt
-      fetchAttendanceRecords(true);
-    } catch (error) {
-      console.error('Biometric auto-sync error:', error);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
 
   const fetchAttendanceRecords = async (silent = false) => {
     try {
@@ -865,16 +801,12 @@ const AttendanceTracker = () => {
 
             <div className="flex items-center space-x-4">
               {isManagementRole && biometricDevices.length > 0 && (
-                <div className={`flex items-center space-x-3 px-6 py-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-xl transition-all ${isSyncing ? 'border-indigo-500/30' : ''}`}>
-                  {isSyncing ? (
-                    <ArrowPathIcon className="h-5 w-5 text-indigo-400 animate-spin" />
-                  ) : (
-                    <ServerIcon className="h-5 w-5 text-indigo-400" />
-                  )}
+                <div className="flex items-center space-x-3 px-6 py-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-xl transition-all">
+                  <ServerIcon className="h-5 w-5 text-indigo-400" />
                   <div className="text-left">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Biometric Stream</p>
                     <p className="text-xs font-bold text-white uppercase">
-                      {isSyncing ? 'Syncing Nodes…' : `Active (${biometricDevices.length} Nodes)`}
+                      Active ({biometricDevices.length} Nodes)
                     </p>
                   </div>
                 </div>

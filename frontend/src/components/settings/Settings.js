@@ -9,7 +9,34 @@ import {
   KeyIcon,
   Cog6ToothIcon,
   ShieldCheckIcon,
+  CheckCircleIcon,
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
+
+// ── Password complexity rules ──────────────────────────────────────────────
+const RULES = [
+  { id: 'length', label: 'At least 8 characters', test: (p) => p.length >= 8 },
+  { id: 'upper', label: 'One uppercase letter (A-Z)', test: (p) => /[A-Z]/.test(p) },
+  { id: 'lower', label: 'One lowercase letter (a-z)', test: (p) => /[a-z]/.test(p) },
+  { id: 'number', label: 'One number (0-9)', test: (p) => /[0-9]/.test(p) },
+  { id: 'special', label: 'One special character (!@#$%^&*…)', test: (p) => /[^A-Za-z0-9]/.test(p) },
+];
+
+const getStrength = (password) => {
+  if (!password) return { score: 0, label: '', color: '' };
+  const passed = RULES.filter((r) => r.test(password)).length;
+  if (passed <= 1) return { score: 1, label: 'Very Weak', color: 'bg-red-500' };
+  if (passed === 2) return { score: 2, label: 'Weak', color: 'bg-orange-500' };
+  if (passed === 3) return { score: 3, label: 'Fair', color: 'bg-yellow-500' };
+  if (passed === 4) return { score: 4, label: 'Strong', color: 'bg-emerald-400' };
+  return { score: 5, label: 'Very Strong', color: 'bg-emerald-500' };
+};
+
+const validatePassword = (password) => {
+  const failed = RULES.filter((r) => !r.test(password));
+  return failed.length === 0 ? null : `Password must include: ${failed.map((r) => r.label.toLowerCase()).join(', ')}.`;
+};
+// ───────────────────────────────────────────────────────────────────────────
 
 const Settings = () => {
   const { theme } = useTheme();
@@ -22,10 +49,22 @@ const Settings = () => {
 
   const handleChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
+  const strength = getStrength(form.new_password);
+  const rulesStatus = RULES.map((r) => ({ ...r, passed: r.test(form.new_password) }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.old_password || !form.new_password || !form.new_password_confirm) {
       toast.error('All fields are required');
+      return;
+    }
+    const complexityError = validatePassword(form.new_password);
+    if (complexityError) {
+      toast.error(complexityError);
+      return;
+    }
+    if (form.new_password !== form.new_password_confirm) {
+      toast.error('New passwords do not match');
       return;
     }
     setSaving(true);
@@ -171,18 +210,62 @@ const Settings = () => {
               </div>
             </div>
 
-            {/* Security hint */}
-            <div className="flex items-start space-x-2 p-3 rounded-xl bg-white/5 border border-white/10">
-              <ShieldCheckIcon className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-gray-400">
-                Use at least 8 characters with a mix of letters, numbers, and symbols for a strong password.
-              </p>
-            </div>
+            {/* ── Password Strength Meter ── */}
+            {form.new_password.length > 0 && (
+              <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10">
+                {/* Bar */}
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Password Strength</span>
+                  <span className={`text-xs font-bold ${strength.score >= 4 ? 'text-emerald-400' : strength.score === 3 ? 'text-yellow-400' : 'text-red-400'}`}>
+                    {strength.label}
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= strength.score ? strength.color : 'bg-white/10'}`}
+                    />
+                  ))}
+                </div>
+                {/* Rules checklist */}
+                <div className="grid grid-cols-1 gap-1 mt-2">
+                  {rulesStatus.map((rule) => (
+                    <div key={rule.id} className="flex items-center space-x-2">
+                      {rule.passed
+                        ? <CheckCircleIcon className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                        : <XCircleIcon className="h-3.5 w-3.5 text-gray-600 flex-shrink-0" />}
+                      <span className={`text-xs ${rule.passed ? 'text-emerald-400' : 'text-gray-500'}`}>
+                        {rule.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {/* Confirm match indicator */}
+                {form.new_password_confirm.length > 0 && (
+                  <div className="flex items-center space-x-2 pt-1 border-t border-white/5">
+                    {form.new_password === form.new_password_confirm
+                      ? <><CheckCircleIcon className="h-3.5 w-3.5 text-emerald-400" /><span className="text-xs text-emerald-400">Passwords match</span></>
+                      : <><XCircleIcon className="h-3.5 w-3.5 text-red-400" /><span className="text-xs text-red-400">Passwords do not match</span></>}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Security hint (shown when no password entered yet) */}
+            {form.new_password.length === 0 && (
+              <div className="flex items-start space-x-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                <ShieldCheckIcon className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-gray-400">
+                  Password must be at least 8 characters and include uppercase, lowercase, number, and special character.
+                </p>
+              </div>
+            )}
 
             <div>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || strength.score < 5}
                 className={`inline-flex items-center px-5 py-2.5 rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/25 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
               >
                 <KeyIcon className="h-4 w-4 mr-2" />

@@ -242,6 +242,14 @@ ENCRYPTION_KEY = config('ENCRYPTION_KEY', default='')
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=CELERY_BROKER_URL)
 
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'auto-sync-biometric': {
+        'task': 'attendance.tasks.auto_sync_biometric_devices',
+        'schedule': crontab(minute='*'),  # runs every minute to check individual DB schedules
+    },
+}
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

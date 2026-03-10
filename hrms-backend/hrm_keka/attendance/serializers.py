@@ -64,7 +64,8 @@ class BiometricDeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiometricDevice
         fields = ['id', 'device_id', 'device_name', 'location', 'ip_address', 
-                  'is_active', 'last_sync', 'created_at']
+                  'is_active', 'auto_sync_enabled', 'sync_interval_minutes',
+                  'last_sync', 'created_at']
 
 
 class AttendanceCreateSerializer(serializers.Serializer):
