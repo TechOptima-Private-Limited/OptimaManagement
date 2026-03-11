@@ -176,7 +176,7 @@ class BiometricDevice(models.Model):
     ip_address = models.GenericIPAddressField()
     is_active = models.BooleanField(default=True)
     auto_sync_enabled = models.BooleanField(default=False)
-    sync_interval_minutes = models.IntegerField(default=15)
+    sync_interval_minutes = models.FloatField(default=15)
     last_sync = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     

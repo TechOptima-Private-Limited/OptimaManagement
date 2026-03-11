@@ -145,13 +145,47 @@ const AttendanceTracker = () => {
     }
   }, [isManagementRole]);
 
-  // Auto-poll database for updates every 1 minute
+  // Auto-poll database for updates every 10 seconds (reduced from 5 seconds)
   useEffect(() => {
-    const pollInterval = setInterval(() => {
-      fetchAttendanceRecords(true);
-    }, 60000);
+    // Only poll if tab is active to save resources and avoid broken pipe
+    const poll = () => {
+      if (document.visibilityState === 'visible') {
+        fetchAttendanceRecords(true);
+      }
+    };
 
-    return () => clearInterval(pollInterval);
+    const pollInterval = setInterval(poll, 10000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchAttendanceRecords(true);
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Refresh immediately when biometric sync is triggered from Biometric Integration
+  useEffect(() => {
+    const refresh = () => fetchAttendanceRecords(true);
+
+    const onStorage = (e) => {
+      if (e?.key === 'attendance_last_biometric_sync') refresh();
+    };
+
+    const onBiometricSync = () => refresh();
+
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('attendance:biometric_sync', onBiometricSync);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('attendance:biometric_sync', onBiometricSync);
+    };
   }, []);
 
   useEffect(() => {
@@ -170,8 +204,19 @@ const AttendanceTracker = () => {
       try {
         const resp = await authAPI.getMyPermissions();
         setPermissions(Array.isArray(resp?.data?.permissions) ? resp.data.permissions : []);
-      } catch (_) {
-        setPermissions([]);
+      } catch (error) {
+        // Handle broken pipe and network errors gracefully
+        if (error.code === 'ECONNRESET' || error.message.includes('Network Error')) {
+          console.warn('Network error fetching permissions, retrying in 2 seconds...');
+          setTimeout(() => {
+            authAPI.getMyPermissions()
+              .then(resp => setPermissions(Array.isArray(resp?.data?.permissions) ? resp.data.permissions : []))
+              .catch(() => setPermissions([]));
+          }, 2000);
+        } else {
+          console.error('Failed to fetch permissions:', error);
+          setPermissions([]);
+        }
       }
     })();
   }, []);
@@ -194,8 +239,13 @@ const AttendanceTracker = () => {
 
 
   const fetchAttendanceRecords = async (silent = false) => {
+    // Use a ref or a flag to prevent overlapping requests
+    if (fetchAttendanceRecords.isLoading && silent) return;
+    
     try {
       if (!silent) setLoading(true);
+      fetchAttendanceRecords.isLoading = true;
+      
       const params = {};
       if (filters.start_date) params.start_date = filters.start_date;
       if (filters.end_date) params.end_date = filters.end_date;
@@ -205,8 +255,10 @@ const AttendanceTracker = () => {
 
       const response = await attendanceAPI.getAttendanceRecords(params);
       console.log('Fetched attendance records:', response.data);
-      const records = response.data.results || response.data;
-      setAttendanceRecords(Array.isArray(records) ? records : []);
+      
+      // Handle the case where response might be wrapped in { results, ... } or just an array
+      const records = Array.isArray(response.data) ? response.data : (response.data.results || []);
+      setAttendanceRecords(records);
 
       // Both HR Manager and Manager get pending approvals count
       if (isManagementRole && response.data.pending_approvals_count !== undefined) {
@@ -215,19 +267,22 @@ const AttendanceTracker = () => {
 
       // Filter records for the target employee to calculate stats (matching the user or filter)
       const targetId = filters.employee_id || user?.employee_id;
-      const recordsToStat = Array.isArray(records)
-        ? records.filter(r => {
-          // Check all possible identity fields to ensure a match
-          const recordId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
-          return String(recordId) === String(targetId);
-        })
-        : [];
+      const recordsToStat = records.filter(r => {
+        // Check all possible identity fields to ensure a match
+        const recordId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
+        return String(recordId) === String(targetId);
+      });
       calculateStats(recordsToStat);
     } catch (error) {
-      toast.error('Failed to fetch attendance records');
-      setAttendanceRecords([]);
+      if (!silent) {
+        toast.error('Failed to fetch attendance records');
+      }
+      console.error('Attendance fetch error:', error);
+      // Don't clear records on silent error to avoid UI flicker
+      if (!silent) setAttendanceRecords([]);
     } finally {
-      setLoading(false);
+      fetchAttendanceRecords.isLoading = false;
+      if (!silent) setLoading(false);
     }
   };
 

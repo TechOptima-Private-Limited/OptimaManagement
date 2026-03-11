@@ -29,6 +29,7 @@ openpyxl
 
 # Task Queue
 celery
+APScheduler==3.10.4
 
 # Image Processing
 pillow

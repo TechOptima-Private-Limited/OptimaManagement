@@ -200,6 +200,14 @@ SIMPLE_JWT = {
     'TOKEN_REFRESH_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenRefreshSerializer',
     'TOKEN_VERIFY_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenVerifySerializer',
     'TOKEN_BLACKLIST_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenBlacklistSerializer',
+
+    # Cookie-based authentication configuration
+    'AUTH_COOKIE': 'access_token',  # Cookie name for access token
+    'AUTH_COOKIE_DOMAIN': None,  # Cookie domain
+    'AUTH_COOKIE_SECURE': config('AUTH_COOKIE_SECURE', default=True, cast=bool),  # HTTPS only in production
+    'AUTH_COOKIE_HTTP_ONLY': True,  # HttpOnly flag to prevent XSS access
+    'AUTH_COOKIE_PATH': '/',  # Cookie path
+    'AUTH_COOKIE_SAMESITE': 'Lax',  # CSRF protection
 }
 
 AUTH_USER_MODEL = 'authentication.User'
@@ -238,17 +246,38 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Encryption key
 ENCRYPTION_KEY = config('ENCRYPTION_KEY', default='')
 
-# Celery Configuration
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=CELERY_BROKER_URL)
+# Celery Configuration (removed - switched back to APScheduler)
+# CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+# CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=CELERY_BROKER_URL)
 
-from celery.schedules import crontab
-CELERY_BEAT_SCHEDULE = {
-    'auto-sync-biometric': {
-        'task': 'attendance.tasks.auto_sync_biometric_devices',
-        'schedule': crontab(minute='*'),  # runs every minute to check individual DB schedules
-    },
+# Cache Configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,  # 5 minutes default timeout
+    }
 }
+
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+# APScheduler Configuration
+SCHEDULER_CONFIG = {
+    "apscheduler.executors.processpool": {
+        "type": "processpool",
+        "max_workers": "1",
+    },
+    "apscheduler.job_defaults": {
+        "coalesce": False,
+        "max_instances": 1,
+        "misfire_grace_time": 30,
+    },
+    "apscheduler.timezone": "UTC",
+}
+
+SCHEDULER_AUTOSTART = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

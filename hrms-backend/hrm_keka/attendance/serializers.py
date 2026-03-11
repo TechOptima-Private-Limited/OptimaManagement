@@ -69,10 +69,23 @@ class BiometricDeviceSerializer(serializers.ModelSerializer):
 
 
 class AttendanceCreateSerializer(serializers.Serializer):
-    date = serializers.DateField()
+    date = serializers.DateField(required=False)
     check_in_time = serializers.TimeField(required=False, allow_null=True)
     check_out_time = serializers.TimeField(required=False, allow_null=True)
     status = serializers.ChoiceField(choices=AttendanceRecord.STATUS_CHOICES)
+    notes = serializers.CharField(required=False, allow_blank=True)
+    check_in_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    check_in_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    check_out_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    check_out_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    edit_reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class AttendanceUpdateSerializer(serializers.Serializer):
+    date = serializers.DateField(required=False)
+    check_in_time = serializers.TimeField(required=False, allow_null=True)
+    check_out_time = serializers.TimeField(required=False, allow_null=True)
+    status = serializers.ChoiceField(choices=AttendanceRecord.STATUS_CHOICES, required=False)
     notes = serializers.CharField(required=False, allow_blank=True)
     check_in_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     check_in_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)

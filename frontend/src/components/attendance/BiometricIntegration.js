@@ -22,6 +22,8 @@ import LoadingSpinner from '../common/LoadingSpinner';
 
 // Auto-sync interval options (in minutes)
 const SYNC_INTERVALS = [
+  { label: '30 seconds', value: 0.5 },
+  { label: '1 minute', value: 1 },
   { label: '5 minutes', value: 5 },
   { label: '10 minutes', value: 10 },
   { label: '15 minutes', value: 15 },
@@ -117,6 +119,14 @@ const BiometricIntegration = () => {
     try {
       const response = await attendanceAPI.syncBiometricLogs(device.ip_address, syncDateToUse);
       const data = response.data;
+
+      try {
+        localStorage.setItem('attendance_last_biometric_sync', String(Date.now()));
+        window.dispatchEvent(new Event('storage'));
+      } catch (_) {
+        // ignore
+      }
+
       setSyncResults(prev => ({
         ...prev,
         [device.id]: {

@@ -607,6 +607,7 @@ const Dashboard = () => {
             attendanceData.check_in_lng = Number(coords.lng).toFixed(6);
           }
           await attendanceAPI.markManualAttendance(attendanceData);
+          checkTodayAttendance(true);
         } catch (err) {
           console.error('Failed to submit WFH check-in:', err);
           toast.error('Failed to submit check-in to server');
@@ -646,6 +647,7 @@ const Dashboard = () => {
         attendanceData.check_in_lng = Number(coords.lng).toFixed(6);
       }
       await attendanceAPI.markManualAttendance(attendanceData);
+      checkTodayAttendance(true);
     } catch (err) {
       console.error('Failed to submit office check-in:', err);
       toast.error('Failed to submit check-in to server');
@@ -682,7 +684,7 @@ const Dashboard = () => {
       }
 
       toast.success(`✅ Checked out successfully! Total worked: ${totalWorkedHours}`);
-      checkTodayAttendance();
+      await checkTodayAttendance(true);
     } catch (error) {
       toast.error('Failed to check out. Please try again.');
       console.error('Check-out error:', error);
