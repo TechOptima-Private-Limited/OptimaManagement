@@ -12,6 +12,7 @@ from django.contrib.auth import get_user_model
 import socket
 from datetime import datetime, date
 from .models import AttendanceRecord, BiometricDevice, WorkFromHomeRequest, AttendanceLocationPing, BiometricAttendanceLog
+from django.db.models import Max, Q, Subquery
 from .serializers import (
     AttendanceRecordSerializer, BiometricDeviceSerializer, AttendanceCreateSerializer, AttendanceUpdateSerializer,
     WorkFromHomeRequestSerializer, WorkFromHomeApplySerializer, AttendanceLocationPingSerializer
@@ -563,6 +564,37 @@ class AttendanceRecordListView(generics.ListAPIView):
             queryset = queryset.filter(date__gte=start_date)
         if end_date:
             queryset = queryset.filter(date__lte=end_date)
+
+        # De-duplicate results (important when biometric/manual sync creates multiple rows)
+        # Keep the latest row per (employee, date) for employee-linked records
+        # and per (biometric_user_id, date) for biometric-only records.
+        try:
+            base_ids = queryset.values('pk')
+
+            employee_latest_ids = AttendanceRecord.objects.filter(
+                pk__in=base_ids,
+                employee__isnull=False,
+            ).values('employee_id', 'date').annotate(
+                latest_id=Max('id')
+            ).values('latest_id')
+
+            biometric_latest_ids = AttendanceRecord.objects.filter(
+                pk__in=base_ids,
+                employee__isnull=True,
+            ).exclude(
+                biometric_user_id__isnull=True
+            ).values('biometric_user_id', 'date').annotate(
+                latest_id=Max('id')
+            ).values('latest_id')
+
+            queryset = queryset.filter(
+                Q(id__in=Subquery(employee_latest_ids)) |
+                Q(id__in=Subquery(biometric_latest_ids)) |
+                Q(employee__isnull=True, biometric_user_id__isnull=True)
+            )
+        except Exception:
+            # If de-dupe fails for any reason, fall back to original queryset.
+            pass
         
         return queryset.order_by('-date')
     
