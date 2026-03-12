@@ -103,6 +103,7 @@ const Navbar = ({ onMenuToggle }) => {
       else if (q.includes('asset')) navigate('/my-assets');
       else if (q.includes('wfh') || q.includes('home')) navigate('/work-from-home');
       else if (q.includes('setting')) navigate('/settings');
+      else navigate(`/employees?search=${encodeURIComponent(searchQuery.trim())}`);
       setShowDropdown(false);
       setSearchQuery('');
     }
@@ -181,7 +182,7 @@ const Navbar = ({ onMenuToggle }) => {
               </div>
 
               {/* Dropdown Results */}
-              {showDropdown && (searchQuery.trim()) && (
+              {(showDropdown && searchQuery.trim()) && (
                 <div className="absolute mt-2 w-full bg-[#0B1120]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="max-h-[min(80vh,500px)] overflow-y-auto custom-scrollbar px-3 py-3">
                     {/* Quick Links Section */}
@@ -192,9 +193,9 @@ const Navbar = ({ onMenuToggle }) => {
                           <button
                             key={link.path}
                             onClick={() => handleResultClick(link.path)}
-                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 transition-all group"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-slate-200 hover:text-white transition-all group"
                           >
-                            <div className="p-2 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
+                            <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
                               <link.icon className="h-4 w-4 text-indigo-500" />
                             </div>
                             <span className="text-sm font-medium">{link.name}</span>
@@ -211,7 +212,7 @@ const Navbar = ({ onMenuToggle }) => {
                           <button
                             key={emp.id}
                             onClick={() => handleResultClick(`/employees/${emp.id}`)}
-                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 transition-all group"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-slate-200 hover:text-white transition-all group"
                           >
                             <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md border border-white/20">
                               {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
@@ -220,9 +221,9 @@ const Navbar = ({ onMenuToggle }) => {
                               <p className="text-sm font-semibold truncate">
                                 {emp.user_info?.full_name || `${emp.user_info?.first_name} ${emp.user_info?.last_name}`}
                               </p>
-                              <p className="text-[11px] text-gray-500 truncate">{emp.position || emp.department?.name || 'Employee'}</p>
+                              <p className="text-[11px] text-slate-400 truncate">{emp.position || emp.department?.name || 'Employee'}</p>
                             </div>
-                            <div className="ml-auto text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600">
+                            <div className="ml-auto text-[10px] bg-white/5 px-2 py-0.5 rounded text-slate-400 group-hover:bg-white/10 group-hover:text-slate-200">
                               {emp.employee_id}
                             </div>
                           </button>

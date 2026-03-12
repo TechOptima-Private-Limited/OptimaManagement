@@ -125,6 +125,69 @@ def get_captcha(request):
     })
 
 
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+        
+        if refresh_token:
+            # Inject refresh token from cookie into request data for SimpleJWT
+            data = request.data.copy()
+            data['refresh'] = refresh_token
+            request._full_data = data # For DRF 3.12+
+            
+        try:
+            response = super().post(request, *args, **kwargs)
+            if response.status_code == 200:
+                access_token = response.data.get('access')
+                
+                # Set new access token cookie
+                response.set_cookie(
+                    key='access_token',
+                    value=access_token,
+                    httponly=True,
+                    secure=not settings.DEBUG,  # Secure in production, allow HTTP in dev
+                    samesite='Lax',
+                    path='/',
+                )
+                
+                # If rotation is enabled, super().post() already updated response.data['refresh']
+                # We should update that cookie too if it exists
+                new_refresh = response.data.get('refresh')
+                if new_refresh:
+                    response.set_cookie(
+                        key='refresh_token',
+                        value=new_refresh,
+                        httponly=True,
+                        secure=not settings.DEBUG,  # Secure in production, allow HTTP in dev
+                        samesite='Lax',
+                        path='/',
+                    )
+            return response
+        except (InvalidToken, TokenError) as e:
+            return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    """Clear authentication cookies and blacklist the refresh token if available"""
+    response = Response({'detail': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+    
+    refresh_token = request.COOKIES.get('refresh_token')
+    if refresh_token:
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception:
+            pass # Token might already be invalid or blacklisted
+            
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    return response
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -155,11 +218,34 @@ def login(request):
         user = authenticate(username=email, password=password)
         if user:
             refresh = RefreshToken.for_user(user)
-            return Response({
+            access_token = str(refresh.access_token)
+            
+            response = Response({
                 'user': UserSerializer(user).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'access': access_token,  
             })
+            
+            # Set access token cookie
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,
+                secure=False,  
+                samesite='Lax',
+                path='/',
+            )
+            
+            # Set refresh token cookie
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                secure=False,  
+                samesite='Lax',
+                path='/',
+            )
+            
+            return response
     
     return Response({
         'error': 'Invalid credentials'

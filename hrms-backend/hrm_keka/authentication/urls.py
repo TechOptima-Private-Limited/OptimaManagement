@@ -6,9 +6,10 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('employee-register/', views.employee_register, name='employee_register'),
     path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
     path('captcha/', views.get_captcha, name='get_captcha'),
 
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/refresh/', views.CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('me/permissions/', views.me_permissions, name='me_permissions'),
     path('profile/', views.UserProfileView.as_view(), name='user_profile'),
     path('profile/change-password/', views.change_password, name='change_password'),

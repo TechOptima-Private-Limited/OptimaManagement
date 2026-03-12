@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   CheckCircleIcon,
@@ -19,6 +20,13 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import Modal from '../common/Modal';
 
 const LeaveApproval = () => {
+  const location = useLocation();
+  const employeeFromUrlRef = useRef('');
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    employeeFromUrlRef.current = params.get('employee') || '';
+  }, [location.search]);
+
   const [pendingRequests, setPendingRequests] = useState([]);
   const [allRequests, setAllRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,9 +73,11 @@ const LeaveApproval = () => {
   const fetchRequests = async () => {
     try {
       setLoading(true);
+      const effectiveEmployeeId = employeeFromUrlRef.current;
+      const employeeScoped = effectiveEmployeeId ? { employee_id: effectiveEmployeeId } : {};
       const [pendingResponse, allResponse] = await Promise.all([
-        leaveAPI.getLeaveRequests({ status: 'PENDING', ...filters }),
-        leaveAPI.getLeaveRequests(filters)
+        leaveAPI.getLeaveRequests({ status: 'PENDING', ...filters, ...employeeScoped }),
+        leaveAPI.getLeaveRequests({ ...filters, ...employeeScoped })
       ]);
       setPendingRequests(pendingResponse.data.results || pendingResponse.data);
       setAllRequests(allResponse.data.results || allResponse.data);

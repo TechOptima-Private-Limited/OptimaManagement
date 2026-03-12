@@ -30,6 +30,15 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,192
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002', cast=Csv())
 
+# HTTPS and SSL Enforcement
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)  # Set to True in production
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0, cast=int)  # Set to 31536000 (1 year) in production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=False, cast=bool)
+SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=False, cast=bool)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -201,13 +210,13 @@ SIMPLE_JWT = {
     'TOKEN_VERIFY_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenVerifySerializer',
     'TOKEN_BLACKLIST_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenBlacklistSerializer',
 
-    # Cookie-based authentication configuration
-    'AUTH_COOKIE': 'access_token',  # Cookie name for access token
-    'AUTH_COOKIE_DOMAIN': None,  # Cookie domain
-    'AUTH_COOKIE_SECURE': config('AUTH_COOKIE_SECURE', default=True, cast=bool),  # HTTPS only in production
-    'AUTH_COOKIE_HTTP_ONLY': True,  # HttpOnly flag to prevent XSS access
-    'AUTH_COOKIE_PATH': '/',  # Cookie path
-    'AUTH_COOKIE_SAMESITE': 'Lax',  # CSRF protection
+    # Cookie-based authentication configuration - Environment aware
+    'AUTH_COOKIE': 'access_token',
+    'AUTH_COOKIE_DOMAIN': None,
+    'AUTH_COOKIE_SECURE': not DEBUG,  # Secure in production, allow HTTP in dev
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_PATH': '/',
+    'AUTH_COOKIE_SAMESITE': 'Lax',
 }
 
 AUTH_USER_MODEL = 'authentication.User'
@@ -283,11 +292,21 @@ SCHEDULER_AUTOSTART = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002', cast=Csv())
-# If CORS_ALLOW_ALL_ORIGINS is True, CORS_ALLOWED_ORIGINS is ignored by the middleware, 
-# but it's good for documentation and if we want to switch off ALL_ORIGINS.
+
+# Content Security Policy (CSP) Configuration - Commented out until django-csp is installed
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
+# CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+# CSP_IMG_SRC = ("'self'", "data:", "https:")
+# CSP_FONT_SRC = ("'self'", "data:")
+# CSP_CONNECT_SRC = ("'self'",)
+# CSP_OBJECT_SRC = ("'none'",)
+# CSP_BASE_URI = ("'self'",)
+# CSP_FORM_ACTION = ("'self'",)
+# CSP_FRAME_ANCESTORS = ("'none'",)
 
 # Webpush Settings
 WEBPUSH_SETTINGS = {

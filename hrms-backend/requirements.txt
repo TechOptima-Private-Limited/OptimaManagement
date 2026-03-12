@@ -20,6 +20,14 @@ python-dotenv==1.0.1
 # Security & Encryption
 cryptography
 bcrypt
+django-fernet-fields
+django-csp
+django-otp
+pyotp
+qrcode
+python-magic-bin
+bleach
+django-ratelimit
 
 # PDF Generation
 xhtml2pdf

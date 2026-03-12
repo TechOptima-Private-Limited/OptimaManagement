@@ -1,5 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -22,745 +23,6 @@ import { formatDate } from '../../utils/formatters';
 import { useTheme } from '../../context/ThemeContext';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api";
-
-
-const EditEmployeeModal = ({ isOpen, onClose, onSuccess, employee }) => {
-  const [loading, setLoading] = useState(false);
-  const [departments, setDepartments] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [formData, setFormData] = useState({
-    employee_id: '',
-    department_id: '',
-    position: '',
-    hire_date: '',
-    salary: '',
-    manager: '',
-    status: 'ACTIVE'
-  });
-  const [documents, setDocuments] = useState([]);
-  const [documentsLoading, setDocumentsLoading] = useState(false);
-  const [documentsError, setDocumentsError] = useState(null);
-  const [documentsFetched, setDocumentsFetched] = useState(false);
-  const [uploadingDocuments, setUploadingDocuments] = useState(false);
-  const [documentInputs, setDocumentInputs] = useState([{ id: 1, docType: '', file: null }]);
-  const [onboardingEmployeeId, setOnboardingEmployeeId] = useState(null);
-
-  const { theme } = useTheme();
-  useEffect(() => {
-    if (isOpen && employee) {
-      // Reset document state for each employee to avoid leaking between employees
-      setDocuments([]);
-      setDocumentsError(null);
-      setDocumentsFetched(false);
-      setDocumentInputs([{ id: 'new-1', docType: '', file: null }]);
-      setOnboardingEmployeeId(null);
-
-      setFormData({
-        employee_id: employee.user?.username || employee.user_info?.username || employee.employee_id || '',
-        department_id: employee.department?.id || '',
-        position: employee.position || '',
-        hire_date: employee.hire_date || '',
-        salary: employee.decrypted_salary || '',
-        manager: employee.manager?.id || '',
-        status: employee.status || 'ACTIVE'
-      });
-      fetchDepartments();
-      fetchEmployees();
-      const initDocs = async () => {
-        const resolvedId = await resolveOnboardingEmployee(employee);
-        const effectiveId = resolvedId || employee.id;
-        setOnboardingEmployeeId(effectiveId);
-        if (resolvedId) {
-          fetchEmployeeDocuments(effectiveId);
-        } else {
-          // No onboarding record yet; allow upload to trigger backend auto-create
-          setDocumentsFetched(true);
-          setDocumentsError(null);
-        }
-      };
-      initDocs();
-    }
-  }, [isOpen, employee]);
-
-  const resolveOnboardingEmployee = async (emp) => {
-    const email = emp?.user_info?.email || emp?.email;
-    if (!email) return null;
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/onboarding/employees/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-
-      if (!response.ok) return null;
-      const data = await response.json();
-      const list = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [];
-      const match = list.find((item) => item.email?.toLowerCase() === email.toLowerCase());
-      return match?.id || null;
-    } catch (error) {
-      console.error('Failed to resolve onboarding employee:', error);
-      return null;
-    }
-  };
-
-  const fetchDepartments = async () => {
-    try {
-      const response = await employeeAPI.getDepartments();
-      setDepartments(response.data.results || response.data || []);
-    } catch (error) {
-      console.error('Failed to fetch departments:', error);
-    }
-  };
-
-  const fetchEmployees = async () => {
-    try {
-      const response = await employeeAPI.getEmployees();
-      setEmployees(response.data.results || response.data || []);
-    } catch (error) {
-      console.error('Failed to fetch employees:', error);
-    }
-  };
-
-  const fetchEmployeeDocuments = async (targetId) => {
-    const effectiveId = targetId ?? onboardingEmployeeId;
-    if (!employee?.id || !effectiveId) return;
-    try {
-      setDocumentsLoading(true);
-      setDocumentsError(null);
-      setDocumentsFetched(false);
-      const response = await fetch(`${API_BASE_URL}/onboarding/employees/${effectiveId}/list_documents/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      //if (!response.ok) {
-      //  setDocumentsError('Unable to load existing documents');
-      //  return;
-      //}
-
-      const data = await response.json();
-      const docs = Array.isArray(data.documents) ? data.documents : [];
-      setDocuments(docs);
-      if (docs.length > 0) {
-        setDocumentInputs(
-          docs.map((doc, idx) => ({
-            id: `existing-${idx}`,
-            docType: doc.doc_type || '',
-            file: null,
-          }))
-        );
-      }
-    } catch (error) {
-      console.error('Failed to fetch employee documents:', error);
-      setDocumentsError('Unable to load existing documents');
-    } finally {
-      setDocumentsLoading(false);
-      setDocumentsFetched(true);
-    }
-  };
-
-  const addDocumentInput = () => {
-    setDocumentInputs((prev) => [...prev, { id: Date.now(), docType: '', file: null }]);
-  };
-
-  const removeDocumentInput = (id) => {
-    setDocumentInputs((prev) => (prev.length === 1 ? prev : prev.filter((item) => item.id !== id)));
-  };
-
-  const updateDocumentInput = (id, field, value) => {
-    setDocumentInputs((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
-
-  const handleDocumentFileChange = (id, file) => {
-    updateDocumentInput(id, 'file', file);
-  };
-
-  const uploadDocuments = async () => {
-    if (!employee?.id) return;
-    const targetId = onboardingEmployeeId || employee.id;
-    const documentsToUpload = documentInputs.filter((item) => item.file && item.docType);
-    if (documentsToUpload.length === 0) {
-      toast.info('Add at least one document with a type before uploading.');
-      return;
-    }
-
-    try {
-      setUploadingDocuments(true);
-      const formData = new FormData();
-      documentsToUpload.forEach((item) => {
-        formData.append(`document_${item.docType}`, item.file);
-      });
-
-      const response = await fetch(`${API_BASE_URL}/onboarding/employees/${targetId}/upload_documents/`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to upload documents');
-      }
-
-      const result = await response.json();
-      const uploadedCount = result.files_uploaded?.length || documentsToUpload.length;
-      toast.success(`Uploaded ${uploadedCount} document${uploadedCount === 1 ? '' : 's'} successfully.`);
-      setDocumentInputs((prev) =>
-        prev.map((item) => ({ ...item, file: null }))
-      );
-      fetchEmployeeDocuments(targetId);
-    } catch (error) {
-      console.error('Document upload failed:', error);
-      toast.error(error.message || 'Failed to upload documents');
-    } finally {
-      setUploadingDocuments(false);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const updateData = { ...formData };
-      // Remove fields not accepted by the backend serializer
-      delete updateData.salary; // salary isn't part of the update serializer
-      // Normalize department
-      if (updateData.department_id === '' || updateData.department_id === null || updateData.department_id === undefined) {
-        delete updateData.department_id;
-      } else {
-        const depId = parseInt(updateData.department_id);
-        if (isNaN(depId)) delete updateData.department_id; else updateData.department_id = depId;
-      }
-      // Normalize manager
-      if (updateData.manager === '' || updateData.manager === null || updateData.manager === undefined) {
-        // Explicitly clear manager when "None" is selected
-        updateData.manager_id = null;
-        delete updateData.manager;
-      } else {
-        const mgrId = parseInt(updateData.manager);
-        if (!isNaN(mgrId)) {
-          updateData.manager_id = mgrId;
-        }
-        delete updateData.manager;
-      }
-      // Omit empty optional fields
-      if (!updateData.position) delete updateData.position;
-      if (!updateData.employee_id) delete updateData.employee_id;
-      if (!updateData.hire_date) delete updateData.hire_date; // avoid sending ''
-
-      const response = await employeeAPI.updateEmployee(employee.id, updateData);
-
-      if (response.status === 200) {
-        toast.success('Employee updated successfully!');
-        onSuccess();
-        onClose();
-      }
-    } catch (error) {
-      console.error('Error updating employee:', error);
-      const data = error.response?.data;
-      const fieldErrors = data && typeof data === 'object' && !data.detail && !data.message
-        ? Object.entries(data).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ')
-        : null;
-      const errorMessage = data?.detail || data?.message || fieldErrors || 'Failed to update employee';
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Helper function to get employee name for display
-  const getEmployeeName = (employee) => {
-    return employee?.user_info?.full_name ||
-      `${employee?.user_info?.first_name || ''} ${employee?.user_info?.last_name || ''}`.trim() ||
-      'Unknown Employee';
-  };
-
-  // Helper function to get employee initials
-  const getEmployeeInitials = (employee) => {
-    const name = getEmployeeName(employee);
-    return name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
-  };
-
-  // Helper function to get profile gradient
-  const getProfileGradient = (name) => {
-    const gradients = [
-      'from-violet-500 to-purple-600',
-      'from-blue-500 to-cyan-600',
-      'from-emerald-500 to-teal-600',
-      'from-amber-500 to-orange-600',
-      'from-rose-500 to-pink-600',
-      'from-indigo-500 to-blue-600'
-    ];
-    const index = name.length % gradients.length;
-    return gradients[index];
-  };
-
-  if (!isOpen || !employee) return null;
-
-  const employeeName = getEmployeeName(employee);
-  const employeeInitials = getEmployeeInitials(employee);
-  const profileGradient = getProfileGradient(employeeName);
-
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Enhanced backdrop with blur */}
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div
-          className="fixed inset-0 bg-[#070B14]/80 backdrop-blur-md transition-opacity duration-300"
-          onClick={onClose}
-        ></div>
-
-        {/* Modal positioning */}
-        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-        {/* Enhanced modal container */}
-        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all duration-300 sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-white/10">
-
-          {/* Enhanced header with employee info */}
-          <div className="relative bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-[#0A0F1A] px-6 py-8 sm:px-8 border-b border-white/5">
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
-
-            <div className="relative flex items-center">
-              {/* Employee avatar */}
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.3)] border border-white/20 p-0.5`}>
-                <div className="w-full h-full rounded-[14px] bg-black/20 flex items-center justify-center backdrop-blur-sm">
-                  <span className="text-white font-black text-xl tracking-wider">
-                    {employeeInitials}
-                  </span>
-                </div>
-              </div>
-
-              <div className="ml-5 flex-1 space-y-1">
-                <h3 className="text-2xl font-black text-white tracking-tight">
-                  Edit Employee
-                </h3>
-                <div className="flex items-center space-x-3">
-                  <p className="text-indigo-300 text-lg font-bold">
-                    {employeeName}
-                  </p>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-                  <p className="text-slate-400 text-sm font-medium">
-                    {formData.employee_id}
-                  </p>
-                </div>
-              </div>
-
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Enhanced content area */}
-          <div className="px-6 py-8 sm:px-8 bg-[#0A0F1A] relative z-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* Employee ID */}
-              <div className="md:col-span-2">
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Username
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="employee_id"
-                    value={formData.employee_id}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none font-medium"
-                    placeholder="Enter employee ID"
-                  />
-                </div>
-              </div>
-
-              {/* Department */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Department
-                </label>
-                <div className="relative">
-                  <select
-                    name="department_id"
-                    value={formData.department_id}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none appearance-none cursor-pointer font-medium hover:border-white/20"
-                  >
-                    <option value="" className="bg-[#0A0F1A]">Select Department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.id} className="bg-[#0A0F1A]">
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Position */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Position
-                </label>
-                <input
-                  type="text"
-                  name="position"
-                  value={formData.position}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none font-medium"
-                  placeholder="Enter position"
-                />
-              </div>
-
-              {/* Hire Date */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Hire Date
-                </label>
-                <input
-                  type="date"
-                  name="hire_date"
-                  value={formData.hire_date}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none font-medium [color-scheme:dark]"
-                />
-              </div>
-
-              {/* Salary */}
-              <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Salary
-                </label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span className="text-slate-500 font-bold group-focus-within:text-indigo-400 transition-colors">$</span>
-                  </div>
-                  <input
-                    type="number"
-                    name="salary"
-                    value={formData.salary}
-                    onChange={handleInputChange}
-                    className="w-full pl-8 pr-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white placeholder-slate-600 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none font-medium"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              {/* Manager */}
-              <div className="md:col-span-2">
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Manager
-                </label>
-                <div className="relative">
-                  <select
-                    name="manager"
-                    value={formData.manager}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none appearance-none cursor-pointer font-medium hover:border-white/20"
-                  >
-                    <option value="" className="bg-[#0A0F1A]">None</option>
-                    {employees
-                      .filter(emp => emp.id !== employee.id) // Don't allow self-reporting
-                      .map((emp) => (
-                        <option key={emp.id} value={emp.id} className="bg-[#0A0F1A]">
-                          {emp.user_info?.full_name || `${emp.user?.first_name} ${emp.user?.last_name}`} ({emp.user?.username || emp.user_info?.username || emp.employee_id})
-                        </option>
-                      ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status */}
-              <div className="md:col-span-2">
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-                  Status
-                </label>
-                <div className="relative">
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-[#070B14] border border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 outline-none appearance-none cursor-pointer font-medium hover:border-white/20"
-                  >
-                    <option value="ACTIVE" className="bg-[#0A0F1A]">Active</option>
-                    <option value="INACTIVE" className="bg-[#0A0F1A]">Inactive</option>
-                    <option value="TERMINATED" className="bg-[#0A0F1A]">Terminated</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Upload Documents (Minimalist redesign) */}
-              <div className="md:col-span-2">
-                <div className="bg-[#070B14] border border-white/10 rounded-2xl overflow-hidden shadow-inner">
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/5">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-indigo-500/10 rounded-lg shrink-0">
-                        <ArrowUpTrayIcon className="h-5 w-5 text-indigo-400" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-white tracking-wide">Documents</h4>
-                        <p className="text-xs text-slate-500 mt-0.5">Manage employee onboarding files</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={addDocumentInput}
-                      className="inline-flex items-center px-3 py-1.5 text-xs font-bold text-indigo-300 bg-indigo-500/10 rounded-lg hover:bg-indigo-500/20 hover:text-indigo-200 transition-colors border border-indigo-500/20"
-                    >
-                      <PlusIcon className="h-3.5 w-3.5 mr-1" />
-                      Add Row
-                    </button>
-                  </div>
-
-                  <div className="divide-y divide-white/5">
-                    {/* Existing documents */}
-                    {documentsFetched && (
-                      <div className="px-6 py-4">
-                        <div className="flex items-center mb-3">
-                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Existing Files</span>
-                          <span className="ml-2 px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-bold text-white">{documents.length}</span>
-                        </div>
-                        {documentsLoading ? (
-                          <div className="flex items-center space-x-2 text-indigo-400 py-2">
-                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span className="text-sm font-medium">Loading files...</span>
-                          </div>
-                        ) : documents.length > 0 ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {documents.map((doc) => (
-                              <div
-                                key={`${doc.field}-${doc.doc_type}`}
-                                className="flex items-center justify-between rounded-xl border border-white/5 px-3 py-2 bg-white/5 hover:bg-white/10 transition-colors group"
-                              >
-                                <div className="flex items-center space-x-2 truncate">
-                                  <PaperClipIcon className="h-4 w-4 text-slate-400 shrink-0" />
-                                  <span className="text-xs font-semibold text-slate-300 truncate">{doc.doc_type}</span>
-                                </div>
-                                {doc.url ? (
-                                  <a
-                                    href={doc.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-xs font-bold text-indigo-400 hover:text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ml-2"
-                                  >
-                                    View
-                                  </a>
-                                ) : (
-                                  <span className="text-[10px] uppercase font-bold text-slate-600 ml-2">Unavailable</span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-slate-500 py-2 font-medium">No files uploaded yet.</p>
-                        )}
-                        {documentsError && <p className="mt-2 text-xs font-bold text-rose-400">{documentsError}</p>}
-                      </div>
-                    )}
-
-                    {/* Upload rows */}
-                    <div className="bg-[#0A0F1A]/50 px-6 py-5 space-y-4">
-                      {documentInputs.map((item, idx) => (
-                        <div
-                          key={item.id}
-                          className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 bg-white/5 p-3 rounded-xl border border-white/5"
-                        >
-                          <div className="w-full sm:w-1/3">
-                            <input
-                              type="text"
-                              value={item.docType}
-                              onChange={(e) => updateDocumentInput(item.id, 'docType', e.target.value)}
-                              placeholder="Document name"
-                              className="w-full bg-[#070B14] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 placeholder-slate-600 transition-all font-medium"
-                            />
-                          </div>
-                          <div className="w-full sm:flex-1 relative">
-                            <input
-                              type="file"
-                              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                              onChange={(e) => handleDocumentFileChange(item.id, e.target.files?.[0] || null)}
-                              className="w-full text-sm text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 file:cursor-pointer file:transition-colors cursor-pointer"
-                            />
-                          </div>
-                          <div className="flex shrink-0">
-                            {documentInputs.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeDocumentInput(item.id)}
-                                className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors"
-                                title="Remove row"
-                              >
-                                <TrashIcon className="h-4 w-4" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      <div className="flex justify-end pt-2">
-                        <button
-                          type="button"
-                          onClick={uploadDocuments}
-                          disabled={uploadingDocuments || documentInputs.every(d => !d.file || !d.docType)}
-                          className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold text-white bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-white/5 hover:border-white/20"
-                        >
-                          {uploadingDocuments ? (
-                            <div className="flex items-center space-x-2">
-                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                              <span>Uploading...</span>
-                            </div>
-                          ) : (
-                            <>
-                              <ArrowUpTrayIcon className="h-4 w-4 mr-2 text-indigo-400" />
-                              Upload Files
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Enhanced Footer */}
-          <div className="bg-white/5 px-6 py-5 sm:px-8 flex flex-col-reverse sm:flex-row justify-end border-t border-white/5 relative z-10 backdrop-blur-md">
-            <button
-              type="button"
-              onClick={onClose}
-              className="mt-3 sm:mt-0 w-full sm:w-auto inline-flex justify-center items-center rounded-xl border border-white/10 px-6 py-2.5 bg-transparent text-sm font-bold text-slate-300 hover:bg-white/5 hover:text-white focus:outline-none focus:ring-4 focus:ring-white/10 transition-all duration-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-              className={`w-full sm:w-auto sm:ml-3 inline-flex justify-center items-center rounded-xl border border-transparent shadow-[0_0_20px_rgba(79,70,229,0.3)] px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-sm font-bold text-white hover:from-indigo-500 hover:to-violet-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all duration-300`}
-            >
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                  <span>Updating...</span>
-                </div>
-              ) : (
-                <>
-                  <PencilIcon className="h-4 w-4 mr-2" />
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Delete Confirmation Modal Component
-const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, employee, loading }) => {
-  if (!isOpen || !employee) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-md" onClick={onClose}></div>
-
-        {/* Modal centering trick */}
-        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
-          <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-50"></div>
-
-          <div className="px-6 pt-8 pb-6 sm:p-8 sm:pb-6">
-            <div className="sm:flex sm:items-start">
-              <div className="mx-auto flex-shrink-0 flex items-center justify-center h-14 w-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.2)] sm:mx-0 sm:h-12 sm:w-12">
-                <TrashIcon className="h-6 w-6 text-rose-400" />
-              </div>
-              <div className="mt-4 text-center sm:mt-0 sm:ml-6 sm:text-left">
-                <h3 className="text-xl leading-6 font-black text-white tracking-tight">
-                  Delete Employee
-                </h3>
-                <div className="mt-3">
-                  <p className="text-sm text-slate-400 font-medium leading-relaxed">
-                    Are you sure you want to delete <span className="font-bold text-white bg-white/5 px-2 py-0.5 rounded-md border border-white/10">{employee.user_info?.full_name || employee.user?.username || employee.employee_id}</span>?
-                    This action cannot be undone and will permanently remove all associated data.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white/5 backdrop-blur-md px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-white/5">
-            <button
-              type="button"
-              onClick={onConfirm}
-              disabled={loading}
-              className="w-full inline-flex justify-center rounded-xl border border-transparent px-6 py-3 bg-rose-600 text-sm font-black text-white hover:bg-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto"
-            >
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                  <span>Deleting...</span>
-                </div>
-              ) : (
-                'Yes, Delete Employee'
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 shadow-sm px-6 py-3 bg-white/5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 focus:outline-none sm:mt-0 sm:w-auto"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 
 const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -1011,7 +273,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           required
                         />
                         <svg className="h-4 w-4 text-slate-500 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
                       {errors.user?.email && <p className="text-rose-400 text-xs mt-1.5 flex items-center font-bold">
@@ -1073,7 +335,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="role"
                           value={formData.profile.role}
                           onChange={(e) => handleInputChange(e, 'profile')}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-white/20 transition-all duration-300 outline-none appearance-none text-sm text-white cursor-pointer"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-white/20 transition-all duration-300 outline-none appearance-none cursor-pointer text-sm text-white"
                         >
                           <option value="EMPLOYEE" className="bg-[#0A0F1A]">Employee</option>
                           <option value="HR_MANAGER" className="bg-[#0A0F1A]">HR Manager</option>
@@ -1297,7 +559,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-white/10 px-6 py-2.5 bg-transparent text-sm font-bold text-slate-300 hover:bg-white/5 hover:text-white focus:outline-none focus:ring-4 focus:ring-white/10 transition-all duration-300"
+              className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-white/10 px-6 py-2.5 bg-transparent text-sm font-bold text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-300"
             >
               Cancel
             </button>
@@ -1328,13 +590,75 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
   );
 };
 
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, employee, loading }) => {
+  if (!isOpen || !employee) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-md" onClick={onClose}></div>
+
+        {/* Modal centering trick */}
+        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+          <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-50"></div>
+
+          <div className="px-6 pt-8 pb-6 sm:p-8 sm:pb-6">
+            <div className="sm:flex sm:items-start">
+              <div className="mx-auto flex-shrink-0 flex items-center justify-center h-14 w-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 shadow-[0_0_20px_rgba(244,63,94,0.2)] sm:mx-0 sm:h-12 sm:w-12">
+                <TrashIcon className="h-6 w-6 text-rose-400" />
+              </div>
+              <div className="mt-4 text-center sm:mt-0 sm:ml-6 sm:text-left">
+                <h3 className="text-xl leading-6 font-black text-white tracking-tight">
+                  Delete Employee
+                </h3>
+                <div className="mt-3">
+                  <p className="text-sm text-slate-400 font-medium leading-relaxed">
+                    Are you sure you want to delete <span className="font-bold text-white bg-white/5 px-2 py-0.5 rounded-md border border-white/10">{employee.user_info?.full_name || employee.user?.username || employee.employee_id}</span>?
+                    This action cannot be undone and will permanently remove all associated data.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white/5 backdrop-blur-md px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-white/5">
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={loading}
+              className="w-full inline-flex justify-center rounded-xl border border-transparent px-6 py-3 bg-rose-600 text-sm font-black text-white hover:bg-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <span>Deleting...</span>
+                </div>
+              ) : (
+                'Yes, Delete Employee'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 shadow-sm px-6 py-3 bg-white/5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 focus:outline-none sm:mt-0 sm:w-auto"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const EmployeeList = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -1399,19 +723,12 @@ const EmployeeList = () => {
   };
 
   const handleEditEmployee = (employee) => {
-    setSelectedEmployee(employee);
-    setShowEditModal(true);
+    navigate(`/employees/${employee.id}`, { state: { editMode: true } });
   };
 
   const handleDeleteEmployee = (employee) => {
     setSelectedEmployee(employee);
     setShowDeleteModal(true);
-  };
-
-  const handleEditSuccess = () => {
-    fetchEmployees();
-    setShowEditModal(false);
-    setSelectedEmployee(null);
   };
 
   const confirmDelete = async () => {
@@ -1807,16 +1124,6 @@ const EmployeeList = () => {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSuccess={handleAddEmployeeSuccess}
-      />
-
-      <EditEmployeeModal
-        isOpen={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setSelectedEmployee(null);
-        }}
-        onSuccess={handleEditSuccess}
-        employee={selectedEmployee}
       />
 
       <DeleteConfirmationModal

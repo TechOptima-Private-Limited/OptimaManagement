@@ -8,9 +8,10 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Enable sending cookies with requests
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token if available in localStorage
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
@@ -34,18 +35,19 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
-          refresh: refreshToken,
-        });
-
-        const { access } = response.data;
-        localStorage.setItem('access_token', access);
-
+        // Call refresh endpoint - refresh token is in HttpOnly cookie
+        const refreshResponse = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {}, { withCredentials: true });
+        
+        // If the backend returns a new access token in the body, update localStorage
+        if (refreshResponse.data && refreshResponse.data.access) {
+          localStorage.setItem('access_token', refreshResponse.data.access);
+        }
+        
+        // Retry original request
         return api(originalRequest);
       } catch (refreshError) {
+        // Refresh failed, clear local storage and redirect to login
         localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         window.location.href = '/login';
         return Promise.reject(refreshError);
@@ -63,7 +65,7 @@ export const authAPI = {
   employeeRegister: (userData) => api.post('/auth/employee-register/', userData),
   getProfile: () => api.get('/auth/profile/'),
   updateProfile: (data) => api.patch('/auth/profile/', data),
-  refreshToken: (refreshToken) => api.post('/auth/token/refresh/', { refresh: refreshToken }),
+  // refreshToken removed - handled via HttpOnly cookies
   changePassword: (data) => api.post('/auth/profile/change-password/', data),
   getMyPermissions: () => api.get('/auth/me/permissions/'),
   getCaptcha: () => api.get('/auth/captcha/'),

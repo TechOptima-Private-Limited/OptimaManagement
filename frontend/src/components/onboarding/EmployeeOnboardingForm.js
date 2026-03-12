@@ -229,70 +229,71 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
     }
   };
 
-  // Show invalid link component if needed
+  const remainingTime = getRemainingTime();
+
   if (linkStatus !== 'valid') {
     return <LinkInvalidComponent status={linkStatus} employee={employee} linkInfo={linkInfo} />;
   }
 
-  const remainingTime = getRemainingTime();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-slate-900">
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-slate-900/50/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-slate-900/50/5 rounded-full translate-x-48 translate-y-48"></div>
 
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-              <Building className="h-12 w-12 text-white" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+          <div className="flex flex-col items-center">
+            <div className="flex items-center justify-center space-x-3 mb-6">
+              <div className="p-3 bg-slate-900/50/20 rounded-xl backdrop-blur-sm">
+                <Building className="h-12 w-12 text-white" />
+              </div>
+              <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
             </div>
-            <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
+
+            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
+              Techoptima Pvt Ltd
+            </h1>
+            <h2 className="text-2xl text-blue-200 mb-6">
+              Employee Onboarding Portal
+            </h2>
+            <p className="text-xl text-blue-200 max-w-3xl mx-auto leading-relaxed">
+              Welcome! Please fill out your personal information and upload required documents below.
+              HR will complete your employment details once your submission is reviewed.
+            </p>
+
+            {remainingTime && (
+              <div className="mt-8 inline-flex items-center px-4 py-2 bg-slate-900/50/20 rounded-xl backdrop-blur-sm">
+                <Clock className="w-5 h-5 text-white mr-2" />
+                <span className="text-white font-medium">
+                  Link expires in: {remainingTime.text}
+                </span>
+              </div>
+            )}
           </div>
-
-          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            Techoptima Pvt Ltd
-          </h1>
-          <h2 className="text-2xl text-blue-100 mb-6">
-            Employee Onboarding Portal
-          </h2>
-          <p className="text-lg text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Welcome! Please fill out your personal information and upload required documents below.
-            HR will complete your employment details once your submission is reviewed.
-          </p>
-
-          {remainingTime && (
-            <div className="mt-6 inline-flex items-center px-4 py-2 bg-white/20 rounded-xl backdrop-blur-sm">
-              <Clock className="w-5 h-5 text-white mr-2" />
-              <span className="text-white font-medium">
-                Link expires in: {remainingTime.text}
-              </span>
-            </div>
-          )}
         </div>
       </div>
 
       {/* Form Container */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
           <div className="p-8 lg:p-12 space-y-8">
 
             {/* Personal Information Section */}
             <div className="space-y-6">
-              <div className="flex items-center space-x-3 pb-4 border-b border-indigo-200">
+              <div className="flex items-center space-x-3 pb-4 border-b border-slate-700/50">
                 <div className="p-2 bg-indigo-600 rounded-lg">
                   <User className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Personal Information</h3>
+                <h3 className="text-2xl font-bold text-white">Personal Information</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-400 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -300,7 +301,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.first_name ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                    className={`w-full px-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.first_name ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                       }`}
                     placeholder="Enter your first name"
                   />
@@ -310,7 +311,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-400 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -318,7 +319,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.last_name ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                    className={`w-full px-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.last_name ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                       }`}
                     placeholder="Enter your last name"
                   />
@@ -328,7 +329,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-400 mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -338,7 +339,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.email ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.email ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                         }`}
                       placeholder="your.email@company.com"
                     />
@@ -349,7 +350,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-400 mb-2">
                     Phone Number <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -359,7 +360,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       name="phone_number"
                       value={formData.phone_number}
                       onChange={handleInputChange}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.phone_number ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.phone_number ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                         }`}
                       placeholder="+91 9876543210"
                     />
@@ -370,7 +371,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-400 mb-2">
                     Current Address <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -380,7 +381,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       value={formData.current_address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.current_address ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.current_address ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                         }`}
                       placeholder="Enter your current address including city, state, PIN code"
                     />
@@ -391,7 +392,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-400 mb-2">
                     Permanent Address <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -401,7 +402,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       value={formData.permanent_address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.permanent_address ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none ${errors.permanent_address ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                         }`}
                       placeholder="Enter your permanent address including city, state, PIN code"
                     />
@@ -415,19 +416,19 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
 
             {/* Document Upload Section */}
             <div className="space-y-6">
-              <div className="flex items-center space-x-3 pb-4 border-b border-indigo-200">
+              <div className="flex items-center space-x-3 pb-4 border-b border-slate-700/50">
                 <div className="p-2 bg-purple-600 rounded-lg">
                   <FileText className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Document Upload</h3>
+                <h3 className="text-2xl font-bold text-white">Document Upload</h3>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-slate-700/50">
                 <div className="flex items-start space-x-3 mb-4">
                   <AlertCircle className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-blue-800 mb-2">Important Guidelines</h4>
-                    <ul className="text-sm text-blue-700 space-y-1">
+                    <h4 className="font-semibold text-white mb-2">Important Guidelines</h4>
+                    <ul className="text-sm text-slate-400 space-y-1">
                       <li>• Accepted formats: PDF, JPG, PNG</li>
                       <li>• Maximum file size: 10MB per document</li>
                       <li>• All documents are required for processing</li>
@@ -440,7 +441,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {documentTypes.map((doc) => (
                   <div key={doc.key} className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
+                    <label className="block text-sm font-semibold text-slate-400">
                       <span className="text-2xl mr-2">{doc.icon}</span>
                       {doc.label}
                       {doc.required && <span className="text-red-500 ml-1">*</span>}
@@ -451,7 +452,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                         name={doc.key}
                         onChange={handleFileChange}
                         accept=".pdf,.jpg,.jpeg,.png"
-                        className={`w-full px-4 py-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 ${errors[doc.key] ? 'border-red-500' : 'border-gray-200 focus:border-indigo-500'
+                        className={`w-full px-4 py-3 border-2 rounded-xl bg-slate-900/50 backdrop-blur-sm focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 ${errors[doc.key] ? 'border-red-500' : 'border-slate-700/50 focus:border-indigo-500'
                           }`}
                       />
                       {formData[doc.key] && (
@@ -491,7 +492,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                 )}
               </button>
 
-              <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+              <div className="flex items-center justify-center space-x-2 text-sm text-slate-400">
                 <Shield className="w-4 h-4" />
                 <span>Your information is secure and will only be used for employment purposes</span>
               </div>
@@ -516,7 +517,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
         };
       case 'already_submitted':
         return {
-          icon: <Check className="h-20 w-20 text-green-500" />,
+          icon: <CheckCircle className="h-20 w-20 text-green-500" />,
           title: 'Onboarding Already Completed',
           subtitle: 'You have already completed your onboarding',
           color: 'green'
@@ -534,11 +535,11 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
   const statusInfo = getStatusInfo();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 p-8 lg:p-12 text-center">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 p-8 lg:p-12 text-center">
           {/* Icon */}
-          <div className="mb-6">
+          <div className="mb-6 flex justify-center">
             {statusInfo.icon}
           </div>
 
@@ -557,7 +558,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
             {statusInfo.title}
           </h2>
 
-          <p className="text-lg text-gray-600 mb-6">
+          <p className="text-lg text-slate-400 mb-6">
             {statusInfo.subtitle}
           </p>
 
@@ -565,7 +566,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
           {employee && (
             <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-6 mb-6">
               <h3 className="font-bold text-gray-800 mb-3">Employee Information</h3>
-              <div className="space-y-2 text-sm text-gray-600">
+              <div className="space-y-2 text-sm text-slate-400">
                 <div><strong>Name:</strong> {employee.first_name} {employee.last_name}</div>
                 <div><strong>Email:</strong> {employee.email}</div>
                 {employee.submitted_at && (
@@ -597,7 +598,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
           </div>
 
           {/* Contact Information */}
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-slate-700/50">
             <h3 className="font-bold text-indigo-800 mb-3 flex items-center justify-center">
               <Phone className="h-5 w-5 mr-2" />
               HR Department Contact
@@ -611,7 +612,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
 
           {/* Security Note */}
           <div className="mt-6 text-center">
-            <div className="inline-flex items-center text-sm text-gray-600">
+            <div className="inline-flex items-center text-sm text-slate-400">
               <Shield className="w-4 h-4 mr-2" />
               <span>Onboarding links expire for security reasons. HR can generate a new link for you.</span>
             </div>

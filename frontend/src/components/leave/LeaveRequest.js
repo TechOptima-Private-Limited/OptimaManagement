@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import {
@@ -21,6 +22,14 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import Modal from '../common/Modal';
 
 const LeaveRequest = () => {
+  const location = useLocation();
+
+  const employeeFromUrlRef = useRef('');
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    employeeFromUrlRef.current = params.get('employee') || '';
+  }, [location.search]);
+
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveTypes, setLeaveTypes] = useState([]);
   const [leaveBalances, setLeaveBalances] = useState([]);
@@ -35,6 +44,12 @@ const LeaveRequest = () => {
     start_date: '',
     end_date: ''
   });
+
+  useEffect(() => {
+    const employeeParam = employeeFromUrlRef.current;
+    if (!employeeParam) return;
+    setFilters((prev) => ({ ...prev, employee_id: employeeParam }));
+  }, [location.search]);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
 
@@ -84,6 +99,9 @@ const LeaveRequest = () => {
       if (filters.leave_type) params.leave_type = filters.leave_type;
       if (filters.start_date) params.start_date = filters.start_date;
       if (filters.end_date) params.end_date = filters.end_date;
+
+      const effectiveEmployeeId = filters.employee_id || employeeFromUrlRef.current;
+      if (effectiveEmployeeId) params.employee_id = effectiveEmployeeId;
 
       const response = await leaveAPI.getLeaveRequests(params);
       setLeaveRequests(response.data.results || response.data);
@@ -242,7 +260,7 @@ const LeaveRequest = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ status: '', leave_type: '', start_date: '', end_date: '' });
+    setFilters({ status: '', leave_type: '', start_date: '', end_date: '', employee_id: employeeFromUrlRef.current || '' });
   };
 
   const getBalanceWarning = () => {

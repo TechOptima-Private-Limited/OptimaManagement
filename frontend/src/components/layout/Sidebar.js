@@ -297,7 +297,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       `}>
         {/* Logo and brand */}
         <div className="relative z-10 flex items-center justify-start h-20 px-6 bg-slate-900/50 backdrop-blur-md border-b border-white/5">
-          <div className="flex items-center space-x-3">
+          <Link
+            to="/dashboard"
+            onClick={onClose}
+            className="flex items-center space-x-3 hover:opacity-90 transition-opacity"
+            aria-label="Go to Dashboard"
+          >
             <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 border border-indigo-400/30">
               <span className="text-white font-bold text-sm tracking-tighter">OMH</span>
             </div>
@@ -309,7 +314,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 ManagementHub
               </p>
             </div>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto relative z-10 custom-scrollbar">

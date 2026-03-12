@@ -54,7 +54,7 @@ class AttendanceRecord(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     # ✅ NEW: Store biometric user info directly
-    biometric_user_id = models.CharField(max_length=100, blank=True, help_text="User ID from biometric device")
+    biometric_user_id = models.CharField(max_length=100, blank=True, null=True, help_text="User ID from biometric device")
     biometric_user_name = models.CharField(max_length=200, blank=True, help_text="User name from biometric device")
     
     # Location fields
