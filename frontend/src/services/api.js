@@ -68,7 +68,6 @@ export const authAPI = {
   // refreshToken removed - handled via HttpOnly cookies
   changePassword: (data) => api.post('/auth/profile/change-password/', data),
   getMyPermissions: () => api.get('/auth/me/permissions/'),
-  getCaptcha: () => api.get('/auth/captcha/'),
 };
 
 // Admin/HR user management API

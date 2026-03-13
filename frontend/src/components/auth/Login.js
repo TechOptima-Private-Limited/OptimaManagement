@@ -1,52 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, ArrowPathIcon, ShieldCheckIcon, SparklesIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon, SparklesIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
-import { authAPI } from '../../services/api';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { login, loading } = useAuth();
+
   const navigate = useNavigate();
   const location = useLocation();
-  const [captcha, setCaptcha] = useState({ key: '', imageUrl: '' });
-  const [fetchingCaptcha, setFetchingCaptcha] = useState(false);
-  const { register, handleSubmit, formState: { errors }, resetField } = useForm();
-
-  const fetchCaptcha = useCallback(async () => {
-    setFetchingCaptcha(true);
-    try {
-      const response = await authAPI.getCaptcha();
-      const apiBase = (process.env.REACT_APP_API_URL || "http://127.0.0.1:8080/api").replace(/\/api$/, "");
-      setCaptcha({
-        key: response.data.key,
-        imageUrl: response.data.image_url.startsWith('http')
-          ? response.data.image_url
-          : `${apiBase}${response.data.image_url}`
-      });
-    } catch (error) {
-      console.error('Failed to fetch captcha:', error);
-      toast.error('Failed to load security code');
-    } finally {
-      setFetchingCaptcha(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCaptcha();
-  }, [fetchCaptcha]);
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const from = location.state?.from?.pathname || '/dashboard';
 
   const onSubmit = async (data) => {
-    const loginData = {
-      ...data,
-      captcha_key: captcha.key,
-      captcha_value: data.captcha
-    };
-    const result = await login(loginData);
+    const result = await login(data);
     if (result.success) {
       toast.success('Access Granted. Welcome back.');
       if (result.user?.must_change_password) {
@@ -56,8 +26,6 @@ const Login = () => {
       }
     } else {
       toast.error(result.error);
-      fetchCaptcha();
-      resetField('captcha');
     }
   };
 
@@ -123,7 +91,7 @@ const Login = () => {
 
         {/* Footer Meta */}
         <div className="flex items-center space-x-6">
-          <p className="text-[10px] font-black text-gray-700 uppercase tracking-widest">© 2026 TechOptima Global</p>
+          <p className="text-[10px] font-black text-gray-700 uppercase tracking-widest"> 2026 TechOptima Global</p>
           <div className="h-px flex-1 bg-white/5" />
         </div>
       </div>
@@ -191,44 +159,6 @@ const Login = () => {
                 </div>
                 {errors.password && (
                   <p className="mt-2 text-[10px] font-black text-rose-500 uppercase tracking-wider">{errors.password.message}</p>
-                )}
-              </div>
-
-              {/* Captcha */}
-              <div className="bg-black/20 rounded-[2rem] p-6 border border-white/5 space-y-4">
-                <label className="block text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">
-                  Human Verification
-                </label>
-
-                <div className="flex items-center space-x-4">
-                  <div className="flex-1 h-14 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center justify-center p-2 relative overflow-hidden group/captcha">
-                    {fetchingCaptcha ? (
-                      <div className="flex space-x-1.5">
-                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" />
-                      </div>
-                    ) : (
-                      <img src={captcha.imageUrl} alt="Captcha" className="h-full object-contain mix-blend-screen opacity-90 transition-opacity hover:opacity-100" />
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={fetchCaptcha}
-                    className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-gray-500 hover:text-indigo-400 hover:border-indigo-500/30 transition-all duration-300"
-                  >
-                    <ArrowPathIcon className={`h-6 w-6 ${fetchingCaptcha ? 'animate-spin' : ''}`} />
-                  </button>
-                </div>
-
-                <input
-                  {...register('captcha', { required: 'Verification code required' })}
-                  type="text"
-                  className={`${inputClass} text-center tracking-[0.3em] font-black uppercase placeholder:tracking-normal placeholder:font-medium`}
-                  placeholder="CODE"
-                />
-                {errors.captcha && (
-                  <p className="text-[10px] font-black text-rose-500 uppercase tracking-wider text-center">{errors.captcha.message}</p>
                 )}
               </div>
 

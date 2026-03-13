@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='fallback-dev-secret')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,192.168.1.3', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,192.168.1.3,optpeople.techoptima.ai,optpeople-b.techoptima.ai', cast=Csv())
 
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002,https://optpeople.techoptima.ai,https://optpeople-b.techoptima.ai', cast=Csv())
 
 # HTTPS and SSL Enforcement
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)  # Set to True in production
@@ -294,7 +294,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002,https://optpeople.techoptima.ai', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002,https://optpeople.techoptima.ai,https://optpeople-b.techoptima.ai', cast=Csv())
 
 # Content Security Policy (CSP) Configuration - Commented out until django-csp is installed
 # CSP_DEFAULT_SRC = ("'self'",)
