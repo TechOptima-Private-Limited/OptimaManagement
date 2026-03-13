@@ -294,7 +294,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002,https://optpeople.techoptima.ai', cast=Csv())
 
 # Content Security Policy (CSP) Configuration - Commented out until django-csp is installed
 # CSP_DEFAULT_SRC = ("'self'",)

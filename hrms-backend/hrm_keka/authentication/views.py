@@ -192,6 +192,8 @@ def logout(request):
 @permission_classes([AllowAny])
 def login(request):
     email = request.data.get('email')
+    if isinstance(email, str):
+        email = email.strip().lower()
     password = request.data.get('password')
     captcha_key = request.data.get('captcha_key')
     captcha_value = request.data.get('captcha_value')
