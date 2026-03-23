@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI, adminUserAPI } from '../../services/api';
-import { isAdmin } from '../../utils/auth';
+import { authAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 import { useTheme } from '../../context/ThemeContext';
 import { UserPlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
@@ -28,7 +27,7 @@ const UsersAuthAddUser = () => {
     e.preventDefault();
     if (submittingRef.current || saving) return; // guard against rapid double-submit
     if (!form.username || !form.email || !form.password || !form.password_confirm) {
-      toast.error('Username, email and both passwords are required');
+      toast.error('UserID, email and both passwords are required');
       return;
     }
     if (form.password !== form.password_confirm) {
@@ -118,7 +117,7 @@ const UsersAuthAddUser = () => {
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">UserID</label>
                 <input
                   type="text"
                   className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"

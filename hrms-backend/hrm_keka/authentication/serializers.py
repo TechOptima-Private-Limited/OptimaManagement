@@ -564,7 +564,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         from .models import UserProfile
 
         if profile_data:
-            # 🔥 Ensure profile exists
+            # Ensure profile exists
             profile, _ = UserProfile.objects.get_or_create(user=instance)
 
             serializer = UserProfileUpdateSerializer(
@@ -576,3 +576,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
             serializer.save()
 
         return instance
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(trim_whitespace=False)

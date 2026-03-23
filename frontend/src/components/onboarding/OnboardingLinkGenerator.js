@@ -18,6 +18,11 @@ const OnboardingLinkGenerator = () => {
   const [copyStatus, setCopyStatus] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const toBase64Url = (input) => {
+    const b64 = btoa(input);
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  };
+
   const generateNewLink = () => {
     setIsGenerating(true);
 
@@ -25,7 +30,7 @@ const OnboardingLinkGenerator = () => {
     setTimeout(() => {
       const timestamp = Math.floor(Date.now() / 1000);
       const data = `GENERIC_${timestamp}`;
-      const encoded = btoa(data);
+      const encoded = toBase64Url(data);
 
       // Get the current origin or use a default
       const baseUrl = window.location.origin || 'http://localhost:3002';

@@ -2,6 +2,13 @@ from rest_framework import serializers
 from .models import AttendanceRecord, BiometricDevice, BiometricAttendanceLog, WorkFromHomeRequest
 from employees.serializers import EmployeeSerializer
 from django.utils import timezone
+from employees.models import Employee
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+from functools import reduce
+import operator
+
+User = get_user_model()
 
 class BiometricAttendanceLogSerializer(serializers.ModelSerializer):
     """Serializer for raw biometric logs"""
@@ -44,20 +51,157 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
             'biometric_user_id', 'biometric_user_name',
             'display_name', 'display_id', 'biometric_logs'
         ]
+
+    def _build_identifier_candidates(self, identifier):
+        if not identifier:
+            return []
+
+        raw = str(identifier)
+        normalized = raw.strip()
+        if not normalized:
+            return []
+
+        upper = normalized.upper()
+        candidates = []
+        for v in [normalized, upper]:
+            if v and v not in candidates:
+                candidates.append(v)
+
+        # If the device provides a numeric user id (e.g. "80"), try common employee_id formats.
+        # Example in this project: TO-00080
+        digits = ''.join([ch for ch in upper if ch.isdigit()])
+        if digits and digits == upper:
+            try:
+                n = int(digits)
+            except ValueError:
+                n = None
+
+            if n is not None:
+                for width in [5, 4, 3]:
+                    padded = str(n).zfill(width)
+                    for prefix in ['TO', 'EMP']:
+                        for fmt in [f"{prefix}-{padded}", f"{prefix}{padded}", f"{prefix}_{padded}"]:
+                            if fmt not in candidates:
+                                candidates.append(fmt)
+
+        # Common variations:
+        # - TO-00080 <-> TO00080
+        # - underscores/spaces
+        no_separators = upper.replace('-', '').replace('_', '').replace(' ', '')
+        if no_separators and no_separators not in candidates:
+            candidates.append(no_separators)
+
+        if '-' in upper:
+            with_underscore = upper.replace('-', '_')
+            if with_underscore not in candidates:
+                candidates.append(with_underscore)
+        elif '_' in upper:
+            with_dash = upper.replace('_', '-')
+            if with_dash not in candidates:
+                candidates.append(with_dash)
+
+        return candidates
+
+    def _resolve_employee_from_biometric_user_id(self, biometric_user_id):
+        """
+        Best-effort lookup of an Employee from a biometric identifier.
+
+        Some biometric devices send an employee code in `biometric_user_id` (e.g. "80")
+        while others place it in `biometric_user_name` (e.g. "TO-00080"). We therefore
+        accept any identifier value here and try several normalized variants.
+        """
+        if not biometric_user_id:
+            return None
+
+        cache = getattr(self, '_biometric_employee_cache', None)
+        if cache is None:
+            cache = {}
+            setattr(self, '_biometric_employee_cache', cache)
+
+        raw = str(biometric_user_id)
+        if raw in cache:
+            return cache[raw]
+
+        candidates = self._build_identifier_candidates(raw)
+        if not candidates:
+            cache[raw] = None
+            return None
+
+        # Single query using OR across candidates (case-insensitive)
+        q = reduce(
+            operator.or_,
+            [Q(employee_id__iexact=c) | Q(user__username__iexact=c) for c in candidates],
+            Q(),
+        )
+        emp = Employee.objects.select_related('user').filter(q).first()
+        cache[raw] = emp
+        return emp
+
+    def _resolve_user_from_identifier(self, identifier):
+        """
+        Fallback for cases where a Django User exists but an Employee row doesn't
+        (or isn't linked yet). We try to match by username and email.
+        """
+        candidates = self._build_identifier_candidates(identifier)
+        if not candidates:
+            return None
+
+        q = reduce(
+            operator.or_,
+            [Q(username__iexact=c) | Q(email__iexact=c) for c in candidates],
+            Q(),
+        )
+        return User.objects.filter(q).first()
     
     def get_display_name(self, obj):
         """Get display name - employee name or biometric name"""
         if obj.employee:
-            return obj.employee.user.get_full_name()
-        else:
-            return obj.biometric_user_name or obj.biometric_user_id or "Unknown"
+            full = obj.employee.user.get_full_name() if obj.employee.user else ''
+            if full:
+                return full
+            # If the user doesn't have first/last name populated, fall back gracefully.
+            return (
+                getattr(obj.employee.user, 'username', None) or
+                getattr(obj.employee, 'employee_id', None) or
+                "Unknown"
+            )
+
+        # Biometric-only records: try resolving by both biometric_user_id and biometric_user_name.
+        emp = (
+            self._resolve_employee_from_biometric_user_id(obj.biometric_user_id) or
+            self._resolve_employee_from_biometric_user_id(obj.biometric_user_name)
+        )
+        if emp and emp.user:
+            full = emp.user.get_full_name()
+            if full:
+                return full
+            return getattr(emp.user, 'username', None) or getattr(emp, 'employee_id', None) or "Unknown"
+
+        # If there's no Employee row but there *is* a User, use that name.
+        u = (
+            self._resolve_user_from_identifier(obj.biometric_user_id) or
+            self._resolve_user_from_identifier(obj.biometric_user_name)
+        )
+        if u:
+            full = u.get_full_name()
+            if full:
+                return full
+            return getattr(u, 'username', None) or getattr(u, 'email', None) or "Unknown"
+
+        # Final fallback: whatever we got from the device.
+        return obj.biometric_user_name or obj.biometric_user_id or "Unknown"
     
     def get_display_id(self, obj):
         """Get display ID - employee ID or biometric ID"""
         if obj.employee:
             return obj.employee.employee_id
-        else:
-            return obj.biometric_user_id or "N/A"
+        emp = (
+            self._resolve_employee_from_biometric_user_id(obj.biometric_user_id) or
+            self._resolve_employee_from_biometric_user_id(obj.biometric_user_name)
+        )
+        if emp:
+            return emp.employee_id
+        return obj.biometric_user_id or "N/A"
 
 
 class BiometricDeviceSerializer(serializers.ModelSerializer):

@@ -23,6 +23,9 @@ from utils.roles import (
     ROLE_CATEGORIES
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Helper function to get manager's team employees
 def get_manager_team_employees(user):
@@ -75,7 +78,7 @@ def get_employee_profile_data(request):
             ).exclude(
                 id=current_employee.id
             )
-            print(f"👑 {user_role} - fetching all employees as peers")
+            logger.debug("Employee profile peers: senior access")
             
         elif has_management_access(user_role) or has_lead_access(user_role):
             # Managers and Team Leads see their team
@@ -85,7 +88,7 @@ def get_employee_profile_data(request):
                 manager=current_employee,
                 status='ACTIVE'
             )
-            print(f"👨‍💼 {user_role} - fetching direct reports as peers")
+            logger.debug("Employee profile peers: manager/team lead")
             
         elif current_employee.manager:
             # Regular employees see peers (same manager)
@@ -97,7 +100,7 @@ def get_employee_profile_data(request):
             ).exclude(
                 id=current_employee.id
             )
-            print(f"👤 {user_role} - fetching peers with same manager")
+            logger.debug("Employee profile peers: same manager")
         
         # Serialize data
         employee_data = EmployeeSerializer(current_employee, context={'request': request}).data
@@ -119,11 +122,8 @@ def get_employee_profile_data(request):
         return Response(response_data)
         
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return Response({
-            'error': f'Failed to fetch employee profile data: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error("Failed to fetch employee profile data user_id=%s", getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -182,11 +182,8 @@ def get_manager_profile_data(request):
         return Response(response_data)
         
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return Response({
-            'error': f'Failed to fetch manager profile data: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error("Failed to fetch manager profile data user_id=%s", getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -233,7 +230,7 @@ def get_all_managers_with_teams(request):
                 manager_data['team_count'] = team_count
                 managers_with_teams.append(manager_data)
         
-        print(f"👥 Found {len(managers_with_teams)} managers with teams")
+        logger.debug("Found %s managers with teams", len(managers_with_teams))
         
         return Response({
             'managers': managers_with_teams,
@@ -241,10 +238,8 @@ def get_all_managers_with_teams(request):
         })
         
     except Exception as e:
-        print(f"❌ Error getting managers: {str(e)}")
-        return Response({
-            'error': f'Failed to fetch managers: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error("Error getting managers user_id=%s", getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EmployeeListCreateView(generics.ListCreateAPIView):
@@ -315,7 +310,7 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         return base_qs.distinct()
 
     def create(self, request, *args, **kwargs):
-        print(" Incoming Employee Payload:", request.data)
+        logger.debug("Incoming Employee payload user_id=%s", getattr(request.user, 'id', None))
         
         # Get user role and permission level
         user = request.user
@@ -348,7 +343,6 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         
         serializer = self.get_serializer(data=transformed_data)
         if not serializer.is_valid():
-            print("❌ Validation Errors:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         employee = serializer.save()
@@ -739,11 +733,5 @@ def dashboard_birthday_festival_data(request):
         return Response(result)
         
     except Exception as e:
-        print(f"❌ Error in dashboard_birthday_festival_data: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        
-        return Response(
-            {'error': f'Failed to fetch birthday and festival data: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        logger.error("Error in dashboard_birthday_festival_data user_id=%s", getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

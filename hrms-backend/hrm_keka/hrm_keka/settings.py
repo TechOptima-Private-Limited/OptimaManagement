@@ -13,6 +13,8 @@ Put your .env at the project root (example .env provided previously).
 
 from pathlib import Path
 import os
+import ipaddress
+import socket
 from datetime import timedelta
 from decouple import config, Csv
 from dotenv import load_dotenv
@@ -95,6 +97,7 @@ LOGGING = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'hrm_keka.security_middleware.SecurityHeadersMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -139,6 +142,25 @@ DATABASES = {
         'PORT': config('DB_PORT'),
     }
 }
+
+ENFORCE_PRIVATE_DB_HOST = config('ENFORCE_PRIVATE_DB_HOST', default=not DEBUG, cast=bool)
+if ENFORCE_PRIVATE_DB_HOST:
+    _db_host = DATABASES.get('default', {}).get('HOST')
+    try:
+        _resolved_ip = None
+        if _db_host:
+            try:
+                _resolved_ip = ipaddress.ip_address(_db_host)
+            except ValueError:
+                try:
+                    _resolved_ip = ipaddress.ip_address(socket.gethostbyname(_db_host))
+                except Exception:
+                    _resolved_ip = None
+
+        if _resolved_ip and not (_resolved_ip.is_private or _resolved_ip.is_loopback):
+            raise RuntimeError('DB_HOST must be private/loopback when ENFORCE_PRIVATE_DB_HOST is enabled')
+    finally:
+        _db_host = None
 
 
 # Email configuration
@@ -296,17 +318,38 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3002,http://127.0.0.1:3002,http://192.168.1.3:3002,https://optpeople.techoptima.ai,https://optpeople-b.techoptima.ai', cast=Csv())
 
-# Content Security Policy (CSP) Configuration - Commented out until django-csp is installed
-# CSP_DEFAULT_SRC = ("'self'",)
-# CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
-# CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
-# CSP_IMG_SRC = ("'self'", "data:", "https:")
-# CSP_FONT_SRC = ("'self'", "data:")
-# CSP_CONNECT_SRC = ("'self'",)
-# CSP_OBJECT_SRC = ("'none'",)
-# CSP_BASE_URI = ("'self'",)
-# CSP_FORM_ACTION = ("'self'",)
-# CSP_FRAME_ANCESTORS = ("'none'",)
+# Content Security Policy (CSP)
+# Allow override via env var CONTENT_SECURITY_POLICY.
+# Default is strict but keeps common SPA needs (inline styles) compatible.
+CONTENT_SECURITY_POLICY = config(
+    'CONTENT_SECURITY_POLICY',
+    default="; ".join([
+        "default-src 'self'",
+        "base-uri 'self'",
+        "frame-ancestors 'none'",
+        "object-src 'none'",
+        "img-src 'self' data: https:",
+        "font-src 'self' data:",
+        "style-src 'self' 'unsafe-inline'",
+        "script-src 'self'",
+        "connect-src 'self'",
+        "form-action 'self'",
+        "upgrade-insecure-requests",
+    ])
+)
+
+REFERRER_POLICY = config('REFERRER_POLICY', default='strict-origin-when-cross-origin')
+PERMISSIONS_POLICY = config(
+    'PERMISSIONS_POLICY',
+    default=', '.join([
+        'geolocation=(self)',
+        'microphone=()',
+        'camera=()',
+        'payment=()',
+        'usb=()',
+        'interest-cohort=()'
+    ])
+)
 
 # Webpush Settings
 WEBPUSH_SETTINGS = {

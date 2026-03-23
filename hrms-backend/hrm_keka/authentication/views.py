@@ -8,9 +8,11 @@ from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Q
+from django.conf import settings
 from .serializers import (
     UserRegistrationSerializer, UserSerializer, EmployeeRegistrationSerializer, 
-    UserDetailSerializer, UserUpdateSerializer, AdminUserSerializer
+    UserDetailSerializer, UserUpdateSerializer, AdminUserSerializer,
+    LoginSerializer
 )
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
@@ -191,47 +193,46 @@ def logout(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
-    email = request.data.get('email')
-    if isinstance(email, str):
-        email = email.strip().lower()
-    password = request.data.get('password')
+    serializer = LoginSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if email and password:
-        user = authenticate(username=email, password=password)
-        if user:
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
-            
-            response = Response({
-                'user': UserSerializer(user).data,
-                'access': access_token,  
-            })
-            
-            # Set access token cookie
-            response.set_cookie(
-                key='access_token',
-                value=access_token,
-                httponly=True,
-                secure=False,  
-                samesite='Lax',
-                path='/',
-            )
-            
-            # Set refresh token cookie
-            response.set_cookie(
-                key='refresh_token',
-                value=str(refresh),
-                httponly=True,
-                secure=False,  
-                samesite='Lax',
-                path='/',
-            )
-            
-            return response
-    
-    return Response({
-        'error': 'Invalid credentials'
-    }, status=status.HTTP_401_UNAUTHORIZED)
+    email = serializer.validated_data['email'].strip().lower()
+    password = serializer.validated_data['password']
+
+    user = authenticate(username=email, password=password)
+    if not user:
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+
+    response = Response({
+        'user': UserSerializer(user).data,
+        'access': access_token,
+    })
+
+    cookie_secure = not settings.DEBUG
+
+    response.set_cookie(
+        key='access_token',
+        value=access_token,
+        httponly=True,
+        secure=cookie_secure,
+        samesite='Lax',
+        path='/',
+    )
+
+    response.set_cookie(
+        key='refresh_token',
+        value=str(refresh),
+        httponly=True,
+        secure=cookie_secure,
+        samesite='Lax',
+        path='/',
+    )
+
+    return response
 
 
 class UserProfileView(generics.RetrieveUpdateAPIView):

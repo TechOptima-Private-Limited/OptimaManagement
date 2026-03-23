@@ -448,7 +448,7 @@ def fetch_biometric_logs(request):
         
         logs = conn.get_attendance()
         filtered_logs = [log for log in logs if log.timestamp.date() == fetch_date]
-        print(f"🔍 Fetched {len(logs)} total logs, {len(filtered_logs)} for date {fetch_date}")
+        logger.debug("Fetched biometric logs total=%s filtered=%s date=%s", len(logs), len(filtered_logs), fetch_date)
         conn.enable_device()
         conn.disconnect()
         
@@ -474,9 +474,9 @@ def fetch_biometric_logs(request):
         }, status=status.HTTP_200_OK)
         
     except Exception as e:
-        logger.error(f"Failed to fetch biometric logs: {str(e)}")
+        logger.error("Failed to fetch biometric logs", exc_info=True)
         return Response({
-            'error': f'Failed to fetch logs: {str(e)}'
+            'error': 'Failed to fetch logs'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -502,7 +502,7 @@ class AttendanceRecordListView(generics.ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        print(f"🔍 Current user: {user}")
+        logger.debug("AttendanceRecordListView user_id=%s", getattr(user, 'id', None))
         
         queryset = AttendanceRecord.objects.all()
         
@@ -525,7 +525,7 @@ class AttendanceRecordListView(generics.ListAPIView):
                 # Managers and Leads see their team + self
                 allowed_employee_ids = get_manager_team_employees(user)
                 queryset = queryset.filter(employee__id__in=allowed_employee_ids)
-                print(f"🔍 Manager/Lead filtered queryset: {queryset}")
+                logger.debug("AttendanceRecordListView scoped to manager/team user_id=%s", getattr(user, 'id', None))
             else:
                 # Regular employees
                 try:
@@ -542,11 +542,11 @@ class AttendanceRecordListView(generics.ListAPIView):
                         
                         allowed_ids = [employee.id] + peer_ids
                         queryset = queryset.filter(employee_id__in=allowed_ids)
-                        print(f"🔍 Employee peer-aware filtered queryset: {allowed_ids}")
+                        logger.debug("AttendanceRecordListView scoped to peers employee_id=%s", employee.id)
                     else:
                         # Only own records
                         queryset = queryset.filter(employee=employee)
-                        print(f"🔍 Employee filtered queryset (own only): {employee.id}")
+                        logger.debug("AttendanceRecordListView scoped to self employee_id=%s", employee.id)
                 except Employee.DoesNotExist:
                     queryset = AttendanceRecord.objects.none()
         
@@ -554,7 +554,7 @@ class AttendanceRecordListView(generics.ListAPIView):
         employee_id_param = self.request.query_params.get('employee_id')
         if employee_id_param:
             queryset = queryset.filter(employee__employee_id=employee_id_param)
-            print(f"🔍 Filtered by employee_id param: {employee_id_param}")
+            logger.debug("AttendanceRecordListView filtered by employee_id param")
 
         # Filter by date range if provided
         start_date = self.request.query_params.get('start_date')
@@ -633,6 +633,7 @@ class AttendanceRecordListView(generics.ListAPIView):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def manual_attendance(request):
     """Create attendance record or submit edit request"""
     try:
@@ -718,7 +719,7 @@ def manual_attendance(request):
                     )
 
                 # Otherwise, treat as an edit that requires approval
-                print(f"🔄 Processing edit request for {employee.user} on {existing_record.date}")
+                logger.info("Processing attendance edit request for user_id=%s date=%s", request.user.id, existing_record.date)
                 existing_record.original_check_in_time = existing_record.check_in_time
                 existing_record.original_check_out_time = existing_record.check_out_time
                 existing_record.original_status = existing_record.status
@@ -755,7 +756,7 @@ def manual_attendance(request):
                 }
                 
                 existing_record.save()
-                print(f"✅ Edit request saved - is_pending_approval: {existing_record.is_pending_approval}")
+                logger.info("Attendance edit request saved record_id=%s pending=%s", existing_record.id, existing_record.is_pending_approval)
                 
                 return Response({
                     'message': 'Edit request submitted! HR and managers have been notified for approval.',
@@ -789,7 +790,7 @@ def manual_attendance(request):
                         employee=employee,
                         **serializer.validated_data
                     )
-                    print(f"✅ New attendance record created for {employee.user}")
+                    logger.info("New attendance record created record_id=%s user_id=%s", attendance_record.id, request.user.id)
                     return Response(
                         AttendanceRecordSerializer(attendance_record).data,
                         status=status.HTTP_201_CREATED
@@ -800,8 +801,8 @@ def manual_attendance(request):
     except Employee.DoesNotExist:
         return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"❌ Error in manual_attendance: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error("Error in manual_attendance user_id=%s", getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -857,7 +858,7 @@ from .signals import send_approval_result_email
 @permission_classes([IsAuthenticated])
 def approve_edit(request, record_id):
     """Approve or reject attendance edit - HR/Manager/Senior Leaders"""
-    print(f"🔍 Approve edit called for record_id: {record_id}")
+    logger.info("Approve edit called record_id=%s user_id=%s", record_id, getattr(request.user, 'id', None))
     
     user_profile = getattr(request.user, 'profile', None)
     user_role = getattr(user_profile, 'role', None) if user_profile else None
@@ -875,7 +876,7 @@ def approve_edit(request, record_id):
     
     try:
         record = AttendanceRecord.objects.get(id=record_id, is_pending_approval=True)
-        print(f"✅ Found pending record: {record}")
+        logger.debug("Approve edit found pending record_id=%s", record_id)
         
         # For managers (not senior leaders/HR), check if they can access this record
         if permission_level == PERMISSION_LEVELS['MANAGER'] and not can_manage_hr(user_role):
@@ -889,17 +890,17 @@ def approve_edit(request, record_id):
         # Try to get approver Employee record
         try:
             approver = Employee.objects.get(user=request.user)
-            print(f"✅ Found approver employee: {approver}")
+            logger.debug("Approve edit approver_employee_id=%s", approver.id)
         except Employee.DoesNotExist:
-            print(f"⚠️ No Employee record found for user {request.user.username}")
+            logger.warning("Approve edit: no Employee record for user_id=%s", getattr(request.user, 'id', None))
             approver = None
         
         action = request.data.get('action')  # 'approve' or 'reject'
-        print(f"🔍 Action: {action}")
+        logger.debug("Approve edit action=%s record_id=%s", action, record_id)
         
         if action == 'approve':
             new_data = request.data.get('new_data', {})
-            print(f"🔍 New data: {new_data}")
+            logger.debug("Approve edit new_data keys=%s", list(new_data.keys()) if isinstance(new_data, dict) else None)
             
             # Apply changes provided by approver
             if new_data:
@@ -928,7 +929,7 @@ def approve_edit(request, record_id):
                     approver_name=approver.user.get_full_name() if approver else 'Manager'
                 )
 
-            print(f"✅ Record approved and updated")
+            logger.info("Attendance edit approved record_id=%s", record_id)
             return Response({'message': 'Edit approved and applied!'}, status=status.HTTP_200_OK)
             
         elif action == 'reject':
@@ -945,7 +946,7 @@ def approve_edit(request, record_id):
                     approved=False,
                     approver_name=approver.user.get_full_name() if approver else 'Manager'
                 )
-            print(f"✅ Record rejected")
+            logger.info("Attendance edit rejected record_id=%s", record_id)
             return Response({'message': 'Edit rejected! Original data preserved.'}, status=status.HTTP_200_OK)
         else:
             return Response(
@@ -954,14 +955,14 @@ def approve_edit(request, record_id):
             )
         
     except AttendanceRecord.DoesNotExist:
-        print(f"❌ Record not found: {record_id}")
+        logger.info("Approve edit record not found or not pending record_id=%s", record_id)
         return Response(
             {'error': 'Record not found or not pending approval'}, 
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
-        print(f"❌ Error in approve_edit: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error("Error in approve_edit record_id=%s user_id=%s", record_id, getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -996,6 +997,7 @@ def ping_location(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def biometric_sync(request):
     """API endpoint for biometric device integration"""
     device_id = request.data.get('device_id')
@@ -1070,11 +1072,11 @@ def apply_work_from_home(request):
         serializer = WorkFromHomeApplySerializer(data=request.data)
         
         if not serializer.is_valid():
-            print(f"❌ WFH Serializer Errors: {serializer.errors}")
+            logger.info("WFH serializer invalid user_id=%s", getattr(request.user, 'id', None))
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
         # Check if already applied for this date range
-        print(f"🔍 Checking if WFH exists for {employee.user} between {serializer.validated_data['start_date']} and {serializer.validated_data['end_date']}")
+        logger.debug("Checking existing WFH request employee_id=%s", employee.id)
         existing_request = WorkFromHomeRequest.objects.filter(
             employee=employee,
             start_date__lte=serializer.validated_data['end_date'],
@@ -1083,7 +1085,7 @@ def apply_work_from_home(request):
         
         if existing_request:
             msg = f"Already applied for WFH during this period ({existing_request.start_date} to {existing_request.end_date}). Status: {existing_request.status}"
-            print(f"⚠️ {msg}")
+            logger.info("Duplicate WFH request employee_id=%s", employee.id)
             return Response({'error': msg}, status=status.HTTP_400_BAD_REQUEST)
             
         # Create WFH request
@@ -1118,7 +1120,7 @@ def apply_work_from_home(request):
                     action_text='Review Request'
                 )
         except Exception as e:
-            print(f"⚠️ Failed to send WFH push notification: {str(e)}")
+            logger.warning("Failed to send WFH push notification", exc_info=True)
         
         return Response({
             'message': 'Work from home request submitted successfully!',
@@ -1184,13 +1186,12 @@ def check_wfh_status(request):
             })
     
     except Exception as e:
-        print(f"❌ Error in check_wfh_status: {str(e)}")
+        logger.error("Error in check_wfh_status user_id=%s", getattr(request.user, 'id', None), exc_info=True)
         return Response({
             'has_wfh_request': False,
             'can_work_from_home': False,
             'request': None,
-            'error': str(e)
-        })
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -1209,7 +1210,7 @@ def get_wfh_requests(request):
             requests = WorkFromHomeRequest.objects.all().select_related(
                 'employee', 'employee__user', 'employee__department', 'approved_by', 'approved_by__user'
             ).order_by('-applied_at')
-            print(f"👑 {user_role} - fetching all requests")
+            logger.debug("WFH requests: fetching all")
             
         elif has_management_access(user_role):
             # Managers see team requests + their own
@@ -1219,7 +1220,7 @@ def get_wfh_requests(request):
             ).select_related(
                 'employee', 'employee__user', 'employee__department', 'approved_by', 'approved_by__user'
             ).order_by('-applied_at')
-            print(f"👨‍💼 Manager - fetching team requests")
+            logger.debug("WFH requests: fetching team")
             
         else:
             # Regular employees see only their own
@@ -1230,7 +1231,7 @@ def get_wfh_requests(request):
                 ).select_related(
                     'employee', 'employee__user', 'employee__department', 'approved_by', 'approved_by__user'
                 ).order_by('-applied_at')
-                print(f"👤 {user_role} - fetching own requests")
+                logger.debug("WFH requests: fetching own employee_id=%s", employee.id)
             except Employee.DoesNotExist:
                 requests = WorkFromHomeRequest.objects.none()
         
@@ -1238,7 +1239,7 @@ def get_wfh_requests(request):
         status_filter = request.query_params.get('status')
         if status_filter:
             requests = requests.filter(status=status_filter.upper())
-            print(f"🔽 Filtered by status '{status_filter}': {requests.count()} requests")
+            logger.debug("WFH requests filtered by status")
         
         # Serialize the data
         serializer = WorkFromHomeRequestSerializer(requests, many=True)
@@ -1248,18 +1249,11 @@ def get_wfh_requests(request):
             'count': requests.count(),
             'user_role': user_role,
             'permission_level': permission_level,
-            'debug_info': {
-                'server_date': str(timezone.now().date()),
-                'server_time': str(timezone.now()),
-                'user': str(user)
-            }
         })
     
     except Exception as e:
-        print(f"❌ Error in get_wfh_requests: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error("Error in get_wfh_requests user_id=%s", getattr(request.user, 'id', None), exc_info=True)
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -1320,7 +1314,7 @@ def approve_wfh_request(request, request_id):
                     action_text='View Attendance'
                 )
             except Exception as e:
-                print(f"⚠️ Failed to send WFH approval push: {str(e)}")
+                logger.warning("Failed to send WFH approval push", exc_info=True)
             
             return Response({'message': 'Work from home request approved!'})
         
@@ -1346,7 +1340,7 @@ def approve_wfh_request(request, request_id):
                     action_text='View Attendance'
                 )
             except Exception as e:
-                print(f"⚠️ Failed to send WFH rejection push: {str(e)}")
+                logger.warning("Failed to send WFH rejection push", exc_info=True)
             
             return Response({'message': 'Work from home request rejected!'})
         
@@ -1378,7 +1372,7 @@ def send_wfh_request_email(wfh_request):
                 recipients.append(wfh_request.employee.manager.user.email)
         
         if not recipients:
-            print("❌ No HR Manager or Manager email found")
+            logger.warning("No HR Manager or Manager email found for WFH request_id=%s", wfh_request.id)
             return
         
         subject = f"Work From Home Request - {wfh_request.employee.user.get_full_name()}"
@@ -1417,11 +1411,10 @@ def send_wfh_request_email(wfh_request):
         )
         email.content_subtype = "html"
         email.send()
-        
-        print(f"✅ WFH request email sent to HR and managers for {wfh_request.employee.user.get_full_name()}")
+        logger.info("WFH request email sent request_id=%s", wfh_request.id)
         
     except Exception as e:
-        print(f"❌ Failed to send WFH request email: {str(e)}")
+        logger.error("Failed to send WFH request email request_id=%s", wfh_request.id, exc_info=True)
 
 
 def send_wfh_approval_email(wfh_request, approved=True):
@@ -1461,11 +1454,10 @@ def send_wfh_approval_email(wfh_request, approved=True):
         )
         email.content_subtype = "html"
         email.send()
-        
-        print(f"✅ WFH {'approval' if approved else 'rejection'} email sent to {wfh_request.employee.user.email}")
+        logger.info("WFH %s email sent request_id=%s", 'approval' if approved else 'rejection', wfh_request.id)
         
     except Exception as e:
-        print(f"❌ Failed to send WFH approval email: {str(e)}")
+        logger.error("Failed to send WFH %s email request_id=%s", 'approval' if approved else 'rejection', wfh_request.id, exc_info=True)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

@@ -12,12 +12,28 @@
 # from .models import Employee, Offboarding
 # from employees.models import Employee as CoreEmployee, Department as CoreDepartment
 # from authentication.models import User, UserProfile
-# from .serializers import EmployeeSerializer, OffboardingSerializer
+# from .serializers import EmployeeSerializer, OffboardingSerializer, EmployeeSelfSubmitSerializer
 # from .forms import EmployeeSelfOnboardingForm
 # import base64
 # import time
 # from datetime import datetime, timedelta
 # import uuid
+
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
+from .models import Employee, Offboarding
+from employees.models import Employee as CoreEmployee, Department as CoreDepartment
+from authentication.models import User, UserProfile
+from .serializers import EmployeeSerializer, OffboardingSerializer, EmployeeSelfSubmitSerializer
+
+import base64
+from datetime import datetime, timedelta
+import uuid
 
 # # Employee Management API Views
 # @api_view(['GET', 'POST'])
@@ -463,180 +479,362 @@
 #         return _by_email(email)
 
 # # Employee Self-Submission API Views
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def validate_onboarding_link(request, encoded_data):
-#     """Validate onboarding link and return link/employee info"""
-#     try:
-#         # Decode the data
-#         decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
-        
-#         if decoded_data.startswith('GENERIC_'):
-#             # Generic link
-#             timestamp = decoded_data.replace('GENERIC_', '')
-#             link_created_time = datetime.fromtimestamp(int(timestamp))
-            
-#             # Check if expired (7 days)
-#             days_old = (datetime.now() - link_created_time).days
-#             if days_old >= 7:
-#                 return Response({
-#                     'status': 'expired',
-#                     'link_info': {
-#                         'created_at': link_created_time,
-#                         'days_old': days_old
-#                     },
-#                     'employee': None
-#                 })
-            
-#             return Response({
-#                 'status': 'valid',
-#                 'link_info': {
-#                     'created_at': link_created_time,
-#                     'expires_at': link_created_time + timedelta(days=7)
-#                 },
-#                 'employee': None
-#             })
-#         else:
-#             # Employee-specific link
-#             employee_id, timestamp = decoded_data.split('_')
-#             employee = get_object_or_404(Employee.all_objects, id=int(employee_id))
-            
-#             if employee.is_deleted:
-#                 return Response({
-#                     'status': 'deleted',
-#                     'employee': EmployeeSerializer(employee).data,
-#                     'link_info': None
-#                 })
-            
-#             if employee.is_self_submitted:
-#                 return Response({
-#                     'status': 'already_submitted',
-#                     'employee': EmployeeSerializer(employee).data,
-#                     'link_info': None
-#                 })
-            
-#             return Response({
-#                 'status': 'valid',
-#                 'employee': EmployeeSerializer(employee).data,
-#                 'link_info': {
-#                     'created_at': datetime.fromtimestamp(int(timestamp)),
-#                     'expires_at': datetime.fromtimestamp(int(timestamp)) + timedelta(days=7)
-#                 }
-#             })
-            
-#     except Exception as e:
-#         return Response({
-#             'status': 'invalid',
-#             'error': str(e),
-#             'employee': None,
-#             'link_info': None
-#         })
+def _decode_onboarding_token(encoded_data: str) -> str:
+    token = (encoded_data or '').strip()
+    # Allow URL-safe base64 without padding
+    token += '=' * (-len(token) % 4)
+    return base64.urlsafe_b64decode(token.encode()).decode()
 
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-# def employee_self_submit(request, encoded_data=None):
-#     """Handle employee self-submission via onboarding form"""
-#     try:
-#         employee = None
-        
-#         # If encoded_data is provided, validate and get employee (avoid calling @api_view directly)
-#         if encoded_data:
-#             try:
-#                 decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
-#                 if decoded_data.startswith('GENERIC_'):
-#                     timestamp = decoded_data.replace('GENERIC_', '')
-#                     link_created_time = datetime.fromtimestamp(int(timestamp))
-#                     days_old = (datetime.now() - link_created_time).days
-#                     if days_old >= 7:
-#                         return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
-#                     employee = None
-#                 else:
-#                     employee_id, timestamp = decoded_data.split('_')
-#                     employee_obj = get_object_or_404(Employee.all_objects, id=int(employee_id))
-#                     if employee_obj.is_deleted or employee_obj.is_self_submitted:
-#                         return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
-#                     employee = employee_obj
-#             except Exception:
-#                 return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
-        
-#         # Extract form data
-#         form_data = {
-#             'first_name': request.data.get('first_name'),
-#             'last_name': request.data.get('last_name'),
-#             'email': request.data.get('email'),
-#             'phone_number': request.data.get('phone_number'),
-#             'current_address': request.data.get('current_address'),
-#             'permanent_address': request.data.get('permanent_address'),
-#         }
-        
-#         # Validate required fields
-#         required_fields = ['first_name', 'last_name', 'email', 'phone_number', 'current_address', 'permanent_address']
-#         missing_fields = [field for field in required_fields if not form_data.get(field)]
-        
-#         if missing_fields:
-#             return Response(
-#                 {'error': f'Missing required fields: {", ".join(missing_fields)}'}, 
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-        
-#         # Check if email already exists (for new submissions)
-#         if not employee:
-#             existing = Employee.all_objects.filter(email=form_data['email']).first()
-#             if existing:
-#                 if existing.is_deleted:
-#                     return Response(
-#                         {'error': 'An employee with this email was previously deactivated. Contact HR.'}, 
-#                         status=status.HTTP_400_BAD_REQUEST
-#                     )
-#                 elif existing.is_self_submitted:
-#                     return Response(
-#                         {'error': 'An employee with this email has already completed onboarding.'}, 
-#                         status=status.HTTP_400_BAD_REQUEST
-#                     )
-#                 else:
-#                     employee = existing
-        
-#         # Create or update employee
-#         if employee:
-#             # Update existing employee
-#             for field, value in form_data.items():
-#                 setattr(employee, field, value)
-#         else:
-#             # Create new employee
-#             employee = Employee(**form_data)
-        
-#         # Handle file uploads
-#         document_fields = [
-#             'aadhar_pan_file',
-#             'payslips_file', 
-#             'educational_certificates_file',
-#             'previous_offer_letter_file',
-#             'relieving_experience_letters_file',
-#             'appraisal_hike_letters_file'
-#         ]
-        
-#         for field in document_fields:
-#             if field in request.FILES:
-#                 setattr(employee, field, request.FILES[field])
-#                 # Auto-check collection field
-#                 collection_field = field.replace('_file', '_collected')
-#                 setattr(employee, collection_field, True)
-        
-#         # Mark as self-submitted
-#         employee.is_self_submitted = True
-#         employee.submitted_at = timezone.now()
-#         employee.save()
-        
-#         return Response({
-#             'message': 'Onboarding information submitted successfully',
-#             'employee_id': employee.id
-#         })
-        
-#     except Exception as e:
-#         return Response(
-#             {'error': f'Submission failed: {str(e)}'}, 
-#             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#         )
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def validate_onboarding_link(request, encoded_data):
+    """Validate onboarding link and return link/employee info"""
+    try:
+        decoded_data = _decode_onboarding_token(encoded_data)
+
+        if decoded_data.startswith('GENERIC_'):
+            timestamp = decoded_data.replace('GENERIC_', '')
+            link_created_time = datetime.fromtimestamp(int(timestamp))
+            days_old = (datetime.now() - link_created_time).days
+
+            if days_old >= 7:
+                return Response({
+                    'status': 'expired',
+                    'link_info': {
+                        'created_at': link_created_time,
+                        'days_old': days_old
+                    },
+                    'employee': None
+                })
+
+            return Response({
+                'status': 'valid',
+                'link_info': {
+                    'created_at': link_created_time,
+                    'expires_at': link_created_time + timedelta(days=7)
+                },
+                'employee': None
+            })
+
+        employee_id, timestamp = decoded_data.split('_')
+        employee = get_object_or_404(Employee.all_objects, id=int(employee_id))
+
+        if employee.is_deleted:
+            return Response({
+                'status': 'deleted',
+                'employee': EmployeeSerializer(employee).data,
+                'link_info': None
+            })
+
+        if employee.is_self_submitted:
+            return Response({
+                'status': 'already_submitted',
+                'employee': EmployeeSerializer(employee).data,
+                'link_info': None
+            })
+
+        created_at = datetime.fromtimestamp(int(timestamp))
+        return Response({
+            'status': 'valid',
+            'employee': EmployeeSerializer(employee).data,
+            'link_info': {
+                'created_at': created_at,
+                'expires_at': created_at + timedelta(days=7)
+            }
+        })
+    except Exception:
+        return Response({
+            'status': 'invalid',
+            'employee': None,
+            'link_info': None
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def employee_self_submit(request, encoded_data=None):
+    """Handle employee self-submission via onboarding form"""
+    try:
+        employee = None
+
+        if encoded_data:
+            try:
+                decoded_data = _decode_onboarding_token(encoded_data)
+                if decoded_data.startswith('GENERIC_'):
+                    timestamp = decoded_data.replace('GENERIC_', '')
+                    link_created_time = datetime.fromtimestamp(int(timestamp))
+                    days_old = (datetime.now() - link_created_time).days
+                    if days_old >= 7:
+                        return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    employee_id, _timestamp = decoded_data.split('_')
+                    employee_obj = get_object_or_404(Employee.all_objects, id=int(employee_id))
+                    if employee_obj.is_deleted or employee_obj.is_self_submitted:
+                        return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
+                    employee = employee_obj
+            except Exception:
+                return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = EmployeeSelfSubmitSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        form_data = {
+            'first_name': serializer.validated_data['first_name'],
+            'last_name': serializer.validated_data['last_name'],
+            'email': serializer.validated_data['email'],
+            'phone_number': serializer.validated_data['phone_number'],
+            'current_address': serializer.validated_data['current_address'],
+            'permanent_address': serializer.validated_data['permanent_address'],
+        }
+
+        if not employee:
+            existing = Employee.all_objects.filter(email=form_data['email']).first()
+            if existing:
+                if existing.is_deleted:
+                    return Response({'error': 'An employee with this email was previously deactivated. Contact HR.'}, status=status.HTTP_400_BAD_REQUEST)
+                if existing.is_self_submitted:
+                    return Response({'error': 'An employee with this email has already completed onboarding.'}, status=status.HTTP_400_BAD_REQUEST)
+                employee = existing
+
+        if employee:
+            for field, value in form_data.items():
+                setattr(employee, field, value)
+        else:
+            employee = Employee(**form_data)
+
+        document_fields = [
+            'aadhar_pan_file',
+            'payslips_file',
+            'educational_certificates_file',
+            'previous_offer_letter_file',
+            'relieving_experience_letters_file',
+            'appraisal_hike_letters_file',
+        ]
+        for field in document_fields:
+            file_obj = serializer.validated_data.get(field)
+            if file_obj:
+                setattr(employee, field, file_obj)
+                collection_field = field.replace('_file', '_collected')
+                setattr(employee, collection_field, True)
+
+        employee.is_self_submitted = True
+        employee.submitted_at = timezone.now()
+        employee.save()
+
+        return Response({
+            'message': 'Onboarding information submitted successfully',
+            'employee_id': employee.id
+        })
+
+    except Exception:
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def employee_list(request):
+    """List onboarding employees (optionally including deleted) or create a new onboarding employee."""
+    if request.method == 'GET':
+        status_filter = request.GET.get('status')
+        deleted_only = (request.GET.get('deleted_only', 'false') or 'false').lower() == 'true'
+        active_only = (request.GET.get('active_only', 'false') or 'false').lower() == 'true'
+
+        if deleted_only:
+            qs = Employee.all_objects.filter(is_deleted=True)
+        elif active_only:
+            qs = Employee.objects.all()
+        else:
+            qs = Employee.all_objects.all()
+
+        if status_filter and status_filter in ['pending', 'accepted', 'rejected']:
+            qs = qs.filter(status=status_filter)
+
+        serializer = EmployeeSerializer(qs, many=True)
+        return Response({'results': serializer.data})
+
+    return employee_create(request)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def employee_create(request):
+    serializer = EmployeeSerializer(data=request.data)
+    if serializer.is_valid():
+        employee = serializer.save()
+        return Response(EmployeeSerializer(employee).data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def employee_update(request, employee_id):
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+    serializer = EmployeeSerializer(employee, data=request.data, partial=True)
+    if serializer.is_valid():
+        employee = serializer.save()
+        return Response(EmployeeSerializer(employee).data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def employee_soft_delete(request, employee_id):
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+    if employee.is_deleted:
+        return Response({'error': 'Employee is already deleted'}, status=status.HTTP_400_BAD_REQUEST)
+    employee.soft_delete()
+    return Response({'message': 'Employee soft deleted successfully'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def employee_restore(request, employee_id):
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+    if not employee.is_deleted:
+        return Response({'error': 'Employee is not deleted'}, status=status.HTTP_400_BAD_REQUEST)
+    employee.restore()
+    return Response({'message': 'Employee restored successfully'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def employee_update_status(request, employee_id):
+    """Update onboarding approval status."""
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+    new_status = request.data.get('status')
+    if new_status not in ['pending', 'accepted', 'rejected']:
+        return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+    employee.status = new_status
+    employee.save(update_fields=['status'])
+    return Response({'message': f'Status updated to {new_status}'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def employee_documents_status(request, employee_id):
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+
+    required_docs = [
+        ('aadhar_pan_collected', 'aadhar_pan_file', 'Aadhar and PAN Card'),
+        ('payslips_collected', 'payslips_file', 'Last 6 months payslips'),
+        ('educational_certificates_collected', 'educational_certificates_file', 'Educational Certificates (Degree)'),
+        ('previous_offer_letter_collected', 'previous_offer_letter_file', 'Previous Offer Letter'),
+        ('relieving_experience_letters_collected', 'relieving_experience_letters_file', 'Relieving & Experience Letters'),
+        ('appraisal_hike_letters_collected', 'appraisal_hike_letters_file', 'Appraisal/Hike Letters'),
+    ]
+
+    uploaded_docs = []
+    missing_docs = []
+
+    for collected_field, file_field, doc_name in required_docs:
+        is_collected = bool(getattr(employee, collected_field, False))
+        file_obj = getattr(employee, file_field, None)
+        has_file = bool(file_obj)
+
+        if is_collected and has_file:
+            uploaded_docs.append({'doc_type': doc_name, 'collected': True, 'file_available': True})
+        else:
+            missing_docs.append({'doc_type': doc_name, 'collected': is_collected, 'file_available': has_file})
+
+    total_required = len(required_docs)
+    total_uploaded = len(uploaded_docs)
+    completion_percentage = (total_uploaded / total_required) * 100 if total_required else 0
+
+    return Response({
+        'employee_id': employee.id,
+        'employee_name': employee.full_name,
+        'required_documents': {
+            'uploaded': uploaded_docs,
+            'missing': missing_docs,
+        },
+        'total_required': total_required,
+        'total_uploaded': total_uploaded,
+        'completion_percentage': round(completion_percentage, 1),
+        'is_complete': total_uploaded == total_required,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def employee_upload_documents(request, employee_id):
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+
+    allowed_exts = getattr(getattr(request, 'settings', None), 'ALLOWED_UPLOAD_EXTENSIONS', None)
+    if not allowed_exts:
+        from django.conf import settings as dj_settings
+        allowed_exts = getattr(dj_settings, 'ALLOWED_UPLOAD_EXTENSIONS', ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'])
+        max_size = getattr(dj_settings, 'FILE_UPLOAD_MAX_MEMORY_SIZE', None)
+    else:
+        max_size = None
+
+    doc_fields = {
+        'aadhar_pan_file': 'aadhar_pan_collected',
+        'payslips_file': 'payslips_collected',
+        'educational_certificates_file': 'educational_certificates_collected',
+        'previous_offer_letter_file': 'previous_offer_letter_collected',
+        'relieving_experience_letters_file': 'relieving_experience_letters_collected',
+        'appraisal_hike_letters_file': 'appraisal_hike_letters_collected',
+    }
+
+    files_uploaded = []
+    for field, collected_field in doc_fields.items():
+        if field not in request.FILES:
+            continue
+
+        file_obj = request.FILES[field]
+        ext = (file_obj.name.rsplit('.', 1)[-1].lower() if '.' in file_obj.name else '')
+        dot_ext = f'.{ext}' if ext else ''
+        if dot_ext.lower() not in [e.lower() for e in allowed_exts]:
+            return Response({'error': 'Unsupported file type'}, status=status.HTTP_400_BAD_REQUEST)
+        if max_size is not None and getattr(file_obj, 'size', 0) > int(max_size):
+            return Response({'error': 'File too large'}, status=status.HTTP_400_BAD_REQUEST)
+
+        setattr(employee, field, file_obj)
+        setattr(employee, collected_field, True)
+        files_uploaded.append({'field': field, 'filename': file_obj.name, 'size': getattr(file_obj, 'size', None)})
+
+    employee.save()
+    return Response({'message': 'Documents uploaded successfully', 'files_uploaded': files_uploaded})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def employee_list_documents(request, employee_id):
+    employee = get_object_or_404(Employee.all_objects, id=employee_id)
+
+    doc_mappings = [
+        ('Aadhar and PAN Card', 'aadhar_pan_file'),
+        ('Last 6 months payslips', 'payslips_file'),
+        ('Educational Certificates (Degree)', 'educational_certificates_file'),
+        ('Previous Offer Letter', 'previous_offer_letter_file'),
+        ('Relieving & Experience Letters', 'relieving_experience_letters_file'),
+        ('Appraisal/Hike Letters', 'appraisal_hike_letters_file'),
+    ]
+
+    documents = []
+    for doc_type, field_name in doc_mappings:
+        file_field = getattr(employee, field_name, None)
+        if not file_field:
+            continue
+        try:
+            url = request.build_absolute_uri(file_field.url)
+        except Exception:
+            url = None
+        documents.append({
+            'doc_type': doc_type,
+            'field': field_name,
+            'name': getattr(file_field, 'name', None),
+            'url': url,
+        })
+
+    return Response({
+        'employee_id': employee.id,
+        'employee_name': employee.full_name,
+        'total_documents': len(documents),
+        'documents': documents,
+    })
+
 
 # # Offboarding API Views  
 # @api_view(['GET', 'POST'])
@@ -655,30 +853,8 @@
 #             )
     
 #     elif request.method == 'POST':
-#         try:
-#             # Prevent duplicate offboarding for the same employee
-#             employee_id = request.data.get('employee')
-#             if employee_id is not None:
-#                 try:
-#                     emp_id_int = int(employee_id)
-#                 except (TypeError, ValueError):
-#                     emp_id_int = employee_id
-#                 if Offboarding.objects.filter(employee_id=emp_id_int).exists():
-#                     return Response(
-#                         {'error': 'This employee already has an offboarding record'},
-#                         status=status.HTTP_400_BAD_REQUEST
-#                     )
+#         return offboarding_create(request)
 
-#             serializer = OffboardingSerializer(data=request.data)
-#             if serializer.is_valid():
-#                 offboarding = serializer.save()
-#                 return Response(OffboardingSerializer(offboarding).data, status=status.HTTP_201_CREATED)
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         except Exception as e:
-#             return Response(
-#                 {'error': f'Failed to create offboarding: {str(e)}'}, 
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
 
 # @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
@@ -1043,780 +1219,6 @@
 # def employee_onboarding_success(request):
 #     """Success page after employee submits onboarding form"""
 #     return render(request, 'onboarding/success.html')
-
-
-
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
-from django.core.files.base import ContentFile
-from django.utils import timezone
-from django.contrib import messages
-from django.core.mail import EmailMessage
-from django.http import Http404
-from .models import Employee, Offboarding
-from employees.models import Employee as CoreEmployee, Department as CoreDepartment
-from authentication.models import User, UserProfile
-from .serializers import EmployeeSerializer, OffboardingSerializer
-from .forms import EmployeeSelfOnboardingForm
-from utils.roles import (
-    has_executive_access,
-    has_management_access,
-    can_manage_hr,
-    get_permission_level,
-    PERMISSION_LEVELS
-)
-import base64
-import time
-from datetime import datetime, timedelta
-import uuid
-
-
-# Helper function to check if user can manage onboarding
-def can_manage_onboarding(user):
-    """Check if user has permission to manage onboarding"""
-    user_profile = getattr(user, 'profile', None)
-    user_role = getattr(user_profile, 'role', None) if user_profile else None
-    
-    return (
-        user.has_perm('onboarding.view_employee') or
-        can_manage_hr(user_role) or
-        has_executive_access(user_role) or
-        user.is_superuser
-    )
-
-
-def can_create_onboarding(user):
-    """Check if user can create onboarding records"""
-    user_profile = getattr(user, 'profile', None)
-    user_role = getattr(user_profile, 'role', None) if user_profile else None
-    
-    return (
-        user.has_perm('onboarding.add_employee') or
-        can_manage_hr(user_role) or
-        has_executive_access(user_role) or
-        user.is_superuser
-    )
-
-
-def can_update_onboarding(user):
-    """Check if user can update onboarding records"""
-    user_profile = getattr(user, 'profile', None)
-    user_role = getattr(user_profile, 'role', None) if user_profile else None
-    
-    return (
-        user.has_perm('onboarding.change_employee') or
-        can_manage_hr(user_role) or
-        has_executive_access(user_role) or
-        user.is_superuser
-    )
-
-
-def can_delete_onboarding(user):
-    """Check if user can delete onboarding records"""
-    user_profile = getattr(user, 'profile', None)
-    user_role = getattr(user_profile, 'role', None) if user_profile else None
-    
-    return (
-        user.has_perm('onboarding.delete_employee') or
-        can_manage_hr(user_role) or
-        has_executive_access(user_role) or
-        user.is_superuser
-    )
-
-
-# Employee Management API Views
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def employee_list(request):
-    """Get list of employees with filtering options or create new employee"""
-    if request.method == 'GET':
-        # Check if user has permission to view onboarding employees
-        if not can_manage_onboarding(request.user):
-            return Response(
-                {'error': 'Permission denied. Only HR and Executives can view onboarding records.'}, 
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        try:
-            # Check for filter parameters
-            status_filter = request.GET.get('status')
-            deleted_only = request.GET.get('deleted_only', 'false').lower() == 'true'
-            active_only = request.GET.get('active_only', 'false').lower() == 'true'
-            
-            if deleted_only:
-                # Show only soft-deleted employees
-                employees = Employee.all_objects.filter(is_deleted=True)
-            elif active_only:
-                # Show only active employees (default manager excludes deleted)
-                employees = Employee.objects.all()
-            else:
-                # Show all employees including deleted ones
-                employees = Employee.all_objects.all()
-            
-            # Apply status filter if provided
-            if status_filter and status_filter in ['pending', 'accepted', 'rejected']:
-                employees = employees.filter(status=status_filter)
-            
-            serializer = EmployeeSerializer(employees, many=True)
-            return Response({'results': serializer.data})
-            
-        except Exception as e:
-            return Response(
-                {'error': f'Failed to fetch employees: {str(e)}'}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    
-    elif request.method == 'POST':
-        return employee_create(request)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def employee_create(request):
-    """Create a new employee"""
-    # Check permissions
-    if not can_create_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can create onboarding records.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        serializer = EmployeeSerializer(data=request.data)
-        if serializer.is_valid():
-            employee = serializer.save()
-            return Response(EmployeeSerializer(employee).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to create employee: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def employee_list_documents(request, employee_id):
-    """List uploaded documents for an employee with absolute URLs"""
-    # Check permissions
-    if not can_manage_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can view documents.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        # First try to find the onboarding employee directly
-        employee = Employee.objects.filter(id=employee_id).first()
-        
-        # If not found, try to find by core employee's email
-        if not employee:
-            core_emp = CoreEmployee.objects.filter(id=employee_id).select_related('user').first()
-            if core_emp and core_emp.user:
-                # Try to find onboarding record by email
-                email = getattr(core_emp.user, 'email', None)
-                if email:
-                    employee = Employee.objects.filter(email__iexact=email).first()
-        
-        # If still no onboarding employee found, return empty documents
-        if not employee:
-            # Get basic info from core employee for the response
-            core_emp = CoreEmployee.objects.filter(id=employee_id).select_related('user').first()
-            employee_name = 'Unknown'
-            if core_emp and core_emp.user:
-                employee_name = f"{core_emp.user.first_name or ''} {core_emp.user.last_name or ''}".strip() or core_emp.user.email
-            
-            return Response({
-                'employee_id': employee_id,
-                'employee_name': employee_name,
-                'total_documents': 0,
-                'documents': [],
-                'message': 'No onboarding documents available for this employee'
-            })
-
-        doc_mappings = [
-            ('Aadhar and PAN Card', 'aadhar_pan_file'),
-            ('Last 6 months payslips', 'payslips_file'),
-            ('Educational Certificates (Degree)', 'educational_certificates_file'),
-            ('Previous Offer Letter', 'previous_offer_letter_file'),
-            ('Relieving & Experience Letters', 'relieving_experience_letters_file'),
-            ('Appraisal/Hike Letters', 'appraisal_hike_letters_file'),
-        ]
-
-        documents = []
-        for doc_type, field_name in doc_mappings:
-            file_field = getattr(employee, field_name, None)
-            if file_field:
-                try:
-                    url = request.build_absolute_uri(file_field.url)
-                except Exception:
-                    url = None
-                documents.append({
-                    'doc_type': doc_type,
-                    'field': field_name,
-                    'name': getattr(file_field, 'name', None),
-                    'url': url,
-                })
-
-        return Response({
-            'employee_id': employee.id,
-            'employee_name': employee.full_name,
-            'total_documents': len(documents),
-            'documents': documents,
-        })
-
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to list documents: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def employee_update(request, employee_id):
-    """Update an employee"""
-    # Check permissions
-    if not can_update_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can update onboarding records.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        employee = get_object_or_404(Employee.all_objects, id=employee_id)
-        serializer = EmployeeSerializer(employee, data=request.data, partial=True)
-        if serializer.is_valid():
-            employee = serializer.save()
-            return Response(EmployeeSerializer(employee).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to update employee: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def employee_soft_delete(request, employee_id):
-    """Soft delete an employee"""
-    # Check permissions
-    if not can_delete_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can delete onboarding records.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        employee = get_object_or_404(Employee.all_objects, id=employee_id)
-        if not employee.is_deleted:
-            employee.soft_delete()
-            return Response({'message': 'Employee soft deleted successfully'})
-        return Response({'error': 'Employee is already deleted'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to delete employee: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def employee_restore(request, employee_id):
-    """Restore a soft deleted employee"""
-    # Check permissions
-    if not can_update_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can restore onboarding records.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        employee = get_object_or_404(Employee.all_objects, id=employee_id)
-        if employee.is_deleted:
-            employee.restore()
-            return Response({'message': 'Employee restored successfully'})
-        return Response({'error': 'Employee is not deleted'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to restore employee: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def employee_update_status(request, employee_id):
-    """Update employee status (pending/accepted/rejected)"""
-    # Check permissions
-    if not can_update_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can update employee status.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        employee = get_object_or_404(Employee.objects, id=employee_id)
-        new_status = request.data.get('status')
-        
-        if new_status not in ['pending', 'accepted', 'rejected']:
-            return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        employee.status = new_status
-        employee.save()
-
-        # When accepted, sync into core Employees app
-        if new_status == 'accepted':
-            # 1) Ensure a User exists for this onboarding record
-            user = None
-            try:
-                user = User.objects.get(email=employee.email)
-            except User.DoesNotExist:
-                # Create a basic user with unusable password
-                base_username = (employee.email.split('@')[0] if employee.email else f"user_{employee.id}")
-                username = base_username
-                suffix = 1
-                while User.objects.filter(username=username).exists():
-                    username = f"{base_username}{suffix}"
-                    suffix += 1
-                user = User.objects.create_user(
-                    username=username,
-                    email=employee.email,
-                    first_name=employee.first_name or '',
-                    last_name=employee.last_name or ''
-                )
-                user.set_unusable_password()
-                user.save()
-                # Ensure a profile exists
-                UserProfile.objects.get_or_create(user=user)
-
-            # 2) Ensure Departments exist in core system (seed if empty)
-            if CoreDepartment.objects.count() == 0:
-                default_departments = [
-                    'Human Resources', 'Information Technology', 'Finance', 'Marketing', 'Sales',
-                    'Operations', 'Development', 'Design', 'Quality Assurance', 'Customer Support',
-                    'Engineering', 'Product Management', 'Data Science', 'Security', 'Legal'
-                ]
-                CoreDepartment.objects.bulk_create(
-                    [CoreDepartment(name=name) for name in default_departments]
-                )
-
-            # 3) Map department
-            dept_label_map = dict(Employee.DEPARTMENT_CHOICES)
-            core_department = None
-            if employee.department:
-                label = dept_label_map.get(employee.department, employee.department)
-                core_department = CoreDepartment.objects.filter(name__iexact=label).first()
-                if not core_department and label:
-                    core_department = CoreDepartment.objects.create(name=label)
-
-            # 4) Map position code to human-readable label
-            pos_label_map = dict(Employee.POSITION_CHOICES)
-            position_label = pos_label_map.get(employee.position, employee.position)
-
-            # 5) Create or update CoreEmployee
-            core_emp, created = CoreEmployee.objects.get_or_create(user=user, defaults={
-                'department': core_department,
-                'position': position_label or '',
-                'hire_date': employee.joining_date,
-                'status': 'INACTIVE',
-            })
-            if not created:
-                updated = False
-                if core_emp.department != core_department:
-                    core_emp.department = core_department
-                    updated = True
-                if (position_label or '') != (core_emp.position or ''):
-                    core_emp.position = position_label or ''
-                    updated = True
-                if employee.joining_date and core_emp.hire_date != employee.joining_date:
-                    core_emp.hire_date = employee.joining_date
-                    updated = True
-                if core_emp.status != 'INACTIVE':
-                    core_emp.status = 'INACTIVE'
-                    updated = True
-                if updated:
-                    core_emp.save()
-
-        return Response({'message': f'Status updated to {new_status}'})
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to update status: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def employee_documents_status(request, employee_id):
-    """Get employee document status"""
-    # Check permissions
-    if not can_manage_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can view document status.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        employee = get_object_or_404(Employee.objects, id=employee_id)
-        
-        # Check required documents
-        required_docs = [
-            ('aadhar_pan_collected', 'aadhar_pan_file', 'Aadhar and PAN Card'),
-            ('payslips_collected', 'payslips_file', 'Last 6 months payslips'),
-            ('educational_certificates_collected', 'educational_certificates_file', 'Educational Certificates'),
-            ('previous_offer_letter_collected', 'previous_offer_letter_file', 'Previous Offer Letter'),
-            ('relieving_experience_letters_collected', 'relieving_experience_letters_file', 'Relieving & Experience Letters'),
-            ('appraisal_hike_letters_collected', 'appraisal_hike_letters_file', 'Appraisal/Hike Letters'),
-        ]
-        
-        uploaded_docs = []
-        missing_docs = []
-        
-        for collected_field, file_field, doc_name in required_docs:
-            is_collected = getattr(employee, collected_field, False)
-            has_file = bool(getattr(employee, file_field, None))
-            
-            if is_collected and has_file:
-                uploaded_docs.append({
-                    'doc_type': doc_name,
-                    'collected': True,
-                    'file_available': True
-                })
-            else:
-                missing_docs.append({
-                    'doc_type': doc_name,
-                    'collected': is_collected,
-                    'file_available': has_file
-                })
-        
-        total_required = len(required_docs)
-        total_uploaded = len(uploaded_docs)
-        completion_percentage = (total_uploaded / total_required) * 100 if total_required > 0 else 0
-        
-        return Response({
-            'employee_id': employee.id,
-            'employee_name': employee.full_name,
-            'required_documents': {
-                'uploaded': uploaded_docs,
-                'missing': missing_docs
-            },
-            'total_required': total_required,
-            'total_uploaded': total_uploaded,
-            'completion_percentage': round(completion_percentage, 1),
-            'is_complete': total_uploaded == total_required,
-            'optional_documents': []
-        })
-        
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to fetch document status: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def employee_upload_documents(request, employee_id):
-    """Upload documents for an employee"""
-    # Check permissions
-    if not can_update_onboarding(request.user):
-        return Response(
-            {'error': 'Permission denied. Only HR and Executives can upload documents.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    try:
-        employee = resolve_or_create_onboarding_employee(employee_id)
-        if not employee:
-            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        files_uploaded = []
-        
-        # Document field mapping
-        doc_fields = {
-            'document_Aadhar and PAN Card': 'aadhar_pan_file',
-            'document_Last 6 months payslips': 'payslips_file',
-            'document_Educational Certificates (Degree)': 'educational_certificates_file',
-            'document_Previous Offer Letter': 'previous_offer_letter_file',
-            'document_Relieving & Experience Letters': 'relieving_experience_letters_file',
-            'document_Appraisal/Hike Letters': 'appraisal_hike_letters_file',
-        }
-        
-        for form_field, model_field in doc_fields.items():
-            if form_field in request.FILES:
-                file = request.FILES[form_field]
-                setattr(employee, model_field, file)
-                
-                # Auto-check corresponding collection field
-                collection_field = model_field.replace('_file', '_collected')
-                setattr(employee, collection_field, True)
-                
-                files_uploaded.append({
-                    'field': model_field,
-                    'filename': file.name,
-                    'size': file.size
-                })
-        
-        employee.save()
-        
-        return Response({
-            'message': 'Documents uploaded successfully',
-            'files_uploaded': files_uploaded
-        })
-        
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to upload documents: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-def resolve_or_create_onboarding_employee(employee_id):
-    """
-    Ensure an onboarding.Employee exists for uploads.
-    If missing, try to pull minimal info from the core employees.Employee
-    and create a stub onboarding record.
-    """
-    # Already present?
-    onboarding_emp = Employee.objects.filter(id=employee_id).first()
-    if onboarding_emp:
-        return onboarding_emp
-
-    # Try to find by email to avoid duplicate creation
-    def _by_email(email_val):
-        if not email_val:
-            return None
-        return Employee.objects.filter(email__iexact=email_val).first()
-
-    # Try core employee
-    core_emp = (
-        CoreEmployee.objects.filter(id=employee_id).select_related('user').first()
-        or CoreEmployee.objects.filter(employee_id=str(employee_id)).select_related('user').first()
-    )
-    if not core_emp:
-        return None
-
-    user = core_emp.user
-    first_name = (getattr(user, 'first_name', '') or '').strip() or 'Unknown'
-    last_name = (getattr(user, 'last_name', '') or '').strip()
-    email = (getattr(user, 'email', '') or '').strip()
-    phone_number = getattr(user, 'phone_number', '') if hasattr(user, 'phone_number') else ''
-    if not phone_number:
-        phone_number = 'N/A'
-
-    if not email:
-        email = f"no-email-{uuid.uuid4()}@placeholder.local"
-
-    existing = _by_email(email)
-    if existing:
-        return existing
-
-    try:
-        onboarding_emp = Employee.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            phone_number=phone_number,
-            employee_type='employee',
-            department=None,
-            position=core_emp.position or '',
-            current_address='',
-            permanent_address='',
-            joining_date=core_emp.hire_date,
-            status='pending'
-        )
-        return onboarding_emp
-    except Exception:
-        return _by_email(email)
-
-
-# Employee Self-Submission API Views
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def validate_onboarding_link(request, encoded_data):
-    """Validate onboarding link and return link/employee info"""
-    try:
-        # Decode the data
-        decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
-        
-        if decoded_data.startswith('GENERIC_'):
-            # Generic link
-            timestamp = decoded_data.replace('GENERIC_', '')
-            link_created_time = datetime.fromtimestamp(int(timestamp))
-            
-            # Check if expired (7 days)
-            days_old = (datetime.now() - link_created_time).days
-            if days_old >= 7:
-                return Response({
-                    'status': 'expired',
-                    'link_info': {
-                        'created_at': link_created_time,
-                        'days_old': days_old
-                    },
-                    'employee': None
-                })
-            
-            return Response({
-                'status': 'valid',
-                'link_info': {
-                    'created_at': link_created_time,
-                    'expires_at': link_created_time + timedelta(days=7)
-                },
-                'employee': None
-            })
-        else:
-            # Employee-specific link
-            employee_id, timestamp = decoded_data.split('_')
-            employee = get_object_or_404(Employee.all_objects, id=int(employee_id))
-            
-            if employee.is_deleted:
-                return Response({
-                    'status': 'deleted',
-                    'employee': EmployeeSerializer(employee).data,
-                    'link_info': None
-                })
-            
-            if employee.is_self_submitted:
-                return Response({
-                    'status': 'already_submitted',
-                    'employee': EmployeeSerializer(employee).data,
-                    'link_info': None
-                })
-            
-            return Response({
-                'status': 'valid',
-                'employee': EmployeeSerializer(employee).data,
-                'link_info': {
-                    'created_at': datetime.fromtimestamp(int(timestamp)),
-                    'expires_at': datetime.fromtimestamp(int(timestamp)) + timedelta(days=7)
-                }
-            })
-            
-    except Exception as e:
-        return Response({
-            'status': 'invalid',
-            'error': str(e),
-            'employee': None,
-            'link_info': None
-        })
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def employee_self_submit(request, encoded_data=None):
-    """Handle employee self-submission via onboarding form"""
-    try:
-        employee = None
-        
-        # If encoded_data is provided, validate and get employee
-        if encoded_data:
-            try:
-                decoded_data = base64.urlsafe_b64decode(encoded_data.encode()).decode()
-                if decoded_data.startswith('GENERIC_'):
-                    timestamp = decoded_data.replace('GENERIC_', '')
-                    link_created_time = datetime.fromtimestamp(int(timestamp))
-                    days_old = (datetime.now() - link_created_time).days
-                    if days_old >= 7:
-                        return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
-                    employee = None
-                else:
-                    employee_id, timestamp = decoded_data.split('_')
-                    employee_obj = get_object_or_404(Employee.all_objects, id=int(employee_id))
-                    if employee_obj.is_deleted or employee_obj.is_self_submitted:
-                        return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
-                    employee = employee_obj
-            except Exception:
-                return Response({'error': 'Invalid or expired link'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Extract form data
-        form_data = {
-            'first_name': request.data.get('first_name'),
-            'last_name': request.data.get('last_name'),
-            'email': request.data.get('email'),
-            'phone_number': request.data.get('phone_number'),
-            'current_address': request.data.get('current_address'),
-            'permanent_address': request.data.get('permanent_address'),
-        }
-        
-        # Validate required fields
-        required_fields = ['first_name', 'last_name', 'email', 'phone_number', 'current_address', 'permanent_address']
-        missing_fields = [field for field in required_fields if not form_data.get(field)]
-        
-        if missing_fields:
-            return Response(
-                {'error': f'Missing required fields: {", ".join(missing_fields)}'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Check if email already exists (for new submissions)
-        if not employee:
-            existing = Employee.all_objects.filter(email=form_data['email']).first()
-            if existing:
-                if existing.is_deleted:
-                    return Response(
-                        {'error': 'An employee with this email was previously deactivated. Contact HR.'}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                elif existing.is_self_submitted:
-                    return Response(
-                        {'error': 'An employee with this email has already completed onboarding.'}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                else:
-                    employee = existing
-        
-        # Create or update employee
-        if employee:
-            # Update existing employee
-            for field, value in form_data.items():
-                setattr(employee, field, value)
-        else:
-            # Create new employee
-            employee = Employee(**form_data)
-        
-        # Handle file uploads
-        document_fields = [
-            'aadhar_pan_file',
-            'payslips_file', 
-            'educational_certificates_file',
-            'previous_offer_letter_file',
-            'relieving_experience_letters_file',
-            'appraisal_hike_letters_file'
-        ]
-        
-        for field in document_fields:
-            if field in request.FILES:
-                setattr(employee, field, request.FILES[field])
-                # Auto-check collection field
-                collection_field = field.replace('_file', '_collected')
-                setattr(employee, collection_field, True)
-        
-        # Mark as self-submitted
-        employee.is_self_submitted = True
-        employee.submitted_at = timezone.now()
-        employee.save()
-        
-        return Response({
-            'message': 'Onboarding information submitted successfully',
-            'employee_id': employee.id
-        })
-        
-    except Exception as e:
-        return Response(
-            {'error': f'Submission failed: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-# Offboarding API Views  
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
 def offboarding_list(request):
     """Get list of offboardings or create new offboarding"""
     if request.method == 'GET':
