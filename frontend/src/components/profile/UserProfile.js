@@ -22,6 +22,9 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { useTheme } from '../../context/ThemeContext';
 
+/** Allow only 0–9 for phone-style fields (strips spaces, +, dashes, etc.). */
+const digitsOnly = (value) => String(value ?? '').replace(/\D/g, '');
+
 const UserProfile = () => {
   const { user } = useAuth();
   const { theme } = useTheme();
@@ -133,10 +136,10 @@ const UserProfile = () => {
           first_name: profileData.first_name || '',
           last_name: profileData.last_name || '',
           email: profileData.email || '',
-          phone_number: profileData.profile?.phone_number || '',
+          phone_number: digitsOnly(profileData.profile?.phone_number),
           address: profileData.profile?.address || '',
           date_of_birth: profileData.profile?.date_of_birth || '',
-          emergency_contact: profileData.profile?.emergency_contact || '',
+          emergency_contact: digitsOnly(profileData.profile?.emergency_contact),
           gender: profileData.profile?.gender || '',
           blood_group: profileData.profile?.blood_group || '',
           aadhaar_number: profileData.profile?.aadhaar_number || '',
@@ -260,6 +263,12 @@ const UserProfile = () => {
     try {
       setSaving(true);
 
+      const payload = {
+        ...editData,
+        phone_number: digitsOnly(editData.phone_number),
+        emergency_contact: digitsOnly(editData.emergency_contact),
+      };
+
       const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
       const response = await fetch(`${apiBase}/auth/profile/`, {
         method: 'PATCH',
@@ -267,7 +276,7 @@ const UserProfile = () => {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(editData)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
@@ -293,10 +302,10 @@ const UserProfile = () => {
       first_name: profile?.first_name || '',
       last_name: profile?.last_name || '',
       email: profile?.email || '',
-      phone_number: profile?.profile?.phone_number || '',
+      phone_number: digitsOnly(profile?.profile?.phone_number),
       address: profile?.profile?.address || '',
       date_of_birth: profile?.profile?.date_of_birth || '',
-      emergency_contact: profile?.profile?.emergency_contact || '',
+      emergency_contact: digitsOnly(profile?.profile?.emergency_contact),
       gender: profile?.profile?.gender || '',
       blood_group: profile?.profile?.blood_group || '',
       aadhaar_number: profile?.profile?.aadhaar_number || '',
@@ -484,10 +493,15 @@ const UserProfile = () => {
                     {editMode ? (
                       <input
                         type="tel"
+                        inputMode="numeric"
+                        autoComplete="tel"
+                        pattern="[0-9]*"
                         value={editData.phone_number}
-                        onChange={(e) => setEditData({ ...editData, phone_number: e.target.value })}
+                        onChange={(e) =>
+                          setEditData({ ...editData, phone_number: digitsOnly(e.target.value) })
+                        }
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-medium"
-                        placeholder="Enter phone number"
+                        placeholder="Digits only (e.g. 9876543210)"
                       />
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/5 group hover:border-white/20 transition-all">
@@ -525,10 +539,15 @@ const UserProfile = () => {
                     {editMode ? (
                       <input
                         type="tel"
+                        inputMode="numeric"
+                        autoComplete="tel"
+                        pattern="[0-9]*"
                         value={editData.emergency_contact}
-                        onChange={(e) => setEditData({ ...editData, emergency_contact: e.target.value })}
+                        onChange={(e) =>
+                          setEditData({ ...editData, emergency_contact: digitsOnly(e.target.value) })
+                        }
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-medium"
-                        placeholder="Enter emergency contact"
+                        placeholder="Digits only (e.g. 9876543210)"
                       />
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/5 group hover:border-white/20 transition-all">

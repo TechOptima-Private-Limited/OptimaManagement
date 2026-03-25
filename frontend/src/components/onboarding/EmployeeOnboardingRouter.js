@@ -20,6 +20,20 @@ import {
   Users
 } from 'lucide-react';
 
+const getApiBase = () => {
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+
+  const host = window.location.hostname;
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1';
+  if (isLocalHost) {
+    return 'http://127.0.0.1:8080/api';
+  }
+
+  return `${window.location.origin}/api`;
+};
+
 // Main Router Component
 const EmployeeOnboardingRouter = () => {
   const { encodedData } = useParams();
@@ -27,7 +41,7 @@ const EmployeeOnboardingRouter = () => {
   const [currentView, setCurrentView] = useState('form'); // 'form', 'success', 'invalid'
   const [linkValidation, setLinkValidation] = useState(null);
 
-  const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+  const apiBase = getApiBase();
 
   useEffect(() => {
     if (encodedData) {
@@ -72,7 +86,7 @@ const EmployeeOnboardingRouter = () => {
 
 // Employee Onboarding Form Component
 const EmployeeOnboardingForm = ({ encodedData, onNavigate, validation }) => {
-  const apiBase = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api');
+  const apiBase = getApiBase();
 
   const [formData, setFormData] = useState({
     first_name: '',

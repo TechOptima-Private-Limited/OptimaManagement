@@ -8,6 +8,19 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
     must_change_password = models.BooleanField(default=False)
 
+
+class UserTokenState(models.Model):
+    """
+    Stores the currently active access token jti for each user.
+    Any token with a different jti is rejected.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='token_state')
+    current_jti = models.CharField(max_length=255, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"UserTokenState(user_id={self.user_id})"
+
 class UserProfile(models.Model):
     ROLE_CHOICES = [
         # Interns & Trainees

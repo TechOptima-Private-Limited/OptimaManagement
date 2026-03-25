@@ -57,20 +57,86 @@ def get_employee_profile_data(request):
                 'user', 'department', 'manager', 'manager__user'
             ).get(user=user)
         except Employee.DoesNotExist:
-            return Response({
-                'error': 'Employee record not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+            # If this user isn't linked to the Employee table, most users can't
+            # see their profile/peers. However, HR/Admin should still be able
+            # to view the employee directory/team.
+            user_profile = getattr(user, 'profile', None)
+            user_role = getattr(user_profile, 'role', None) if user_profile else None
+            permission_level = get_permission_level(user_role) if user_role else 0
+
+            group_names_lower = {str(name).lower() for name in user.groups.values_list('name', flat=True)}
+            is_hr_admin_group = (
+                'admin' in group_names_lower
+                or 'office admin' in group_names_lower
+                or 'hr manager' in group_names_lower
+                or 'hr admin' in group_names_lower
+                or 'hr_admin' in group_names_lower
+                or 'hr executive' in group_names_lower
+            )
+
+            logger.warning(
+                "profile-data (no employee row): user_email=%s role=%s perm=%s is_hr_admin_group=%s",
+                getattr(user, "email", None),
+                user_role,
+                permission_level,
+                is_hr_admin_group,
+            )
+
+            if (
+                user.has_perm('employees.view_employee')
+                or user.is_superuser
+                or permission_level >= PERMISSION_LEVELS['SENIOR_LEADER']
+                or can_manage_hr(user_role)
+                or is_hr_admin_group
+            ):
+                peer_colleagues = Employee.objects.select_related(
+                    'user', 'department'
+                ).filter(status='ACTIVE')
+                logger.warning(
+                    "profile-data (no employee row): peers_count=%s",
+                    peer_colleagues.count(),
+                )
+                peers_data = EmployeeSerializer(
+                    peer_colleagues,
+                    many=True,
+                    context={'request': request}
+                ).data
+                return Response({
+                    'employee': None,
+                    'peers': peers_data,
+                    'manager': None,
+                    'user_role': user_role,
+                    'permission_level': permission_level,
+                })
+
+            return Response({'error': 'Employee record not found'}, status=status.HTTP_404_NOT_FOUND)
         
         # Get user role and permission level
         user_profile = getattr(user, 'profile', None)
         user_role = getattr(user_profile, 'role', None) if user_profile else None
         permission_level = get_permission_level(user_role) if user_role else 0
+
+        group_names_lower = {str(name).lower() for name in user.groups.values_list('name', flat=True)}
+        is_hr_admin_group = (
+            'admin' in group_names_lower
+            or 'office admin' in group_names_lower
+            or 'hr manager' in group_names_lower
+            or 'hr admin' in group_names_lower
+            or 'hr_admin' in group_names_lower
+            or 'hr executive' in group_names_lower
+        )
         
         # Get peer colleagues based on role
         peer_colleagues = []
         
-        if permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
-            # Executives and HR see all active employees except self
+        if (
+            user.has_perm('employees.view_employee')
+            or user.is_superuser
+            or permission_level >= PERMISSION_LEVELS['SENIOR_LEADER']
+            or can_manage_hr(user_role)
+            or is_hr_admin_group
+        ):
+            # Executives/HR/admin-permission users can see all active employees except self
             peer_colleagues = Employee.objects.select_related(
                 'user', 'department'
             ).filter(
@@ -78,7 +144,7 @@ def get_employee_profile_data(request):
             ).exclude(
                 id=current_employee.id
             )
-            logger.debug("Employee profile peers: senior access")
+            logger.debug("Employee profile peers: elevated access")
             
         elif has_management_access(user_role) or has_lead_access(user_role):
             # Managers and Team Leads see their team
@@ -104,6 +170,15 @@ def get_employee_profile_data(request):
         
         # Serialize data
         employee_data = EmployeeSerializer(current_employee, context={'request': request}).data
+        peers_count = peer_colleagues.count() if hasattr(peer_colleagues, "all") else len(peer_colleagues or [])
+        logger.warning(
+            "profile-data: user_email=%s role=%s perm=%s is_hr_admin_group=%s peers_count=%s",
+            getattr(user, "email", None),
+            user_role,
+            permission_level,
+            is_hr_admin_group,
+            peers_count,
+        )
         peers_data = EmployeeSerializer(peer_colleagues, many=True, context={'request': request}).data
         
         # Get manager data if exists
@@ -256,6 +331,19 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         user_profile = getattr(user, 'profile', None)
         user_role = getattr(user_profile, 'role', None) if user_profile else None
         permission_level = get_permission_level(user_role) if user_role else 0
+
+        # Some deployments assign HR/Admin access via Django Groups rather than
+        # setting `profile.role` consistently. Treat these group memberships as
+        # full-access the same way as the role-based checks below.
+        group_names_lower = {str(name).lower() for name in user.groups.values_list('name', flat=True)}
+        is_hr_admin_group = (
+            'admin' in group_names_lower
+            or 'office admin' in group_names_lower
+            or 'hr manager' in group_names_lower
+            or 'hr admin' in group_names_lower
+            or 'hr_admin' in group_names_lower
+            or 'hr executive' in group_names_lower
+        )
         
         # Check Django permission first
         if user.has_perm('employees.view_employee'):
@@ -266,7 +354,11 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
             # C-Level can see all employees
             base_qs = qs
             
-        elif permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
+        elif (
+            permission_level >= PERMISSION_LEVELS['SENIOR_LEADER']
+            or can_manage_hr(user_role)
+            or is_hr_admin_group
+        ):
             # VP/Directors and HR can see all employees
             base_qs = qs
             
@@ -370,12 +462,23 @@ class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
         user_profile = getattr(user, 'profile', None)
         user_role = getattr(user_profile, 'role', None) if user_profile else None
         permission_level = get_permission_level(user_role) if user_role else 0
+
+        # Keep detail access aligned with list access.
+        group_names_lower = {str(name).lower() for name in user.groups.values_list('name', flat=True)}
+        is_hr_admin_group = (
+            'admin' in group_names_lower
+            or 'office admin' in group_names_lower
+            or 'hr manager' in group_names_lower
+            or 'hr admin' in group_names_lower
+            or 'hr_admin' in group_names_lower
+            or 'hr executive' in group_names_lower
+        )
         
         # Check view access
         if user.has_perm('employees.view_employee'):
             return obj
             
-        if permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
+        if permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role) or is_hr_admin_group:
             # Senior leaders and HR can view any employee
             return obj
             

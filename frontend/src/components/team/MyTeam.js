@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -749,10 +749,10 @@ const MyTeam = () => {
                             Employee
                           </th>
                           {getDaysInMonth(calendarDate).map(({ day, weekday }) => (
-                            <th key={day} className="px-3 py-4 text-center min-w-[48px] border-r border-white/5 last:border-r-0">
+                            <th key={day} className="px-1.5 py-2.5 text-center min-w-[36px] border-r border-white/5 last:border-r-0">
                               <div className="flex flex-col items-center">
                                 <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">{weekday}</span>
-                                <span className="text-sm font-black text-slate-200">{day}</span>
+                                <span className="text-xs font-black text-slate-200">{day}</span>
                               </div>
                             </th>
                           ))}
@@ -774,8 +774,8 @@ const MyTeam = () => {
                             {getDaysInMonth(calendarDate).map(({ day }) => {
                               const status = getStatusForDate(member.id, day);
                               return (
-                                <td key={day} className="px-1 py-4 text-center border-r border-white/5 last:border-r-0">
-                                  <div className={`w-8 h-8 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black transition-all duration-300 shadow-md transform hover:scale-125 hover:z-20 relative
+                                <td key={day} className="px-1 py-2.5 text-center border-r border-white/5 last:border-r-0">
+                                  <div className={`w-6 h-6 mx-auto rounded-md flex items-center justify-center text-[8px] font-black transition-all duration-300 shadow-md transform hover:scale-125 hover:z-20 relative
                                 ${status === 'PRESENT' ? 'bg-emerald-500 text-white ring-2 ring-emerald-500/50 shadow-emerald-500/20' :
                                       status === 'WFH' ? 'bg-indigo-500 text-white ring-2 ring-indigo-500/50 shadow-indigo-500/20' :
                                         status === 'LEAVE' ? 'bg-amber-500 text-white ring-2 ring-amber-500/50 shadow-amber-500/20' :
@@ -803,31 +803,31 @@ const MyTeam = () => {
 
                 <div className="px-8 py-5 bg-white/5 border-t border-white/10 flex flex-wrap gap-x-10 gap-y-4 items-center">
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 bg-emerald-500 ring-2 ring-emerald-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">P</div>
+                    <div className="w-5 h-5 bg-emerald-500 ring-2 ring-emerald-500/50 rounded-md flex items-center justify-center text-[8px] font-black text-white group-hover:scale-125 transition-transform">P</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Present</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 bg-indigo-500 ring-2 ring-indigo-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">W</div>
+                    <div className="w-5 h-5 bg-indigo-500 ring-2 ring-indigo-500/50 rounded-md flex items-center justify-center text-[8px] font-black text-white group-hover:scale-125 transition-transform">W</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">WFH</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 bg-amber-500 ring-2 ring-amber-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">L</div>
+                    <div className="w-5 h-5 bg-amber-500 ring-2 ring-amber-500/50 rounded-md flex items-center justify-center text-[8px] font-black text-white group-hover:scale-125 transition-transform">L</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Leave</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 bg-rose-500 ring-2 ring-rose-500/50 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">A</div>
+                    <div className="w-5 h-5 bg-rose-500 ring-2 ring-rose-500/50 rounded-md flex items-center justify-center text-[8px] font-black text-white group-hover:scale-125 transition-transform">A</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Absent</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 bg-rose-500/50 ring-2 ring-rose-500/30 rounded-lg flex items-center justify-center text-[9px] font-black text-white group-hover:scale-125 transition-transform">H</div>
+                    <div className="w-5 h-5 bg-rose-500/50 ring-2 ring-rose-500/30 rounded-md flex items-center justify-center text-[8px] font-black text-white group-hover:scale-125 transition-transform">H</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Half Day</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 bg-slate-700/50 border border-white/10 rounded-lg flex items-center justify-center text-[9px] font-black text-slate-400 group-hover:scale-125 transition-transform">•</div>
+                    <div className="w-5 h-5 bg-slate-700/50 border border-white/10 rounded-md flex items-center justify-center text-[8px] font-black text-slate-400 group-hover:scale-125 transition-transform">•</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Week Off</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-6 h-6 border border-white/5 rounded-lg opacity-20"></div>
+                    <div className="w-5 h-5 border border-white/5 rounded-md opacity-20"></div>
                     <span className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">No Data</span>
                   </div>
                 </div>
@@ -969,28 +969,30 @@ const MyTeam = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-auto custom-scrollbar px-8 pb-8">
+                <div className="flex-1 overflow-auto custom-scrollbar px-4 pb-6">
                   <div className="bg-white/5 rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl">
-                    {selectedCategory === 'late' ? (
+                    {(selectedCategory === 'late' || selectedCategory === 'on_time') ? (
                       <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full border-collapse">
+                        <table className="w-full table-fixed border-collapse">
                           <thead>
                             <tr className="bg-white/5 border-b border-white/10 text-left">
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] sticky left-0 bg-[#0d1420] z-20 border-r border-white/10 min-w-[220px]">Employee</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[150px]">Department</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[150px]">Team (Manager)</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[120px]">Location</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[150px]">Job Title</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[120px]">Clock-in</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[200px]">Assigned Shift</th>
-                              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center min-w-[100px]">Delay</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] sticky left-0 bg-[#0d1420] z-20 border-r border-white/10 min-w-[160px]">Employee</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[105px]">Department</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[115px]">Team</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[85px]">Location</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[115px]">Job</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[95px]">Clock</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[135px]">Shift</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center min-w-[75px]">Delay</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-white/5">
                             {getFilteredTeamMembers().map((member) => {
                               const record = member.attendanceRecord;
-                              let delayStr = "0h 0m 0s";
-                              if (record?.check_in_time) {
+                              const isOnTime = selectedCategory === 'on_time';
+                              let delayStr = isOnTime ? 'On time' : "0h 0m 0s";
+
+                              if (!isOnTime && record?.check_in_time) {
                                 const [h, m, s] = record.check_in_time.split(':').map(Number);
                                 const checkInSec = h * 3600 + m * 60 + s;
                                 const thresholdSec = 10 * 3600; // 10:00 AM
@@ -1005,34 +1007,34 @@ const MyTeam = () => {
 
                               return (
                                 <tr key={member.id} className="hover:bg-white/5 transition-colors group">
-                                  <td className="px-6 py-5 sticky left-0 bg-[#0d1420] z-10 border-r border-white/10">
+                                  <td className="px-3 py-3 sticky left-0 bg-[#0d1420] z-10 border-r border-white/10">
                                     <div className="flex flex-col">
-                                      <span className="text-sm font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight">{member.user_info?.full_name}</span>
+                                      <span className="text-[12px] font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight truncate">{member.user_info?.full_name}</span>
                                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{member.employee_id}</span>
                                     </div>
                                   </td>
-                                  <td className="px-6 py-5 text-[13px] text-slate-300 font-bold border-r border-white/5 italic">
+                                  <td className="px-3 py-3 text-[11px] text-slate-300 font-bold border-r border-white/5 italic truncate">
                                     {member.department?.name || 'N/A'}
                                   </td>
-                                  <td className="px-6 py-5 text-[13px] text-slate-400 font-medium border-r border-white/5">
+                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/5 truncate">
                                     {member.manager?.user_info?.full_name || 'Individual'}
                                   </td>
-                                  <td className="px-6 py-5 text-[13px] text-slate-400 font-medium border-r border-white/5">
+                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/5 truncate">
                                     {member.location || 'Hyderabad'}
                                   </td>
-                                  <td className="px-6 py-5 text-[13px] text-slate-400 font-medium border-r border-white/5 italic">
+                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/5 italic truncate">
                                     {member.position || 'Software Developer'}
                                   </td>
-                                  <td className="px-6 py-5 text-[13px] text-emerald-400 font-black text-center border-r border-white/5">
+                                  <td className="px-3 py-3 text-[11px] text-emerald-400 font-black text-center border-r border-white/5">
                                     {record?.check_in_time ? formatTime(record.check_in_time) : 'N/A'}
                                   </td>
-                                  <td className="px-6 py-5 text-center border-r border-white/5">
+                                  <td className="px-3 py-3 text-center border-r border-white/5">
                                     <div className="flex flex-col items-center">
-                                      <span className="text-[12px] font-black text-slate-300 tracking-widest">10AM - 7PM</span>
-                                      <span className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">(10:00 AM - 07:00 PM)</span>
+                                      <span className="text-[11px] font-black text-slate-300 tracking-widest">10AM-7PM</span>
+                                      <span className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">(10-7)</span>
                                     </div>
                                   </td>
-                                  <td className="px-6 py-5 text-[13px] text-rose-500 font-black text-center">
+                                  <td className="px-3 py-3 text-[11px] text-rose-500 font-black text-center">
                                     {delayStr}
                                   </td>
                                 </tr>
@@ -1064,7 +1066,7 @@ const MyTeam = () => {
                   </div>
                 </div>
 
-                <div className="px-8 py-5 bg-white/5 border-t border-white/10 flex justify-between items-center mt-auto backdrop-blur-xl">
+                <div className="px-3 py-2 bg-white/5 border-t border-white/10 flex justify-between items-center mt-auto backdrop-blur-xl">
                   <div className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     Showing 1 to {getFilteredTeamMembers().length} of {getFilteredTeamMembers().length} employees
                   </div>

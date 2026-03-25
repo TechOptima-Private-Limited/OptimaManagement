@@ -3,7 +3,7 @@ from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import Group, Permission
@@ -17,7 +17,7 @@ from .serializers import (
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
 
-from .models import User
+from .models import User, UserTokenState
 from utils.permissions import IsHRorAdmin, IsAdmin
 from employees.models import Employee
 from utils.roles import (
@@ -34,6 +34,17 @@ from utils.roles import (
     get_role_category
 )
 import re
+
+
+def _bind_access_token_to_user(user, access_token_value):
+    access_token = AccessToken(access_token_value)
+    token_jti = access_token.get('jti')
+    if not token_jti:
+        return
+    UserTokenState.objects.update_or_create(
+        user=user,
+        defaults={'current_jti': token_jti}
+    )
 
 
 def validate_password_complexity(password):
@@ -88,6 +99,7 @@ def register(request):
             }
         )
         refresh = RefreshToken.for_user(user)
+        _bind_access_token_to_user(user, str(refresh.access_token))
         return Response({
             'user': UserSerializer(user).data,
             'refresh': str(refresh),
@@ -104,6 +116,7 @@ def employee_register(request):
     if serializer.is_valid():
         user = serializer.save()
         refresh = RefreshToken.for_user(user)
+        _bind_access_token_to_user(user, str(refresh.access_token))
         return Response({
             'message': 'Registration completed successfully!',
             'user': UserSerializer(user).data,
@@ -144,6 +157,17 @@ class CustomTokenRefreshView(TokenRefreshView):
             response = super().post(request, *args, **kwargs)
             if response.status_code == 200:
                 access_token = response.data.get('access')
+                if access_token:
+                    try:
+                        token = AccessToken(access_token)
+                        user_id = token.get('user_id')
+                        if user_id:
+                            UserTokenState.objects.update_or_create(
+                                user_id=user_id,
+                                defaults={'current_jti': token.get('jti', '')}
+                            )
+                    except Exception:
+                        return Response({'detail': 'Invalid token.'}, status=status.HTTP_401_UNAUTHORIZED)
                 
                 # Set new access token cookie
                 response.set_cookie(
@@ -184,6 +208,8 @@ def logout(request):
             token.blacklist()
         except Exception:
             pass # Token might already be invalid or blacklisted
+
+    UserTokenState.objects.filter(user=request.user).update(current_jti='')
             
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
@@ -206,6 +232,7 @@ def login(request):
 
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
+    _bind_access_token_to_user(user, access_token)
 
     response = Response({
         'user': UserSerializer(user).data,
@@ -387,6 +414,7 @@ def admin_set_user_password(request, user_id):
 
     user.set_password(password)
     user.save()
+    UserTokenState.objects.filter(user=user).update(current_jti='')
     return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)
 
 
@@ -412,6 +440,7 @@ def change_password(request):
     user.set_password(new_password)
     user.must_change_password = False  # Reset the flag after change
     user.save()
+    UserTokenState.objects.filter(user=user).update(current_jti='')
     return Response({'detail': 'Password changed successfully.'}, status=status.HTTP_200_OK)
 
 

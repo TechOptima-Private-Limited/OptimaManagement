@@ -83,7 +83,9 @@ def can_manage_users(role):
 
 def can_manage_hr(role):
     """Check if role can manage HR functions"""
-    return role in ROLE_CATEGORIES['HR_STAFF'] or role in ['ADMIN', 'CEO', 'COO']
+    # Treat both ADMIN and admin-like roles as HR-capable, since the UI/API
+    # expects HR/Admin users to see the full employee directory/team.
+    return role in ROLE_CATEGORIES['HR_STAFF'] or role in ['ADMIN', 'OFFICE_ADMIN', 'SYSTEM_ADMIN', 'CEO', 'COO']
 
 def can_manage_assets(role):
     """Check if role can manage assets"""
