@@ -32,9 +32,18 @@ class SecurityHeadersMiddleware:
 
 class JWTRequestValidationMiddleware:
     """
-    Validates bearer/cookie JWTs at middleware layer for API requests.
-    Returns 401 for malformed, tampered, expired, or DB-mismatched jti tokens.
+    Validates JWT tokens for protected API routes.
+    Skips authentication for public endpoints like login/register.
     """
+
+    # ✅ Public endpoints (NO token required)
+    EXEMPT_URLS = [
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/auth/employee-register",
+        "/api/auth/captcha",
+        "/api/auth/token/refresh",
+    ]
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -48,10 +57,18 @@ class JWTRequestValidationMiddleware:
         )
 
     def __call__(self, request):
+        # ✅ Only apply to API routes
         if not request.path.startswith("/api/"):
             return self.get_response(request)
 
+        # ✅ Skip public endpoints
+        if any(request.path.startswith(url) for url in self.EXEMPT_URLS):
+            return self.get_response(request)
+
+        # ✅ Extract token
         token = self._extract_token(request)
+
+        # ✅ Validate only if token exists
         if token:
             is_valid, message = self._validate_token(token)
             if not is_valid:
@@ -63,6 +80,7 @@ class JWTRequestValidationMiddleware:
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
         if auth_header.startswith("Bearer "):
             return auth_header.split(" ", 1)[1].strip()
+
         return request.COOKIES.get("access_token")
 
     def _validate_token(self, raw_token):
@@ -73,13 +91,17 @@ class JWTRequestValidationMiddleware:
         except Exception:
             return False, "Invalid token."
 
+        # ✅ Required claims check
         for claim in ("user_id", "jti", "exp"):
             if claim not in payload:
                 return False, f"Missing required claim: {claim}."
 
         user_id = payload.get("user_id")
         token_jti = payload.get("jti")
+
         state = UserTokenState.objects.filter(user_id=user_id).only("current_jti").first()
+
+        # ✅ Check if token is still valid (not revoked)
         if not state or state.current_jti != token_jti:
             return False, "Token is no longer valid."
 
