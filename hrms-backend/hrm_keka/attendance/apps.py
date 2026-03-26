@@ -2,6 +2,9 @@ from django.apps import AppConfig
 import threading
 import time
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AttendanceConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -12,22 +15,21 @@ class AttendanceConfig(AppConfig):
 
         # Start background thread for biometric sync
         from django.conf import settings
-        if settings.SCHEDULER_AUTOSTART and not os.getenv('DISABLE_BIOMETRIC_AUTO_SYNC'):
+        is_leader = os.getenv('BIOMETRIC_SYNC_LEADER', '').lower() in {'1', 'true', 'yes'}
+        if settings.SCHEDULER_AUTOSTART and is_leader and not os.getenv('DISABLE_BIOMETRIC_AUTO_SYNC'):
             from .tasks import auto_sync_biometric_devices  # Import your sync task
 
             def run_sync():
-                print("🔄 Background sync thread started - will run every 15 seconds")
+                logger.info("Background sync thread started (every 15 seconds)")
                 while True:
                     try:
-                        print("🔄 Calling auto_sync_biometric_devices...")
+                        logger.info("Calling auto_sync_biometric_devices")
                         result = auto_sync_biometric_devices()
-                        print(f"✅ Sync completed: {result}")
+                        logger.info("Sync completed: %s", result)
                     except Exception as e:
-                        print(f"❌ Sync error: {e}")
-                    import time
+                        logger.exception("Sync error: %s", e)
                     time.sleep(15)  # Run every 15 seconds
 
-            import threading
             thread = threading.Thread(target=run_sync, daemon=True)
             thread.start()
-            print("✅ Background sync thread started")
+            logger.info("Background sync thread started")

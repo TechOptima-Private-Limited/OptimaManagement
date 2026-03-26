@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'onboarding',
     'notifications',
     'resource_management',
+    'copilot',
     'dal',
     'dal_select2',
     'django_ckeditor_5',
@@ -309,7 +310,7 @@ SCHEDULER_CONFIG = {
     "apscheduler.timezone": "UTC",
 }
 
-SCHEDULER_AUTOSTART = True
+SCHEDULER_AUTOSTART = config('SCHEDULER_AUTOSTART', default=False, cast=bool)
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
