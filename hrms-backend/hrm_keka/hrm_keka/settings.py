@@ -334,7 +334,7 @@ CONTENT_SECURITY_POLICY = config(
         "font-src 'self' data:",
         "style-src 'self' 'unsafe-inline'",
         "script-src 'self'",
-        "connect-src 'self'",
+        "connect-src 'self' https://optpeople.techoptima.ai https://optpeople-b.techoptima.ai",
         "form-action 'self'",
         "upgrade-insecure-requests",
     ])
