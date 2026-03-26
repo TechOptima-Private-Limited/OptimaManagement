@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'onboarding',
     'notifications',
     'resource_management',
-    'copilot',
+#    'copilot',
     'dal',
     'dal_select2',
     'django_ckeditor_5',
