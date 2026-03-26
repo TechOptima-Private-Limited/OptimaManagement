@@ -19,6 +19,7 @@ import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
 import WorkFromHomePopup from '../attendance/WorkFromHomePopup';
 import { useTheme } from '../../context/ThemeContext';
+import CopilotChat from '../copilot/CopilotChat';
 
 // Helper to get local YYYY-MM-DD date (avoid UTC offset issues)
 const toLocalDate = (date) => {
@@ -1863,6 +1864,9 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Copilot widget (fixed bottom) */}
+      <CopilotChat />
 
       {/* Work From Home Popup - Only show for employees and HR managers */}
       {!isManagerOnly && (

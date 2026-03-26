@@ -9,20 +9,27 @@ from authentication.models import UserTokenState
 
 
 class SecurityHeadersMiddleware:
+    """
+    Adds security-related HTTP headers safely.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
 
+        # Content Security Policy
         csp = getattr(settings, "CONTENT_SECURITY_POLICY", None)
         if csp:
             response.setdefault("Content-Security-Policy", csp)
 
+        # Permissions Policy
         permissions_policy = getattr(settings, "PERMISSIONS_POLICY", None)
         if permissions_policy:
             response.setdefault("Permissions-Policy", permissions_policy)
 
+        # Referrer Policy
         referrer_policy = getattr(settings, "REFERRER_POLICY", None)
         if referrer_policy:
             response.setdefault("Referrer-Policy", referrer_policy)
@@ -33,10 +40,10 @@ class SecurityHeadersMiddleware:
 class JWTRequestValidationMiddleware:
     """
     Validates JWT tokens for protected API routes.
-    Skips authentication for public endpoints like login/register.
+    - Skips public endpoints
+    - Allows preflight (OPTIONS) requests
     """
 
-    # ✅ Public endpoints (NO token required)
     EXEMPT_URLS = [
         "/api/auth/login",
         "/api/auth/register",
@@ -57,18 +64,23 @@ class JWTRequestValidationMiddleware:
         )
 
     def __call__(self, request):
-        # ✅ Only apply to API routes
+        # ✅ 1. Allow CORS preflight requests (CRITICAL)
+        if request.method == "OPTIONS":
+            return self.get_response(request)
+
+        # ✅ 2. Apply only to API routes
         if not request.path.startswith("/api/"):
             return self.get_response(request)
 
-        # ✅ Skip public endpoints
-        if any(request.path.startswith(url) for url in self.EXEMPT_URLS):
+        # ✅ 3. Skip public endpoints
+        normalized_path = request.path.rstrip("/")
+        if any(normalized_path.startswith(url) for url in self.EXEMPT_URLS):
             return self.get_response(request)
 
-        # ✅ Extract token
+        # ✅ 4. Extract token
         token = self._extract_token(request)
 
-        # ✅ Validate only if token exists
+        # ✅ 5. Validate token if present
         if token:
             is_valid, message = self._validate_token(token)
             if not is_valid:
@@ -91,17 +103,23 @@ class JWTRequestValidationMiddleware:
         except Exception:
             return False, "Invalid token."
 
-        # ✅ Required claims check
-        for claim in ("user_id", "jti", "exp"):
+        # Required claims check
+        required_claims = ("user_id", "jti", "exp")
+        for claim in required_claims:
             if claim not in payload:
                 return False, f"Missing required claim: {claim}."
 
         user_id = payload.get("user_id")
         token_jti = payload.get("jti")
 
-        state = UserTokenState.objects.filter(user_id=user_id).only("current_jti").first()
+        state = (
+            UserTokenState.objects
+            .filter(user_id=user_id)
+            .only("current_jti")
+            .first()
+        )
 
-        # ✅ Check if token is still valid (not revoked)
+        # Check if token is still valid
         if not state or state.current_jti != token_jti:
             return False, "Token is no longer valid."
 

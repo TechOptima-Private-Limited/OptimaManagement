@@ -17,7 +17,8 @@ import {
   UsersIcon,
   BriefcaseIcon,
   ComputerDesktopIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 import {
   getRoleDisplayName,

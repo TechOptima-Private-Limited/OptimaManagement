@@ -9,7 +9,14 @@ from .models import (
 
 @admin.register(LeaveType)
 class LeaveTypeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'days_allowed_per_year', 'is_carry_forward', 'is_active']
+    list_display = [
+        'name',
+        'code',
+        'days_allowed_per_year',
+        'expiry_date',
+        'is_carry_forward',
+        'is_active'
+    ]
     list_filter = ['is_active', 'is_carry_forward']
     search_fields = ['name', 'code']
     ordering = ['name']

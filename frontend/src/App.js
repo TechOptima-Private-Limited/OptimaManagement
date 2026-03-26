@@ -251,7 +251,6 @@ function App() {
                 {/* Groups management */}
 
                 <Route
-
                   path="/users-auth/groups"
 
                   element={

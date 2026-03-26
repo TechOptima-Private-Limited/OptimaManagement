@@ -144,10 +144,20 @@ const LeaveTypesManagement = () => {
             </div>
           </div>
 
-          <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
-            <div className="flex items-center space-x-2">
-              <CheckCircleIcon className="h-4 w-4 text-emerald-400" />
-              <span className="font-bold tracking-wider">Created: {formatDate(leaveType.created_at)}</span>
+          <div className="flex items-center flex-wrap gap-3">
+            {leaveType.expiry_date && (
+              <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
+                <div className="flex items-center space-x-2">
+                  <CalendarDaysIcon className="h-4 w-4 text-indigo-300" />
+                  <span className="font-bold tracking-wider">Expiry: {formatDate(leaveType.expiry_date)}</span>
+                </div>
+              </div>
+            )}
+            <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
+              <div className="flex items-center space-x-2">
+                <CheckCircleIcon className="h-4 w-4 text-emerald-400" />
+                <span className="font-bold tracking-wider">Created: {formatDate(leaveType.created_at)}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -369,6 +379,20 @@ const LeaveTypesManagement = () => {
               />
               {errors.days_allowed_per_year && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.days_allowed_per_year.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                Expiry Date <span className="text-rose-400">*</span>
+              </label>
+              <input
+                {...register('expiry_date', { required: 'Expiry date is required' })}
+                type="date"
+                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+              />
+              {errors.expiry_date && (
+                <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.expiry_date.message}</p>
               )}
             </div>
 

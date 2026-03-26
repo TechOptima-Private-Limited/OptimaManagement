@@ -211,6 +211,9 @@ class LeaveType(models.Model):
     code = models.CharField(max_length=10, unique=True)  # e.g., 'AL', 'SL', 'ML'
     days_allowed_per_year = models.IntegerField(validators=[MinValueValidator(0)])
     description = models.TextField(blank=True)
+    # Date when the leave balance for this leave type expires (informational/optional).
+    # Stored as an absolute date; the UI expects a `YYYY-MM-DD` value.
+    expiry_date = models.DateField(null=True, blank=True)
     is_carry_forward = models.BooleanField(default=False)
     max_carry_forward_days = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     is_active = models.BooleanField(default=True)
