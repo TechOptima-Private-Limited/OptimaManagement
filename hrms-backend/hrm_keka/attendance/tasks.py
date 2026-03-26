@@ -1,35 +1,34 @@
 import logging
-import time
 import pytz
 from datetime import date
 from django.utils import timezone
 from django.core.cache import cache
-from django.db.models import Count, Min, Max, Q
-from django.db import transaction
-
+from django.db.models import Count, Min, Max
+ 
 from .models import BiometricDevice, AttendanceRecord, BiometricAttendanceLog
 from employees.models import Employee
-
+ 
 logger = logging.getLogger(__name__)
-
+ 
 try:
     from zk import ZK
     BIOMETRIC_AVAILABLE = True
 except ImportError:
     BIOMETRIC_AVAILABLE = False
     logger.warning("ZK library not available.")
-
-
+ 
+ 
 def auto_sync_biometric_devices():
-
+ 
     if not BIOMETRIC_AVAILABLE:
         return "ZK library missing"
-
+ 
     lock_key = "biometric_sync_lock"
-
+ 
     if not cache.add(lock_key, True, timeout=300):
         logger.info("Sync already running")
         return "Sync in progress"
+<<<<<<< HEAD
 
     tz_ist = pytz.timezone("Asia/Kolkata")
     sync_date = date.today()
@@ -130,14 +129,55 @@ def auto_sync_biometric_devices():
                 except Exception:
                     pass
 
+=======
+ 
+    try:
+        tz_ist = pytz.timezone("Asia/Kolkata")
+        sync_date = date.today()
+ 
+        total_synced_devices = 0
+        total_logs_processed = 0
+        total_records_created = 0
+ 
+        # ✅ FIX: define active devices
+        active_devices = BiometricDevice.objects.filter(is_active=True)
+ 
+        for device in active_devices:
+            device_ip = device.ip_address
+            conn = None
+ 
+            device_synced_count = 0
+            device_records_created = 0
+ 
+            # Skip if recently synced
+            if device.last_sync:
+                time_since_sync = timezone.now() - device.last_sync
+                minutes = time_since_sync.total_seconds() / 60
+ 
+                if minutes < device.sync_interval_minutes:
+                    logger.info(f"Skipping {device_ip}, last sync {minutes:.1f} min ago")
+                    continue
+ 
+            logger.info(f"Starting sync for {device_ip}")
+ 
+            try:
+                zk = ZK(device_ip, port=4370, timeout=15, force_udp=False)
+                conn = zk.connect()
+ 
+                # Fetch users
+                try:
+                    users = conn.get_users()
+                    user_names = {str(u.user_id): u.name for u in users}
+                except Exception as e:
+                    logger.error(f"Failed to fetch users from {device_ip}: {e}")
+                    user_names = {}
+ 
+                # Fetch logs
+>>>>>>> 0e1aa3ff (Refactor biometric device sync logic and improve error handling)
                 logs = conn.get_attendance()
-
-                if conn:
-                    conn.disconnect()
-
-                bulk_logs = []
-
+ 
                 for log in logs:
+<<<<<<< HEAD
 
                     ts = log.timestamp
 
@@ -275,23 +315,150 @@ def auto_sync_biometric_devices():
 
                 logger.info(f"Sync success {device_ip}")
 
+=======
+                    try:
+                        ts = log.timestamp
+ 
+                        if ts.tzinfo is None:
+                            ts = tz_ist.localize(ts)
+                        else:
+                            ts = ts.astimezone(tz_ist)
+ 
+                        attendance_date = ts.date()
+                        attendance_time = ts.time()
+ 
+                        biometric_user_id = str(log.user_id)
+                        biometric_user_name = user_names.get(biometric_user_id, "Unknown")
+ 
+                        employee = Employee.objects.filter(employee_id=biometric_user_id).first()
+ 
+                        # Create/update attendance
+                        record = None
+                        if employee:
+                            record = AttendanceRecord.objects.filter(
+                                employee=employee,
+                                date=attendance_date
+                            ).first()
+                        else:
+                            record = AttendanceRecord.objects.filter(
+                                biometric_user_id=biometric_user_id,
+                                date=attendance_date,
+                                employee__isnull=True
+                            ).first()
+ 
+                        if not record:
+                            record = AttendanceRecord.objects.create(
+                                employee=employee,
+                                date=attendance_date,
+                                biometric_user_id=biometric_user_id if not employee else None,
+                                biometric_user_name=biometric_user_name,
+                                check_in_time=attendance_time,
+                                status='PRESENT',
+                                attendance_type='BIOMETRIC',
+                                biometric_device_id=device_ip
+                            )
+                            device_records_created += 1
+                        else:
+                            updated = False
+ 
+                            if not record.check_in_time or attendance_time < record.check_in_time:
+                                record.check_in_time = attendance_time
+                                updated = True
+ 
+                            if attendance_time > record.check_in_time:
+                                if not record.check_out_time or attendance_time > record.check_out_time:
+                                    record.check_out_time = attendance_time
+                                    updated = True
+ 
+                            if employee and not record.employee:
+                                record.employee = employee
+                                updated = True
+ 
+                            if updated:
+                                record.save()
+ 
+                        # Save biometric log
+                        bio_log = BiometricAttendanceLog.objects.filter(
+                            biometric_user_id=biometric_user_id,
+                            timestamp=ts
+                        ).first()
+ 
+                        if not bio_log:
+                            BiometricAttendanceLog.objects.create(
+                                biometric_user_id=biometric_user_id,
+                                timestamp=ts,
+                                biometric_user_name=biometric_user_name,
+                                device_id=device_ip,
+                                date=attendance_date,
+                                time=attendance_time,
+                                employee=employee,
+                                attendance_record=record
+                            )
+ 
+                        device_synced_count += 1
+ 
+                    except Exception as log_err:
+                        logger.error(f"Error processing log for user {log.user_id}: {log_err}")
+ 
+                # Normalize check-in/out
+                try:
+                    user_logs = BiometricAttendanceLog.objects.filter(
+                        device_id=device_ip,
+                        date=sync_date
+                    ).values('biometric_user_id').annotate(
+                        first_punch=Min('time'),
+                        last_punch=Max('time'),
+                        punch_count=Count('id')
+                    )
+ 
+                    for ul in user_logs:
+                        uid = ul['biometric_user_id']
+                        employee = Employee.objects.filter(employee_id=uid).first()
+ 
+                        if employee:
+                            rec = AttendanceRecord.objects.filter(employee=employee, date=sync_date).first()
+                        else:
+                            rec = AttendanceRecord.objects.filter(
+                                biometric_user_id=uid,
+                                date=sync_date,
+                                employee__isnull=True
+                            ).first()
+ 
+                        if rec:
+                            rec.check_in_time = ul['first_punch']
+                            rec.check_out_time = (
+                                ul['last_punch'] if ul['punch_count'] >= 2 else None
+                            )
+                            rec.save()
+ 
+                except Exception as norm_err:
+                    logger.error(f"Normalization failed for {device_ip}: {norm_err}")
+ 
+                device.last_sync = timezone.now()
+                device.save()
+ 
+                total_synced_devices += 1
+                total_logs_processed += device_synced_count
+                total_records_created += device_records_created
+ 
+                logger.info(f"Sync successful for {device_ip}")
+ 
+>>>>>>> 0e1aa3ff (Refactor biometric device sync logic and improve error handling)
             except Exception as e:
-
                 logger.error(f"Device {device_ip} failed: {e}")
-
+ 
+            finally:
                 if conn:
                     try:
                         conn.disconnect()
                     except Exception:
                         pass
-
-                continue
-
+ 
         return (
-            f"Synced {total_devices} devices | "
-            f"{total_logs} logs processed | "
-            f"{total_records} attendance records"
+            f"Synced {total_synced_devices} devices | "
+            f"{total_logs_processed} logs processed | "
+            f"{total_records_created} attendance records"
         )
-
+ 
     finally:
         cache.delete(lock_key)
