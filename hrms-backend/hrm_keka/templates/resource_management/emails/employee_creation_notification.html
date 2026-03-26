@@ -26,13 +26,10 @@
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Login URL:</strong> <a href="{{ site_url }}/en/456">{{ site_url }}/en/456</a></p>
 
-            <p><strong>Username for Login:</strong> Please use your Employee ID as the username when logging in. Ensure you enter it in the same format, with alphabets in capital letters (e.g., <strong>TO-00999</strong>).</p>
-            <p>Your password follows this format:</p>
-            <p><strong>First three characters of your last name (with the first letter capitalized) followed by first three characters of your first name+ '@' + Last three digits of your Employee ID</strong></p>
-            <p>For example, if your name is <em>Someswara Rao Gurugu</em> and your Employee ID is <em>TO-00999</em>, your password will be: <strong>Gursom@999</strong></p>
-            
-            
-            <p>If you have any questions or need assistance, feel free to reach out to Someswara Rao Gurugu</p>
+            <p><strong>Username for Login:</strong> Your email address {{ user.email }} is your username.</p>
+            <p>Your password is:</p>
+            <p><strong>The password "Welcome@123" after login with this password you can change your password and then login with new password.</strong></p>
+            <p>If you have any questions or need assistance, feel free to reach out to the IT Team.</p>
             
             <p>Best regards,<br><strong>The HR Team</strong></p>
         </div>
