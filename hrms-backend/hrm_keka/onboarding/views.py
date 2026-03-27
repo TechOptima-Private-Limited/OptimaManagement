@@ -23,17 +23,45 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
+from django.contrib import messages
+from django.core.mail import EmailMessage
 
 from .models import Employee, Offboarding
 from employees.models import Employee as CoreEmployee, Department as CoreDepartment
 from authentication.models import User, UserProfile
 from .serializers import EmployeeSerializer, OffboardingSerializer, EmployeeSelfSubmitSerializer
+from utils.roles import can_manage_hr, has_executive_access
 
 import base64
 from datetime import datetime, timedelta
 import uuid
+
+
+def _user_role(user):
+    profile = getattr(user, 'profile', None)
+    return getattr(profile, 'role', None) if profile else None
+
+
+def can_manage_onboarding(user):
+    """Allow HR managers/executives and executive leadership."""
+    if not user or not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    role = _user_role(user)
+    return can_manage_hr(role) or has_executive_access(role)
+
+
+def can_create_onboarding(user):
+    """Create follows same access as onboarding management."""
+    return can_manage_onboarding(user)
+
+
+def can_delete_onboarding(user):
+    """Delete is restricted to management/executive access."""
+    return can_manage_onboarding(user)
 
 # # Employee Management API Views
 # @api_view(['GET', 'POST'])
@@ -1219,6 +1247,8 @@ def employee_list_documents(request, employee_id):
 # def employee_onboarding_success(request):
 #     """Success page after employee submits onboarding form"""
 #     return render(request, 'onboarding/success.html')
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def offboarding_list(request):
     """Get list of offboardings or create new offboarding"""
     if request.method == 'GET':

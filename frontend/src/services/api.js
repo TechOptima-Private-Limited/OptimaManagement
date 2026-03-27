@@ -310,9 +310,4 @@ export const assetsAPI = {
   getAssetType: (id) => api.get(`/assets/asset-types/${id}/`),
 };
 
-// Copilot API - in-app assistant/chat
-export const copilotAPI = {
-  chat: (payload) => api.post('/copilot/chat/', payload),
-};
-
 export default api;

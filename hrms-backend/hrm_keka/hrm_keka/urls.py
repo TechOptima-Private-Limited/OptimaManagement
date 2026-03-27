@@ -81,7 +81,6 @@ urlpatterns = [
 
     path('api/notifications/', include('notifications.urls')),
     path('api/resource-management/', include('resource_management.urls')),
-    path('api/copilot/', include('copilot.urls')),
     path('api/webpush/', include('webpush.urls')),
     path('captcha/', include('captcha.urls')),
 ]

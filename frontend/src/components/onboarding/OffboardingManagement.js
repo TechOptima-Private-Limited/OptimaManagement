@@ -18,6 +18,8 @@ const OffboardingManagement = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [employeeSearchTerm, setEmployeeSearchTerm] = useState('');
+  const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedOffboarding, setSelectedOffboarding] = useState(null);
@@ -55,6 +57,10 @@ const OffboardingManagement = () => {
       console.error('Error fetching employees:', error);
       toast.error('Failed to fetch employees');
     }
+  };
+
+  const getEmployeeDisplayName = (employee) => {
+    return employee.full_name || `${employee.first_name || ''} ${employee.last_name || ''}`.trim() || employee.email;
   };
 
   const createOffboarding = async () => {
@@ -138,6 +144,12 @@ const OffboardingManagement = () => {
   // Track employees who already have an offboarding record (for disabling options)
   const offboardedEmployeeIds = new Set((offboardings || []).map(o => o.employee));
   const displayEmployees = (employees || []);
+  const matchingEmployees = employeeSearchTerm.trim().length >= 2
+    ? displayEmployees.filter((employee) =>
+      getEmployeeDisplayName(employee).toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
+      (employee.email || '').toLowerCase().includes(employeeSearchTerm.toLowerCase())
+    )
+    : [];
 
   if (loading) {
     return (
@@ -159,7 +171,11 @@ const OffboardingManagement = () => {
             </p>
           </div>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              setShowCreateModal(true);
+              setEmployeeSearchTerm('');
+              setShowEmployeeDropdown(false);
+            }}
             className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 border border-rose-500/50 rounded-xl shadow-lg shadow-rose-500/20 text-sm font-bold text-white hover:from-rose-400 hover:to-red-500 hover:shadow-rose-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
           >
             <PlusIcon className="h-5 w-5 mr-2" />
@@ -341,22 +357,55 @@ const OffboardingManagement = () => {
                   <div className="space-y-5">
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-1.5">Employee *</label>
-                      <select
-                        value={newOffboarding.employee}
-                        onChange={(e) => setNewOffboarding({ ...newOffboarding, employee: e.target.value })}
-                        className="block w-full bg-black/20 border border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-300 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
-                      >
-                        <option value="" className="bg-slate-900 text-slate-400">Select Employee</option>
-                        {(displayEmployees || []).map((employee) => {
-                          const isOffboarded = offboardedEmployeeIds.has(employee.id);
-                          const name = employee.full_name || `${employee.first_name || ''} ${employee.last_name || ''}`.trim() || employee.email;
-                          return (
-                            <option key={employee.id} value={employee.id} disabled={isOffboarded} className="bg-slate-900">
-                              {isOffboarded ? `${name} (already offboarded)` : name}
-                            </option>
-                          );
-                        })}
-                      </select>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={employeeSearchTerm}
+                          onChange={(e) => {
+                            setEmployeeSearchTerm(e.target.value);
+                            setShowEmployeeDropdown(true);
+                            if (newOffboarding.employee) {
+                              setNewOffboarding({ ...newOffboarding, employee: '' });
+                            }
+                          }}
+                          onFocus={() => setShowEmployeeDropdown(true)}
+                          placeholder="Type at least 2 letters to search employee"
+                          className="block w-full bg-black/20 border border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                        />
+                        {showEmployeeDropdown && (
+                          <div className="absolute z-20 mt-1 w-full bg-slate-900 border border-white/10 rounded-xl shadow-lg max-h-56 overflow-y-auto">
+                            {employeeSearchTerm.trim().length < 2 ? (
+                              <div className="px-3 py-2 text-sm text-slate-400">
+                                Type at least 2 letters to search
+                              </div>
+                            ) : matchingEmployees.length === 0 ? (
+                              <div className="px-3 py-2 text-sm text-slate-400">
+                                No matching employees
+                              </div>
+                            ) : (
+                              matchingEmployees.map((employee) => {
+                                const isOffboarded = offboardedEmployeeIds.has(employee.id);
+                                const name = getEmployeeDisplayName(employee);
+                                return (
+                                  <button
+                                    type="button"
+                                    key={employee.id}
+                                    disabled={isOffboarded}
+                                    onClick={() => {
+                                      setNewOffboarding({ ...newOffboarding, employee: employee.id });
+                                      setEmployeeSearchTerm(name);
+                                      setShowEmployeeDropdown(false);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isOffboarded ? `${name} (already offboarded)` : name}
+                                  </button>
+                                );
+                              })
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-1.5">Last Working Date *</label>

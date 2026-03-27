@@ -16,7 +16,9 @@ def create_employee_for_new_user(sender, instance, created, **kwargs):
     if hasattr(instance, "employee"):
         return
 
-    employee_id = f"EMP-{instance.id:04d}"
+    # Prefer the user-provided UserID (username) as employee_id.
+    # Fall back to TO-XXXXX only when username is unavailable.
+    employee_id = (instance.username or "").strip() or f"TO-{instance.id:05d}"
 
     Employee.objects.create(
         user=instance,

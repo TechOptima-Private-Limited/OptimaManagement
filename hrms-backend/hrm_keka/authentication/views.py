@@ -87,10 +87,12 @@ def register(request):
         user.must_change_password = True
         user.save()
         # Ensure an Employee exists and is ACTIVE for admin-created users.
+        employee_identifier = (user.username or "").strip() or f"TO-{user.id:05d}"
         Employee.objects.update_or_create(
             user=user,
             defaults={
-                'employee_id': f"EMP-{user.id:04d}",
+                # Use the UserID entered in the Add User form as employee_id.
+                'employee_id': employee_identifier,
                 'department': None,
                 'position': '',
                 'hire_date': None,

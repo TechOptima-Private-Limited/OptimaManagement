@@ -40,56 +40,38 @@ def auto_sync_biometric_devices():
 
     try:
 
-        total_device_rows = BiometricDevice.objects.count()
         devices = BiometricDevice.objects.filter(
             is_active=True,
             auto_sync_enabled=True
         )
 
-        logger.info(
-            f"Auto Sync device rows: total={total_device_rows}, enabled={devices.count()}, "
-            f"enabled_ips={list(devices.values_list('ip_address', flat=True))}"
-        )
+        logger.info(f"Auto Sync started. Devices: {devices.count()}")
 
         if not devices.exists():
             return "No devices"
 
-        # 🔹 Cache employees (VERY IMPORTANT FOR PERFORMANCE)
-        # Devices may send user ids that match either Employee.employee_id or the linked User.username
-        # (e.g. "TO-00087"). Build a lookup across both plus a few normalized variants.
+        # 🔹 Cache employees
         employees = {}
         for e in Employee.objects.select_related('user').all():
             keys = []
+
             if e.employee_id:
                 keys.append(str(e.employee_id))
+
             if getattr(e, 'user', None) and getattr(e.user, 'username', None):
                 keys.append(str(e.user.username))
 
-            normalized_keys = set()
             for k in keys:
-                k = k.strip()
-                if not k:
-                    continue
-                normalized_keys.add(k)
-                normalized_keys.add(k.upper())
-                normalized_keys.add(k.replace(' ', ''))
-                normalized_keys.add(k.upper().replace(' ', ''))
-                normalized_keys.add(k.upper().replace('-', ''))
-                normalized_keys.add(k.upper().replace('_', ''))
-                normalized_keys.add(k.upper().replace('-', '_'))
-                normalized_keys.add(k.upper().replace('_', '-'))
+                if k:
+                    employees[k.strip().upper()] = e
 
-            for k in normalized_keys:
-                if k and k not in employees:
-                    employees[k] = e
-
+        # 🔹 Loop devices
         for device in devices:
 
             device_ip = device.ip_address
             conn = None
 
             try:
-
                 logger.info(f"Sync starting {device_ip}")
 
                 zk = ZK(
@@ -100,28 +82,17 @@ def auto_sync_biometric_devices():
                     ommit_ping=True,
                 )
 
-                zk.ommit_ping = True
-                logger.info(
-                    f"ZK init {device_ip}: ommit_ping={getattr(zk, 'ommit_ping', None)}, "
-                    f"force_udp={getattr(zk, 'force_udp', None)}"
-                )
-
-                # 🔹 Connection retry
-                last_conn_err = None
+                # 🔹 Retry connection
                 for i in range(3):
                     try:
                         conn = zk.connect()
                         break
-                    except Exception as conn_err:
-                        last_conn_err = conn_err
-                        logger.error(
-                            f"ZK connect failed {device_ip} attempt {i + 1}/3: "
-                            f"{type(conn_err).__name__}: {conn_err}"
-                        )
+                    except Exception as e:
+                        logger.error(f"Connect failed {device_ip} attempt {i+1}: {e}")
                         time.sleep(2)
 
                 if not conn:
-                    raise last_conn_err or Exception("Device connection failed")
+                    raise Exception("Connection failed")
 
                 users = {}
                 try:
@@ -131,11 +102,9 @@ def auto_sync_biometric_devices():
                     pass
 
                 logs = conn.get_attendance()
+                conn.disconnect()
 
-                if conn:
-                    conn.disconnect()
-
-                bulk_logs = []
+                bulk_logs = []  # ✅ FIXED
 
                 for log in logs:
 
@@ -152,20 +121,7 @@ def auto_sync_biometric_devices():
                     uid = str(log.user_id)
                     name = users.get(uid, "")
 
-                    employee = employees.get(uid) or employees.get(uid.strip()) or employees.get(uid.strip().upper())
-                    if not employee:
-                        uid_norm = uid.strip().upper()
-                        uid_compact = uid_norm.replace(' ', '')
-                        employee = (
-                            employees.get(uid_compact)
-                            or employees.get(uid_compact.replace('-', ''))
-                            or employees.get(uid_compact.replace('_', ''))
-                            or employees.get(uid_compact.replace('-', '_'))
-                            or employees.get(uid_compact.replace('_', '-'))
-                        )
-
-                    attendance_date = ts.date()
-                    attendance_time = ts.time().replace(tzinfo=None)
+                    employee = employees.get(uid.strip().upper())
 
                     bulk_logs.append(
                         BiometricAttendanceLog(
@@ -173,13 +129,13 @@ def auto_sync_biometric_devices():
                             biometric_user_name=name,
                             timestamp=ts,
                             device_id=device_ip,
-                            date=attendance_date,
-                            time=attendance_time,
+                            date=ts.date(),
+                            time=ts.time().replace(tzinfo=None),
                             employee=employee
                         )
                     )
 
-                # 🔹 Bulk insert logs
+                # 🔹 Save logs
                 BiometricAttendanceLog.objects.bulk_create(
                     bulk_logs,
                     ignore_conflicts=True
@@ -187,7 +143,7 @@ def auto_sync_biometric_devices():
 
                 total_logs += len(bulk_logs)
 
-                # 🔹 Normalize attendance
+                # 🔹 Create attendance
                 summaries = (
                     BiometricAttendanceLog.objects
                     .filter(device_id=device_ip, date=sync_date)
@@ -204,45 +160,15 @@ def auto_sync_biometric_devices():
                     for s in summaries:
 
                         uid = s["biometric_user_id"]
-                        employee = employees.get(uid) or employees.get(str(uid).strip()) or employees.get(str(uid).strip().upper())
-                        if not employee:
-                            uid_norm = str(uid).strip().upper()
-                            uid_compact = uid_norm.replace(' ', '')
-                            employee = (
-                                employees.get(uid_compact)
-                                or employees.get(uid_compact.replace('-', ''))
-                                or employees.get(uid_compact.replace('_', ''))
-                                or employees.get(uid_compact.replace('-', '_'))
-                                or employees.get(uid_compact.replace('_', '-'))
-                            )
+                        employee = employees.get(uid.strip().upper())
 
                         checkin = s["first"]
                         checkout = s["last"] if s["count"] >= 2 else None
 
-                        record = None
-
-                        if employee:
-                            record = (
-                                AttendanceRecord.objects.filter(
-                                    employee=employee,
-                                    date=sync_date,
-                                )
-                                .order_by("-id")
-                                .first()
-                            )
-
-                        if not record:
-                            record = (
-                                AttendanceRecord.objects.filter(
-                                    date=sync_date,
-                                )
-                                .filter(
-                                    Q(employee__isnull=True, biometric_user_id=uid)
-                                    | Q(employee__employee_id=uid)
-                                )
-                                .order_by("-id")
-                                .first()
-                            )
+                        record = AttendanceRecord.objects.filter(
+                            employee=employee,
+                            date=sync_date
+                        ).first()
 
                         if not record:
                             record = AttendanceRecord.objects.create(
@@ -258,12 +184,6 @@ def auto_sync_biometric_devices():
                         else:
                             record.check_in_time = checkin
                             record.check_out_time = checkout
-                            if employee and not record.employee:
-                                record.employee = employee
-                            record.attendance_type = "BIOMETRIC"
-                            record.status = "PRESENT"
-                            record.biometric_device_id = device_ip
-                            record.biometric_user_id = uid
                             record.save()
 
                         total_records += 1
@@ -276,7 +196,6 @@ def auto_sync_biometric_devices():
                 logger.info(f"Sync success {device_ip}")
 
             except Exception as e:
-
                 logger.error(f"Device {device_ip} failed: {e}")
 
                 if conn:
@@ -285,7 +204,11 @@ def auto_sync_biometric_devices():
                     except Exception:
                         pass
 
-                continue
+        # ✅ FINAL LOG (IMPORTANT)
+        logger.info(
+            f"Sync completed: Synced {total_devices} devices | "
+            f"{total_logs} logs processed | {total_records} attendance records"
+        )
 
         return (
             f"Synced {total_devices} devices | "

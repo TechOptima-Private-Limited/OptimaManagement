@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     'onboarding',
     'notifications',
     'resource_management',
-    'copilot',
     'dal',
     'dal_select2',
     'django_ckeditor_5',
@@ -88,7 +87,10 @@ LOGGING = {
     'handlers': {
         'console': {'class': 'logging.StreamHandler'},
     },
-    'root': {'handlers': ['console']},
+    'root': {
+    'handlers': ['console'],
+    'level': 'INFO',
+},
     'loggers': {
         'django': {'handlers': ['console'], 'level': config('DJANGO_LOG_LEVEL', default='INFO'), 'propagate': False},
         'onboarding': {'handlers': ['console'], 'level': config('ONBOARDING_LOG_LEVEL', default='DEBUG'), 'propagate': False},
