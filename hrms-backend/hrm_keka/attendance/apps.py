@@ -18,8 +18,8 @@ class AttendanceConfig(AppConfig):
         import attendance.signals
 
         # ✅ Prevent duplicate threads (VERY IMPORTANT)
-        if os.environ.get("RUN_MAIN") != "true":
-            return
+        # if os.environ.get("RUN_MAIN") != "true":
+        #     return
 
         from django.conf import settings
 
