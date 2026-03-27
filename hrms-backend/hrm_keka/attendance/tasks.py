@@ -182,8 +182,14 @@ def auto_sync_biometric_devices():
                                 biometric_device_id=device_ip,
                             )
                         else:
-                            record.check_in_time = checkin
-                            record.check_out_time = checkout
+                             # Keep earliest check-in across all synced devices.
+                            if not record.check_in_time or (checkin and checkin < record.check_in_time):
+                                record.check_in_time = checkin
+
+                            # Keep latest check-out across all synced devices.
+                            if checkout:
+                                if not record.check_out_time or checkout > record.check_out_time:
+                                    record.check_out_time = checkout
                             record.save()
 
                         total_records += 1
