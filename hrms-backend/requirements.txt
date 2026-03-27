@@ -25,7 +25,7 @@ django-csp
 django-otp
 pyotp
 qrcode
-python-magic-bin
+python-magic
 bleach
 django-ratelimit
 
