@@ -887,6 +887,11 @@ class LeaveBalanceService:
         """Get or create leave balance for employee"""
         if not year:
             year = datetime.now().year
+
+        if getattr(leave_type, 'code', None) == 'EL':
+            raise ValueError(
+                'Earned Leave (EL) is tracked in LeaveLedger only, not LeaveBalance.'
+            )
         
         try:
             balance = LeaveBalance.objects.get(
@@ -926,18 +931,39 @@ class LeaveBalanceService:
     @staticmethod 
     def check_leave_balance(employee, leave_type, days_requested, year=None):
         """Check if employee has enough leave balance"""
-        if not year:
-            year = datetime.now().year
+        if leave_type.code == 'EL':
+            from django.db.models import Sum
+            from django.utils import timezone
+            from .models import LeaveLedger
             
-        balance = LeaveBalanceService.get_or_create_balance(employee, leave_type, year)
-        remaining_days = float(balance.remaining_days)
-        days_requested_float = float(days_requested)
-        
-        has_sufficient = remaining_days >= days_requested_float
-        
-        logger.info(f"🔍 Balance check: {employee.user.get_full_name()} - {leave_type.name} - Available: {remaining_days}, Requested: {days_requested_float}, Sufficient: {has_sufficient}")
-        
-        return has_sufficient, remaining_days
+            today = timezone.localdate()
+            balance = LeaveLedger.objects.filter(
+                employee=employee,
+                leave_type=leave_type,
+                transaction_type='ACCRUAL',
+                remaining_days__gt=0,
+                expiry_date__gte=today
+            ).aggregate(total=Sum('remaining_days'))['total'] or Decimal('0.00')
+            
+            remaining_days = float(balance)
+            days_requested_float = float(days_requested)
+            has_sufficient = remaining_days >= days_requested_float
+            
+            logger.info(f"🔍 EL Ledger Balance check: {employee.user.get_full_name()} - Available: {remaining_days}, Requested: {days_requested_float}")
+            return has_sufficient, remaining_days
+        else:
+            if not year:
+                year = datetime.now().year
+                
+            balance = LeaveBalanceService.get_or_create_balance(employee, leave_type, year)
+            remaining_days = float(balance.remaining_days)
+            days_requested_float = float(days_requested)
+            
+            has_sufficient = remaining_days >= days_requested_float
+            
+            logger.info(f"🔍 Balance check: {employee.user.get_full_name()} - {leave_type.name} - Available: {remaining_days}, Requested: {days_requested_float}, Sufficient: {has_sufficient}")
+            
+            return has_sufficient, remaining_days
     
     @staticmethod
     def deduct_leave_balance(leave_request):
@@ -948,30 +974,88 @@ class LeaveBalanceService:
                 logger.warning(f"⚠️ Balance already deducted for leave {leave_request.id}")
                 return None
             
-            year = leave_request.start_date.year
-            balance = LeaveBalanceService.get_or_create_balance(
-                leave_request.employee,
-                leave_request.leave_type,
-                year
-            )
-            
             days_to_deduct = float(leave_request.days_requested)
-            current_remaining = float(balance.remaining_days)
             
-            # Check sufficient balance
-            if current_remaining < days_to_deduct:
-                raise ValueError(f"Insufficient balance: {current_remaining} available, {days_to_deduct} requested")
-            
-            # Update balance
-            balance.used_days = float(balance.used_days) + days_to_deduct
-            balance.save()  # remaining_days auto-calculates in model save()
-            
-            # MARK AS DEDUCTED to prevent double deduction
-            leave_request.balance_deducted = True
-            leave_request.save(update_fields=['balance_deducted'])
-            
-            logger.info(f"✅ Balance deducted: {leave_request.employee.user.get_full_name()} - {leave_request.leave_type.name} - Used: {balance.used_days}, Remaining: {balance.remaining_days}")
-            return balance
+            if leave_request.leave_type.code == 'EL':
+                from django.utils import timezone
+                from .models import LeaveLedger
+                
+                today = timezone.localdate()
+                has_sufficient, current_remaining = LeaveBalanceService.check_leave_balance(
+                    leave_request.employee, leave_request.leave_type, days_to_deduct, leave_request.start_date.year
+                )
+                
+                if not has_sufficient:
+                    raise ValueError(f"Insufficient EL balance: {current_remaining} available, {days_to_deduct} requested")
+                
+                # FIFO logic
+                accruals = LeaveLedger.objects.filter(
+                    employee=leave_request.employee,
+                    leave_type=leave_request.leave_type,
+                    transaction_type='ACCRUAL',
+                    remaining_days__gt=0,
+                    expiry_date__gte=today
+                ).order_by('transaction_date', 'id')
+                
+                deducted = Decimal('0.00')
+                target_deduct = Decimal(str(days_to_deduct))
+                
+                for accrual in accruals:
+                    if deducted >= target_deduct:
+                        break
+                    
+                    available = accrual.remaining_days
+                    needed = target_deduct - deducted
+                    
+                    if available <= needed:
+                        deduct_amt = available
+                        accrual.remaining_days = Decimal('0.00')
+                    else:
+                        deduct_amt = needed
+                        accrual.remaining_days = available - needed
+                    
+                    accrual.save(update_fields=['remaining_days'])
+                    deducted += deduct_amt
+                    
+                    LeaveLedger.objects.create(
+                        employee=leave_request.employee,
+                        leave_type=leave_request.leave_type,
+                        transaction_type='DEDUCTION',
+                        transaction_date=today,
+                        days=deduct_amt,
+                        related_request=leave_request,
+                        description=f"Deducted for Leave Request {leave_request.id}"
+                    )
+                
+                leave_request.balance_deducted = True
+                leave_request.save(update_fields=['balance_deducted'])
+                
+                logger.info(f"✅ EL Balance deducted via Ledger: {leave_request.employee.user.get_full_name()} - {days_to_deduct} days")
+                return None
+            else:
+                year = leave_request.start_date.year
+                balance = LeaveBalanceService.get_or_create_balance(
+                    leave_request.employee,
+                    leave_request.leave_type,
+                    year
+                )
+                
+                current_remaining = float(balance.remaining_days)
+                
+                # Check sufficient balance
+                if current_remaining < days_to_deduct:
+                    raise ValueError(f"Insufficient balance: {current_remaining} available, {days_to_deduct} requested")
+                
+                # Update balance
+                balance.used_days = float(balance.used_days) + days_to_deduct
+                balance.save()  # remaining_days auto-calculates in model save()
+                
+                # MARK AS DEDUCTED to prevent double deduction
+                leave_request.balance_deducted = True
+                leave_request.save(update_fields=['balance_deducted'])
+                
+                logger.info(f"✅ Balance deducted: {leave_request.employee.user.get_full_name()} - {leave_request.leave_type.name} - Used: {balance.used_days}, Remaining: {balance.remaining_days}")
+                return balance
             
         except Exception as e:
             logger.error(f"❌ Balance deduction failed: {e}")
@@ -986,29 +1070,66 @@ class LeaveBalanceService:
                 logger.warning(f"⚠️ No balance to restore for leave {leave_request.id}")
                 return None
             
-            year = leave_request.start_date.year
-            balance = LeaveBalance.objects.filter(
-                employee=leave_request.employee,
-                leave_type=leave_request.leave_type,
-                year=year
-            ).first()
-            
-            if not balance:
-                logger.warning(f"⚠️ No balance record found for restoration")
-                return None
-            
             days_to_restore = float(leave_request.days_requested)
             
-            # Restore balance
-            balance.used_days = max(0, float(balance.used_days) - days_to_restore)
-            balance.save()  # remaining_days auto-calculates
-            
-            # MARK AS NOT DEDUCTED
-            leave_request.balance_deducted = False
-            leave_request.save(update_fields=['balance_deducted'])
-            
-            logger.info(f"✅ Balance restored: {leave_request.employee.user.get_full_name()} - {leave_request.leave_type.name} - Used: {balance.used_days}, Remaining: {balance.remaining_days}")
-            return balance
+            if leave_request.leave_type.code == 'EL':
+                from .models import LeaveLedger
+                from django.utils import timezone
+                from datetime import timedelta
+                
+                deductions = LeaveLedger.objects.filter(
+                    related_request=leave_request,
+                    transaction_type='DEDUCTION'
+                )
+                
+                from django.db.models import Sum
+                restored_total = deductions.aggregate(total=Sum('days'))['total'] or Decimal('0.00')
+                
+                if restored_total > 0:
+                    employee = leave_request.employee
+                    months_valid = 24 if employee.is_client_employee else 15
+                    expiry_date = timezone.localdate() + timedelta(days=int(30.436875 * months_valid))
+                    
+                    LeaveLedger.objects.create(
+                        employee=employee,
+                        leave_type=leave_request.leave_type,
+                        transaction_type='ACCRUAL',
+                        transaction_date=timezone.localdate(),
+                        days=restored_total,
+                        remaining_days=restored_total,
+                        expiry_date=expiry_date,
+                        description=f"Restored from Cancelled Leave Request {leave_request.id}"
+                    )
+                    
+                    # Log the deletion of old deductions implicitly by returning the days as a new general accrual
+                    deductions.delete()
+                    logger.info(f"✅ Restored {restored_total} EL days back to {employee.user.get_full_name()}'s ledger.")
+                
+                leave_request.balance_deducted = False
+                leave_request.save(update_fields=['balance_deducted'])
+                return None
+            else:
+                year = leave_request.start_date.year
+                balance = LeaveBalance.objects.filter(
+                    employee=leave_request.employee,
+                    leave_type=leave_request.leave_type,
+                    year=year
+                ).first()
+                
+                if not balance:
+                    logger.warning(f"⚠️ No balance record found for restoration")
+                    return None
+                
+                # Restore balance
+                balance.used_days = max(0, float(balance.used_days) - days_to_restore)
+                balance.save()  # remaining_days auto-calculates
+                
+                # MARK AS NOT DEDUCTED
+                leave_request.balance_deducted = False
+                leave_request.save(update_fields=['balance_deducted'])
+                
+                logger.info(f"✅ Balance restored: {leave_request.employee.user.get_full_name()} - {leave_request.leave_type.name} - Used: {balance.used_days}, Remaining: {balance.remaining_days}")
+                return balance
             
         except Exception as e:
             logger.error(f"❌ Balance restoration failed: {e}")
@@ -1042,5 +1163,52 @@ class LeaveBalanceService:
             summary['total_allocated'] += float(balance.total_days)
             summary['total_used'] += float(balance.used_days)
             summary['total_remaining'] += float(balance.remaining_days)
+            
+        # Append EL ledger balance dynamically
+        from .models import LeaveType, LeaveLedger
+        from django.db.models import Sum
+        from django.utils import timezone
+        
+        el_type = LeaveType.objects.filter(code='EL').first()
+        if el_type:
+            today = timezone.localdate()
+            el_balance = LeaveLedger.objects.filter(
+                employee=employee,
+                leave_type=el_type,
+                transaction_type='ACCRUAL',
+                remaining_days__gt=0,
+                expiry_date__gte=today
+            ).aggregate(total=Sum('remaining_days'))['total'] or Decimal('0.00')
+            
+            el_used = LeaveLedger.objects.filter(
+                employee=employee,
+                leave_type=el_type,
+                transaction_type='DEDUCTION',
+                transaction_date__year=year
+            ).aggregate(total=Sum('days'))['total'] or Decimal('0.00')
+            
+            # Determine total allocated this year roughly for display purposes
+            el_allocated = LeaveLedger.objects.filter(
+                employee=employee,
+                leave_type=el_type,
+                transaction_type='ACCRUAL',
+                transaction_date__year=year
+            ).aggregate(total=Sum('days'))['total'] or Decimal('0.00')
+            
+            # Remove the old EL record from summary if it somehow made it through the old LeaveBalance table
+            summary['balances'] = [b for b in summary['balances'] if b['leave_type'] != el_type.name]
+            
+            util_pct = round((float(el_used) / float(el_allocated)) * 100, 2) if el_allocated > 0 else 0
+            summary['balances'].append({
+                'leave_type': el_type.name,
+                'total_days': float(el_allocated),
+                'used_days': float(el_used),
+                'remaining_days': float(el_balance),
+                'utilization_percentage': util_pct
+            })
+            
+            summary['total_allocated'] += float(el_allocated)
+            summary['total_used'] += float(el_used)
+            summary['total_remaining'] += float(el_balance)
         
         return summary

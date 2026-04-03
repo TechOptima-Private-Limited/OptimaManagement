@@ -89,6 +89,7 @@ import ResourceManagement from './components/resourcemanagement/ResourceManageme
 import HolidayManagement from './components/admin/HolidayManagement';
 
 import MyAssets from './components/assets/MyAssets';
+import CompanyDocuments from './components/documents/CompanyDocuments';
 
 import { AuthProvider } from './context/AuthContext';
 
@@ -697,6 +698,15 @@ function App() {
 
                   }
 
+                />
+
+                <Route
+                  path="/documents"
+                  element={
+                    <ProtectedRoute>
+                      <CompanyDocuments />
+                    </ProtectedRoute>
+                  }
                 />
 
 

@@ -220,7 +220,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'id', 'user', 'user_data', 'profile_data', 'user_info', 
             'employee_id', 'department_id', 'department', 'sub_department', 'location',
             'position', 'hire_date', 'manager_id', 'manager', 
-            'status', 'subordinates_count', 'created_at', 'updated_at'
+            'status', 'is_client_employee', 'subordinates_count', 'created_at', 'updated_at'
         ]
 
     def create(self, validated_data):
@@ -400,6 +400,11 @@ class EmployeeBirthdaySerializer(serializers.ModelSerializer):
 
 
 class FestivalSerializer(serializers.ModelSerializer):
+    formatted_date = serializers.ReadOnlyField()
+    formatted_date_with_year = serializers.ReadOnlyField()
+    is_today = serializers.ReadOnlyField()
+    days_until_festival = serializers.ReadOnlyField()
+
     class Meta:
         model = Festival
         fields = [

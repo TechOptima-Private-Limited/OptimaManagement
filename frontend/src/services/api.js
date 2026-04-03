@@ -261,6 +261,7 @@ export const leaveAPI = {
   // Leave Balances
   getLeaveBalances: (params) => api.get('/leave/balances/', { params }),
   getLeaveSummary: () => api.get('/leave/summary/'),
+  getLeaveLedgerHistory: (params) => api.get('/leave/balances/ledger-history/', { params }),
 
   // Notifications
   getNotifications: () => api.get('/leave/notifications/'),
@@ -308,6 +309,15 @@ export const assetsAPI = {
   getMyAssignments: (params) => api.get('/assets/asset-assignments/', { params }),
   getAsset: (id) => api.get(`/assets/assets/${id}/`),
   getAssetType: (id) => api.get(`/assets/asset-types/${id}/`),
+};
+
+export const companyDocumentsAPI = {
+  getDocuments: () => api.get('/resource-management/company-documents/'),
+  uploadDocument: (formData) =>
+    api.post('/resource-management/company-documents/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  deleteDocument: (id) => api.delete(`/resource-management/company-documents/${id}/`),
 };
 
 export default api;

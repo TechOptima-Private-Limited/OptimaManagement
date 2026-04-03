@@ -106,6 +106,7 @@ const EmployeeDetail = () => {
     sub_department: '',
     location: '',
     status: 'ACTIVE',
+    is_client_employee: false,
   });
   const [departments, setDepartments] = useState([]);
   const [managers, setManagers] = useState([]);
@@ -276,6 +277,7 @@ const EmployeeDetail = () => {
     sub_department: emp?.sub_department || '',
     location: emp?.location || '',
     status: emp?.status || 'ACTIVE',
+    is_client_employee: emp?.is_client_employee || false,
   });
 
   useEffect(() => {
@@ -317,8 +319,11 @@ const EmployeeDetail = () => {
   }, [isEditing, employee]);
 
   const handleEditInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setEditData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
   const startEditing = () => {
@@ -398,13 +403,13 @@ const EmployeeDetail = () => {
         canEditOtherUsers && userId
           ? adminUserAPI.updateUser(userId, userUpdatePayload)
           : authAPI.updateProfile({
-              first_name: userUpdatePayload.first_name,
-              last_name: userUpdatePayload.last_name,
-              phone_number: userUpdatePayload.profile.phone_number,
-              address: userUpdatePayload.profile.address,
-              date_of_birth: userUpdatePayload.profile.date_of_birth,
-              emergency_contact: userUpdatePayload.profile.emergency_contact,
-            }),
+            first_name: userUpdatePayload.first_name,
+            last_name: userUpdatePayload.last_name,
+            phone_number: userUpdatePayload.profile.phone_number,
+            address: userUpdatePayload.profile.address,
+            date_of_birth: userUpdatePayload.profile.date_of_birth,
+            emergency_contact: userUpdatePayload.profile.emergency_contact,
+          }),
       ]);
 
       toast.success('Employee updated successfully!');
@@ -710,6 +715,30 @@ const EmployeeDetail = () => {
                           </select>
                         ) : (
                           <div className="mt-2 text-sm font-semibold text-white">{employee.status || 'N/A'}</div>
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Client Employee</div>
+                        {isEditing ? (
+                          <div className="mt-2 flex items-center h-12">
+                            <input
+                              type="checkbox"
+                              name="is_client_employee"
+                              checked={editData.is_client_employee}
+                              onChange={handleEditInputChange}
+                              className="w-5 h-5 text-indigo-600 bg-[#070B14] border-white/20 rounded focus:ring-indigo-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#070B14] transition-all"
+                            />
+                            <span className="ml-3 text-sm font-semibold text-slate-300">Yes, is client</span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-sm font-semibold text-white">
+                            {employee.is_client_employee ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                Client Employee
+                              </span>
+                            ) : 'No'}
+                          </div>
                         )}
                       </div>
                     </div>

@@ -27,7 +27,7 @@ const EmployeeForm = () => {
     try {
       const response = await employeeAPI.getEmployee(id);
       const employee = response.data;
-      
+
       // Reset form with employee data
       reset({
         first_name: employee.user.first_name,
@@ -39,6 +39,7 @@ const EmployeeForm = () => {
         department: employee.department?.id || '',
         hire_date: employee.hire_date,
         status: employee.status,
+        is_client_employee: employee.is_client_employee || false,
         manager: employee.manager?.id || '',
         phone_number: employee.user.profile?.phone_number || '',
         address: employee.user.profile?.address || '',
@@ -166,7 +167,7 @@ const EmployeeForm = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Email *</label>
                 <input
-                  {...register('email', { 
+                  {...register('email', {
                     required: 'Email is required',
                     pattern: {
                       value: /^\S+@\S+$/i,
@@ -290,6 +291,18 @@ const EmployeeForm = () => {
                   <option value="INACTIVE">Inactive</option>
                   <option value="TERMINATED">Terminated</option>
                 </select>
+              </div>
+
+              <div className="flex items-center mt-6">
+                <input
+                  {...register('is_client_employee')}
+                  type="checkbox"
+                  id="is_client_employee"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="is_client_employee" className="ml-2 block text-sm text-gray-900 font-medium">
+                  Is Client Employee
+                </label>
               </div>
 
               <div>

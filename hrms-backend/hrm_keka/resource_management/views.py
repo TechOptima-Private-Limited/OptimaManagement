@@ -41,6 +41,20 @@ from utils.roles import (
 
 
 # Helper functions for resource management permissions
+def _user_role(user):
+    profile = getattr(user, 'profile', None)
+    return getattr(profile, 'role', None) if profile else None
+
+
+def can_upload_company_documents(user):
+    if not user or not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    role = _user_role(user)
+    return role in ['ADMIN', 'HR_MANAGER'] or role in ROLE_CATEGORIES.get('C_LEVEL', [])
+
+
 def can_manage_resources(user):
     """Check if user can manage resources (view/approve requests)"""
     user_profile = getattr(user, 'profile', None)
@@ -58,6 +72,46 @@ def can_manage_resources(user):
         user_role in ROLE_CATEGORIES['DEVOPS'] or
         user_role in ROLE_CATEGORIES['ADMIN_STAFF']
     )
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def company_documents_list(request):
+    """List company documents for all users; upload restricted to C-level/Admin/HR Manager."""
+    if request.method == 'GET':
+        docs = CompanyDocument.objects.all()
+        serializer = CompanyDocumentSerializer(docs, many=True, context={'request': request})
+        return Response({'results': serializer.data})
+
+    if not can_upload_company_documents(request.user):
+        return Response(
+            {'error': 'Only C-level, Admin, and HR Manager can upload company documents.'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    serializer = CompanyDocumentSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        instance = serializer.save(uploaded_by=request.user)
+        return Response(
+            CompanyDocumentSerializer(instance, context={'request': request}).data,
+            status=status.HTTP_201_CREATED
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def company_documents_delete(request, document_id):
+    """Delete company document; restricted to C-level/Admin/HR Manager."""
+    if not can_upload_company_documents(request.user):
+        return Response(
+            {'error': 'Only C-level, Admin, and HR Manager can delete company documents.'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    document = get_object_or_404(CompanyDocument, id=document_id)
+    document.delete()
+    return Response({'message': 'Document deleted successfully'})
 
 
 def can_view_all_requests(user):

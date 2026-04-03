@@ -214,6 +214,7 @@ class LeaveType(models.Model):
     # Date when the leave balance for this leave type expires (informational/optional).
     # Stored as an absolute date; the UI expects a `YYYY-MM-DD` value.
     expiry_date = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
     is_carry_forward = models.BooleanField(default=False)
     max_carry_forward_days = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     is_active = models.BooleanField(default=True)
@@ -436,3 +437,44 @@ class Notification(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.recipient.username}"
+
+class LeaveLedger(models.Model):
+    TRANSACTION_CHOICES = [
+        ('ACCRUAL', 'Accrual'),
+        ('DEDUCTION', 'Deduction'),
+        ('EXPIRED', 'Expired'),
+        ('ENCASHMENT', 'Encashment'),
+    ]
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='leave_ledgers')
+    leave_type = models.ForeignKey(LeaveType, on_delete=models.CASCADE)
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_CHOICES)
+    
+    import django.utils.timezone
+    transaction_date = models.DateField(default=django.utils.timezone.localdate)
+    
+    # Positive absolute value of days added/removed
+    days = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    # Used for FIFO matching. Only ACCRUAL entries will have remaining_days > 0 initially
+    remaining_days = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    
+    # Null for non-accruals
+    expiry_date = models.DateField(null=True, blank=True)
+    
+    related_request = models.ForeignKey(
+        LeaveRequest, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='ledger_entries'
+    )
+    
+    description = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-transaction_date', '-created_at']
+
+    def __str__(self):
+        return f"{self.employee.user.get_full_name()} - {self.leave_type.code} - {self.transaction_type} ({self.days} days)"

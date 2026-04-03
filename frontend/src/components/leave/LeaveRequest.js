@@ -38,6 +38,11 @@ const LeaveRequest = () => {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showBalanceDetails, setShowBalanceDetails] = useState(false);
+  const [balanceDetailsTab, setBalanceDetailsTab] = useState('history'); // 'history' | 'policy'
+  const [balanceDetailsLoading, setBalanceDetailsLoading] = useState(false);
+  const [balanceDetailsData, setBalanceDetailsData] = useState(null);
+  const [balanceDetailsLeaveTypeId, setBalanceDetailsLeaveTypeId] = useState(null);
   const [filters, setFilters] = useState({
     status: '',
     leave_type: '',
@@ -150,6 +155,79 @@ const LeaveRequest = () => {
   const validateLeaveBalance = (leaveTypeId, daysRequested) => {
     const availableBalance = getAvailableBalance(leaveTypeId);
     return availableBalance >= daysRequested;
+  };
+
+  const formatDays = (value) => {
+    const num = Number(value ?? 0);
+    if (!Number.isFinite(num)) return '0';
+    // Keep 2 decimals for earned leave (e.g. 0.83), trim trailing zeros.
+    const asFixed = num.toFixed(2);
+    return asFixed.replace(/0+$/, '').replace(/\.$/, '');
+  };
+
+  const dayLabel = (value) => {
+    const num = Number(value ?? 0);
+    const isInteger = Number.isFinite(num) && Math.abs(num - Math.round(num)) < 1e-9;
+
+    // Match the UI style you shared:
+    // - decimals like `0.83 day`
+    // - integers like `2 days`, but also show `0 day`
+    let dayWord = 'days';
+    if (!Number.isFinite(num)) {
+      dayWord = 'days';
+    } else if (!isInteger) {
+      dayWord = 'day';
+    } else if (num === 0) {
+      dayWord = 'day';
+    } else if (num === 1) {
+      dayWord = 'day';
+    }
+    return `${formatDays(num)} ${dayWord}`;
+  };
+
+  const getLeaveAccent = (balance) => {
+    const code = String(balance?.leave_type?.code ?? '').toUpperCase();
+    const name = String(balance?.leave_type?.name ?? balance?.leave_type_name ?? '').toLowerCase();
+
+    if (code === 'EL' || name.includes('earned')) {
+      return { stop1: '#8b5cf6', stop2: '#a855f7', glow: 'shadow-[0_0_20px_rgba(139,92,246,0.35)]' };
+    }
+    if (name.includes('personal') || code === 'PL') {
+      return { stop1: '#22d3ee', stop2: '#2dd4bf', glow: 'shadow-[0_0_20px_rgba(34,211,238,0.25)]' };
+    }
+    if (name.includes('sick') || code === 'SL') {
+      return { stop1: '#eab308', stop2: '#f59e0b', glow: 'shadow-[0_0_20px_rgba(234,179,8,0.25)]' };
+    }
+    return { stop1: '#6366f1', stop2: '#a855f7', glow: 'shadow-[0_0_20px_rgba(99,102,241,0.25)]' };
+  };
+
+  const formatSignedDays = (value) => {
+    const num = Number(value ?? 0);
+    if (!Number.isFinite(num)) return '+0';
+    const sign = num > 0 ? '+' : num < 0 ? '-' : '+';
+    return `${sign}${formatDays(Math.abs(num))}`;
+  };
+
+  const openBalanceDetails = async (balance) => {
+    const leaveTypeId = balance?.leave_type?.id;
+    if (!leaveTypeId) return;
+
+    const year = balance?.year ?? new Date().getFullYear();
+    setBalanceDetailsLeaveTypeId(leaveTypeId);
+    setBalanceDetailsTab('history');
+    setShowBalanceDetails(true);
+    setBalanceDetailsLoading(true);
+    setBalanceDetailsData(null);
+
+    try {
+      const resp = await leaveAPI.getLeaveLedgerHistory({ leave_type_id: leaveTypeId, year });
+      setBalanceDetailsData(resp.data);
+    } catch (error) {
+      toast.error('Failed to load balance details');
+      console.error('Failed to load balance details:', error);
+    } finally {
+      setBalanceDetailsLoading(false);
+    }
   };
 
   const onSubmit = async (data) => {
@@ -341,21 +419,271 @@ const LeaveRequest = () => {
             <h4 className="text-xl font-bold text-white ml-4 tracking-wide">Your Leave Balance</h4>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
-            {leaveBalances.map((balance) => (
-              <div key={balance.id} className="bg-white/5 p-6 rounded-[1.5rem] border border-white/10 shadow-lg hover:shadow-indigo-500/10 transition-all hover:-translate-y-1">
-                <p className="text-xs font-black text-slate-500 uppercase tracking-widest">{balance.leave_type.name}</p>
-                <div className="flex items-baseline space-x-2 mt-2">
-                  <p className="text-3xl font-black text-white">{balance.remaining_days}</p>
-                  <p className="text-sm font-medium text-slate-400">/ {balance.total_days}</p>
+            {leaveBalances.map((balance, idx) => {
+              const remaining = Number(balance.remaining_days ?? 0);
+              const used = Number(balance.used_days ?? 0);
+              const accruedSoFar = Number(balance.total_days ?? 0);
+              const annualQuota = Number(balance.leave_type?.days_allowed_per_year ?? accruedSoFar);
+              const accent = getLeaveAccent(balance);
+
+              const totalForDonut = accruedSoFar > 0 ? accruedSoFar : 1; // avoid division by zero
+              const percentage = Math.max(0, Math.min(100, (remaining / totalForDonut) * 100));
+
+              const circumference = 2 * Math.PI * 45;
+              const strokeDasharray = circumference;
+              const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+              const gradientId = `leave_grad_${String(balance.leave_type?.code ?? 'X')}_${balance.year ?? new Date().getFullYear()}_${idx}`;
+
+              return (
+                <div
+                  key={balance.leave_type?.code ?? idx}
+                  className={`bg-white/5 p-6 rounded-[1.5rem] border border-white/10 shadow-lg hover:shadow-indigo-500/10 transition-all hover:-translate-y-1 ${accent.glow}`}
+                >
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="min-w-0">
+                      <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                        {balance.leave_type?.name ?? balance.leave_type_name ?? 'Leave'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openBalanceDetails(balance);
+                      }}
+                      className="text-[12px] font-bold text-indigo-300 hover:text-indigo-200 whitespace-nowrap"
+                      title="View details"
+                    >
+                      View details
+                    </button>
+                  </div>
+
+                  <div className="relative w-28 h-28 mx-auto">
+                    <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.06)" strokeWidth="8" fill="none" />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        stroke={`url(#${gradientId})`}
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={strokeDasharray}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                      />
+                      <defs>
+                        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor={accent.stop1} />
+                          <stop offset="100%" stopColor={accent.stop2} />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-xl font-black text-white">{formatDays(remaining)}</div>
+                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                          Days Available
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-2 gap-y-4 gap-x-3 pt-5 border-t border-white/10">
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">AVAILABLE</div>
+                      <div className="text-sm font-black text-white mt-1">{dayLabel(remaining)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">CONSUMED</div>
+                      <div className="text-sm font-black text-white mt-1">{dayLabel(used)}</div>
+                    </div>
+                    <div className="col-span-1">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ACCRUED SO FAR</div>
+                      <div className="text-sm font-black text-white mt-1">{dayLabel(accruedSoFar)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ANNUAL QUOTA</div>
+                      <div className="text-sm font-black text-white mt-1">{dayLabel(annualQuota)}</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="w-full bg-white/5 rounded-full h-2 mt-4 border border-white/10 overflow-hidden">
-                  <div
-                    className="bg-indigo-500 h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
-                    style={{ width: `${(balance.remaining_days / balance.total_days) * 100}% ` }}
-                  ></div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {showBalanceDetails && (
+        <div className="fixed inset-0 z-[60] bg-[#0A0F1A]/80 backdrop-blur-md">
+          <div className="h-full overflow-auto px-4 py-8">
+            <div className="max-w-6xl mx-auto bg-[#0A0F1A] border border-white/10 rounded-[2.25rem] shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                <div className="flex items-center space-x-3">
+                  <SparklesIcon className="h-7 w-7 text-indigo-300" />
+                  <div>
+                    <div className="text-sm font-black text-slate-500 uppercase tracking-widest">
+                      Balance Details
+                    </div>
+                    <div className="text-lg font-black text-white">
+                      {balanceDetailsData?.leave_type?.name ?? 'Leave'}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBalanceDetails(false);
+                    setBalanceDetailsData(null);
+                    setBalanceDetailsLeaveTypeId(null);
+                  }}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  aria-label="Close"
+                  title="Close"
+                >
+                  X
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] h-full">
+                {/* Left nav */}
+                <div className="border-b md:border-b-0 md:border-r border-white/10 bg-white/5">
+                  <div className="p-4">
+                    {leaveBalances.map((b) => {
+                      const isActive = String(b?.leave_type?.id ?? '') === String(balanceDetailsLeaveTypeId ?? '');
+                      return (
+                        <button
+                          key={b.leave_type?.id}
+                          type="button"
+                          onClick={() => openBalanceDetails(b)}
+                          className={`w-full text-left px-4 py-3 rounded-2xl border transition-all mb-2 ${
+                            isActive
+                              ? 'bg-white/10 border-white/20 text-white'
+                              : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:border-white/10'
+                          }`}
+                        >
+                          <div className="text-sm font-black truncate">{b.leave_type?.name ?? b.leave_type_name}</div>
+                          {typeof b.remaining_days !== 'undefined' && (
+                            <div className="text-xs mt-1 font-bold text-slate-500">
+                              {formatDays(b.remaining_days)} left
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Main content */}
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-5">
+                    <button
+                      type="button"
+                      onClick={() => setBalanceDetailsTab('history')}
+                      className={`px-4 py-2 rounded-xl font-bold border transition-all ${
+                        balanceDetailsTab === 'history'
+                          ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                      }`}
+                    >
+                      Balance history
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBalanceDetailsTab('policy')}
+                      className={`px-4 py-2 rounded-xl font-bold border transition-all ${
+                        balanceDetailsTab === 'policy'
+                          ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                      }`}
+                    >
+                      Policy
+                    </button>
+                  </div>
+
+                  {balanceDetailsLoading ? (
+                    <div className="py-16 text-center text-slate-400 font-bold">Loading…</div>
+                  ) : balanceDetailsTab === 'history' ? (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                      <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                        <div className="text-white font-black">Transactions</div>
+                        <div className="text-slate-400 text-sm font-bold">Year {balanceDetailsData?.year ?? ''}</div>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full">
+                          <thead>
+                            <tr className="text-left text-slate-400 text-xs font-black uppercase tracking-widest">
+                              <th className="px-5 py-3">Transaction date</th>
+                              <th className="px-5 py-3">Change</th>
+                              <th className="px-5 py-3">Balance</th>
+                              <th className="px-5 py-3">Reason</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                            {(balanceDetailsData?.entries ?? []).length === 0 ? (
+                              <tr>
+                                <td colSpan={4} className="px-5 py-8 text-center text-slate-500 font-bold">
+                                  No leave history available.
+                                </td>
+                              </tr>
+                            ) : (
+                              (balanceDetailsData?.entries ?? []).map((e) => (
+                                <tr key={e.id}>
+                                  <td className="px-5 py-4 text-white font-bold">
+                                    {formatDate(e.transaction_date, 'dd MMM yyyy')}
+                                  </td>
+                                  <td className="px-5 py-4 font-black">
+                                    <span className={Number(e.change) >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+                                      {Number(e.change) >= 0 ? '+' : '-'}
+                                      {formatDays(Math.abs(Number(e.change)))}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4 text-white font-bold">{formatDays(e.balance)}</td>
+                                  <td className="px-5 py-4 text-slate-400 font-medium">
+                                    {(() => {
+                                      const raw = String(e.reason || '');
+                                      const lower = raw.toLowerCase();
+                                      if (lower.includes('accrual')) return 'Monthly Accrual';
+                                      if (lower.includes('deducted')) return 'Deduction';
+                                      if (lower.includes('expired')) return 'Expired';
+                                      if (lower.includes('encash')) return 'Encashment';
+                                      return raw || '';
+                                    })()}
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                      <div className="text-white font-black mb-3">Leave policy</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Annual quota</div>
+                          <div className="text-lg font-black text-white mt-2">
+                            {formatDays(balanceDetailsData?.policy?.annual_quota_days ?? 0)} days
+                          </div>
+                        </div>
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Carry forward</div>
+                          <div className="text-lg font-black text-white mt-2">
+                            {(balanceDetailsData?.policy?.carry_forward_enabled ? 'Enabled' : 'No')}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 text-slate-400 text-sm font-medium">
+                        More detailed policy rules (advance notice, max consecutive days, etc.) are shown for HR users.
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}

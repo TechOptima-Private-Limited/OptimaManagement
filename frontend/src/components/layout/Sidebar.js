@@ -253,8 +253,16 @@ const Sidebar = ({ isOpen, onClose }) => {
       color: 'from-teal-500 to-cyan-600'
     },
     {
+      name: 'Documents',
+      href: '/documents',
+      icon: DocumentTextIcon,
+      roles: getAllRoles(),
+      description: 'View company documents',
+      color: 'from-slate-500 to-slate-700'
+    },
+    {
       name: 'Settings',
-      href: '/profile',
+      href: '/settings',
       icon: CogIcon,
       roles: [...getManagementRoles(), ...getITRoles(), ...getHRRoles()],
       description: 'System configuration',

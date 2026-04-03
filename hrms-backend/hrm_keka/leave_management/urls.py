@@ -86,6 +86,7 @@ urlpatterns = [
     # Leave Balances
     path('balances/', views.LeaveBalanceListView.as_view(), name='leave_balances'),
     path('balances/initialize/', views.initialize_my_balances, name='initialize_my_balances'),
+    path('balances/ledger-history/', views.leave_ledger_history, name='leave_ledger_history'),
     path('summary/', views.leave_summary, name='leave_summary'),
     
     # Notifications

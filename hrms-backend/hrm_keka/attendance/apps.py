@@ -17,9 +17,13 @@ class AttendanceConfig(AppConfig):
         # ✅ Ensure signals are registered
         import attendance.signals
 
+        import sys
         # ✅ Prevent duplicate threads (VERY IMPORTANT)
         # if os.environ.get("RUN_MAIN") != "true":
         #     return
+        if 'manage.py' in sys.argv and not 'runserver' in sys.argv:
+            return
+
 
         from django.conf import settings
 

@@ -6,10 +6,8 @@ import {
   UserMinusIcon,
   CalendarDaysIcon,
   DocumentTextIcon,
-  PhotoIcon,
   MagnifyingGlassIcon,
   EyeIcon,
-  PencilIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
 
@@ -68,6 +66,7 @@ const OffboardingManagement = () => {
       const formData = new FormData();
       formData.append('employee', newOffboarding.employee);
       formData.append('last_working_date', newOffboarding.last_working_date);
+      formData.append('notice_period_days', newOffboarding.notice_period_days ?? 30);
       formData.append('remarks', newOffboarding.remarks);
 
       if (newOffboarding.resignation_email_screenshot) {
@@ -75,7 +74,9 @@ const OffboardingManagement = () => {
         formData.append('damaged_assets_file', newOffboarding.resignation_email_screenshot);
       }
 
-      await api.post('/onboarding/offboarding/', formData);
+      await api.post('/onboarding/offboarding/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
       toast.success('Offboarding created successfully!');
       setShowCreateModal(false);
@@ -414,7 +415,6 @@ const OffboardingManagement = () => {
                         value={newOffboarding.last_working_date}
                         onChange={(e) => setNewOffboarding({ ...newOffboarding, last_working_date: e.target.value })}
                         className="block w-full bg-black/20 border border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
-                        min={new Date().toISOString().split('T')[0]}
                         style={{ colorScheme: 'dark' }}
                       />
                     </div>

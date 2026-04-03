@@ -247,6 +247,7 @@
 
 
 
+from django.conf import settings
 from django.db import models
 
 class ITSupporter(models.Model):
@@ -467,8 +468,13 @@ class Employee(models.Model):
         return self.all_documents_collected and self.all_documents_uploaded
 
 class Offboarding(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='offboardings')
+    # NOTE: Matches migration 0002_offboarding_created_at_and_more.py
+    employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='offboardings')
     last_working_date = models.DateField()
+    notice_period_days = models.IntegerField(default=30)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     # Asset collection checkboxes
     laptop_returned = models.BooleanField(default=False, verbose_name="Laptop")

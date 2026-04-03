@@ -188,6 +188,18 @@ class IsHRorAdmin(permissions.BasePermission):
         )
 
 
+class IsHRorAdminOrManager(permissions.BasePermission):
+    """
+    Allow access if the user is HR/Admin/Executive OR has management access.
+
+    This avoids relying on bitwise composition of permission instances, which
+    can behave differently across DRF versions/configurations.
+    """
+
+    def has_permission(self, request, view):
+        return IsHRorAdmin().has_permission(request, view) or IsManager().has_permission(request, view)
+
+
 class AssetModelPermissions(permissions.DjangoModelPermissions):
     """Custom permissions for asset management"""
     def has_permission(self, request, view):

@@ -1270,20 +1270,20 @@ def offboarding_list(request):
             )
     
     elif request.method == 'POST':
-        return offboarding_create(request)
+        # NOTE: Don't call another @api_view-decorated function with a DRF Request.
+        # That pattern can trigger DRF's internal assertions and yield a 500.
+        return _offboarding_create_impl(request)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def offboarding_create(request):
-    """Create a new offboarding record"""
+def _offboarding_create_impl(request):
+    """Shared implementation for creating an offboarding record."""
     # Check permissions
     if not can_create_onboarding(request.user):
         return Response(
-            {'error': 'Permission denied. Only HR and Executives can create offboarding records.'}, 
+            {'error': 'Permission denied. Only HR and Executives can create offboarding records.'},
             status=status.HTTP_403_FORBIDDEN
         )
-    
+
     try:
         # Prevent duplicate offboarding for the same employee
         employee_id = request.data.get('employee')
@@ -1305,9 +1305,16 @@ def offboarding_create(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(
-            {'error': f'Failed to create offboarding: {str(e)}'}, 
+            {'error': f'Failed to create offboarding: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def offboarding_create(request):
+    """Create a new offboarding record"""
+    return _offboarding_create_impl(request)
 
 
 @api_view(['DELETE'])

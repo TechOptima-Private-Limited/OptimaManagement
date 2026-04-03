@@ -19,6 +19,7 @@ import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
 import WorkFromHomePopup from '../attendance/WorkFromHomePopup';
 import { useTheme } from '../../context/ThemeContext';
+import { getAvgMinutesPerDayInWeek, formatMinutesAsHhMm } from '../../utils/attendanceStats';
 
 // Helper to get local YYYY-MM-DD date (avoid UTC offset issues)
 const toLocalDate = (date) => {
@@ -87,7 +88,7 @@ const calculateAttendanceStats = (records, targetEmployeeId = null) => {
 
   const calculateAvgHours = (recs) => {
     if (!recs || recs.length === 0) return '0h 0m';
-    const validRecords = recs.filter(r => r.check_in_time && r.check_out_time);
+    const validRecords = recs.filter(r => r.check_in_time && r.check_out_time && !r.is_pending_approval);
     if (validRecords.length === 0) return '0h 0m';
 
     const totalMinutes = validRecords.reduce((acc, r) => {
@@ -110,7 +111,7 @@ const calculateAttendanceStats = (records, targetEmployeeId = null) => {
   const todayRecords = records.filter(r => r.date === localToday);
 
   return {
-    avgHours: calculateAvgHours(myRecords),
+    avgHours: formatMinutesAsHhMm(getAvgMinutesPerDayInWeek(records, targetEmployeeId)),
     onTimeArrival: calculateOnTimePercent(myRecords), // Monthly on-time % for user
     teamAvgHours: calculateAvgHours(records),         // Monthly avg hours for team
     teamOnTime: todayRecords.length > 0 ? calculateOnTimePercent(todayRecords) : calculateOnTimePercent(records)  // Fallback to monthly if today is empty
@@ -307,7 +308,10 @@ const Dashboard = () => {
       const promises = [];
 
       const now = new Date();
-      const startOfMonth = toLocalDate(new Date(now.getFullYear(), now.getMonth(), 1));
+      const attendanceRangeStart = new Date(now);
+      attendanceRangeStart.setDate(now.getDate() - 30);
+      const attendanceStartDate = toLocalDate(attendanceRangeStart);
+      const attendanceEndDate = toLocalDate(now);
 
       if (isManagerOrAbove) {
         // For managers and HR: fetch team data (page_size: 1000 for stats)
@@ -315,7 +319,7 @@ const Dashboard = () => {
           employeeAPI.getEmployees({ limit: 10 }),                       // [0]
           leaveAPI.getLeaveRequests({ status: 'PENDING', limit: 10 }),    // [1]
           leaveAPI.getLeaveRequests({ status: 'APPROVED', limit: 10 }),   // [2]
-          attendanceAPI.getAttendanceRecords({ start_date: startOfMonth, page_size: 1000 }), // [3]
+          attendanceAPI.getAttendanceRecords({ start_date: attendanceStartDate, end_date: attendanceEndDate, page_size: 1000 }), // [3]
           leaveAPI.getOnLeaveToday(),                                   // [4]
           workFromHomeAPI.getWFHToday()                                 // [5]
         );
@@ -325,7 +329,7 @@ const Dashboard = () => {
           leaveAPI.getLeaveSummary(),                                   // [0]
           attendanceAPI.getAttendanceRecords({ limit: 7 }),              // [1]
           leaveAPI.getLeaveRequests({ limit: 5 }),                      // [2]
-          attendanceAPI.getAttendanceRecords({ start_date: startOfMonth, page_size: 100 }), // [3]
+          attendanceAPI.getAttendanceRecords({ start_date: attendanceStartDate, end_date: attendanceEndDate, page_size: 500 }), // [3]
           leaveAPI.getOnLeaveToday(),                                   // [4]
           workFromHomeAPI.getWFHToday()                                 // [5]
         );
@@ -1472,7 +1476,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="mt-4 text-[10px] text-slate-400 font-medium text-center italic">
-                * Statistics based on current month's attendance data
+                * Same period as Attendance page default: last 30 days (Mon–Sun weekly avg. hrs/day)
               </div>
             </QuickAccessCard>
             {/* Manager/HR Quick Access */}

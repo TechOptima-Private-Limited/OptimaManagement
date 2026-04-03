@@ -25,6 +25,7 @@ import Table from '../common/Table';
 import Modal from '../common/Modal';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { getAvgMinutesPerDayInWeek } from '../../utils/attendanceStats';
 const AttendanceVisual = ({ logs }) => {
   if (!logs || logs.length === 0) return <div className="h-4 w-full bg-white/5 rounded-full border border-white/5"></div>;
   const sortedLogs = [...logs].sort((a, b) => a.time.localeCompare(b.time));
@@ -96,7 +97,7 @@ const AttendanceTracker = () => {
     presentDays: 0,
     absentDays: 0,
     lateDays: 0,
-    avgMinutesPerDay: 0,
+    avgMinutesPerDayInWeek: 0,
     onTimePercent: 0
   });
   // Default date ranges: Start of current month to today
@@ -253,7 +254,7 @@ const AttendanceTracker = () => {
         const recordId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
         return String(recordId) === String(targetId);
       });
-      calculateStats(recordsToStat);
+      calculateStats(recordsToStat, targetId);
     } catch (error) {
       if (!silent) {
         toast.error('Failed to fetch attendance records');
@@ -279,19 +280,12 @@ const AttendanceTracker = () => {
     const [hours, minutes, seconds] = checkInTime.split(':').map(Number);
     return hours > 10 || (hours === 10 && (minutes > 0 || seconds > 0));
   };
-  const calculateStats = (records) => {
+  const calculateStats = (records, scopedEmployeeId) => {
     const approvedRecords = records.filter(r => !r.is_pending_approval);
     const presentDays = approvedRecords.filter(r => r.status === 'PRESENT' && !isLate(r.check_in_time)).length;
     const absentDays = approvedRecords.filter(r => r.status === 'ABSENT').length;
     const lateDays = approvedRecords.filter(r => r.status === 'LATE' || isLate(r.check_in_time)).length;
-    const workingRecords = approvedRecords.filter(r => r.check_in_time && r.check_out_time);
-    let totalMinutes = 0;
-    for (const r of workingRecords) {
-      const start = new Date(`2000-01-01T${r.check_in_time}`);
-      const end = new Date(`2000-01-01T${r.check_out_time}`);
-      totalMinutes += Math.max(0, Math.floor((end - start) / 60000));
-    }
-    const avgMinutesPerDay = workingRecords.length > 0 ? Math.round(totalMinutes / workingRecords.length) : 0;
+    const avgMinutesPerDayInWeek = getAvgMinutesPerDayInWeek(records, scopedEmployeeId);
     const onTimeBase = presentDays + lateDays;
     const onTimePercent = onTimeBase > 0 ? Math.round((presentDays / onTimeBase) * 100) : 0;
     setStats({
@@ -299,7 +293,7 @@ const AttendanceTracker = () => {
       presentDays,
       absentDays,
       lateDays,
-      avgMinutesPerDay,
+      avgMinutesPerDayInWeek,
       onTimePercent
     });
   };
@@ -839,11 +833,11 @@ const AttendanceTracker = () => {
             </div>
             <div className="grid grid-cols-1 gap-6">
               <div className="p-6 rounded-3xl bg-white/5 border border-white/5 group-hover:border-indigo-500/30 transition-all shadow-inner">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Avg Temporal Duration</p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Avg Hours / Day (This Week)</p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <ClockIcon className="h-6 w-6 text-indigo-400 mr-3" />
-                    <p className="text-xl font-black text-white uppercase tracking-tight">{minutesToHHMM(stats.avgMinutesPerDay)}</p>
+                    <p className="text-xl font-black text-white uppercase tracking-tight">{minutesToHHMM(stats.avgMinutesPerDayInWeek)}</p>
                   </div>
                 </div>
               </div>
@@ -956,10 +950,10 @@ const AttendanceTracker = () => {
           />
           <StatCard
             title="Avg Hours / Day"
-            value={minutesToHHMM(stats.avgMinutesPerDay)}
+            value={minutesToHHMM(stats.avgMinutesPerDayInWeek)}
             icon={ClockIcon}
             gradient="from-gray-500 to-gray-600"
-            trend="Working time"
+            trend="Daily average (Mon–Sun week)"
           />
           <StatCard
             title="On-Time Arrival"

@@ -12,7 +12,7 @@ from .serializers import (
     EmployeeBirthdaySerializer, FestivalSerializer
 )
 from authentication.models import User, UserProfile
-from utils.permissions import IsHRManager, IsEmployee, IsManager, IsHRorAdmin
+from utils.permissions import IsHRManager, IsEmployee, IsManager, IsHRorAdmin, IsHRorAdminOrManager
 from utils.roles import (
     has_executive_access,
     has_management_access,
@@ -773,7 +773,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
-        return [IsAuthenticated(), IsHRorAdmin() | IsManager()]
+        return [IsAuthenticated(), IsHRorAdminOrManager()]
 
     def get_queryset(self):
         return self.queryset

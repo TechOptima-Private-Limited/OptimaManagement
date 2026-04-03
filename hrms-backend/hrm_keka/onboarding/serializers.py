@@ -28,15 +28,27 @@ class EmployeeSerializer(serializers.ModelSerializer):
         }
 
 class OffboardingSerializer(serializers.ModelSerializer):
-    employee_name = serializers.ReadOnlyField(source='employee.full_name')
+    employee_name = serializers.SerializerMethodField()
     employee_email = serializers.ReadOnlyField(source='employee.email')
     
     class Meta:
         model = Offboarding
         fields = [
             'id', 'employee', 'employee_name', 'employee_email', 'last_working_date',
-            'laptop_returned', 'charger_returned', 'damaged_assets_file', 'remarks'
+            'notice_period_days',
+            'laptop_returned', 'charger_returned', 'damaged_assets_file', 'remarks',
+            'created_at', 'updated_at',
         ]
+
+    def get_employee_name(self, obj):
+        user = getattr(obj, 'employee', None)
+        if not user:
+            return None
+        try:
+            full_name = (user.get_full_name() or '').strip()
+        except Exception:
+            full_name = ''
+        return full_name or getattr(user, 'email', None) or getattr(user, 'username', None)
 
 class EmployeeSelfSubmitSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=150)

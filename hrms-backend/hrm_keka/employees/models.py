@@ -37,7 +37,8 @@ class Employee(models.Model):
     )
     sub_department = models.CharField(max_length=100, null=True, blank=True, default='Not Available')
     location = models.CharField(max_length=100, null=True, blank=True, default='Hyderabad')
-    status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='ACTIVE')  # ADD THIS FIELD
+    status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, default='ACTIVE')
+    is_client_employee = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -68,8 +68,16 @@ const LeaveTypesManagement = () => {
       setEditingType(null);
       reset();
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Failed to save leave type';
-      toast.error(errorMessage);
+      const d = error.response?.data;
+      let errorMessage = d?.error || d?.detail;
+      if (!errorMessage && d && typeof d === 'object') {
+        const firstKey = Object.keys(d)[0];
+        if (firstKey) {
+          const v = d[firstKey];
+          errorMessage = Array.isArray(v) ? `${firstKey}: ${v[0]}` : `${firstKey}: ${v}`;
+        }
+      }
+      toast.error(errorMessage || 'Failed to save leave type');
       console.error('Error saving leave type:', error);
     } finally {
       setSubmitting(false);
@@ -145,6 +153,14 @@ const LeaveTypesManagement = () => {
           </div>
 
           <div className="flex items-center flex-wrap gap-3">
+            {leaveType.start_date && (
+              <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
+                <div className="flex items-center space-x-2">
+                  <CalendarDaysIcon className="h-4 w-4 text-emerald-400" />
+                  <span className="font-bold tracking-wider">Start Date: {formatDate(leaveType.start_date)}</span>
+                </div>
+              </div>
+            )}
             {leaveType.expiry_date && (
               <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
                 <div className="flex items-center space-x-2">
@@ -359,6 +375,9 @@ const LeaveTypesManagement = () => {
                 placeholder="e.g., AL, SL, ML"
                 maxLength={10}
               />
+              <p className="mt-1 text-xs text-slate-500 ml-1">
+                For Earned Leave, use code <span className="text-indigo-300 font-semibold">EL</span> (required for accrual/ledger). Codes and names must be unique.
+              </p>
               {errors.code && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.code.message}</p>
               )}
@@ -384,10 +403,24 @@ const LeaveTypesManagement = () => {
 
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
-                Expiry Date <span className="text-rose-400">*</span>
+                Start Date <span className="text-rose-400">*</span>
               </label>
               <input
-                {...register('expiry_date', { required: 'Expiry date is required' })}
+                {...register('start_date', { required: 'Start date is required' })}
+                type="date"
+                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+              />
+              {errors.start_date && (
+                <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.start_date.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                Expiry Date
+              </label>
+              <input
+                {...register('expiry_date')}
                 type="date"
                 className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />

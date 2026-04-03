@@ -19,7 +19,7 @@ from .serializers import (
     NotificationSerializer
 )
 from employees.models import Employee
-from utils.permissions import IsEmployee, IsHRManager
+from utils.permissions import IsEmployee, IsHRManager, IsHRorAdmin
 from utils.roles import (
     has_executive_access,
     has_management_access,
@@ -31,6 +31,7 @@ from utils.roles import (
 )
 from rest_framework import serializers
 from .services import LeaveNotificationService, LeaveBalanceService
+from .el_balance import get_el_balance_payload, merge_el_balance
 
 
 class LeaveTypeListCreateView(generics.ListCreateAPIView):
@@ -40,14 +41,15 @@ class LeaveTypeListCreateView(generics.ListCreateAPIView):
     
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsHRManager()]
+            # Match broader HR/Admin/Executive access (C-level, etc.) for configuring leave types
+            return [IsHRorAdmin()]
         return [IsAuthenticated()]
 
 
 class LeaveTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = LeaveType.objects.all()
     serializer_class = LeaveTypeSerializer
-    permission_classes = [IsHRManager]
+    permission_classes = [IsHRorAdmin]
 
 
 class LeavePolicyListCreateView(generics.ListCreateAPIView):
@@ -92,7 +94,6 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        print(f"🔍 Current user: {user}")
         queryset = LeaveRequest.objects.all()
 
         # Get user role and permission level
@@ -115,7 +116,6 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                 # Managers see their team + self
                 allowed_employee_ids = get_manager_team_employees(user)
                 queryset = queryset.filter(employee_id__in=allowed_employee_ids)
-                print(f"🔍 Manager filtered queryset: {queryset}")
                 
             elif has_lead_access(user_role):
                 # Team leads see their team + self (if they have direct reports)
@@ -134,7 +134,6 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                         # No team members, just own requests
                         queryset = queryset.filter(employee=lead_employee)
                     
-                    print(f"🔍 Team Lead filtered queryset")
                 except Employee.DoesNotExist:
                     queryset = LeaveRequest.objects.none()
                     
@@ -143,7 +142,6 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                 try:
                     employee = Employee.objects.get(user=user)
                     queryset = queryset.filter(employee=employee)
-                    print(f"🔍 Employee filtered queryset (own only): {employee.id}")
                 except Employee.DoesNotExist:
                     queryset = LeaveRequest.objects.none()
         
@@ -201,8 +199,16 @@ class LeaveRequestListCreateView(generics.ListCreateAPIView):
                 pending_count = 0
         
         # Add pending approvals data
+        raw_data = response.data
+        # DRF paginated responses are typically dicts with a `results` key.
+        # When pagination is disabled, `response.data` can be a plain list.
+        if isinstance(raw_data, dict):
+            results = raw_data.get('results', [])
+        else:
+            results = raw_data
+
         response.data = {
-            'results': response.data.get('results', response.data),
+            'results': results,
             'pending_approvals_count': pending_count,
             'has_pending_approvals': pending_count > 0,
             'user_role': user_role,
@@ -323,9 +329,11 @@ class LeaveRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
         is_elevated = permission_level >= PERMISSION_LEVELS['MANAGER'] or can_manage_hr(user_role)
         
         if is_owner and not is_elevated:
-            if leave_request.status not in ['APPROVED', 'REJECTED', 'CANCELLED']:
+            # Employees can delete requests that haven't been finalized as approved.
+            # Approved requests should generally be immutable for employees (balance + audit trail).
+            if leave_request.status not in ['PENDING', 'REJECTED', 'CANCELLED', 'WITHDRAWN']:
                 return Response(
-                    {'error': 'You can only delete approved, rejected, or cancelled requests'}, 
+                    {'error': 'You can only delete pending, rejected, cancelled, or withdrawn requests'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
@@ -346,7 +354,7 @@ class LeaveRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
                 
                 import logging
                 logger = logging.getLogger(__name__)
-                logger.info(f"✅ Balance restored on deletion: {leave_request.employee.user.get_full_name()} - {leave_request.leave_type.name}")
+                logger.info(f"Balance restored on deletion: {leave_request.employee.user.get_full_name()} - {leave_request.leave_type.name}")
                 
             except LeaveBalance.DoesNotExist:
                 pass
@@ -544,6 +552,38 @@ def cancel_leave_request(request, request_id):
 class LeaveBalanceListView(generics.ListAPIView):
     serializer_class = LeaveBalanceSerializer
     permission_classes = [IsEmployee]
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        year = int(request.query_params.get('year', datetime.now().year))
+        user = request.user
+        user_profile = getattr(user, 'profile', None)
+        user_role = getattr(user_profile, 'role', None) if user_profile else None
+        permission_level = get_permission_level(user_role) if user_role else 0
+
+        single_employee = None
+        try:
+            if request.query_params.get('employee_id'):
+                single_employee = Employee.objects.get(id=int(request.query_params['employee_id']))
+            elif permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role):
+                pass
+            elif has_management_access(user_role) or has_lead_access(user_role):
+                pass
+            else:
+                single_employee = Employee.objects.get(user=user)
+        except (Employee.DoesNotExist, ValueError, TypeError):
+            single_employee = None
+
+        if single_employee is None:
+            return response
+
+        if isinstance(response.data, dict) and 'results' in response.data:
+            response.data['results'] = merge_el_balance(
+                list(response.data['results']), single_employee, year
+            )
+        elif isinstance(response.data, list):
+            response.data = merge_el_balance(response.data, single_employee, year)
+        return response
     
     def get_queryset(self):
         year = int(self.request.query_params.get('year', datetime.now().year))
@@ -566,7 +606,7 @@ class LeaveBalanceListView(generics.ListAPIView):
                 except Employee.DoesNotExist:
                     queryset = LeaveBalance.objects.none()
             else:
-                queryset = LeaveBalance.objects.filter(year=year)
+                queryset = LeaveBalance.objects.filter(year=year).exclude(leave_type__code='EL')
                 
         elif has_management_access(user_role) or has_lead_access(user_role):
             # Managers and Team Leads can view their team's balances + their own
@@ -590,14 +630,18 @@ class LeaveBalanceListView(generics.ListAPIView):
                 queryset = LeaveBalance.objects.filter(employee=employee, year=year)
             except Employee.DoesNotExist:
                 queryset = LeaveBalance.objects.none()
-        
-        return queryset.order_by('leave_type__name')
+
+        # Earned Leave (EL) is tracked in LeaveLedger, not LeaveBalance — exclude stale rows
+        return queryset.exclude(leave_type__code='EL').order_by('leave_type__name')
     
     def _initialize_employee_balances(self, employee, year):
         """Initialize missing leave balances for an employee"""
         leave_types = LeaveType.objects.filter(is_active=True)
         
         for leave_type in leave_types:
+            # Earned Leave (EL) is accrued in LeaveLedger — do not mirror in LeaveBalance
+            if leave_type.code == 'EL':
+                continue
             # Calculate used days from existing approved requests
             approved_days = LeaveRequest.objects.filter(
                 employee=employee,
@@ -666,13 +710,19 @@ def leave_summary(request):
         employee = Employee.objects.get(user=request.user)
         current_year = datetime.now().year
         
-        # Initialize balances first
+        # Initialize balances first (EL uses LeaveLedger, not LeaveBalance)
         leave_types = LeaveType.objects.filter(is_active=True)
         for leave_type in leave_types:
+            if leave_type.code == 'EL':
+                continue
             LeaveBalanceService.get_or_create_balance(employee, leave_type, current_year)
         
-        # Get leave balances
-        leave_balances = LeaveBalance.objects.filter(employee=employee, year=current_year)
+        leave_balances = LeaveBalance.objects.filter(employee=employee, year=current_year).exclude(leave_type__code='EL')
+        balance_data = merge_el_balance(
+            LeaveBalanceSerializer(leave_balances, many=True).data,
+            employee,
+            current_year,
+        )
         
         # Get recent leave requests (last 10)
         recent_requests = LeaveRequest.objects.filter(employee=employee)[:10]
@@ -697,7 +747,7 @@ def leave_summary(request):
         ).aggregate(total=Sum('days_requested'))['total'] or 0
         
         data = {
-            'leave_balances': LeaveBalanceSerializer(leave_balances, many=True).data,
+            'leave_balances': balance_data,
             'recent_requests': LeaveRequestSerializer(recent_requests, many=True).data,
             'pending_requests_count': pending_count,
             'approved_requests_count': approved_count,
@@ -716,7 +766,11 @@ def leave_summary(request):
 @api_view(['GET'])
 @permission_classes([IsEmployee])
 def leave_analytics(request):
-    """Get leave analytics - Available to HR, Senior Leaders, and Managers"""
+    """Get leave analytics.
+
+    - HR, Senior Leaders, and Managers: org/team analytics
+    - Other employees: self-only analytics (instead of 403)
+    """
     user = request.user
     user_profile = getattr(user, 'profile', None)
     user_role = getattr(user_profile, 'role', None) if user_profile else None
@@ -729,12 +783,6 @@ def leave_analytics(request):
         has_management_access(user_role)
     )
     
-    if not has_access:
-        return Response(
-            {'error': 'Access denied. Only HR, Managers, and Senior Leaders can view analytics.'}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
     current_year = datetime.now().year
     
     # Filter data based on role
@@ -745,7 +793,7 @@ def leave_analytics(request):
             start_date__year=current_year
         )
         employees_qs = Employee.objects.filter(status='ACTIVE')
-    else:
+    elif has_access:
         # Manager: only their team
         allowed_employee_ids = get_manager_team_employees(user)
         leave_requests_qs = LeaveRequest.objects.filter(
@@ -754,6 +802,19 @@ def leave_analytics(request):
             employee_id__in=allowed_employee_ids
         )
         employees_qs = Employee.objects.filter(id__in=allowed_employee_ids, status='ACTIVE')
+    else:
+        # Regular employee: self-only analytics
+        try:
+            employee = Employee.objects.get(user=user)
+        except Employee.DoesNotExist:
+            return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        leave_requests_qs = LeaveRequest.objects.filter(
+            status='APPROVED',
+            start_date__year=current_year,
+            employee=employee,
+        )
+        employees_qs = Employee.objects.filter(id=employee.id, status='ACTIVE')
     
     # Leave type usage
     leave_type_usage = leave_requests_qs.values('leave_type__name').annotate(
@@ -793,7 +854,11 @@ def leave_analytics(request):
                 'total_days': float(emp.total_leaves or 0)
             } for emp in top_leave_takers
         ],
-        'scope': 'full' if (permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role)) else 'team'
+        'scope': (
+            'full'
+            if (permission_level >= PERMISSION_LEVELS['SENIOR_LEADER'] or can_manage_hr(user_role))
+            else ('team' if has_access else 'self')
+        )
     })
 
 
@@ -822,6 +887,8 @@ def initialize_yearly_balances(request):
     
     for employee in employees:
         for leave_type in leave_types:
+            if leave_type.code == 'EL':
+                continue
             # Calculate used days from existing approved requests
             approved_days = LeaveRequest.objects.filter(
                 employee=employee,
@@ -871,6 +938,88 @@ def initialize_yearly_balances(request):
 
 
 # Add this new endpoint 
+@api_view(['GET'])
+@permission_classes([IsEmployee])
+def leave_ledger_history(request):
+    """
+    Return LeaveLedger rows for the logged-in employee for the given leave_type_id + year.
+    Used by the frontend "Balance history" panel.
+    """
+    try:
+        employee = Employee.objects.get(user=request.user)
+    except Employee.DoesNotExist:
+        return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    leave_type_id = request.query_params.get('leave_type_id')
+    year = request.query_params.get('year') or datetime.now().year
+
+    if not leave_type_id:
+        return Response({'error': 'leave_type_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        leave_type_id = int(leave_type_id)
+        year = int(year)
+    except (TypeError, ValueError):
+        return Response({'error': 'Invalid leave_type_id or year'}, status=status.HTTP_400_BAD_REQUEST)
+
+    leave_type = get_object_or_404(LeaveType, id=leave_type_id)
+
+    from .models import LeaveLedger
+    ledger_entries = list(
+        LeaveLedger.objects.filter(
+            employee=employee,
+            leave_type=leave_type,
+            transaction_date__year=year,
+        ).order_by('transaction_date', 'id')
+    )
+
+    # Compute a "running balance" based on transaction_type semantics.
+    # - ACCRUAL increases balance
+    # - DEDUCTION / EXPIRED / ENCASHMENT decrease balance
+    def sign_for(tx_type: str) -> int:
+        tx = (tx_type or '').upper()
+        if tx == 'ACCRUAL':
+            return 1
+        if tx in {'DEDUCTION', 'EXPIRED', 'ENCASHMENT'}:
+            return -1
+        return 0
+
+    running_balance = 0.0
+    entries_out = []
+    for l in ledger_entries:
+        days = float(l.days or 0)
+        change = days * sign_for(l.transaction_type)
+        running_balance += change
+
+        entries_out.append({
+            'id': l.id,
+            'transaction_date': l.transaction_date.isoformat(),
+            'change': round(change, 2),
+            'balance': round(running_balance, 2),
+            'reason': l.description or l.transaction_type,
+        })
+
+    # Policy tab: return basic leave-type info; full policies are HR-only.
+    policy_payload = {
+        'leave_type_name': leave_type.name,
+        'leave_type_code': leave_type.code,
+        'annual_quota_days': float(getattr(leave_type, 'days_allowed_per_year', 0) or 0),
+        'start_date': leave_type.start_date.isoformat() if getattr(leave_type, 'start_date', None) else None,
+        'carry_forward_enabled': bool(getattr(leave_type, 'is_carry_forward', False)),
+        'max_carry_forward_days': float(getattr(leave_type, 'max_carry_forward_days', 0) or 0),
+    }
+
+    return Response({
+        'leave_type': {
+            'id': leave_type.id,
+            'name': leave_type.name,
+            'code': leave_type.code,
+        },
+        'year': year,
+        'entries': entries_out,
+        'policy': policy_payload,
+    })
+
 @api_view(['POST'])
 @permission_classes([IsEmployee])
 def initialize_my_balances(request):
@@ -884,6 +1033,8 @@ def initialize_my_balances(request):
         updated_count = 0
         
         for leave_type in leave_types:
+            if leave_type.code == 'EL':
+                continue
             # Calculate used days from existing approved requests for the year
             approved_days = LeaveRequest.objects.filter(
                 employee=employee,
@@ -920,10 +1071,13 @@ def initialize_my_balances(request):
                     balance.remaining_days = remaining_days
                     balance.save()
                     updated_count += 1
+
+        LeaveBalance.objects.filter(employee=employee, year=year, leave_type__code='EL').delete()
         
-        # Return all balances (updated)
-        balances = LeaveBalance.objects.filter(employee=employee, year=year).order_by('leave_type__name')
+        # Return all balances (updated); EL comes from ledger
+        balances = LeaveBalance.objects.filter(employee=employee, year=year).exclude(leave_type__code='EL').order_by('leave_type__name')
         serialized_balances = LeaveBalanceSerializer(balances, many=True).data
+        serialized_balances = merge_el_balance(serialized_balances, employee, year)
         
         return Response({
             'message': f'Initialized {len(serialized_balances)} leave balance records (created: {created_count}, updated: {updated_count})',

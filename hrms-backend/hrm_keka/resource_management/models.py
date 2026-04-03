@@ -647,3 +647,23 @@ class EmailThread(models.Model):
 
     def __str__(self):
         return f"Thread for {self.ticket_number}"
+
+
+class CompanyDocument(models.Model):
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to='company_documents/')
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='uploaded_company_documents',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title

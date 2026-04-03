@@ -150,6 +150,19 @@ class LeaveTypeSerializer(serializers.ModelSerializer):
         model = LeaveType
         fields = '__all__'
 
+    def to_internal_value(self, data):
+        # React forms often send "" for optional number inputs; DRF rejects that on IntegerField.
+        if isinstance(data, dict):
+            data = {**data}
+            if data.get('max_carry_forward_days') in ('', None):
+                data['max_carry_forward_days'] = 0
+        elif hasattr(data, 'copy') and hasattr(data, 'get'):
+            mutable = data.copy()
+            if mutable.get('max_carry_forward_days') in ('', None):
+                mutable['max_carry_forward_days'] = 0
+            data = mutable
+        return super().to_internal_value(data)
+
 class LeavePolicySerializer(serializers.ModelSerializer):
     leave_type = LeaveTypeSerializer(read_only=True)
     leave_type_id = serializers.IntegerField(write_only=True)

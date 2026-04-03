@@ -12,6 +12,8 @@ router.register(r'access-requests', AccessRequestViewSet, basename='access-reque
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('company-documents/', views.company_documents_list, name='company_documents_list'),
+    path('company-documents/<int:document_id>/', views.company_documents_delete, name='company_documents_delete'),
     path('approve-request/<int:request_id>/<str:token>/<str:action>/', 
          views.handle_approval, name='handle_approval'),
     path('approve-request/<int:request_id>/<str:token>/', 

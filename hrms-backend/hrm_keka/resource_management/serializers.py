@@ -103,3 +103,39 @@ class UploadImageSerializer(serializers.Serializer):
 class RequestApprovalSerializer(serializers.Serializer):
     approver_email = serializers.EmailField()
     notes = serializers.CharField(required=False, allow_blank=True, max_length=1000)
+
+
+class CompanyDocumentSerializer(serializers.ModelSerializer):
+    uploaded_by_name = serializers.SerializerMethodField()
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CompanyDocument
+        fields = [
+            'id',
+            'title',
+            'file',
+            'file_url',
+            'uploaded_by',
+            'uploaded_by_name',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
+
+    def get_uploaded_by_name(self, obj):
+        user = getattr(obj, 'uploaded_by', None)
+        if not user:
+            return None
+        full_name = (user.get_full_name() or '').strip()
+        return full_name or user.email or user.username
+
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        if not getattr(obj, 'file', None):
+            return None
+        try:
+            url = obj.file.url
+            return request.build_absolute_uri(url) if request else url
+        except Exception:
+            return None
