@@ -533,7 +533,7 @@ const ResourceManagement = () => {
         </div>
 
         {/* Content */}
-        <div className={`${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl border ${theme.cardBorder} min-h-[600px] overflow-hidden`}>
+        <div className={`${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl border ${theme.cardBorder} min-h-[600px]`}>
           <Routes>
             <Route path="/" element={<ResourceDashboard />} />
             <Route path="/request" element={<ResourceRequestForm />} />

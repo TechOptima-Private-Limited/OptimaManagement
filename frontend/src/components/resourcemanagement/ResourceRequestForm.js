@@ -529,11 +529,11 @@ const ResourceRequestForm = () => {
                       disabled={resourceTypesLoading}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                     >
-                      <option value="">
+                      <option value="" className="bg-slate-800 text-white">
                         {resourceTypesLoading ? 'Loading...' : 'Select a resource type'}
                       </option>
                       {resourceTypes.map(type => (
-                        <option key={type.id} value={type.id}>
+                        <option key={type.id} value={type.id} className="bg-slate-800 text-white">
                           {type.name}
                         </option>
                       ))}
@@ -557,7 +557,7 @@ const ResourceRequestForm = () => {
                       disabled={!formData.resource_type || resourcesLoading}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                     >
-                      <option value="">
+                      <option value="" className="bg-slate-800 text-white">
                         {resourcesLoading ? 'Loading...' : 'Select a resource'}
                       </option>
                       {resources.map(resource => (
@@ -581,7 +581,7 @@ const ResourceRequestForm = () => {
                     disabled={accessLevelsLoading}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                   >
-                    <option value="">
+                    <option value="" className="bg-slate-800 text-white">
                       {accessLevelsLoading ? 'Loading...' : 'Select access level'}
                     </option>
                     {accessLevels.map(level => (
@@ -610,7 +610,7 @@ const ResourceRequestForm = () => {
                   disabled={myAssetsLoading}
                   className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-50 appearance-none"
                 >
-                  <option value="">
+                  <option value="" className="bg-slate-800 text-white">
                     {myAssetsLoading ? 'Loading assets...' : 'Select an asset'}
                   </option>
                   {myAssets.map(asset => (

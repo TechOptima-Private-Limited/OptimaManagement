@@ -38,6 +38,7 @@ const LeaveApproval = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const [comments, setComments] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
+  const [leaveTypes, setLeaveTypes] = useState([]);
   const [filters, setFilters] = useState({
     status: '',
     leave_type: '',
@@ -46,6 +47,7 @@ const LeaveApproval = () => {
 
   useEffect(() => {
     fetchRequests();
+    fetchLeaveTypes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,6 +72,15 @@ const LeaveApproval = () => {
   //     setActionLoading(false);
   //   }
   // };
+  const fetchLeaveTypes = async () => {
+    try {
+      const response = await leaveAPI.getLeaveTypes();
+      setLeaveTypes(response.data.results || response.data);
+    } catch (error) {
+      console.error('Error fetching leave types:', error);
+    }
+  };
+
   const fetchRequests = async () => {
     try {
       setLoading(true);
@@ -183,7 +194,14 @@ const LeaveApproval = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium text-slate-400 mb-4">
                 <div className="flex items-center">
                   <CalendarDaysIcon className="h-5 w-5 mr-2 text-indigo-400" />
-                  <span>{request.leave_type?.name}</span>
+                  <div className="flex items-center space-x-2">
+                    <span>{request.leave_type?.name}</span>
+                    {request.leave_type?.is_unpaid && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-widest shadow-[0_0_10px_rgba(244,63,94,0.3)]">
+                        Unpaid (LOP)
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center">
                   <ClockIcon className="h-5 w-5 mr-2 text-emerald-400" />
@@ -341,10 +359,11 @@ const LeaveApproval = () => {
               className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Types</option>
-              <option value="1">Sick Leave</option>
-              <option value="2">Annual Leave</option>
-              <option value="3">Personal Leave</option>
-              <option value="4">Maternity Leave</option>
+              {leaveTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name} {type.is_unpaid ? '(Unpaid)' : ''}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -410,14 +429,17 @@ const LeaveApproval = () => {
       <div>
         {activeTab === 'pending' ? (
           pendingRequests.length === 0 ? (
-            <div className="text-center py-20 bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-lg border border-blue-200">
-              <div className="p-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-                <ClockIcon className="h-16 w-16 text-blue-600" />
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
+              <div className="relative z-10">
+                <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
+                  <ClockIcon className="h-16 w-16 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">No pending requests</h3>
+                <p className="text-slate-400 text-lg font-medium">
+                  All leave requests have been processed. Outstanding work! 🎉
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">No pending requests</h3>
-              <p className="text-gray-600 text-lg">
-                All leave requests have been processed. Outstanding work! 🎉
-              </p>
             </div>
           ) : (
             <div>
@@ -458,14 +480,17 @@ const LeaveApproval = () => {
           )
         ) : (
           allRequests.length === 0 ? (
-            <div className="text-center py-20 bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-lg border border-blue-200">
-              <div className="p-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-                <UserIcon className="h-16 w-16 text-blue-600" />
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
+              <div className="relative z-10">
+                <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
+                  <UserIcon className="h-16 w-16 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">No requests found</h3>
+                <p className="text-slate-400 text-lg font-medium">
+                  No leave requests have been submitted yet.
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">No requests found</h3>
-              <p className="text-gray-600 text-lg">
-                No leave requests have been submitted yet.
-              </p>
             </div>
           ) : (
             allRequests.map(request => (
@@ -619,6 +644,23 @@ const LeaveApproval = () => {
                 </div>
               </div>
             </div>
+
+            {selectedRequest.leave_type?.is_unpaid && (
+              <div className="bg-rose-500/10 border border-rose-500/30 p-6 rounded-[2rem] relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-rose-400 to-pink-500"></div>
+                <div className="flex items-center space-x-5 relative z-10">
+                  <div className="p-3 bg-rose-500/20 rounded-2xl border border-rose-500/30">
+                    <ExclamationTriangleIcon className="h-8 w-8 text-rose-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-black text-rose-400 mb-1">Unpaid Leave (LOP)</h4>
+                    <p className="text-rose-100/80 leading-relaxed">
+                      Approving this request will trigger an <strong>automatic salary deduction</strong> (Loss of Pay) for {selectedRequest.days_requested} day(s).
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">

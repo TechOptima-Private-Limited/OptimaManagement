@@ -217,6 +217,7 @@ class LeaveType(models.Model):
     start_date = models.DateField(null=True, blank=True)
     is_carry_forward = models.BooleanField(default=False)
     max_carry_forward_days = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    is_unpaid = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

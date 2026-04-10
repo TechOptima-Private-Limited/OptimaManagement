@@ -644,10 +644,7 @@ function App() {
 
 
 
-                {/* Leave Management */}
-
                 <Route
-
                   path="/leave/*"
 
                   element={

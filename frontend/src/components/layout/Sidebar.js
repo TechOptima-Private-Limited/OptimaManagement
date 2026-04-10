@@ -1,36 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
   UsersIcon,
   ClockIcon,
   CalendarDaysIcon,
-  KeyIcon,
   ChartBarIcon,
-  CogIcon,
+  Cog6ToothIcon,
   DocumentTextIcon,
-  BuildingOfficeIcon,
-  UserGroupIcon,
   ComputerDesktopIcon,
   UserPlusIcon,
   UserMinusIcon,
   WrenchScrewdriverIcon,
   LinkIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  LifebuoyIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { getUserRole } from '../../utils/auth';
 import { authAPI } from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import {
-  hasExecutiveAccess,
-  hasManagementAccess,
-  hasLeadAccess,
   canManageUsers,
-  canManageHR,
-  canManageAssets,
-  getRoleDisplayName,
-  getRoleIcon,
-  getRoleBadgeColor,
-  PERMISSION_LEVELS,
   getPermissionLevel,
   ROLE_CATEGORIES,
 } from '../../utils/roleConfig';
@@ -38,9 +30,10 @@ import {
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const userRole = getUserRole();
-  const [permissions, setPermissions] = React.useState([]);
+  const [permissions, setPermissions] = useState([]);
+  const [expandedSections, setExpandedSections] = useState({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const resp = await authAPI.getMyPermissions();
@@ -55,16 +48,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const allowedByPerms = (href) => {
     if (href === '/onboarding/assets') {
-      const assetPerms = [
-        'assets.view_asset',
-        'assets.view_assetassignment',
-        'assets.view_assethistory',
-        'assets.view_assetreturn',
-        'assets.view_assettype',
-        'assets.add_asset',
-        'assets.change_asset',
-        'assets.delete_asset',
-      ];
+      const assetPerms = ['assets.view_asset', 'assets.view_assetassignment', 'assets.add_asset'];
       return assetPerms.some(hasPerm);
     }
     if (href === '/attendance') return hasPerm('attendance.view_attendancerecord');
@@ -74,353 +58,330 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const { theme } = useTheme();
 
-  // Helper function to check if user has access based on permission level
-  const hasAccessByLevel = (minLevel) => {
-    return getPermissionLevel(userRole) >= minLevel;
-  };
+  const getManagementRoles = () => [
+    ...ROLE_CATEGORIES.C_LEVEL,
+    ...ROLE_CATEGORIES.VP_LEVEL,
+    ...ROLE_CATEGORIES.DIRECTOR_LEVEL,
+    ...ROLE_CATEGORIES.MANAGEMENT,
+  ];
 
-  // Get all roles for a navigation item based on permission levels
+  const getHRRoles = () => [
+    ...ROLE_CATEGORIES.HR_STAFF,
+    ...ROLE_CATEGORIES.C_LEVEL,
+    'ADMIN',
+  ];
+
+  const getITRoles = () => [
+    ...ROLE_CATEGORIES.IT_SUPPORT,
+    ...ROLE_CATEGORIES.ADMIN_STAFF,
+    'CTO',
+    'CIO',
+  ];
+
+  const getHolidayRoles = () => [
+    ...ROLE_CATEGORIES.HR_STAFF,
+    ...ROLE_CATEGORIES.MANAGEMENT,
+    ...ROLE_CATEGORIES.C_LEVEL,
+    'ADMIN',
+  ];
+
   const getAllRoles = () => {
-    const allRoles = [];
-    Object.values(ROLE_CATEGORIES).forEach(roles => {
-      allRoles.push(...roles);
-    });
-    return allRoles;
+    const roles = [];
+    Object.values(ROLE_CATEGORIES).forEach(r => roles.push(...r));
+    return roles;
   };
 
-  const getManagementRoles = () => {
-    return [
-      ...ROLE_CATEGORIES.C_LEVEL,
-      ...ROLE_CATEGORIES.VP_LEVEL,
-      ...ROLE_CATEGORIES.DIRECTOR_LEVEL,
-      ...ROLE_CATEGORIES.MANAGEMENT,
-    ];
-  };
-
-  const getHRRoles = () => {
-    return [
-      ...ROLE_CATEGORIES.HR_STAFF,
-      ...ROLE_CATEGORIES.C_LEVEL,
-      'ADMIN',
-    ];
-  };
-
-  const getITRoles = () => {
-    return [
-      ...ROLE_CATEGORIES.IT_SUPPORT,
-      ...ROLE_CATEGORIES.ADMIN_STAFF,
-      'CTO',
-      'CIO',
-    ];
-  };
-
-  const getHolidayRoles = () => {
-    return [
-      ...ROLE_CATEGORIES.HR_STAFF,
-      ...ROLE_CATEGORIES.MANAGEMENT,
-      ...ROLE_CATEGORIES.C_LEVEL,
-      'ADMIN',
-    ];
-  };
-
-  const navigation = [
+  const menuStructure = [
     {
       name: 'Dashboard',
       href: '/dashboard',
       icon: HomeIcon,
       roles: getAllRoles(),
-      description: 'Overview and quick stats',
+      description: 'Overview and stats',
       color: 'from-orange-500 to-red-600'
     },
     {
-      name: 'Users and Authentication',
-      href: '/users-auth',
+      name: 'Workforce',
       icon: UsersIcon,
-      roles: ['ADMIN', 'CEO', 'CIO'],
-      description: 'Manage users and authentication',
-      color: 'from-gray-500 to-gray-600',
-    },
-    {
-      name: 'Asset Management',
-      href: '/onboarding/assets',
-      icon: WrenchScrewdriverIcon,
-      roles: [...getITRoles(), ...getHRRoles()],
-      description: 'Manage company assets',
-      color: 'from-orange-500 to-red-600'
-    },
-    {
-      name: 'My Profile',
-      href: '/profile',
-      icon: UserGroupIcon,
-      roles: getAllRoles(),
-      description: 'View and edit your profile',
-      color: 'from-purple-500 to-pink-600'
-    },
-    {
-      name: 'My Team',
-      href: '/my-team',
-      icon: UsersIcon,
-      roles: getAllRoles(),
-      description: 'View your team members and reporting structure',
       color: 'from-emerald-500 to-teal-600',
+      children: [
+        {
+          name: 'Users & Authentication',
+          href: '/users-auth',
+          roles: ['ADMIN', 'CEO', 'CIO'],
+          description: 'Manage identities'
+        },
+        {
+          name: 'Employees',
+          href: '/employees',
+          roles: [...getHRRoles(), ...getManagementRoles()],
+          description: 'Employee directory'
+        },
+        {
+          name: 'My Team',
+          href: '/my-team',
+          roles: getAllRoles(),
+          description: 'Team hierarchy'
+        },
+        {
+          name: 'My Profile',
+          href: '/profile',
+          roles: getAllRoles(),
+          description: 'View your details'
+        }
+      ]
     },
     {
-      name: 'Employees',
-      href: '/employees',
-      icon: UsersIcon,
-      roles: [...getHRRoles(), ...getManagementRoles()],
-      description: 'Manage employee directory',
-      color: 'from-green-500 to-emerald-600'
-    },
-    {
-      name: 'Attendance',
-      href: '/attendance',
+      name: 'Attendance & Leave',
       icon: ClockIcon,
-      roles: getAllRoles(),
-      description: 'Track time and attendance',
-      color: 'from-yellow-500 to-orange-600'
+      color: 'from-blue-600 to-purple-600',
+      children: [
+        {
+          name: 'Attendance',
+          href: '/attendance',
+          roles: getAllRoles(),
+          description: 'Time tracking'
+        },
+        {
+          name: 'Leave Management',
+          href: '/leave',
+          roles: getAllRoles(),
+          description: 'Time off'
+        },
+        {
+          name: 'Holidays',
+          href: '/holidays',
+          roles: getHolidayRoles(),
+          description: 'Company calendar'
+        },
+        {
+          name: 'Work From Home',
+          href: '/work-from-home',
+          roles: getAllRoles(),
+          description: 'Remote management'
+        }
+      ]
     },
     {
-      name: 'Leave Management',
-      href: '/leave',
-      icon: CalendarDaysIcon,
-      roles: getAllRoles(),
-      description: 'Manage leave requests',
-      color: 'from-blue-600 to-purple-600'
+      name: 'Employee Lifecycle',
+      icon: ArrowPathIcon,
+      color: 'from-cyan-500 to-blue-600',
+      children: [
+        {
+          name: 'Employee Onboarding',
+          href: '/onboarding/employees',
+          roles: getHRRoles(),
+          description: 'New hires'
+        },
+        {
+          name: 'Onboarding Links',
+          href: '/onboarding/link-generator',
+          roles: getHRRoles(),
+          description: 'Secure invites'
+        },
+        {
+          name: 'Employee Offboarding',
+          href: '/onboarding/offboarding',
+          roles: getHRRoles(),
+          description: 'Exits'
+        }
+      ]
     },
     {
-      name: 'Holidays',
-      href: '/holidays',
-      icon: CalendarDaysIcon,
-      roles: getHolidayRoles(),
-      description: 'Manage company holidays',
-      color: 'from-red-500 to-rose-600'
-    },
-    {
-      name: 'Work From Home',
-      href: '/work-from-home',
-      icon: HomeIcon,
-      roles: getAllRoles(),
-      description: 'Manage WFH requests',
-      color: 'from-violet-500 to-purple-600'
-    },
-    {
-      name: 'Support 24/7',
-      href: '/resource-management',
-      icon: KeyIcon,
-      roles: getAllRoles(),
-      description: 'Access support and resources',
-      color: 'from-emerald-500 to-teal-600'
-    },
-    {
-      name: 'My Assets',
-      href: '/my-assets',
+      name: 'Assets & Devices',
       icon: ComputerDesktopIcon,
-      roles: getAllRoles(),
-      description: 'Assets assigned to you',
-      color: 'from-indigo-500 to-blue-600'
+      color: 'from-indigo-500 to-blue-600',
+      children: [
+        {
+          name: 'Asset Management',
+          href: '/onboarding/assets',
+          roles: [...getITRoles(), ...getHRRoles()],
+          description: 'Inventory'
+        },
+        {
+          name: 'My Assets',
+          href: '/my-assets',
+          roles: getAllRoles(),
+          description: 'Personal inventory'
+        },
+        {
+          name: 'Biometric Devices',
+          href: '/attendance/biometric',
+          roles: [...getITRoles(), ...getHRRoles()],
+          description: 'Device sync'
+        }
+      ]
     },
     {
-      name: 'Employee Onboarding',
-      href: '/onboarding/employees',
-      icon: UserPlusIcon,
-      roles: getHRRoles(),
-      description: 'Manage new employee onboarding',
-      color: 'from-cyan-500 to-blue-600'
-    },
-    {
-      name: 'Onboarding Links',
-      href: '/onboarding/link-generator',
-      icon: LinkIcon,
-      roles: getHRRoles(),
-      description: 'Generate secure onboarding links',
-      color: 'from-indigo-500 to-purple-600'
-    },
-    {
-      name: 'Employee Offboarding',
-      href: '/onboarding/offboarding',
-      icon: UserMinusIcon,
-      roles: getHRRoles(),
-      description: 'Manage employee exit process',
-      color: 'from-red-700 to-rose-800'
-    },
-    {
-      name: 'Biometric Devices',
-      href: '/attendance/biometric',
-      icon: ComputerDesktopIcon,
-      roles: [...getITRoles(), ...getHRRoles()],
-      description: 'Manage biometric integration',
-      color: 'from-teal-500 to-cyan-600'
-    },
-    {
-      name: 'Documents',
-      href: '/documents',
-      icon: DocumentTextIcon,
-      roles: getAllRoles(),
-      description: 'View company documents',
-      color: 'from-slate-500 to-slate-700'
+      name: 'Help & Support',
+      icon: LifebuoyIcon,
+      color: 'from-slate-500 to-slate-700',
+      children: [
+        {
+          name: 'Documents',
+          href: '/documents',
+          roles: getAllRoles(),
+          description: 'Company resources'
+        },
+        {
+          name: 'Support 24/7',
+          href: '/resource-management',
+          roles: getAllRoles(),
+          description: 'Get help'
+        }
+      ]
     },
     {
       name: 'Settings',
       href: '/settings',
-      icon: CogIcon,
+      icon: Cog6ToothIcon,
       roles: [...getManagementRoles(), ...getITRoles(), ...getHRRoles()],
-      description: 'System configuration',
+      description: 'Configuration',
       color: 'from-slate-600 to-gray-700'
-    },
+    }
   ];
 
-  const filteredNavigation = navigation.filter((item) => {
-    if (!(item.roles.includes(userRole) || allowedByPerms(item.href))) return false;
-    // Extra safety: Users and Authentication should only show for authorized roles
-    if (item.href === '/users-auth') {
-      return canManageUsers(userRole);
+  const canAccess = (item) => {
+    if (item.href) {
+      if (item.href === '/users-auth') return canManageUsers(userRole);
+      return item.roles.includes(userRole) || allowedByPerms(item.href);
     }
-    return true;
-  });
+    if (item.children) {
+      return item.children.some(child => canAccess(child));
+    }
+    return false;
+  };
 
-  const isActiveLink = (href) => {
-    if (href === '/dashboard') {
-      return location.pathname === href;
-    }
-    return location.pathname === href || location.pathname.startsWith(href + '/');
+  const isActive = (href) => {
+    if (!href) return false;
+    return location.pathname === href || (href !== '/' && location.pathname.startsWith(href + '/'));
+  };
+
+  useEffect(() => {
+    const initialExpanded = {};
+    menuStructure.forEach(section => {
+      if (section.children?.some(child => isActive(child.href))) {
+        initialExpanded[section.name] = true;
+      }
+    });
+    setExpandedSections(initialExpanded);
+  }, [location.pathname]);
+
+  const toggleSection = (name) => {
+    setExpandedSections(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
   return (
     <>
-      {/* Mobile backdrop */}
       {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-all duration-300"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-all duration-300" onClick={onClose} />
       )}
 
-      {/* Sidebar */}
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b ${theme.sidebarGradient}
         transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         shadow-2xl border-r border-white/10 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        {/* Logo and brand */}
         <div className="relative z-10 flex items-center justify-start h-20 px-6 bg-slate-900/50 backdrop-blur-md border-b border-white/5">
-          <Link
-            to="/dashboard"
-            onClick={onClose}
-            className="flex items-center space-x-3 hover:opacity-90 transition-opacity"
-            aria-label="Go to Dashboard"
-          >
+          <Link to="/dashboard" onClick={onClose} className="flex items-center space-x-3 hover:opacity-90">
             <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 border border-indigo-400/30">
-              <span className="text-white font-bold text-sm tracking-tighter">OMH</span>
+              <span className="text-white font-bold text-sm">OMH</span>
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-white text-lg font-black leading-tight tracking-tight">
-                Optima
-              </h1>
-              <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest leading-none">
-                ManagementHub
-              </p>
+            <div>
+              <h1 className="text-white text-lg font-black leading-tight">Optima</h1>
+              <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest leading-none">ManagementHub</p>
             </div>
           </Link>
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto relative z-10 custom-scrollbar">
-          {filteredNavigation.map((item) => {
-            const Icon = item.icon;
-            const isActive = isActiveLink(item.href);
+          {menuStructure.map((section) => {
+            if (!canAccess(section)) return null;
+
+            if (!section.children) {
+              const active = isActive(section.href);
+              return (
+                <Link
+                  key={section.name}
+                  to={section.href}
+                  onClick={onClose}
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all relative overflow-hidden ${active ? 'bg-indigo-500/10 text-white border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                    }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 bg-gradient-to-r ${section.color} opacity-80 group-hover:opacity-100`}>
+                    <section.icon className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-sm">{section.name}</div>
+                  </div>
+                </Link>
+              );
+            }
+
+            const isExpanded = expandedSections[section.name];
+            const hasActiveChild = section.children.some(child => isActive(child.href));
 
             return (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={onClose}
-                className={`
-                    group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 ease-in-out
-                    relative overflow-hidden
-                    ${isActive
-                    ? `bg-indigo-500/10 text-white shadow-xl scale-[1.02] border border-indigo-500/20`
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white hover:scale-[1.02] border border-transparent'
-                  }
-                  `}
-                title={item.description}
-              >
-                {/* Active item background effect */}
-                {isActive && (
-                  <div className={`absolute inset-0 bg-gradient-to-r ${theme.primaryGradient} opacity-30 animate-pulse`}></div>
-                )}
-
-                <div className={`
-                    relative z-10 w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-300
-                    ${isActive
-                    ? 'bg-white/20 shadow-md border border-white/30'
-                    : `bg-gradient-to-r ${item.color} opacity-80 group-hover:opacity-100 group-hover:shadow-md group-hover:scale-110`
-                  }
-                  `}>
-                  <Icon className="h-4 w-4 text-white" />
-                </div>
-
-                <div className="flex-1 relative z-10">
-                  <div className="font-semibold text-sm">{item.name}</div>
-                  <div className={`
-                      text-[11px] mt-0.5 transition-colors duration-300
-                      ${isActive ? 'text-indigo-100' : 'text-slate-500 group-hover:text-slate-300'}
-                    `}>
-                    {item.description}
+              <div key={section.name} className="space-y-1">
+                <button
+                  onClick={() => toggleSection(section.name)}
+                  className={`w-full group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${hasActiveChild ? 'text-indigo-400' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 bg-gradient-to-r ${section.color} opacity-80 group-hover:opacity-100`}>
+                    <section.icon className="h-4 w-4 text-white" />
                   </div>
-                </div>
+                  <div className="flex-1 text-left font-semibold text-sm">{section.name}</div>
+                  {isExpanded ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
+                </button>
 
-                {isActive && (
-                  <div className="relative z-10 flex items-center space-x-1">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                {isExpanded && (
+                  <div className="pl-12 space-y-1 animate-fadeIn">
+                    {section.children.map(child => {
+                      if (!canAccess(child)) return null;
+                      const childActive = isActive(child.href);
+                      return (
+                        <Link
+                          key={child.name}
+                          to={child.href}
+                          onClick={onClose}
+                          className={`block py-2 text-xs font-bold transition-all uppercase tracking-widest ${childActive ? 'text-indigo-400' : 'text-slate-500 hover:text-white'
+                            }`}
+                        >
+                          {child.name}
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
-              </Link>
+              </div>
             );
           })}
         </nav>
 
-        {/* Enhanced stats footer */}
-        <div className={`relative z-10 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-sm`}>
+        <div className="relative z-10 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-sm">
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest">
-              <span className="text-slate-500 font-bold">System Status</span>
-              <span className="text-emerald-400 flex items-center font-bold">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2 animate-pulse"></div>
-                Online
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-slate-500">
+              <span>Status</span>
+              <span className="text-emerald-400 flex items-center">
+                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></div>
+                Live
               </span>
             </div>
-
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest">
-              <span className="text-slate-500 font-bold">Version</span>
-              <span className="text-indigo-300 font-bold bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
-                v1.0.0
-              </span>
-            </div>
-
-            <div className="pt-2 flex justify-center space-x-1.5">
-              <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-              <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-1 h-1 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-slate-500">
+              <span>Version</span>
+              <span className="text-indigo-300">v1.0.0</span>
             </div>
           </div>
         </div>
       </div>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(15, 23, 42, 0.1);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(99, 102, 241, 0.3);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(99, 102, 241, 0.5);
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 10px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.2s ease-out forwards; }
       `}</style>
     </>
   );

@@ -145,19 +145,26 @@ const LeaveRequest = () => {
 
   const getAvailableBalance = (leaveTypeId) => {
     const id = parseInt(leaveTypeId);
+    const type = leaveTypes.find(t => t.id === id);
+    if (type?.is_unpaid) return Infinity;
+
     const balance = leaveBalances.find(b => b.leave_type.id === id);
     if (balance) return parseFloat(balance.remaining_days);
     // Fallback to allowed days from leave types if balance isn't initialized yet
-    const type = leaveTypes.find(t => t.id === id);
     return type ? parseFloat(type.days_allowed_per_year) : 0;
   };
 
   const validateLeaveBalance = (leaveTypeId, daysRequested) => {
+    const id = parseInt(leaveTypeId);
+    const type = leaveTypes.find(t => t.id === id);
+    if (type?.is_unpaid) return true;
+
     const availableBalance = getAvailableBalance(leaveTypeId);
     return availableBalance >= daysRequested;
   };
 
   const formatDays = (value) => {
+    if (value === Infinity) return '∞';
     const num = Number(value ?? 0);
     if (!Number.isFinite(num)) return '0';
     // Keep 2 decimals for earned leave (e.g. 0.83), trim trailing zeros.
@@ -197,6 +204,9 @@ const LeaveRequest = () => {
     }
     if (name.includes('sick') || code === 'SL') {
       return { stop1: '#eab308', stop2: '#f59e0b', glow: 'shadow-[0_0_20px_rgba(234,179,8,0.25)]' };
+    }
+    if (balance?.leave_type?.is_unpaid) {
+      return { stop1: '#f43f5e', stop2: '#fb7185', glow: 'shadow-[0_0_20px_rgba(244,63,94,0.25)]' };
     }
     return { stop1: '#6366f1', stop2: '#a855f7', glow: 'shadow-[0_0_20px_rgba(99,102,241,0.25)]' };
   };
@@ -351,6 +361,22 @@ const LeaveRequest = () => {
 
     const availableBalance = getAvailableBalance(leaveTypeId);
     const isValid = validateLeaveBalance(leaveTypeId, daysRequested);
+    const type = leaveTypes.find(t => t.id === parseInt(leaveTypeId));
+
+    if (type?.is_unpaid) {
+      return (
+        <div className="bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 rounded-2xl p-4">
+          <div className="flex">
+            <ExclamationTriangleIcon className="h-6 w-6 text-rose-500" />
+            <div className="ml-3">
+              <p className="text-sm text-rose-800 font-semibold">
+                <strong>Unpaid Leave:</strong> This request will result in a **Loss of Pay (LOP)** deduction from your salary.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     if (!isValid) {
       return (
@@ -420,14 +446,15 @@ const LeaveRequest = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
             {leaveBalances.map((balance, idx) => {
-              const remaining = Number(balance.remaining_days ?? 0);
+              const isUnpaid = balance.leave_type?.is_unpaid;
+              const remaining = isUnpaid ? Infinity : Number(balance.remaining_days ?? 0);
               const used = Number(balance.used_days ?? 0);
-              const accruedSoFar = Number(balance.total_days ?? 0);
-              const annualQuota = Number(balance.leave_type?.days_allowed_per_year ?? accruedSoFar);
+              const accruedSoFar = isUnpaid ? Infinity : Number(balance.total_days ?? 0);
+              const annualQuota = isUnpaid ? Infinity : Number(balance.leave_type?.days_allowed_per_year ?? accruedSoFar);
               const accent = getLeaveAccent(balance);
 
-              const totalForDonut = accruedSoFar > 0 ? accruedSoFar : 1; // avoid division by zero
-              const percentage = Math.max(0, Math.min(100, (remaining / totalForDonut) * 100));
+              const totalForDonut = accruedSoFar > 0 && accruedSoFar !== Infinity ? accruedSoFar : (accruedSoFar === Infinity ? 100 : 1); // avoid division by zero
+              const percentage = isUnpaid ? 100 : Math.max(0, Math.min(100, (remaining / totalForDonut) * 100));
 
               const circumference = 2 * Math.PI * 45;
               const strokeDasharray = circumference;
@@ -438,7 +465,7 @@ const LeaveRequest = () => {
               return (
                 <div
                   key={balance.leave_type?.code ?? idx}
-                  className={`bg-white/5 p-6 rounded-[1.5rem] border border-white/10 shadow-lg hover:shadow-indigo-500/10 transition-all hover:-translate-y-1 ${accent.glow}`}
+                  className={`bg-white/5 p-4 rounded-[2rem] border border-white/10 shadow-lg hover:shadow-indigo-500/10 transition-all hover:-translate-y-1 ${accent.glow}`}
                 >
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="min-w-0">
@@ -492,20 +519,20 @@ const LeaveRequest = () => {
 
                   <div className="mt-5 grid grid-cols-2 gap-y-4 gap-x-3 pt-5 border-t border-white/10">
                     <div>
-                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">AVAILABLE</div>
-                      <div className="text-sm font-black text-white mt-1">{dayLabel(remaining)}</div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{isUnpaid ? 'TYPE' : 'AVAILABLE'}</div>
+                      <div className="text-sm font-black text-white mt-1">{isUnpaid ? 'Unpaid (LOP)' : dayLabel(remaining)}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">CONSUMED</div>
                       <div className="text-sm font-black text-white mt-1">{dayLabel(used)}</div>
                     </div>
                     <div className="col-span-1">
-                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ACCRUED SO FAR</div>
-                      <div className="text-sm font-black text-white mt-1">{dayLabel(accruedSoFar)}</div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{isUnpaid ? 'STATUS' : 'ACCRUED SO FAR'}</div>
+                      <div className="text-sm font-black text-white mt-1">{isUnpaid ? 'Unlimited' : dayLabel(accruedSoFar)}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ANNUAL QUOTA</div>
-                      <div className="text-sm font-black text-white mt-1">{dayLabel(annualQuota)}</div>
+                      <div className="text-sm font-black text-white mt-1">{isUnpaid ? 'Unlimited' : dayLabel(annualQuota)}</div>
                     </div>
                   </div>
                 </div>
@@ -558,11 +585,10 @@ const LeaveRequest = () => {
                           key={b.leave_type?.id}
                           type="button"
                           onClick={() => openBalanceDetails(b)}
-                          className={`w-full text-left px-4 py-3 rounded-2xl border transition-all mb-2 ${
-                            isActive
-                              ? 'bg-white/10 border-white/20 text-white'
-                              : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:border-white/10'
-                          }`}
+                          className={`w-full text-left px-4 py-3 rounded-2xl border transition-all mb-2 ${isActive
+                            ? 'bg-white/10 border-white/20 text-white'
+                            : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:border-white/10'
+                            }`}
                         >
                           <div className="text-sm font-black truncate">{b.leave_type?.name ?? b.leave_type_name}</div>
                           {typeof b.remaining_days !== 'undefined' && (
@@ -582,22 +608,20 @@ const LeaveRequest = () => {
                     <button
                       type="button"
                       onClick={() => setBalanceDetailsTab('history')}
-                      className={`px-4 py-2 rounded-xl font-bold border transition-all ${
-                        balanceDetailsTab === 'history'
-                          ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
-                      }`}
+                      className={`px-4 py-2 rounded-xl font-bold border transition-all ${balanceDetailsTab === 'history'
+                        ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        }`}
                     >
                       Balance history
                     </button>
                     <button
                       type="button"
                       onClick={() => setBalanceDetailsTab('policy')}
-                      className={`px-4 py-2 rounded-xl font-bold border transition-all ${
-                        balanceDetailsTab === 'policy'
-                          ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
-                      }`}
+                      className={`px-4 py-2 rounded-xl font-bold border transition-all ${balanceDetailsTab === 'policy'
+                        ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        }`}
                     >
                       Policy
                     </button>
@@ -755,15 +779,18 @@ const LeaveRequest = () => {
       <div className="bg-white/5 backdrop-blur-xl shadow-2xl rounded-[2rem] border border-white/10 overflow-hidden">
         <ul className="divide-y divide-white/5">
           {leaveRequests.length === 0 ? (
-            <li className="p-12 text-center">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="p-6 bg-white/5 border border-white/10 rounded-full">
-                  <CalendarDaysIcon className="h-16 w-16 text-indigo-400/50" />
+            <li className="p-16 text-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
+              <div className="relative z-10 flex flex-col items-center space-y-6">
+                <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.15)]">
+                  <CalendarDaysIcon className="h-16 w-16 text-indigo-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white">No leave requests</h3>
-                <p className="text-slate-400 font-medium max-w-md">
-                  {!isHRManager() ? 'Get started by creating a new leave request.' : 'No leave requests found matching your criteria.'}
-                </p>
+                <div>
+                  <h3 className="text-2xl font-black text-white tracking-tight">No Leave Requests</h3>
+                  <p className="text-slate-400 mt-2 font-medium max-w-sm mx-auto">
+                    You haven't submitted any leave requests yet. Your future requests will appear here.
+                  </p>
+                </div>
               </div>
             </li>
           ) : (
@@ -790,6 +817,11 @@ const LeaveRequest = () => {
                           {request.leave_duration !== 'FULL_DAY' && (
                             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                               {request.leave_duration.replace('_', ' ')}
+                            </span>
+                          )}
+                          {request.leave_type?.is_unpaid && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-widest shadow-[0_0_10px_rgba(244,63,94,0.3)]">
+                              Unpaid (LOP)
                             </span>
                           )}
                         </div>
@@ -876,11 +908,12 @@ const LeaveRequest = () => {
                 <option value="">Select Leave Type</option>
                 {leaveTypes.map((type) => {
                   const balance = leaveBalances.find(b => b.leave_type.id === type.id);
-                  const availableDays = balance ? balance.remaining_days : type.days_allowed_per_year;
+                  const isUnpaid = type.is_unpaid;
+                  const availableDays = isUnpaid ? 'Unlimited' : (balance ? balance.remaining_days : type.days_allowed_per_year);
 
                   return (
                     <option key={type.id} value={type.id}>
-                      {type.name} ({availableDays} days available)
+                      {type.name} ({isUnpaid ? availableDays : `${availableDays} days available`})
                     </option>
                   );
                 })}

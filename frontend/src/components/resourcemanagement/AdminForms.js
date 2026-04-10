@@ -1425,7 +1425,7 @@ const AdminForms = () => {
                   value={formData.resource_type}
                   onChange={(e) => setFormData({ ...formData, resource_type: e.target.value })}
                   required
-                  className="flex-1 px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800"
+                  className="flex-1 px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800 [&>option]:text-white"
                 >
                   <option value="">--------</option>
                   {resourceTypes.map(type => (
@@ -1478,7 +1478,7 @@ const AdminForms = () => {
               <select
                 value={formData.environment}
                 onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800 [&>option]:text-white"
                 required
               >
                 {environments.map(env => (

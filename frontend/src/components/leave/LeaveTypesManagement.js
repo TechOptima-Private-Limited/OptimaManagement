@@ -121,77 +121,77 @@ const LeaveTypesManagement = () => {
   };
 
   const LeaveTypeCard = ({ leaveType }) => (
-    <div className="bg-white/5 backdrop-blur-md rounded-3xl shadow-xl border border-white/10 p-8 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+    <div className="bg-white/5 backdrop-blur-md rounded-[2rem] shadow-xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
       <div className="flex items-start justify-between relative z-10">
         <div className="flex-1">
-          <div className="flex items-center space-x-3 mb-4">
-            <h3 className="text-2xl font-black text-white">{leaveType.name}</h3>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          <div className="flex items-center space-x-3 mb-3">
+            <h3 className="text-xl font-black text-white">{leaveType.name}</h3>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
               {leaveType.code}
             </span>
             {!leaveType.is_active && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
                 Inactive
               </span>
             )}
           </div>
 
-          <p className="text-slate-300 mb-6 leading-relaxed font-medium">{leaveType.description}</p>
+          <p className="text-slate-300 mb-4 leading-relaxed font-medium text-sm">{leaveType.description}</p>
 
-          <div className="grid grid-cols-2 gap-6 text-sm mb-6">
-            <div className="bg-[#0A0F1A] p-4 rounded-2xl border border-white/5 shadow-inner">
-              <span className="font-bold text-indigo-400 block mb-1 uppercase tracking-wider text-xs">Days per year</span>
-              <span className="text-white text-xl font-black">{leaveType.days_allowed_per_year}</span>
+          <div className="grid grid-cols-2 gap-4 text-sm mb-5">
+            <div className="bg-[#0A0F1A] p-3 rounded-2xl border border-white/5 shadow-inner">
+              <span className="font-bold text-indigo-400 block mb-0.5 uppercase tracking-wider text-[10px]">Days per year</span>
+              <span className="text-white text-lg font-black">{leaveType.is_unpaid ? '∞' : leaveType.days_allowed_per_year}</span>
             </div>
-            <div className="bg-[#0A0F1A] p-4 rounded-2xl border border-white/5 shadow-inner">
-              <span className="font-bold text-emerald-400 block mb-1 uppercase tracking-wider text-xs">Carry forward</span>
-              <span className="text-white font-bold text-lg">
-                {leaveType.is_carry_forward ? `Yes (${leaveType.max_carry_forward_days} max)` : 'No'}
+            <div className="bg-[#0A0F1A] p-3 rounded-2xl border border-white/5 shadow-inner">
+              <span className="font-bold text-emerald-400 block mb-0.5 uppercase tracking-wider text-[10px]">Type</span>
+              <span className={`font-bold text-base ${leaveType.is_unpaid ? 'text-rose-400' : 'text-white'}`}>
+                {leaveType.is_unpaid ? 'Unpaid (LOP)' : 'Paid'}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center flex-wrap gap-3">
+          <div className="flex items-center flex-wrap gap-2">
             {leaveType.start_date && (
-              <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
+              <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/5 inline-block">
                 <div className="flex items-center space-x-2">
-                  <CalendarDaysIcon className="h-4 w-4 text-emerald-400" />
-                  <span className="font-bold tracking-wider">Start Date: {formatDate(leaveType.start_date)}</span>
+                  <CalendarDaysIcon className="h-3 w-3 text-emerald-400" />
+                  <span className="font-bold tracking-wider">Start: {formatDate(leaveType.start_date)}</span>
                 </div>
               </div>
             )}
             {leaveType.expiry_date && (
-              <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
+              <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/5 inline-block">
                 <div className="flex items-center space-x-2">
-                  <CalendarDaysIcon className="h-4 w-4 text-indigo-300" />
+                  <CalendarDaysIcon className="h-3 w-3 text-indigo-300" />
                   <span className="font-bold tracking-wider">Expiry: {formatDate(leaveType.expiry_date)}</span>
                 </div>
               </div>
             )}
-            <div className="text-xs text-slate-400 bg-white/5 p-3 rounded-xl border border-white/5 inline-block">
+            <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/5 inline-block">
               <div className="flex items-center space-x-2">
-                <CheckCircleIcon className="h-4 w-4 text-emerald-400" />
+                <CheckCircleIcon className="h-3 w-3 text-emerald-400" />
                 <span className="font-bold tracking-wider">Created: {formatDate(leaveType.created_at)}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center space-y-3 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="flex flex-col items-center space-y-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={() => handleEditType(leaveType)}
-            className="inline-flex items-center justify-center p-3 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-2xl font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)] hover:shadow-[0_0_20px_rgba(79,70,229,0.4)] w-12 h-12"
+            className="inline-flex items-center justify-center p-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-xl font-bold transition-all shadow-[0_0_10px_rgba(79,70,229,0.2)] w-10 h-10"
             title="Edit"
           >
-            <PencilIcon className="h-5 w-5" />
+            <PencilIcon className="h-4 w-4" />
           </button>
           <button
             onClick={() => handleDeleteType(leaveType.id)}
-            className="inline-flex items-center justify-center p-3 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-2xl font-bold transition-all shadow-[0_0_15px_rgba(244,63,94,0.2)] hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] w-12 h-12"
+            className="inline-flex items-center justify-center p-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl font-bold transition-all shadow-[0_0_10px_rgba(244,63,94,0.2)] w-10 h-10"
             title="Delete"
           >
-            <TrashIcon className="h-5 w-5" />
+            <TrashIcon className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -475,6 +475,29 @@ const LeaveTypesManagement = () => {
                 className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="0"
               />
+            </div>
+
+            <div className="sm:col-span-2">
+              <div className="bg-rose-500/10 border border-rose-500/20 p-6 rounded-[2rem] relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-rose-400 to-pink-500"></div>
+                <div className="flex items-center relative z-10 pl-2">
+                  <div className="relative flex items-center">
+                    <input
+                      {...register('is_unpaid')}
+                      type="checkbox"
+                      id="is_unpaid"
+                      className="peer sr-only"
+                    />
+                    <label
+                      htmlFor="is_unpaid"
+                      className="relative h-6 w-11 cursor-pointer rounded-full bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-rose-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-white/20"
+                    ></label>
+                  </div>
+                  <label htmlFor="is_unpaid" className="ml-4 block text-lg font-bold text-white cursor-pointer">
+                    Mark as Unpaid <span className="text-rose-400/80 font-medium text-base ml-2">(triggers automated salary deduction)</span>
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="sm:col-span-2">

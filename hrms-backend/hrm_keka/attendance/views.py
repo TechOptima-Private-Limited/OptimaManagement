@@ -565,6 +565,10 @@ class AttendanceRecordListView(generics.ListAPIView):
         if end_date:
             queryset = queryset.filter(date__lte=end_date)
 
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            queryset = queryset.filter(status=status_param.upper())
+
         # De-duplicate results (important when biometric/manual sync creates multiple rows)
         # Keep the latest row per (employee, date) for employee-linked records
         # and per (biometric_user_id, date) for biometric-only records.
@@ -672,6 +676,31 @@ def manual_attendance(request):
             )
 
             if existing_record:
+                # NEW: If the existing record is a "zero-length" session (Check In == Check Out),
+                # allow re-opening it with the new check-in time without requiring approval.
+                # This fixes the biometric sync pulse issue.
+                if (
+                    not is_past_date and
+                    existing_record.check_in_time == existing_record.check_out_time and
+                    new_check_in is not None and
+                    new_check_out is None
+                ):
+                    existing_record.check_in_time = new_check_in
+                    existing_record.check_out_time = None
+                    if new_ci_lat is not None:
+                        existing_record.check_in_lat = new_ci_lat
+                    if new_ci_lng is not None:
+                        existing_record.check_in_lng = new_ci_lng
+                    existing_record.status = new_status or existing_record.status
+                    existing_record.notes = new_notes or existing_record.notes
+                    existing_record.is_pending_approval = False
+                    existing_record.attendance_type = existing_record.attendance_type or 'MANUAL'
+                    existing_record.save()
+                    return Response(
+                        AttendanceRecordSerializer(existing_record).data,
+                        status=status.HTTP_200_OK
+                    )
+
                 # Allow direct checkout update ONLY if it's for TODAY
                 if (
                     not is_past_date and
@@ -697,8 +726,16 @@ def manual_attendance(request):
 
                 # HR or Senior Leaders can directly update without approval
                 if can_bypass_approval:
-                    existing_record.check_in_time = new_check_in if new_check_in is not None else existing_record.check_in_time
-                    existing_record.check_out_time = new_check_out if new_check_out is not None else existing_record.check_out_time
+                    # EARLIEST IN: Only update check-in if new one is earlier
+                    if new_check_in:
+                        if not existing_record.check_in_time or new_check_in < existing_record.check_in_time:
+                            existing_record.check_in_time = new_check_in
+                    
+                    # LATEST OUT: Only update check-out if new one is later
+                    if new_check_out:
+                        if not existing_record.check_out_time or new_check_out > existing_record.check_out_time:
+                            existing_record.check_out_time = new_check_out
+
                     if new_ci_lat is not None:
                         existing_record.check_in_lat = new_ci_lat
                     if new_ci_lng is not None:
@@ -707,6 +744,7 @@ def manual_attendance(request):
                         existing_record.check_out_lat = new_co_lat
                     if new_co_lng is not None:
                         existing_record.check_out_lng = new_co_lng
+                    
                     existing_record.status = new_status or existing_record.status
                     existing_record.notes = new_notes or existing_record.notes
                     existing_record.attendance_type = existing_record.attendance_type or 'MANUAL'
@@ -1011,18 +1049,45 @@ def biometric_sync(request):
             try:
                 employee = Employee.objects.get(employee_id=record['employee_id'])
                 
-                attendance_record, created = AttendanceRecord.objects.get_or_create(
+                # Find existing record for this employee and date
+                attendance_record = AttendanceRecord.objects.filter(
                     employee=employee,
                     date=datetime.strptime(record['date'], '%Y-%m-%d').date(),
-                    is_pending_approval=False,
-                    defaults={
-                        'check_in_time': record.get('check_in_time'),
-                        'check_out_time': record.get('check_out_time'),
-                        'status': record.get('status', 'PRESENT'),
-                        'attendance_type': 'BIOMETRIC',
-                        'biometric_device_id': device_id,
-                    }
-                )
+                    is_pending_approval=False
+                ).first()
+                
+                new_in = record.get('check_in_time')
+                new_out = record.get('check_out_time')
+                
+                if attendance_record:
+                    # Merge Logic: Earliest In, Latest Out
+                    updated = False
+                    if new_in:
+                        if not attendance_record.check_in_time or new_in < attendance_record.check_in_time:
+                            attendance_record.check_in_time = new_in
+                            updated = True
+                    
+                    if new_out:
+                        if not attendance_record.check_out_time or new_out > attendance_record.check_out_time:
+                            attendance_record.check_out_time = new_out
+                            updated = True
+                    
+                    if updated:
+                        attendance_record.save()
+                    created = False
+                else:
+                    # Create new record
+                    attendance_record = AttendanceRecord.objects.create(
+                        employee=employee,
+                        date=datetime.strptime(record['date'], '%Y-%m-%d').date(),
+                        check_in_time=new_in,
+                        check_out_time=new_out,
+                        status=record.get('status', 'PRESENT'),
+                        attendance_type='BIOMETRIC',
+                        biometric_device_id=device_id,
+                        is_pending_approval=False
+                    )
+                    created = True
                 
                 if created:
                     created_records.append(attendance_record.id)
@@ -1486,3 +1551,196 @@ def wfh_today(request):
         })
     
     return Response(results)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def attendance_analytics(request):
+    """
+    Returns attendance trend data for charts.
+    Query params:
+      period: 'weekly' (default) or 'monthly'
+      employee_id: filter to a specific employee (management only)
+      days: number of days to look back (default 30 for weekly, 90 for monthly)
+    """
+    from datetime import timedelta
+    from django.db.models import Count, Q
+    from collections import defaultdict
+
+    user = request.user
+    user_profile = getattr(user, 'profile', None)
+    user_role = getattr(user_profile, 'role', None) if user_profile else None
+    permission_level = get_permission_level(user_role) if user_role else 0
+
+    period = request.query_params.get('period', 'weekly')
+    employee_id_param = request.query_params.get('employee_id')
+    days_back = int(request.query_params.get('days', 30 if period == 'weekly' else 90))
+
+    end_date = date.today()
+    start_date = end_date - timedelta(days=days_back)
+
+    # Build base queryset with role-based scoping
+    queryset = AttendanceRecord.objects.filter(
+        date__gte=start_date,
+        date__lte=end_date,
+        is_pending_approval=False,
+    )
+
+    is_elevated = (
+        user.has_perm('attendance.view_attendancerecord') or
+        permission_level >= PERMISSION_LEVELS.get('SENIOR_LEADER', 40) or
+        can_manage_hr(user_role)
+    )
+
+    if employee_id_param and is_elevated:
+        queryset = queryset.filter(employee__employee_id=employee_id_param)
+    elif not is_elevated:
+        # Scope to self
+        try:
+            employee = Employee.objects.get(user=user)
+            queryset = queryset.filter(employee=employee)
+        except Employee.DoesNotExist:
+            queryset = AttendanceRecord.objects.none()
+
+    # Late threshold: 10:00 AM
+    LATE_THRESHOLD_HOUR = 10
+
+    # ── Collect unique (employee_id, date) tuples per status ──────────────────
+    # This prevents duplicate biometric/manual records inflating the counters.
+    # Key: (employee_id, date)  →  we deduplicate so each employee counts once per day.
+    total_emp_days = set()    # all (emp_id, date) with any approved record
+    present_emp_days = set()  # (emp_id, date) where status is PRESENT or LATE
+    late_emp_days = set()     # (emp_id, date) where check-in is after threshold
+
+    seen = {}  # (emp_id, date) → best record (prefer PRESENT/LATE over ABSENT)
+
+    for r in queryset.values('date', 'employee_id', 'status', 'check_in_time'):
+        emp_id = r['employee_id']
+        if not emp_id:
+            continue
+        day = str(r['date'])
+        key = (emp_id, day)
+
+        # Keep the "best" status per employee per day
+        # Priority: PRESENT > LATE > ABSENT (so a biometric PRESENT beats a manual ABSENT)
+        priority = {'PRESENT': 3, 'LATE': 2, 'HALF_DAY': 1, 'ABSENT': 0}
+        current_priority = priority.get(seen.get(key, {}).get('status', ''), -1)
+        new_priority = priority.get(r['status'], -1)
+
+        if key not in seen or new_priority > current_priority:
+            seen[key] = {'status': r['status'], 'check_in_time': r['check_in_time']}
+
+    # Build sets from deduplicated records
+    for (emp_id, day), rec in seen.items():
+        key = (emp_id, day)
+        total_emp_days.add(key)
+        if rec['status'] in ('PRESENT', 'LATE'):
+            present_emp_days.add(key)
+        check_in = rec['check_in_time']
+        if check_in:
+            h = check_in.hour if hasattr(check_in, 'hour') else int(str(check_in).split(':')[0])
+            m = check_in.minute if hasattr(check_in, 'minute') else (int(str(check_in).split(':')[1]) if ':' in str(check_in) else 0)
+            if h > LATE_THRESHOLD_HOUR or (h == LATE_THRESHOLD_HOUR and m > 0):
+                late_emp_days.add(key)
+
+    def get_bucket_key_weekly(day_str):
+        d = datetime.strptime(day_str, '%Y-%m-%d').date()
+        monday = d - timedelta(days=d.weekday())
+        return monday.strftime('%d %b'), monday
+
+    def get_bucket_key_monthly(day_str):
+        d = datetime.strptime(day_str, '%Y-%m-%d').date()
+        return d.strftime('%b %Y'), d.replace(day=1)
+
+    def count_working_days(start, end):
+        """Count Mon–Fri days between start and end (inclusive)."""
+        count = 0
+        d = start
+        while d <= end:
+            if d.weekday() < 5:
+                count += 1
+            d += timedelta(days=1)
+        return count
+
+    if period == 'weekly':
+        bucket_key_fn = get_bucket_key_weekly
+    else:
+        bucket_key_fn = get_bucket_key_monthly
+
+    # ── Total distinct employees in scope ───────────────────────────────────
+    total_unique_employees = len(set(emp_id for emp_id, day in total_emp_days)) or 1
+
+    # ── Bucket: label → {present, late, working_days} ───────────────────────
+    # present/late: unique employee-days
+    # working_days: Mon–Fri calendar days in that bucket (for denominator)
+    buckets = {}
+    bucket_sort = {}      # label → sort key (date for ordering)
+    bucket_dates = {}     # label → (bucket_start, bucket_end)
+
+    # Determine bucket date ranges from ALL days in the window
+    d_iter = start_date
+    while d_iter <= end_date:
+        label, sort_key = bucket_key_fn(str(d_iter))
+        if label not in buckets:
+            buckets[label] = {'present': 0, 'late': 0}
+            bucket_sort[label] = sort_key
+            if period == 'weekly':
+                b_start = sort_key              # Monday
+                b_end = b_start + timedelta(days=6)   # Sunday
+            else:
+                # First day of month already in sort_key
+                import calendar as cal_mod
+                b_start = sort_key
+                last_day = cal_mod.monthrange(b_start.year, b_start.month)[1]
+                b_end = b_start.replace(day=last_day)
+            # Clamp to query range
+            b_start = max(b_start, start_date)
+            b_end = min(b_end, end_date)
+            bucket_dates[label] = (b_start, b_end)
+        d_iter += timedelta(days=1)
+
+    # Accumulate present/late employee-days per bucket
+    for emp_id, day in present_emp_days:
+        label, _ = bucket_key_fn(day)
+        if label in buckets:
+            buckets[label]['present'] += 1
+
+    for emp_id, day in late_emp_days:
+        label, _ = bucket_key_fn(day)
+        if label in buckets:
+            buckets[label]['late'] += 1
+
+    trend_data = []
+    for label in sorted(buckets.keys(), key=lambda l: bucket_sort[l]):
+        b = buckets[label]
+        b_start, b_end = bucket_dates[label]
+        # Expected = total active employees × working days in this bucket
+        working_days = count_working_days(b_start, b_end)
+        expected = total_unique_employees * working_days
+        pct = round((b['present'] / expected) * 100, 1) if expected else 0
+        pct = min(pct, 100.0)  # safety cap
+        trend_data.append({
+            'label': label,
+            'attendance_pct': pct,
+            'late_count': b['late'],
+            'working_days': working_days,
+            'expected_employee_days': expected,
+            'present_employee_days': b['present'],
+        })
+
+    # Summary stats
+    all_pcts = [d['attendance_pct'] for d in trend_data]
+    all_late = [d['late_count'] for d in trend_data]
+
+    return Response({
+        'period': period,
+        'start_date': str(start_date),
+        'end_date': str(end_date),
+        'trend': trend_data,
+        'summary': {
+            'avg_attendance_pct': round(sum(all_pcts) / len(all_pcts), 1) if all_pcts else 0,
+            'total_late_arrivals': sum(all_late),
+            'best_attendance_pct': max(all_pcts) if all_pcts else 0,
+            'worst_attendance_pct': min(all_pcts) if all_pcts else 0,
+        }
+    })

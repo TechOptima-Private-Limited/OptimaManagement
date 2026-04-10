@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from 'react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useTheme } from '../../context/ThemeContext';
 import {
   ClockIcon,
@@ -9,14 +9,76 @@ import {
   ServerIcon,
   KeyIcon,
   ChartBarIcon,
-  ArrowTrendingUpIcon
+  ArrowTrendingUpIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { getCurrentUser, hasAdminPrivileges } from '../../utils/auth';
+import RequestDetailModal, { getStatusIcon, getStatusBadge } from './RequestDetailModal';
+
 
 const ResourceDashboard = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const queryClient = useQueryClient();
+  const [selectedRequest, setSelectedRequest] = useState(null);
+
+  const user = getCurrentUser();
+  const isAdminLike = (() => {
+    if (typeof hasAdminPrivileges === 'function' && hasAdminPrivileges()) return true;
+    const role = (user?.role || user?.profile?.role || '').toLowerCase?.();
+    return ['admin', 'super_admin', 'hr_admin', 'hr_manager', 'it_supporter'].includes(role);
+  })();
+
+  // Mutations (consistent with AccessRequestList)
+  const approveMutation = useMutation(
+    (id) => api.post(`/resource-management/access-requests/${id}/approve/`),
+    {
+      onSuccess: () => {
+        toast.success('Request approved');
+        queryClient.invalidateQueries('resource-dashboard');
+        queryClient.invalidateQueries('recent-requests');
+      },
+      onError: () => toast.error('Failed to approve request')
+    }
+  );
+
+  const rejectMutation = useMutation(
+    (id) => api.post(`/resource-management/access-requests/${id}/reject/`),
+    {
+      onSuccess: () => {
+        toast.success('Request rejected');
+        queryClient.invalidateQueries('resource-dashboard');
+        queryClient.invalidateQueries('recent-requests');
+      },
+      onError: () => toast.error('Failed to reject request')
+    }
+  );
+
+  const requestApprovalMutation = useMutation(
+    ({ id, approver_email }) => api.post(`/resource-management/access-requests/${id}/request_approval/`, { approver_email }),
+    {
+      onSuccess: () => {
+        toast.success('Approval request sent');
+        queryClient.invalidateQueries('recent-requests');
+      },
+      onError: () => toast.error('Failed to send approval request')
+    }
+  );
+
+  const updateRequestMutation = useMutation(
+    ({ id, data }) => api.patch(`/resource-management/access-requests/${id}/`, data),
+    {
+      onSuccess: () => {
+        toast.success('Request updated');
+        queryClient.invalidateQueries('recent-requests');
+      },
+      onError: () => toast.error('Failed to update request')
+    }
+  );
+
   // Fetch dashboard data
   const { data: dashboardData, isLoading } = useQuery(
     'resource-dashboard',
@@ -78,37 +140,6 @@ const ResourceDashboard = () => {
     }
   ];
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'PENDING':
-        return <ClockIcon className="h-4 w-4 text-yellow-500" />;
-      case 'APPROVAL_REQUIRED':
-        return <ExclamationTriangleIcon className="h-4 w-4 text-orange-500" />;
-      case 'APPROVED':
-        return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
-      case 'REJECTED':
-        return <XCircleIcon className="h-4 w-4 text-red-500" />;
-      default:
-        return <ClockIcon className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    const baseClasses = "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case 'PENDING':
-        return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      case 'APPROVAL_REQUIRED':
-        return `${baseClasses} bg-orange-100 text-orange-800`;
-      case 'APPROVED':
-        return `${baseClasses} bg-green-100 text-green-800`;
-      case 'REJECTED':
-        return `${baseClasses} bg-red-100 text-red-800`;
-      default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
-    }
-  };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -117,6 +148,7 @@ const ResourceDashboard = () => {
       minute: '2-digit'
     });
   };
+
 
   if (isLoading) {
     return (
@@ -186,23 +218,32 @@ const ResourceDashboard = () => {
             {recentRequests.length > 0 ? (
               <div className="space-y-4">
                 {recentRequests.map((request) => (
-                  <div key={request.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                  <div
+                    key={request.id}
+                    onClick={() => setSelectedRequest(request)}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer group"
+                  >
                     <div className="flex items-center space-x-3">
-                      {getStatusIcon(request.status)}
+                      <div className="p-2 bg-white/5 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
+                        {getStatusIcon(request.status)}
+                      </div>
                       <div>
-                        <p className="text-sm font-medium text-white">#{request.ticket_number}</p>
+                        <p className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors">#{request.ticket_number}</p>
                         <p className="text-xs text-gray-400">
                           {request.request_type === 'IT' ? 'IT Support' : request.resource_name}
                         </p>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end space-y-1">
-                      <span className={getStatusBadge(request.status)}>
-                        {request.status}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {formatDate(request.requested_at)}
-                      </span>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex flex-col items-end space-y-1">
+                        <span className={getStatusBadge(request.status)}>
+                          {request.status}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {formatDate(request.requested_at)}
+                        </span>
+                      </div>
+                      <EyeIcon className="h-5 w-5 text-gray-500 group-hover:text-indigo-400 transition-colors" />
                     </div>
                   </div>
                 ))}
@@ -321,8 +362,19 @@ const ResourceDashboard = () => {
           </div>
         </div>
       </div>
+      {/* Request Detail Modal */}
+      <RequestDetailModal
+        request={selectedRequest}
+        onClose={() => setSelectedRequest(null)}
+        theme={theme}
+        isAdminLike={isAdminLike}
+        approveMutation={approveMutation}
+        rejectMutation={rejectMutation}
+        requestApprovalMutation={requestApprovalMutation}
+        updateRequestMutation={updateRequestMutation}
+      />
     </div>
   );
 };
 
-export default ResourceDashboard;
+export default ResourceDashboard;

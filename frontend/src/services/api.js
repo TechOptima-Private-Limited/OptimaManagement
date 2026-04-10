@@ -205,7 +205,11 @@ export const attendanceAPI = {
   // Approval workflow
   getPendingEdits: () => api.get('/attendance/pending-edits/'),
   approveEdit: (recordId, data) => api.post(`/attendance/approve-edit/${recordId}/`, data),
+
+  // Analytics
+  getAttendanceTrends: (params) => api.get('/attendance/analytics/', { params }),
 };
+
 
 // Work From Home API
 export const workFromHomeAPI = {

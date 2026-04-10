@@ -931,6 +931,10 @@ class LeaveBalanceService:
     @staticmethod 
     def check_leave_balance(employee, leave_type, days_requested, year=None):
         """Check if employee has enough leave balance"""
+        if getattr(leave_type, 'is_unpaid', False):
+            logger.info(f"🔍 Unpaid Leave Balance check: {employee.user.get_full_name()} - Unlimited")
+            return True, 999.0
+
         if leave_type.code == 'EL':
             from django.db.models import Sum
             from django.utils import timezone
@@ -974,6 +978,12 @@ class LeaveBalanceService:
                 logger.warning(f"⚠️ Balance already deducted for leave {leave_request.id}")
                 return None
             
+            if getattr(leave_request.leave_type, 'is_unpaid', False):
+                leave_request.balance_deducted = True
+                leave_request.save(update_fields=['balance_deducted'])
+                logger.info(f"✅ Unpaid leave marked as deducted for {leave_request.employee.user.get_full_name()}")
+                return None
+
             days_to_deduct = float(leave_request.days_requested)
             
             if leave_request.leave_type.code == 'EL':
@@ -1070,6 +1080,12 @@ class LeaveBalanceService:
                 logger.warning(f"⚠️ No balance to restore for leave {leave_request.id}")
                 return None
             
+            if getattr(leave_request.leave_type, 'is_unpaid', False):
+                leave_request.balance_deducted = False
+                leave_request.save(update_fields=['balance_deducted'])
+                logger.info(f"✅ Unpaid leave marked as restored (un-deducted) for {leave_request.employee.user.get_full_name()}")
+                return None
+
             days_to_restore = float(leave_request.days_requested)
             
             if leave_request.leave_type.code == 'EL':

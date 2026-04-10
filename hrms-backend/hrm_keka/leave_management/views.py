@@ -639,8 +639,8 @@ class LeaveBalanceListView(generics.ListAPIView):
         leave_types = LeaveType.objects.filter(is_active=True)
         
         for leave_type in leave_types:
-            # Earned Leave (EL) is accrued in LeaveLedger — do not mirror in LeaveBalance
-            if leave_type.code == 'EL':
+            # EL and Unpaid leaves use synthetic payloads from ledger/logic — skip LeaveBalance record
+            if leave_type.code == 'EL' or getattr(leave_type, 'is_unpaid', False):
                 continue
             # Calculate used days from existing approved requests
             approved_days = LeaveRequest.objects.filter(
@@ -713,7 +713,7 @@ def leave_summary(request):
         # Initialize balances first (EL uses LeaveLedger, not LeaveBalance)
         leave_types = LeaveType.objects.filter(is_active=True)
         for leave_type in leave_types:
-            if leave_type.code == 'EL':
+            if leave_type.code == 'EL' or getattr(leave_type, 'is_unpaid', False):
                 continue
             LeaveBalanceService.get_or_create_balance(employee, leave_type, current_year)
         

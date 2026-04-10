@@ -72,7 +72,7 @@ const Layout = ({ children }) => {
                 <div className="flex items-center space-x-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                   <span>Powered by</span>
                   <span className="text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                    Premium UI Engine
+                    TechOptima
                   </span>
                 </div>
               </div>

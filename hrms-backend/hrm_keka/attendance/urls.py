@@ -44,4 +44,7 @@ urlpatterns = [
     path('wfh/requests/', views.get_wfh_requests, name='get_wfh_requests'),
     path('wfh/requests/<int:request_id>/approve/', views.approve_wfh_request, name='approve_wfh_request'),
     path('wfh-today/', views.wfh_today, name='wfh_today'),
-]
+
+    # Analytics
+    path('analytics/', views.attendance_analytics, name='attendance_analytics'),
+]

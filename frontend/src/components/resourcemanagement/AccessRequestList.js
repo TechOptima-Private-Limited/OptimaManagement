@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useTheme } from '../../context/ThemeContext';
@@ -6,13 +7,20 @@ import {
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
+  XMarkIcon,
   ExclamationTriangleIcon,
   EyeIcon,
   FunnelIcon,
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
-import api, { employeeAPI } from '../../services/api';
+import api, { employeeAPI, adminUserAPI } from '../../services/api';
+import { Combobox, Transition } from '@headlessui/react';
+import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid';
 import { getCurrentUser, hasAdminPrivileges } from '../../utils/auth';
+
+// Helper Functions
+import RequestDetailModal, { getStatusIcon, getStatusBadge, getPriorityBadge, formatDate } from './RequestDetailModal';
+
 
 const AccessRequestList = () => {
   const { theme } = useTheme();
@@ -112,359 +120,6 @@ const AccessRequestList = () => {
 
     return matchesStatus && matchesSearch;
   });
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'PENDING':
-        return <ClockIcon className="h-5 w-5 text-yellow-500" />;
-      case 'APPROVAL_REQUIRED':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-orange-500" />;
-      case 'APPROVED':
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
-      case 'REJECTED':
-        return <XCircleIcon className="h-5 w-5 text-red-500" />;
-      default:
-        return <ClockIcon className="h-5 w-5 text-gray-500" />;
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    const baseClasses = "inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border";
-    switch (status) {
-      case 'PENDING':
-        return `${baseClasses} bg-amber-500/10 text-amber-400 border-amber-500/30`;
-      case 'APPROVAL_REQUIRED':
-        return `${baseClasses} bg-orange-500/10 text-orange-400 border-orange-500/30`;
-      case 'APPROVED':
-        return `${baseClasses} bg-emerald-500/10 text-emerald-400 border-emerald-500/30`;
-      case 'REJECTED':
-        return `${baseClasses} bg-rose-500/10 text-rose-400 border-rose-500/30`;
-      default:
-        return `${baseClasses} bg-gray-500/10 text-gray-400 border-gray-500/30`;
-    }
-  };
-
-  const getPriorityBadge = (priority) => {
-    const baseClasses = "inline-flex items-center px-2 py-1.5 rounded-lg text-xs font-bold shadow-sm";
-    switch (priority) {
-      case 'LOW':
-        return `${baseClasses} bg-emerald-500/10 text-emerald-400 border border-emerald-500/20`;
-      case 'MEDIUM':
-        return `${baseClasses} bg-amber-500/10 text-amber-400 border border-amber-500/20`;
-      case 'HIGH':
-        return `${baseClasses} bg-orange-500/10 text-orange-400 border border-orange-500/20`;
-      case 'URGENT':
-        return `${baseClasses} bg-rose-500/10 text-rose-400 border border-rose-500/20`;
-      default:
-        return `${baseClasses} bg-gray-500/10 text-gray-400 border border-gray-500/20`;
-    }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const RequestDetailModal = ({ request, onClose }) => {
-    const [approverEmail, setApproverEmail] = useState('');
-    const [assignedTo, setAssignedTo] = useState(request?.assigned_to || null);
-    const [requiresApproval, setRequiresApproval] = useState(Boolean(request?.requires_approval));
-    const [notes, setNotes] = useState(request?.notes || '');
-    const [users, setUsers] = useState([]);
-
-    useEffect(() => {
-      let mounted = true;
-      (async () => {
-        try {
-          const res = await employeeAPI.getUsers();
-          const data = res?.data?.results || res?.data || [];
-          if (mounted) setUsers(data);
-        } catch (e) {
-          setUsers([]);
-        }
-      })();
-      return () => { mounted = false; };
-    }, []);
-
-    useEffect(() => {
-      setApproverEmail(request?.approver_email || '');
-    }, [request]);
-    if (!request) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className={`bg-slate-900 border ${theme.cardBorder} rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto`}>
-          <div className={`sticky top-0 bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-6 py-4 rounded-t-2xl z-10`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className={`text-xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent`}>Request Details</h3>
-                <p className="text-sm text-gray-400 mt-1">Ticket #{request.ticket_number}</p>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors group"
-              >
-                <svg className="h-6 w-6 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div className="p-6 space-y-8">
-            {/* Request Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Status</label>
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-white/5 rounded-lg border border-white/5">
-                      {getStatusIcon(request.status)}
-                    </div>
-                    <span className={getStatusBadge(request.status)}>
-                      {request.status_display || request.status}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Priority</label>
-                  <span className={getPriorityBadge(request.priority)}>
-                    {request.priority_display || request.priority}
-                  </span>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Request Type</label>
-                  <p className="text-white font-medium text-lg">{request.request_type === 'IT' ? 'IT Support' : 'New Access'}</p>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Requested At</label>
-                  <p className="text-white font-mono">{formatDate(request.requested_at)}</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Duration</label>
-                  <p className="text-white font-medium">{request.duration} days</p>
-                </div>
-
-                {request.expires_at && (
-                  <div>
-                    <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Expires At</label>
-                    <p className="text-rose-200 font-mono">{formatDate(request.expires_at)}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Resource Info (if not IT request) */}
-            {request.request_type !== 'IT' && (
-              <div className="border-t border-white/10 pt-8">
-                <h4 className="text-lg font-bold text-white mb-6">Resource Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Resource</label>
-                    <p className="text-white text-lg font-medium">{request.resource_name || 'N/A'}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Access Level</label>
-                    <p className="text-white text-lg font-medium">{request.access_level_name || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Justification */}
-            <div className="border-t border-white/10 pt-8">
-              <label className="block text-lg font-bold text-white mb-4">Justification</label>
-              <div
-                className="prose prose-invert max-w-none text-gray-300 bg-white/5 rounded-xl p-6 border border-white/10 italic"
-                dangerouslySetInnerHTML={{ __html: request.justification || '<span class="text-gray-500">No justification provided.</span>' }}
-              />
-            </div>
-
-            {/* Additional Info */}
-            {(request.approved_by || request.approved_at || request.status === 'REJECTED') && (
-              <div className="border-t border-white/10 pt-8">
-                <h4 className="text-lg font-bold text-white mb-6">Approval Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-xl bg-black/20 border border-white/5">
-                  {request.status === 'REJECTED' && request.rejected_by_name && (
-                    <div>
-                      <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Rejected By</label>
-                      <p className="text-rose-200">{request.rejected_by_name}</p>
-                    </div>
-                  )}
-                  {request.status !== 'REJECTED' && request.approved_by && (
-                    <div>
-                      <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Approved By</label>
-                      <p className="text-emerald-200">{request.approved_by_name || request.approved_by}</p>
-                    </div>
-                  )}
-
-                  {request.approved_at && (
-                    <div>
-                      <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Approved At</label>
-                      <p className="text-white font-mono">{formatDate(request.approved_at)}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Admin Actions */}
-            {isAdminLike && (
-              <div className="border-t border-white/10 pt-8 pb-4">
-                <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-6 shadow-inner">
-                  <h4 className="text-lg font-bold text-indigo-300 mb-6 flex items-center">
-                    <CheckCircleIcon className="w-5 h-5 mr-3" />
-                    Admin Actions
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-bold text-indigo-200">Assigned To</label>
-                      <select
-                        value={assignedTo || ''}
-                        onChange={(e) => setAssignedTo(e.target.value ? Number(e.target.value) : null)}
-                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-colors hover:bg-white/10 hover:border-white/20"
-                      >
-                        <option value="" className="bg-slate-800 text-white">Unassigned</option>
-                        {users.map(u => (
-                          <option key={u.id} value={u.id} className="bg-slate-800 text-white">
-                            {u.full_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username || u.email}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 mt-7 border border-white/10 bg-white/5 px-5 py-3 rounded-xl hover:bg-white/10 hover:border-white/20 transition-colors shadow-sm">
-                      <input
-                        id="requiresApproval"
-                        type="checkbox"
-                        checked={requiresApproval}
-                        onChange={(e) => setRequiresApproval(e.target.checked)}
-                        className="h-5 w-5 text-indigo-500 border-white/20 rounded bg-white/5 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
-                      />
-                      <label htmlFor="requiresApproval" className="text-sm font-bold text-white cursor-pointer select-none">Requires Manager Approval</label>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-bold text-indigo-200">Status</label>
-                      <input
-                        value={request.status_display || request.status}
-                        disabled
-                        className="px-4 py-3 border border-white/5 rounded-xl bg-black/20 text-gray-400 cursor-not-allowed font-medium"
-                      />
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-bold text-indigo-200">{request.status === 'REJECTED' ? 'Rejected By' : 'Approved By'}</label>
-                      <input
-                        value={(request.status === 'REJECTED' ? (request.rejected_by_name || '') : (request.approved_by_name || ''))}
-                        disabled
-                        className="px-4 py-3 border border-white/5 rounded-xl bg-black/20 text-gray-400 cursor-not-allowed placeholder-gray-600 font-medium"
-                        placeholder="Pending..."
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2 flex flex-col gap-2 mt-2">
-                      <label className="text-sm font-bold text-indigo-200">Admin Notes</label>
-                      <textarea
-                        rows={3}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Add internal notes or comments..."
-                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-white/10 hover:border-white/20 placeholder-gray-500 resize-none shadow-sm"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-4 items-center pt-6 border-t border-indigo-500/20">
-                    <button
-                      onClick={async () => {
-                        await approveMutation.mutateAsync(request.id);
-                        onClose();
-                      }}
-                      disabled={approveMutation.isLoading || request.status === 'APPROVED'}
-                      className="px-6 py-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/50 transition-all disabled:opacity-50 shadow-sm"
-                    >
-                      Approve Request
-                    </button>
-                    
-                    <button
-                      onClick={async () => {
-                        await rejectMutation.mutateAsync(request.id);
-                        onClose();
-                      }}
-                      disabled={rejectMutation.isLoading || request.status === 'REJECTED'}
-                      className="px-6 py-3 bg-rose-500/10 text-rose-400 border border-rose-500/30 font-bold rounded-xl hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/50 transition-all disabled:opacity-50 shadow-sm"
-                    >
-                      Reject Request
-                    </button>
-                    
-                    <div className="w-px h-10 bg-indigo-500/20 mx-2 hidden md:block"></div>
-                    
-                    <div className="flex gap-2 flex-grow flex-wrap">
-                      <input
-                        type="email"
-                        value={approverEmail}
-                        onChange={(e) => setApproverEmail(e.target.value)}
-                        placeholder="Manager email..."
-                        className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-w-[200px] flex-grow placeholder-gray-500 shadow-sm"
-                      />
-                      <button
-                        onClick={async () => {
-                          const email = (approverEmail || '').trim();
-                          if (!email) {
-                            toast.error('Please enter approver email');
-                            return;
-                          }
-                          await requestApprovalMutation.mutateAsync({ id: request.id, approver_email: email });
-                          onClose();
-                        }}
-                        disabled={requestApprovalMutation.isLoading || !approverEmail}
-                        className="px-6 py-3 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold rounded-xl hover:bg-indigo-500/30 hover:border-indigo-500/50 hover:text-indigo-200 transition-all disabled:opacity-50 whitespace-nowrap shadow-sm"
-                      >
-                        Request Approval
-                      </button>
-                    </div>
-                    
-                    <div className="w-full mt-2 md:mt-0 md:w-auto">
-                      <button
-                        onClick={async () => {
-                          const payload = {
-                            assigned_to: assignedTo,
-                            requires_approval: requiresApproval,
-                            notes: notes,
-                            approver_email: approverEmail || null,
-                          };
-                          await updateRequestMutation.mutateAsync({ id: request.id, data: payload });
-                          onClose();
-                        }}
-                        disabled={updateRequestMutation.isLoading}
-                        className="w-full px-8 py-3 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -626,6 +281,12 @@ const AccessRequestList = () => {
       <RequestDetailModal
         request={selectedRequest}
         onClose={() => setSelectedRequest(null)}
+        theme={theme}
+        isAdminLike={isAdminLike}
+        approveMutation={approveMutation}
+        rejectMutation={rejectMutation}
+        requestApprovalMutation={requestApprovalMutation}
+        updateRequestMutation={updateRequestMutation}
       />
     </div>
   );

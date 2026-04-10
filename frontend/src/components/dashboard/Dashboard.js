@@ -19,7 +19,7 @@ import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
 import WorkFromHomePopup from '../attendance/WorkFromHomePopup';
 import { useTheme } from '../../context/ThemeContext';
-import { getAvgMinutesPerDayInWeek, formatMinutesAsHhMm } from '../../utils/attendanceStats';
+import { getLastWeekRange, getStatsForPeriod, formatMinutesAsHhMm } from '../../utils/attendanceStats';
 
 // Helper to get local YYYY-MM-DD date (avoid UTC offset issues)
 const toLocalDate = (date) => {
@@ -31,90 +31,20 @@ const toLocalDate = (date) => {
 };
 
 const calculateAttendanceStats = (records, targetEmployeeId = null) => {
-  if (!records || records.length === 0) return {
-    avgHours: '0h 0m',
-    onTimeArrival: '0%',
-    teamAvgHours: '0h 0m',
-    teamOnTime: '0%'
-  };
+  const { start: lwStart, end: lwEnd } = getLastWeekRange();
 
-  const localToday = toLocalDate(new Date());
+  // Stats for target employee ("Me")
+  const meStats = getStatsForPeriod(records, targetEmployeeId, lwStart, lwEnd);
 
-  // Filter records for the target employee (if provided)
-  const myRecords = targetEmployeeId
-    ? records.filter(r => {
-      // Robust matching: Check multiple identity fields against the target ID
-      const recordId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id)) || (r.employee_details && r.employee_details.employee_id);
-      const userId = r.user || (r.employee && r.employee.user);
-
-      return (recordId && String(recordId) === String(targetEmployeeId)) ||
-        (userId && String(userId) === String(targetEmployeeId));
-    })
-    : [];
-
-  // On-Time Arrival (threshold 10:00:00)
-  const isOnTime = (timeStr) => {
-    if (!timeStr) return false;
-    // Standardize time string format (handles HH:MM:SS, HH:MM, and 12h formats)
-    let h, m, s = 0;
-
-    if (String(timeStr).includes('AM') || String(timeStr).includes('PM')) {
-      const [time, modifier] = String(timeStr).split(' ');
-      let [hours, minutes] = time.split(':');
-      h = parseInt(hours, 10);
-      m = parseInt(minutes, 10);
-      if (modifier === 'PM' && h < 12) h += 12;
-      if (modifier === 'AM' && h === 12) h = 0;
-    } else {
-      const parts = String(timeStr).split(':').map(Number);
-      h = parts[0] || 0;
-      m = parts[1] || 0;
-      s = parts[2] || 0;
-    }
-
-    // 10:00:00 is the limit
-    if (h < 10) return true;
-    if (h === 10 && m === 0 && (isNaN(s) || s === 0)) return true;
-    return false;
-  };
-
-  const calculateOnTimePercent = (recs) => {
-    if (!recs || recs.length === 0) return '0%';
-    const withCheckIn = recs.filter(r => r.check_in_time);
-    if (withCheckIn.length === 0) return '0%';
-    const onTimeCount = withCheckIn.filter(r => isOnTime(r.check_in_time)).length;
-    return `${Math.round((onTimeCount / withCheckIn.length) * 100)}%`;
-  };
-
-  const calculateAvgHours = (recs) => {
-    if (!recs || recs.length === 0) return '0h 0m';
-    const validRecords = recs.filter(r => r.check_in_time && r.check_out_time && !r.is_pending_approval);
-    if (validRecords.length === 0) return '0h 0m';
-
-    const totalMinutes = validRecords.reduce((acc, r) => {
-      try {
-        const [ciH, ciM] = r.check_in_time.split(':').map(Number);
-        const [coH, coM] = r.check_out_time.split(':').map(Number);
-        const duration = (coH * 60 + (coM || 0)) - (ciH * 60 + (ciM || 0));
-        return acc + (duration > 0 ? duration : 0);
-      } catch (err) {
-        return acc;
-      }
-    }, 0);
-
-    const avgMinutes = totalMinutes / validRecords.length;
-    const h = Math.floor(avgMinutes / 60);
-    const m = Math.round(avgMinutes % 60);
-    return `${h}h ${m}m`;
-  };
-
-  const todayRecords = records.filter(r => r.date === localToday);
+  // Stats for the whole group ("Team")
+  // By passing null for employeeId, getStatsForPeriod will average all records in the range
+  const teamStats = getStatsForPeriod(records, null, lwStart, lwEnd);
 
   return {
-    avgHours: formatMinutesAsHhMm(getAvgMinutesPerDayInWeek(records, targetEmployeeId)),
-    onTimeArrival: calculateOnTimePercent(myRecords), // Monthly on-time % for user
-    teamAvgHours: calculateAvgHours(records),         // Monthly avg hours for team
-    teamOnTime: todayRecords.length > 0 ? calculateOnTimePercent(todayRecords) : calculateOnTimePercent(records)  // Fallback to monthly if today is empty
+    avgHours: formatMinutesAsHhMm(meStats.avgMinutes),
+    onTimeArrival: `${meStats.onTimePercent}%`,
+    teamAvgHours: formatMinutesAsHhMm(teamStats.avgMinutes),
+    teamOnTime: `${teamStats.onTimePercent}%`
   };
 };
 
@@ -139,35 +69,29 @@ const Dashboard = () => {
 
   // Attendance state with localStorage persistence (only for employees and HR managers)
   const [attendanceState, setAttendanceState] = useState(() => {
-    if (isManagerOnly) return null; // Regular managers don't need attendance state
+    // Note: Previously we excluded isManagerOnly, but managers are also employees 
+    // who need to see their own status (e.g. from biometric sync).
 
-    // const saved = localStorage.getItem(`attendance_${user?.id}`);
-    // if (saved) {
-    //   const parsed = JSON.parse(saved);
-    //   return {
-    //     ...parsed,
-    //     checkInTime: parsed.checkInTime ? new Date(parsed.checkInTime) : null,
-    //     workingHours: 0,
-    //     workingMinutes: 0,
-    //     workingSeconds: 0
-    //   };
-    // }
     const saved = localStorage.getItem(`attendance_${user?.id}`);
     if (saved) {
-      JSON.parse(saved);
-
-      // ❗ DO NOT auto-check-in from storage
-      return {
-        isCheckedIn: false,
-        checkInTime: null,
-        workingHours: 0,
-        workingMinutes: 0,
-        workingSeconds: 0,
-        isWorkFromHome: false,
-        todayAttendance: null,
-        pendingSubmission: false,
-        _restored: true // marker only
-      };
+      try {
+        const parsed = JSON.parse(saved);
+        // We restore isCheckedIn from storage for immediate UI response.
+        // checkTodayAttendance() will then sync with the server truth.
+        return {
+          isCheckedIn: parsed.isCheckedIn || false,
+          checkInTime: parsed.checkInTime ? new Date(parsed.checkInTime) : null,
+          workingHours: 0,
+          workingMinutes: 0,
+          workingSeconds: 0,
+          isWorkFromHome: parsed.isWorkFromHome || false,
+          todayAttendance: null,
+          pendingSubmission: parsed.pendingSubmission || false,
+          _restored: true
+        };
+      } catch (e) {
+        console.error('Failed to parse saved attendance state', e);
+      }
     }
     return {
       isCheckedIn: false,
@@ -188,6 +112,10 @@ const Dashboard = () => {
   }, [attendanceState]);
 
   const [submittingAttendance, setSubmittingAttendance] = useState(false);
+
+  // Auto alert dismissed state (per session)
+  const [dismissedAlerts, setDismissedAlerts] = useState({ late: false, forgotCheckout: false, onTime: false });
+  const dismissAlert = (key) => setDismissedAlerts(prev => ({ ...prev, [key]: true }));
 
   // WFH related state (only for employees and HR managers)
   const [showWFHPopup, setShowWFHPopup] = useState(false);
@@ -268,11 +196,57 @@ const Dashboard = () => {
       clearInterval(poolTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isManagerOnly]);
+  }, [isManagerOnly, user?.id, user?.employee_id]);
 
   // ===================
   // API FUNCTIONS
   // ===================
+
+  const syncAttendanceFromRecords = (records, silent = false) => {
+    if (!records || records.length === 0) return;
+
+    const todayStr = toLocalDate(new Date());
+    const targetId = user?.employee_id || user?.employee_pk || user?.id;
+
+    // Standardized matching logic used by alerts and UI
+    const todayRecord = records.find(r => {
+      if (r.date !== todayStr) return false;
+      const rId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
+      const rPK = r.employee?.id || r.employee;
+      
+      return (
+        String(rId) === String(targetId) || 
+        String(rPK) === String(user?.employee_pk) || 
+        String(rPK) === String(user?.id)
+      );
+    });
+
+    if (todayRecord && todayRecord.check_in_time && (!todayRecord.check_out_time || todayRecord.check_out_time === todayRecord.check_in_time)) {
+      const reconstructedCheckIn = new Date(`${todayRecord.date}T${todayRecord.check_in_time}`);
+      
+      setAttendanceState(prev => ({
+        ...(prev || {}),
+        isCheckedIn: true,
+        checkInTime: reconstructedCheckIn,
+        isWorkFromHome: todayRecord.attendance_type === 'WFH' || todayRecord.notes?.includes('Work from Home'),
+        todayAttendance: todayRecord,
+        pendingSubmission: prev?.pendingSubmission || false
+      }));
+    } else if (todayRecord?.check_out_time && todayRecord.check_out_time !== todayRecord.check_in_time) {
+      // Record exists and is completed (checked out)
+      setAttendanceState(prev => ({
+        ...(prev || {}),
+        isCheckedIn: false,
+        checkInTime: null,
+        isWorkFromHome: false,
+        todayAttendance: todayRecord,
+        pendingSubmission: false
+      }));
+    } else if (!todayRecord && !silent) {
+       // Only reset if we are sure no record exists (not a silent background check)
+       // This prevents flickering while data is loading
+    }
+  };
 
   const fetchBirthdayFestivalData = async () => {
     try {
@@ -346,29 +320,42 @@ const Dashboard = () => {
       const wfhTodayData = results[5]?.data || [];
 
       if (isManagerOrAbove) {
+        // Find recent attendance for the current user from the stats list
+        const myRecentAttendance = allAttendance.filter(r => {
+          const rId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
+          const targetId = user?.employee_id || user?.employee_pk || user?.id;
+          return String(rId) === String(targetId);
+        }).slice(0, 7);
+
         setDashboardData(prev => ({
           ...prev,
           employees: results[0]?.data?.results || results[0]?.data || [],
           pendingLeaves: results[1]?.data?.results || results[1]?.data || [],
           approvedLeaves: results[2]?.data?.results || results[2]?.data || [],
+          recentActivity: myRecentAttendance,
           attendanceStats: stats,
           onLeaveToday: onLeaveTodayData,
           wfhToday: wfhTodayData,
           currentTime: new Date(),
           loading: false
         }));
+        // Sync attendance state for managers too
+        syncAttendanceFromRecords(allAttendance, silent);
       } else {
+        const recentActivity = results[1]?.data?.results || results[1]?.data || [];
         setDashboardData(prev => ({
           ...prev,
           leaveBalances: results[0].data.leave_balances || [],
           leaveSummary: results[0].data,
-          recentActivity: results[1]?.data?.results || results[1]?.data || [],
+          recentActivity: recentActivity,
           attendanceStats: stats,
           onLeaveToday: onLeaveTodayData,
           wfhToday: wfhTodayData,
           currentTime: new Date(),
           loading: false
         }));
+        // Sync attendance state from the personal records fetched
+        syncAttendanceFromRecords(recentActivity, silent);
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -394,72 +381,23 @@ const Dashboard = () => {
 
     try {
       const today = toLocalDate(new Date());
-      const response = await attendanceAPI.getAttendanceRecords({
+      // For regular employees, the backend already handles isolation.
+      // We only pass employee_id if we have it and it's a specific requirement.
+      const params = {
         start_date: today,
-        end_date: today,
-        employee_id: user?.employee_id
-      });
-
-      const allRecords = response.data?.results || response.data || [];
-      console.log('📡 Today attendance records:', allRecords);
-
-      // Safety filter: ensure we only look at the current user's record
-      const myTodayRecords = allRecords.filter(r => {
-        const recordEmpId = r.employee?.id || r.employee;
-        return String(recordEmpId) === String(user?.employee_id);
-      });
-
-      const todayRecord = myTodayRecords.length > 0 ? myTodayRecords[0] : null;
-
-      if (todayRecord && todayRecord.check_in_time && !todayRecord.check_out_time) {
-        const reconstructedCheckIn = new Date(
-          `${todayRecord.date}T${todayRecord.check_in_time}`
-        );
-
-        // ✅ Only restore state if this session created it
-        const wasThisSession = localStorage.getItem(`attendance_${user?.id}`);
-
-        if (wasThisSession) {
-          // User checked in during this browser session - restore the UI state
-          setAttendanceState(prev => ({
-            ...(prev || {}),
-            isCheckedIn: true,
-            checkInTime: reconstructedCheckIn,
-            isWorkFromHome: todayRecord.notes?.includes('Work from Home') || false,
-            todayAttendance: todayRecord,
-            pendingSubmission: true
-          }));
-        } else {
-          // User checked in from another device/session - restore state but respect server truth
-          setAttendanceState(prev => ({
-            ...(prev || {}),
-            isCheckedIn: true,  // ✅ Show as checked in since server says so
-            checkInTime: reconstructedCheckIn,
-            isWorkFromHome: todayRecord.attendance_type === 'WFH' || todayRecord.notes?.includes('Work from Home'),
-            todayAttendance: todayRecord,
-            pendingSubmission: false
-          }));
-        }
-      } else {
-        // No active check-in found for today (or already checked out)
-        // Reset state to ensure UI is in sync with server truth
-        setAttendanceState(prev => {
-          if (!prev?.isCheckedIn) return prev; // Already not checked in, avoid ripple updates
-
-          return {
-            ...prev,
-            isCheckedIn: false,
-            checkInTime: null,
-            isWorkFromHome: false,
-            pendingSubmission: false
-          };
-        });
-
-        // Also cleanup local storage if we're definitely not checked in anymore
-        if (user?.id) {
-          localStorage.removeItem(`attendance_${user.id}`);
-        }
+        end_date: today
+      };
+      
+      // Only add employee_id filter if it exists and we're not a regular employee
+      // (regular employees are already scoped by backend)
+      if (user?.employee_id && isManagerOrAbove) {
+        params.employee_id = user.employee_id;
       }
+
+      const response = await attendanceAPI.getAttendanceRecords(params);
+      const allRecords = response.data?.results || response.data || [];
+      
+      syncAttendanceFromRecords(allRecords, silent);
     } catch (error) {
       console.error('Failed to check today attendance/WFH:', error);
     }
@@ -1209,6 +1147,226 @@ const Dashboard = () => {
   };
 
   // ===================
+  // AUTO ALERTS
+  // ===================
+
+  // Compute which alerts are active based on current time + attendance.
+  // Uses recentActivity (API-fetched records) as ground truth to cover biometric
+  // and any non-web check-ins where attendanceState may not be updated.
+  const computeAutoAlerts = () => {
+    if (isManagerOnly || !attendanceState) return { isLate: false, forgotCheckout: false, hasCheckedIn: false, checkInTime: null, isOnTime: false };
+
+    const now = dashboardData.currentTime;
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const totalMinutes = currentHour * 60 + currentMinute;
+
+    // Check real API records for today (covers biometric + web check-ins)
+    const todayStr = toLocalDate(now);
+    const recentRecords = dashboardData.recentActivity || [];
+    
+    // Filter specifically for the current user's record today
+    // (relevant for managers who might have multiple people's data in records)
+    const todayApiRecord = recentRecords.find(r => {
+      if (r.date !== todayStr) return false;
+      const rId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
+      const targetId = user?.employee_id || user?.employee_pk || user?.id;
+      return String(rId) === String(targetId);
+    });
+
+    // Employee has attended today if:
+    //  1. Web UI state says checked in, OR
+    //  2. todayAttendance is set from checkTodayAttendance, OR
+    //  3. A fetched attendance record exists for today (biometric / other device)
+    const todayRecord = attendanceState.todayAttendance || todayApiRecord;
+    const hasCheckedInToday = attendanceState.isCheckedIn || !!todayRecord;
+
+    // "Late" logic (Office starts at 10:00 AM)
+    const lateThresholdMinutes = 10 * 60 + 5; // 10:05 AM (5 min grace period)
+
+    let isLate = false;
+    let checkInTimeStr = null;
+
+    if (hasCheckedInToday) {
+      // Find the EARLIEST check-in time across all sources
+      let earliestCheckInMinutes = Infinity;
+      let displayTime = null;
+
+      // 1. Check API record
+      const recordToProcess = attendanceState.todayAttendance || todayApiRecord;
+      if (recordToProcess && recordToProcess.check_in_time) {
+        const [h, m] = recordToProcess.check_in_time.split(':').map(Number);
+        const minutes = h * 60 + m;
+        if (minutes < earliestCheckInMinutes) {
+          earliestCheckInMinutes = minutes;
+          displayTime = recordToProcess.check_in_time;
+        }
+      }
+
+      // 2. Check Web memory state (might be earlier than synced record)
+      if (attendanceState.checkInTime) {
+        const h = attendanceState.checkInTime.getHours();
+        const m = attendanceState.checkInTime.getMinutes();
+        const minutes = h * 60 + m;
+        if (minutes < earliestCheckInMinutes) {
+          earliestCheckInMinutes = minutes;
+          displayTime = attendanceState.checkInTime;
+        }
+      }
+
+      // 3. Evaluate if late
+      if (earliestCheckInMinutes !== Infinity && earliestCheckInMinutes > lateThresholdMinutes) {
+        isLate = true;
+        checkInTimeStr = formatTime(displayTime);
+      }
+    } else {
+      // Still haven't checked in, and past threshold
+      if (totalMinutes >= lateThresholdMinutes) {
+        isLate = true;
+      }
+    }
+
+    // "Forgot to check out" = after 7:00 PM and an active check-in exists (no checkout yet)
+    const checkoutThresholdMinutes = 19 * 60; // 7:00 PM
+    const hasActiveCheckIn =
+      attendanceState.isCheckedIn ||
+      (todayApiRecord && todayApiRecord.check_in_time && !todayApiRecord.check_out_time);
+
+    const forgotCheckout = totalMinutes >= checkoutThresholdMinutes && hasActiveCheckIn;
+
+    const isOnTime = hasCheckedInToday && !isLate;
+    const isWorkFromHome = (todayRecord?.attendance_type === 'WFH') || 
+                          (todayRecord?.notes?.includes('Work from Home')) || 
+                          (attendanceState.isWorkFromHome);
+
+    return { 
+      isLate, 
+      forgotCheckout, 
+      hasCheckedIn: hasCheckedInToday, 
+      checkInTime: checkInTimeStr, 
+      isOnTime,
+      isWorkFromHome
+    };
+  };
+
+  const autoAlerts = computeAutoAlerts();
+
+  const AutoAlerts = () => {
+    if (isManagerOnly) return null;
+
+    const alerts = [];
+
+    if (autoAlerts.isLate && !dismissedAlerts.late) {
+      const isMissing = !autoAlerts.hasCheckedIn;
+      alerts.push({
+        key: 'late',
+        emoji: isMissing ? '⏰' : '⚠️',
+        title: isMissing ? 'You are late today' : 'Late Arrival Recorded',
+        subtitle: isMissing
+          ? 'It looks like you haven\'t checked in yet. Please check in as soon as possible.'
+          : `You checked in at ${autoAlerts.checkInTime}, which is after the 10:00 AM shift start.`,
+        gradient: isMissing
+          ? 'from-rose-500/20 via-orange-500/15 to-amber-500/10'
+          : 'from-orange-500/15 via-amber-500/10 to-transparent',
+        border: isMissing ? 'border-rose-500/30' : 'border-orange-500/30',
+        icon_bg: isMissing ? 'bg-rose-500/20' : 'bg-orange-500/20',
+        icon_color: isMissing ? 'text-rose-400' : 'text-orange-400',
+        accent: isMissing ? 'text-rose-300' : 'text-orange-300',
+        pulse: isMissing ? 'bg-rose-500' : 'bg-orange-500',
+        action: isMissing ? () => document.getElementById('checkin-btn')?.click() : null,
+        actionLabel: isMissing ? 'Check In Now' : null
+      });
+    }
+
+    if (autoAlerts.isOnTime && !dismissedAlerts.onTime) {
+      alerts.push({
+        key: 'onTime',
+        emoji: '🙌',
+        title: 'Great job!',
+        subtitle: 'You arrived on time today. Keep up the excellent work! 🚀',
+        gradient: 'from-emerald-500/20 via-teal-500/15 to-transparent',
+        border: 'border-emerald-500/30',
+        icon_bg: 'bg-emerald-500/20',
+        icon_color: 'text-emerald-400',
+        accent: 'text-emerald-300',
+        pulse: 'bg-emerald-500',
+        action: null,
+        actionLabel: null
+      });
+    }
+
+    if (autoAlerts.forgotCheckout && !dismissedAlerts.forgotCheckout) {
+      alerts.push({
+        key: 'forgotCheckout',
+        emoji: '🔔',
+        title: 'Forgot to check out?',
+        subtitle: 'You are still marked as checked in. Don\'t forget to check out before you leave!',
+        gradient: 'from-amber-500/20 via-yellow-500/15 to-orange-500/10',
+        border: 'border-amber-500/30',
+        icon_bg: 'bg-amber-500/20',
+        icon_color: 'text-amber-400',
+        accent: 'text-amber-300',
+        pulse: 'bg-amber-400',
+        action: null,
+        actionLabel: null
+      });
+    }
+
+    if (alerts.length === 0) return null;
+
+    return (
+      <div className="space-y-3 mb-6">
+        {alerts.map((alert) => (
+          <div
+            key={alert.key}
+            className={`relative flex items-start justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r ${alert.gradient} border ${alert.border} backdrop-blur-sm shadow-lg overflow-hidden group animate-in slide-in-from-top-2 duration-500`}
+          >
+            {/* Animated shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out pointer-events-none" />
+
+            <div className="flex items-start space-x-4">
+              {/* Icon */}
+              <div className={`flex-shrink-0 w-11 h-11 ${alert.icon_bg} rounded-xl flex items-center justify-center text-xl shadow-inner border border-white/10`}>
+                {alert.emoji}
+              </div>
+
+              {/* Text */}
+              <div>
+                <div className="flex items-center space-x-2 mb-0.5">
+                  <div className={`w-2 h-2 ${alert.pulse} rounded-full animate-pulse`} />
+                  <h4 className={`text-sm font-bold ${alert.accent} uppercase tracking-wider`}>
+                    {alert.title}
+                  </h4>
+                </div>
+                <p className="text-slate-400 text-xs leading-relaxed">{alert.subtitle}</p>
+                {alert.actionLabel && (
+                  <button
+                    onClick={alert.action}
+                    className={`mt-2 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${alert.icon_bg} ${alert.accent} border ${alert.border} hover:bg-white/10 transition-colors`}
+                  >
+                    {alert.actionLabel}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Dismiss button */}
+            <button
+              onClick={() => dismissAlert(alert.key)}
+              className="flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-white/5"
+              title="Dismiss"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // ===================
   // MAIN RENDER
   // ===================
 
@@ -1252,17 +1410,17 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex items-center space-x-6">
-            {/* Role-based Status Display */}
-            {!isManagerOnly && attendanceState && (
+            {/* Enhanced Status Display (Syncs with ground truth from alerts) */}
+            {attendanceState && (
               <div className="text-right">
-                <div className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-md border border-white/10 ${attendanceState.isCheckedIn
-                  ? attendanceState.isWorkFromHome
+                <div className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-md border border-white/10 ${autoAlerts.hasCheckedIn
+                  ? autoAlerts.isWorkFromHome
                     ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
                     : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                   : 'bg-white/5 text-slate-400 border-white/10'
                   }`}>
-                  {attendanceState.isCheckedIn
-                    ? attendanceState.isWorkFromHome ? '🏠 Working from Home' : '🏢 Checked In'
+                  {autoAlerts.hasCheckedIn
+                    ? autoAlerts.isWorkFromHome ? '🏠 Working from Home' : '🏢 Checked In'
                     : '⏸️ Not Checked In'
                   }
                 </div>
@@ -1290,6 +1448,9 @@ const Dashboard = () => {
 
 
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Auto Alerts */}
+        <AutoAlerts />
+
         {/* Birthday Banner */}
         <BirthdayBanner />
 
@@ -1389,35 +1550,29 @@ const Dashboard = () => {
 
                   <div className="space-y-4">
                     {!attendanceState.isCheckedIn ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          onClick={() => handleCheckIn(false)}
-                          disabled={submittingAttendance || (attendanceState?.isCheckedIn && attendanceState?.isWorkFromHome && !isHRManager())}
-                          className="flex items-center justify-center py-3.5 px-4 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-indigo-600/20 text-xs tracking-widest uppercase"
-                        >
-                          CHECK IN
-                        </button>
-
-                        <button
-                          onClick={handleCheckOut}
-                          disabled={submittingAttendance || !attendanceState.isCheckedIn}
-                          className={`flex items-center justify-center py-3.5 px-4 rounded-xl font-bold transition-all duration-300 text-xs tracking-widest uppercase ${!attendanceState.isCheckedIn
-                            ? 'bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700'
-                            : 'bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-600/20'
-                            }`}
-                        >
-                          CHECK OUT
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleCheckIn(false)}
+                        disabled={submittingAttendance}
+                        className="w-full flex items-center justify-center py-4 px-6 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-indigo-600/20 text-xs tracking-widest uppercase"
+                      >
+                        {submittingAttendance ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-3"></div>
+                            <span>Processing...</span>
+                          </>
+                        ) : (
+                          'CHECK IN'
+                        )}
+                      </button>
                     ) : (
                       <button
                         onClick={handleCheckOut}
                         disabled={submittingAttendance}
-                        className="w-full flex items-center justify-center py-4 px-6 bg-white/10 text-white hover:bg-white/20 rounded-xl font-bold transition-all duration-300 shadow-xl text-xs tracking-widest uppercase border border-white/10"
+                        className="w-full flex items-center justify-center py-4 px-6 bg-rose-600 text-white hover:bg-rose-700 rounded-xl font-bold transition-all duration-300 shadow-xl shadow-rose-600/20 text-xs tracking-widest uppercase border border-rose-500/10"
                       >
                         {submittingAttendance ? (
                           <>
-                            <div className="w-4 h-4 border-2 border-slate-200 border-t-indigo-600 rounded-full animate-spin mr-3"></div>
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-3"></div>
                             <span>Processing...</span>
                           </>
                         ) : (
@@ -1448,7 +1603,7 @@ const Dashboard = () => {
             <QuickAccessCard title="📊 Attendance Statistics" gradient={true}>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl border border-white/5 shadow-inner bg-white/5">
-                  <div className="text-[10px] font-bold uppercase mb-2 text-indigo-400 tracking-wider">My Performance</div>
+                  <div className="text-[10px] font-bold uppercase mb-2 text-indigo-400 tracking-wider">My Performance (Last Week)</div>
                   <div className="flex justify-between items-end">
                     <div>
                       <div className="text-2xl font-black text-white">{dashboardData.attendanceStats?.avgHours}</div>
@@ -1462,7 +1617,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="bg-gradient-to-br from-indigo-500/10 to-violet-500/10 p-4 rounded-xl border border-indigo-500/20 shadow-inner">
-                  <div className="text-[10px] font-bold text-indigo-300 uppercase mb-2 tracking-wider">Team Overview</div>
+                  <div className="text-[10px] font-bold text-indigo-300 uppercase mb-2 tracking-wider">Team Overview (Last Week)</div>
                   <div className="flex justify-between items-end">
                     <div>
                       <div className="text-2xl font-black text-white">{dashboardData.attendanceStats?.teamAvgHours}</div>
@@ -1475,8 +1630,8 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 text-[10px] text-slate-400 font-medium text-center italic">
-                * Same period as Attendance page default: last 30 days (Mon–Sun weekly avg. hrs/day)
+              <div className="mt-4 text-center">
+                <p className="text-[9px] text-slate-500 italic opacity-75">* Stats are for the last completed week (Mon-Sun)</p>
               </div>
             </QuickAccessCard>
             {/* Manager/HR Quick Access */}

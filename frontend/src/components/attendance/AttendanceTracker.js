@@ -13,19 +13,46 @@ import {
   ExclamationTriangleIcon,
   SparklesIcon,
   PlusIcon,
-  ServerIcon,
-  ArrowPathIcon
+  ServerIcon
 } from '@heroicons/react/24/outline';
-import { attendanceAPI, authAPI } from '../../services/api';
-import { isHRManager, isManager } from '../../utils/auth';
-import { formatDate, formatTime } from '../../utils/formatters';
+import { attendanceAPI, authAPI, employeeAPI } from '../../services/api';
+import { isHRManager, isManager, getUserRole, isAdmin } from '../../utils/auth';
+import { ROLE_CATEGORIES } from '../../utils/roleConfig';
+import { formatDate } from '../../utils/formatters';
 import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Table from '../common/Table';
 import Modal from '../common/Modal';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { getAvgMinutesPerDayInWeek } from '../../utils/attendanceStats';
+import { getAvgMinutesPerWeek, getLastWeekRange, getStatsForPeriod, getTotalMinutesThisWeek } from '../../utils/attendanceStats';
+import AttendanceTrends from './AttendanceTrends';
+
+
+const toLocalYMD = (date) => {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+};
+
+/** Admin, HR, or C-level: org-wide attendance with tighter default range + filter bar */
+const isOrgWideAttendanceRole = () => {
+  const role = getUserRole();
+  return isAdmin() || isHRManager() || ROLE_CATEGORIES.C_LEVEL.includes(role);
+};
+
+const getDefaultFilters = () => {
+  const now = new Date();
+  const end = toLocalYMD(now);
+  const start = new Date(now);
+  const daysBack = isOrgWideAttendanceRole() ? 6 : 29;
+  start.setDate(start.getDate() - daysBack);
+  return {
+    start_date: toLocalYMD(start),
+    end_date: end,
+    status: '',
+    employee_id: ''
+  };
+};
 const AttendanceVisual = ({ logs }) => {
   if (!logs || logs.length === 0) return <div className="h-4 w-full bg-white/5 rounded-full border border-white/5"></div>;
   const sortedLogs = [...logs].sort((a, b) => a.time.localeCompare(b.time));
@@ -97,22 +124,14 @@ const AttendanceTracker = () => {
     presentDays: 0,
     absentDays: 0,
     lateDays: 0,
-    avgMinutesPerDayInWeek: 0,
-    onTimePercent: 0
+    avgMinutesPerWeek: 0,
+    totalMinutesThisWeek: 0,
+    onTimePercent: 0,
+    lastWeekMe: { avgMinutes: 0, onTimePercent: 0 },
+    lastWeekTeam: { avgMinutes: 0, onTimePercent: 0 }
   });
-  // Default date ranges: Start of current month to today
-  const getLast30Days = () => {
-    const now = new Date();
-    now.setDate(now.getDate() - 30);
-    return now.toISOString().split('T')[0];
-  };
-  const getTodayDate = () => new Date().toISOString().split('T')[0];
-  const [filters, setFilters] = useState({
-    start_date: getLast30Days(),
-    end_date: getTodayDate(),
-    status: '',
-    employee_id: ''
-  });
+  const [filters, setFilters] = useState(() => getDefaultFilters());
+  const [orgEmployeeOptions, setOrgEmployeeOptions] = useState([]);
   const filtersRef = useRef(filters);
   const employeeFromUrlRef = useRef('');
   useEffect(() => {
@@ -130,6 +149,8 @@ const AttendanceTracker = () => {
   const [use24Hour, setUse24Hour] = useState(false);
   const [now, setNow] = useState(new Date());
   const [permissions, setPermissions] = useState([]);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+
   // Check if user is HR Manager or Manager - both get management interface
   const isManagementRole = isHRManager() || isManager();
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
@@ -138,7 +159,7 @@ const AttendanceTracker = () => {
       status: 'PRESENT'
     }
   });
-  const { register: registerApproval, handleSubmit: handleApprovalSubmit, reset: resetApproval, formState: { errors: approvalErrors } } = useForm();
+  const { register: registerApproval, handleSubmit: handleApprovalSubmit, reset: resetApproval } = useForm();
   const selectedDate = watch('date');
   // Load biometric devices
   useEffect(() => {
@@ -184,6 +205,21 @@ const AttendanceTracker = () => {
     fetchAttendanceRecords();
     fetchUserPendingRequests();
   }, [filters]);
+
+  useEffect(() => {
+    if (!isOrgWideAttendanceRole()) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await employeeAPI.getEmployees({ page_size: 500, status: 'ACTIVE' });
+        const rows = res.data?.results || res.data || [];
+        if (!cancelled) setOrgEmployeeOptions(Array.isArray(rows) ? rows : []);
+      } catch (_) {
+        if (!cancelled) setOrgEmployeeOptions([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
@@ -285,16 +321,35 @@ const AttendanceTracker = () => {
     const presentDays = approvedRecords.filter(r => r.status === 'PRESENT' && !isLate(r.check_in_time)).length;
     const absentDays = approvedRecords.filter(r => r.status === 'ABSENT').length;
     const lateDays = approvedRecords.filter(r => r.status === 'LATE' || isLate(r.check_in_time)).length;
-    const avgMinutesPerDayInWeek = getAvgMinutesPerDayInWeek(records, scopedEmployeeId);
+    const avgMinutesPerWeek = getAvgMinutesPerWeek(records, scopedEmployeeId);
+    const totalMinutesThisWeek = getTotalMinutesThisWeek(records, scopedEmployeeId);
     const onTimeBase = presentDays + lateDays;
     const onTimePercent = onTimeBase > 0 ? Math.round((presentDays / onTimeBase) * 100) : 0;
+
+    // Calculate Last Week stats for "Me" and "Team"
+    const { start: lwStart, end: lwEnd } = getLastWeekRange();
+    const lastWeekMe = getStatsForPeriod(records, scopedEmployeeId || user?.employee_id, lwStart, lwEnd);
+
+    // For team stats: if manager, use their team records. If not, use organizational average from fetched records
+    const otherRecords = records.filter(r => {
+      const rId = r.display_id || r.employee_id || (r.employee && (r.employee.employee_id || r.employee.id));
+      return String(rId) !== String(scopedEmployeeId || user?.employee_id);
+    });
+
+    const lastWeekTeam = otherRecords.length > 0
+      ? getStatsForPeriod(records, null, lwStart, lwEnd) // Passing null to catch all in period for team average
+      : { avgMinutes: 0, onTimePercent: 0 };
+
     setStats({
       totalDays: approvedRecords.length,
       presentDays,
       absentDays,
       lateDays,
-      avgMinutesPerDayInWeek,
-      onTimePercent
+      avgMinutesPerWeek,
+      totalMinutesThisWeek,
+      onTimePercent,
+      lastWeekMe,
+      lastWeekTeam
     });
   };
   const minutesToHHMM = (m) => {
@@ -413,9 +468,7 @@ const AttendanceTracker = () => {
   };
   const clearFilters = () => {
     setFilters({
-      start_date: getLast30Days(),
-      end_date: getTodayDate(),
-      status: '',
+      ...getDefaultFilters(),
       employee_id: employeeFromUrlRef.current || ''
     });
   };
@@ -797,6 +850,18 @@ const AttendanceTracker = () => {
                 <DocumentChartBarIcon className="h-5 w-5 mr-3 text-indigo-400 group-hover:scale-125 transition-transform" />
                 Export Dataset
               </button>
+              <button
+                onClick={() => setShowAnalytics(v => !v)}
+                className={`group flex items-center px-8 py-5 border text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-2xl ${
+                  showAnalytics
+                    ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                }`}
+              >
+                <SparklesIcon className="h-5 w-5 mr-3 text-indigo-400 group-hover:scale-125 transition-transform" />
+                {showAnalytics ? 'Hide Analytics' : 'Analytics'}
+              </button>
+
             </div>
           </div>
         </div>
@@ -825,30 +890,58 @@ const AttendanceTracker = () => {
         )}
         {/* Overview Row: Stats Summary, Timings, Actions */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-12">
-          {/* Stats Summary */}
+          {/* Attendance Stats (Me vs Team) - Redesigned to match sample */}
           <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-8 shadow-2xl relative overflow-hidden group">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Attendance Equilibrium</h3>
-              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-tighter bg-indigo-500/10 px-2 py-0.5 rounded-full">Current Epoch</span>
+              <h3 className="text-2xl font-black text-white uppercase tracking-tight">Attendance Stats</h3>
+              <div className="flex items-center space-x-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Last Week</span>
+                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-6">
-              <div className="p-6 rounded-3xl bg-white/5 border border-white/5 group-hover:border-indigo-500/30 transition-all shadow-inner">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Avg Hours / Day (This Week)</p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <ClockIcon className="h-6 w-6 text-indigo-400 mr-3" />
-                    <p className="text-xl font-black text-white uppercase tracking-tight">{minutesToHHMM(stats.avgMinutesPerDayInWeek)}</p>
-                  </div>
+
+            <div className="space-y-6">
+              {/* Header Labels */}
+              <div className="flex items-center justify-between px-2">
+                <div className="w-1/3"></div>
+                <div className="flex-1 flex justify-around">
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Avg Hrs / Day</span>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">On Time Arrival</span>
                 </div>
               </div>
-              <div className="p-6 rounded-3xl bg-white/5 border border-white/5 group-hover:border-emerald-500/30 transition-all shadow-inner">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Presence Fidelity</p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <CheckCircleIcon className="h-6 w-6 text-emerald-400 mr-3" />
-                    <p className="text-xl font-black text-white uppercase tracking-tight">{stats.onTimePercent}%</p>
+
+              {/* Me Row */}
+              <div className="group/row flex items-center justify-between p-4 bg-white/5 rounded-[1.5rem] border border-white/5 hover:border-indigo-500/30 transition-all">
+                <div className="w-1/3 flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+                    <UserIcon className="h-5 w-5 text-amber-500" />
                   </div>
+                  <span className="text-sm font-black text-white uppercase tracking-wider">Me</span>
                 </div>
+                <div className="flex-1 flex justify-around items-center">
+                  <span className="text-lg font-black text-white tracking-tight">{minutesToHHMM(stats.lastWeekMe.avgMinutes)}</span>
+                  <span className="text-lg font-black text-white tracking-tight">{stats.lastWeekMe.onTimePercent}%</span>
+                </div>
+              </div>
+
+              {/* Team Row */}
+              <div className="group/row flex items-center justify-between p-4 bg-white/5 rounded-[1.5rem] border border-white/5 hover:border-blue-500/30 transition-all opacity-80 hover:opacity-100">
+                <div className="w-1/3 flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                    <SparklesIcon className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <span className="text-sm font-black text-slate-300 uppercase tracking-wider">My Team</span>
+                </div>
+                <div className="flex-1 flex justify-around items-center">
+                  <span className="text-lg font-black text-slate-300 tracking-tight">{minutesToHHMM(stats.lastWeekTeam.avgMinutes)}</span>
+                  <span className="text-lg font-black text-slate-300 tracking-tight">{stats.lastWeekTeam.onTimePercent}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute top-0 right-0 p-4">
+              <div className="h-6 w-6 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-600 hover:text-white hover:border-white/30 cursor-help transition-colors">
+                i
               </div>
             </div>
           </div>
@@ -949,13 +1042,6 @@ const AttendanceTracker = () => {
             trend="Late arrivals"
           />
           <StatCard
-            title="Avg Hours / Day"
-            value={minutesToHHMM(stats.avgMinutesPerDayInWeek)}
-            icon={ClockIcon}
-            gradient="from-gray-500 to-gray-600"
-            trend="Daily average (Mon–Sun week)"
-          />
-          <StatCard
             title="On-Time Arrival"
             value={`${stats.onTimePercent}%`}
             icon={CheckCircleIcon}
@@ -963,6 +1049,18 @@ const AttendanceTracker = () => {
             trend="Punctuality"
           />
         </div>
+
+        {/* ── Analytics Section ── */}
+        {showAnalytics && (
+          <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-8 mb-12 shadow-2xl">
+            <AttendanceTrends
+              theme={theme}
+              attendanceRecords={attendanceRecords}
+              isManagementRole={isManagementRole}
+            />
+          </div>
+        )}
+
         {/* Pending Edit Requests Section - Always show if requests exist, or for regular employees always */}
         {(!isManagementRole || userPendingRequests.length > 0) && (
           <div className="bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-8 shadow-xl">
@@ -1265,6 +1363,83 @@ const AttendanceTracker = () => {
             </form>
           </div>
         )}
+        {/* Admin / HR / C-level: explicit filters (defaults to last 7 days vs. full history) */}
+        {isOrgWideAttendanceRole() && (
+          <div className="mb-8 rounded-3xl overflow-hidden border border-indigo-500/20 bg-indigo-500/5 backdrop-blur-xl shadow-2xl">
+            <div className="px-6 py-4 border-b border-white/5 bg-white/5">
+              <div className="flex items-center gap-3">
+                <FunnelIcon className="h-5 w-5 text-indigo-400" />
+                <div>
+                  <h3 className="text-sm font-black text-white uppercase tracking-tight">Organization filters</h3>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                    Employee, date range, and status — loads last 7 days by default
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Employee</label>
+                <select
+                  value={filters.employee_id}
+                  onChange={(e) => handleFilterChange('employee_id', e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 [color-scheme:dark]"
+                >
+                  <option value="">All employees</option>
+                  {orgEmployeeOptions.map((emp) => {
+                    const label = emp.user_info?.full_name || `${emp.user?.first_name || ''} ${emp.user?.last_name || ''}`.trim() || emp.employee_id || `ID ${emp.id}`;
+                    return (
+                      <option key={emp.id} value={emp.employee_id || ''}>
+                        {label}{emp.employee_id ? ` (${emp.employee_id})` : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">From</label>
+                <input
+                  type="date"
+                  value={filters.start_date}
+                  onChange={(e) => handleFilterChange('start_date', e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">To</label>
+                <input
+                  type="date"
+                  value={filters.end_date}
+                  onChange={(e) => handleFilterChange('end_date', e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Status</label>
+                <select
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                >
+                  <option value="">All statuses</option>
+                  <option value="PRESENT">Present</option>
+                  <option value="ABSENT">Absent</option>
+                  <option value="LATE">Late</option>
+                  <option value="HALF_DAY">Half day</option>
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="w-full px-4 py-3 rounded-2xl bg-white/10 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-white/15 hover:text-white transition-all"
+                >
+                  Reset filters
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Filters */}
         {(() => {
           const today = new Date();
@@ -1276,30 +1451,47 @@ const AttendanceTracker = () => {
               month: d.getMonth(),
             };
           });
+          const isLast7Active = (() => {
+            const d7 = new Date(today);
+            d7.setDate(today.getDate() - 6);
+            return filters.start_date === toLocalYMD(d7) && filters.end_date === toLocalYMD(today);
+          })();
           const isLast30Active = (() => {
             const d30 = new Date(today);
             d30.setDate(today.getDate() - 29);
-            const expected_start = d30.toISOString().split('T')[0];
-            const expected_end = today.toISOString().split('T')[0];
-            return filters.start_date === expected_start && filters.end_date === expected_end;
+            return filters.start_date === toLocalYMD(d30) && filters.end_date === toLocalYMD(today);
           })();
           const activeMonthIndex = months.findIndex(m => {
-            const ms = new Date(m.year, m.month, 1).toISOString().split('T')[0];
-            const me = new Date(m.year, m.month + 1, 0).toISOString().split('T')[0];
-            return filters.start_date === ms && filters.end_date === me;
+            const ms = new Date(m.year, m.month, 1);
+            const me = new Date(m.year, m.month + 1, 0);
+            return filters.start_date === toLocalYMD(ms) && filters.end_date === toLocalYMD(me);
           });
+          const setLast7 = () => {
+            const d7 = new Date(today);
+            d7.setDate(today.getDate() - 6);
+            handleFilterChange('start_date', toLocalYMD(d7));
+            handleFilterChange('end_date', toLocalYMD(today));
+          };
           const setLast30 = () => {
             const d30 = new Date(today);
             d30.setDate(today.getDate() - 29);
-            handleFilterChange('start_date', d30.toISOString().split('T')[0]);
-            handleFilterChange('end_date', today.toISOString().split('T')[0]);
+            handleFilterChange('start_date', toLocalYMD(d30));
+            handleFilterChange('end_date', toLocalYMD(today));
           };
           const setMonth = (m) => {
-            const ms = new Date(m.year, m.month, 1).toISOString().split('T')[0];
-            const me = new Date(m.year, m.month + 1, 0).toISOString().split('T')[0];
-            handleFilterChange('start_date', ms);
-            handleFilterChange('end_date', me);
+            const ms = new Date(m.year, m.month, 1);
+            const me = new Date(m.year, m.month + 1, 0);
+            handleFilterChange('start_date', toLocalYMD(ms));
+            handleFilterChange('end_date', toLocalYMD(me));
           };
+          const orgWide = isOrgWideAttendanceRole();
+          const timelineLabel = orgWide && isLast7Active
+            ? 'LAST 7 DAYS'
+            : isLast30Active
+              ? 'LAST 30 CYCLES'
+              : activeMonthIndex >= 0
+                ? `${months[activeMonthIndex].label} ${months[activeMonthIndex].year}`
+                : 'CUSTOM SPEC';
           return (
             <div className="mb-8 rounded-3xl overflow-hidden border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl">
               <div className="flex flex-col md:flex-row md:items-center px-10 py-6 gap-6">
@@ -1308,11 +1500,21 @@ const AttendanceTracker = () => {
                     <FunnelIcon className="h-4 w-4 text-indigo-400" />
                   </div>
                   <span className="text-white text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                    Timeline Query: {isLast30Active ? 'LAST 30 CYCLES' : activeMonthIndex >= 0 ? `${months[activeMonthIndex].label} ${months[activeMonthIndex].year}` : 'CUSTOM SPEC'}
+                    Timeline Query: {timelineLabel}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
+                  {orgWide && (
+                    <button
+                      type="button"
+                      onClick={setLast7}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast7Active ? `bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5 text-slate-500 border border-white/5 hover:border-white/20'}`}
+                    >
+                      7 DAYS
+                    </button>
+                  )}
                   <button
+                    type="button"
                     onClick={setLast30}
                     className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast30Active ? `bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5 text-slate-500 border border-white/5 hover:border-white/20'}`}
                   >
@@ -1320,6 +1522,7 @@ const AttendanceTracker = () => {
                   </button>
                   {months.map((m, i) => (
                     <button
+                      type="button"
                       key={i}
                       onClick={() => setMonth(m)}
                       className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${activeMonthIndex === i ? `bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5 text-slate-500 border border-white/5 hover:border-white/20 hover:text-white'}`}
