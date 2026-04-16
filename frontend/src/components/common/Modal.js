@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
 
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-        <div className={`inline-block align-bottom bg-white/5 dark:bg-slate-900 border border-black/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle ${sizeClasses[size]} sm:w-full`}>
+        <div className={`inline-block align-bottom bg-white/5 dark:bg-slate-900 border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle ${sizeClasses[size]} sm:w-full`}>
           <div className="bg-transparent px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-start justify-between">
               <h3 className="text-xl leading-6 font-bold text-white">

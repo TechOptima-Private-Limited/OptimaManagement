@@ -102,14 +102,14 @@ const ForceChangePassword = () => {
 
                 <div className="flex items-center space-x-6">
                     <p className="text-[10px] font-black text-gray-700 uppercase tracking-widest">© 2026 TechOptima Global</p>
-                    <div className="h-px flex-1 bg-white/5/5" />
+                    <div className="h-px flex-1 bg-white/5" />
                 </div>
             </div>
 
             {/* ── Right: Change Password Card ── */}
             <div className="w-full lg:w-[45%] flex items-center justify-center p-6 relative z-10">
                 <div className="w-full max-w-[480px]">
-                    <div className="bg-white/5 dark:bg-slate-900/40 backdrop-blur-[40px] rounded-[3rem] border border-black/10 dark:border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
+                    <div className="bg-white/5 dark:bg-slate-900/40 backdrop-blur-[40px] rounded-[3rem] border border-white/10 dark:border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
 
                         <div className="mb-10 text-center sm:text-left">
@@ -167,7 +167,7 @@ const ForceChangePassword = () => {
                                 )}
                                 {/* Live complexity checklist */}
                                 {password && password.length > 0 && (
-                                    <div className="mt-3 space-y-1.5 p-3 rounded-xl bg-white/5/5 border border-white/10">
+                                    <div className="mt-3 space-y-1.5 p-3 rounded-xl bg-white/5 border border-white/10">
                                         {rulesStatus.map((rule) => (
                                             <div key={rule.id} className="flex items-center space-x-2">
                                                 {rule.passed

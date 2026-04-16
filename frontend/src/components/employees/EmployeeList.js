@@ -179,7 +179,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
         {/* Enhanced modal container */}
-        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-t-3xl sm:rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all duration-300 sm:my-8 sm:align-middle w-full sm:max-w-4xl border border-black/10 dark:border-white/10">
+        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-t-3xl sm:rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all duration-300 sm:my-8 sm:align-middle w-full sm:max-w-4xl border border-white/10 dark:border-white/10">
 
           {/* Enhanced header */}
           <div className="relative bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-[#0A0F1A] px-6 py-6 sm:px-8 border-b border-white/10">
@@ -244,7 +244,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={(e) => handleInputChange(e, 'user')}
                         className={`w-full px-4 py-2.5 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white placeholder-slate-600 ${errors.user?.username
                           ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                          : 'border-black/10 dark:border-white/10 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20'
+                          : 'border-white/10 dark:border-white/10 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20'
                           }`}
                         placeholder="e.g. jdoe"
                         required
@@ -267,7 +267,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           onChange={(e) => handleInputChange(e, 'user')}
                           className={`w-full px-4 py-2.5 pl-11 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white placeholder-slate-600 ${errors.user?.email
                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                            : 'border-black/10 dark:border-white/10 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20'
+                            : 'border-white/10 dark:border-white/10 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20'
                             }`}
                           placeholder="employee@company.com"
                           required
@@ -292,7 +292,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="first_name"
                           value={formData.user.first_name}
                           onChange={(e) => handleInputChange(e, 'user')}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white placeholder-slate-600"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white placeholder-slate-600"
                           placeholder="Jane"
                         />
                       </div>
@@ -304,7 +304,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="last_name"
                           value={formData.user.last_name}
                           onChange={(e) => handleInputChange(e, 'user')}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white placeholder-slate-600"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white placeholder-slate-600"
                           placeholder="Doe"
                         />
                       </div>
@@ -335,7 +335,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="role"
                           value={formData.profile.role}
                           onChange={(e) => handleInputChange(e, 'profile')}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none appearance-none cursor-pointer text-sm text-white"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none appearance-none cursor-pointer text-sm text-white"
                         >
                           <option value="EMPLOYEE" className="bg-[#0A0F1A]">Employee</option>
                           <option value="HR_MANAGER" className="bg-[#0A0F1A]">HR Manager</option>
@@ -359,7 +359,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={(e) => handleInputChange(e, 'profile')}
                         className={`w-full px-4 py-2.5 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white placeholder-slate-600 ${errors.profile?.phone_number
                           ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                          : 'border-black/10 dark:border-white/10 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20'
+                          : 'border-white/10 dark:border-white/10 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20'
                           }`}
                         placeholder="+1 (555) 000-0000"
                       />
@@ -374,7 +374,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="date_of_birth"
                           value={formData.profile.date_of_birth}
                           onChange={(e) => handleInputChange(e, 'profile')}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white [color-scheme:dark]"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white [color-scheme:dark]"
                         />
                       </div>
 
@@ -385,7 +385,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="emergency_contact"
                           value={formData.profile.emergency_contact}
                           onChange={(e) => handleInputChange(e, 'profile')}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white placeholder-slate-600"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white placeholder-slate-600"
                           placeholder="Contact Info"
                         />
                       </div>
@@ -412,7 +412,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                     name="address"
                     value={formData.profile.address}
                     onChange={(e) => handleInputChange(e, 'profile')}
-                    className="w-full px-4 py-3 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none resize-none text-sm text-white placeholder-slate-600 relative z-10"
+                    className="w-full px-4 py-3 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none resize-none text-sm text-white placeholder-slate-600 relative z-10"
                     placeholder="Enter full address"
                     rows="2"
                   />
@@ -443,7 +443,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={handleInputChange}
                         className={`w-full px-4 py-2.5 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white placeholder-slate-600 ${errors.employee_id
                           ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                          : 'border-black/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
+                          : 'border-white/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
                           }`}
                         placeholder="e.g. TO-00076"
                         required
@@ -460,7 +460,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           onChange={handleInputChange}
                           className={`w-full px-4 py-2.5 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white appearance-none cursor-pointer ${errors.department_id
                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                            : 'border-black/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
+                            : 'border-white/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
                             }`}
                           required
                         >
@@ -489,7 +489,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                         onChange={handleInputChange}
                         className={`w-full px-4 py-2.5 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white placeholder-slate-600 ${errors.position
                           ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                          : 'border-black/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
+                          : 'border-white/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
                           }`}
                         placeholder="e.g. Developer"
                         required
@@ -507,7 +507,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           onChange={handleInputChange}
                           className={`flex-1 px-4 py-2.5 bg-[#0A0F1A] border rounded-xl shadow-sm transition-all duration-300 outline-none text-sm text-white [color-scheme:dark] ${errors.hire_date
                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-                            : 'border-black/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
+                            : 'border-white/10 dark:border-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20'
                             }`}
                           required
                         />
@@ -532,7 +532,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                           name="manager"
                           value={formData.manager}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-xl shadow-sm focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white appearance-none cursor-pointer"
+                          className="w-full px-4 py-2.5 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-xl shadow-sm focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 hover:border-black/20 dark:border-white/20 transition-all duration-300 outline-none text-sm text-white appearance-none cursor-pointer"
                         >
                           <option value="" className="bg-[#0A0F1A]">None / Top Level</option>
                           {employees.map((emp) => (
@@ -555,11 +555,11 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Enhanced Footer */}
-          <div className="bg-white/5/5 px-6 py-5 sm:px-8 flex flex-col-reverse sm:flex-row justify-end space-y-2 space-y-reverse sm:space-y-0 sm:space-x-3 border-t border-white/10 relative z-10 backdrop-blur-md">
+          <div className="bg-white/5 px-6 py-5 sm:px-8 flex flex-col-reverse sm:flex-row justify-end space-y-2 space-y-reverse sm:space-y-0 sm:space-x-3 border-t border-white/10 relative z-10 backdrop-blur-md">
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-black/10 dark:border-white/10 px-6 py-2.5 bg-transparent text-sm font-bold text-slate-300 hover:bg-white/5/5 hover:text-white transition-all duration-300"
+              className="w-full sm:w-auto inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 px-6 py-2.5 bg-transparent text-sm font-bold text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-300"
             >
               Cancel
             </button>
@@ -601,7 +601,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, employee, loading
         {/* Modal centering trick */}
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-black/10 dark:border-white/10">
+        <div className="relative inline-block align-bottom bg-[#0A0F1A] rounded-3xl text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10 dark:border-white/10">
           <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-50"></div>
 
           <div className="px-6 pt-8 pb-6 sm:p-8 sm:pb-6">
@@ -615,14 +615,14 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, employee, loading
                 </h3>
                 <div className="mt-3">
                   <p className="text-sm text-slate-400 font-medium leading-relaxed">
-                    Are you sure you want to delete <span className="font-bold text-white bg-white/5/5 px-2 py-0.5 rounded-md border border-black/10 dark:border-white/10">{employee.user_info?.full_name || employee.user?.username || employee.employee_id}</span>?
+                    Are you sure you want to delete <span className="font-bold text-white bg-white/5 px-2 py-0.5 rounded-md border border-white/10 dark:border-white/10">{employee.user_info?.full_name || employee.user?.username || employee.employee_id}</span>?
                     This action cannot be undone and will permanently remove all associated data.
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-white/5/5 backdrop-blur-md px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-white/10">
+          <div className="bg-white/5 backdrop-blur-md px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-white/10">
             <button
               type="button"
               onClick={onConfirm}
@@ -641,7 +641,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, employee, loading
             <button
               type="button"
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-xl border border-black/10 dark:border-white/10 shadow-sm px-6 py-3 bg-white/5/5 text-sm font-bold text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all duration-300 focus:outline-none sm:mt-0 sm:w-auto"
+              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-3 bg-white/5 text-sm font-bold text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all duration-300 focus:outline-none sm:mt-0 sm:w-auto"
             >
               Cancel
             </button>
@@ -864,7 +864,7 @@ const EmployeeList = () => {
               </p>
 
               <div className="flex flex-wrap items-center gap-6 pt-2">
-                <div className="flex items-center space-x-3 bg-white/5/5 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/10 dark:border-white/10">
+                <div className="flex items-center space-x-3 bg-white/5 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 dark:border-white/10">
                   <div className="p-1.5 bg-indigo-500/20 rounded-lg">
                     <UserGroupIcon className="h-4 w-4 text-indigo-400" />
                   </div>
@@ -874,7 +874,7 @@ const EmployeeList = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3 bg-white/5/5 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/10 dark:border-white/10">
+                <div className="flex items-center space-x-3 bg-white/5 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 dark:border-white/10">
                   <div className="p-1.5 bg-blue-500/20 rounded-lg">
                     <BuildingOfficeIcon className="h-4 w-4 text-blue-400" />
                   </div>
@@ -906,7 +906,7 @@ const EmployeeList = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Premium Filters Section */}
-        <div className="bg-white/5/5 backdrop-blur-xl shadow-2xl rounded-3xl border border-black/10 dark:border-white/10 p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+        <div className="bg-white/5 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/10 dark:border-white/10 p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
           <div className="lg:col-span-5 space-y-2">
             <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Search Talent</label>
             <div className="relative group">
@@ -952,7 +952,7 @@ const EmployeeList = () => {
           <div className="lg:col-span-2">
             <button
               onClick={clearFilters}
-              className="w-full inline-flex items-center justify-center px-6 py-4 bg-white/5/5 border border-black/10 dark:border-white/10 text-sm font-black text-slate-300 rounded-2xl hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all duration-300 group"
+              className="w-full inline-flex items-center justify-center px-6 py-4 bg-white/5 border border-white/10 dark:border-white/10 text-sm font-black text-slate-300 rounded-2xl hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all duration-300 group"
             >
               <FunnelIcon className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
               Reset Filters
@@ -963,10 +963,10 @@ const EmployeeList = () => {
         {/* Enhanced Employee Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {employees.length === 0 ? (
-            <div className="col-span-full text-center py-24 bg-white/5/5 rounded-[40px] border border-black/10 dark:border-white/10 backdrop-blur-xl">
+            <div className="col-span-full text-center py-24 bg-white/5 rounded-[40px] border border-white/10 dark:border-white/10 backdrop-blur-xl">
               <div className="relative mx-auto w-32 h-32 mb-8">
                 <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
-                <div className="relative flex items-center justify-center w-full h-full bg-[#0A0F1A] rounded-full border border-black/10 dark:border-white/10">
+                <div className="relative flex items-center justify-center w-full h-full bg-[#0A0F1A] rounded-full border border-white/10 dark:border-white/10">
                   <UserIcon className="h-12 w-12 text-slate-500" />
                 </div>
               </div>
@@ -993,7 +993,7 @@ const EmployeeList = () => {
               return (
                 <div
                   key={employee.id}
-                  className="group relative bg-white/5/5 backdrop-blur-xl rounded-[32px] border border-black/10 dark:border-white/10 hover:border-indigo-500/30 shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2"
+                  className="group relative bg-white/5 backdrop-blur-xl rounded-[32px] border border-white/10 dark:border-white/10 hover:border-indigo-500/30 shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {/* Premium Hover Gradient */}
@@ -1107,7 +1107,7 @@ const EmployeeList = () => {
         {/* Premium Results Count */}
         {employees.length > 0 && (
           <div className="flex justify-center pb-12">
-            <div className="inline-flex items-center px-6 py-3 bg-white/5/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10">
+            <div className="inline-flex items-center px-6 py-3 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 dark:border-white/10">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(99,102,241,0.8)]"></div>
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">

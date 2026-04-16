@@ -279,7 +279,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
 
       {/* Form Container */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+        <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
           <div className="p-8 lg:p-12 space-y-8">
 
             {/* Personal Information Section */}
@@ -301,7 +301,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.first_name ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                    className={`w-full px-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.first_name ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                       }`}
                     placeholder="Enter your first name"
                   />
@@ -319,7 +319,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.last_name ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                    className={`w-full px-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.last_name ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                       }`}
                     placeholder="Enter your last name"
                   />
@@ -339,7 +339,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.email ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.email ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                         }`}
                       placeholder="your.email@company.com"
                     />
@@ -360,7 +360,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       name="phone_number"
                       value={formData.phone_number}
                       onChange={handleInputChange}
-                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.phone_number ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.phone_number ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                         }`}
                       placeholder="+91 9876543210"
                     />
@@ -381,7 +381,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       value={formData.current_address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.current_address ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.current_address ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                         }`}
                       placeholder="Enter your current address including city, state, PIN code"
                     />
@@ -402,7 +402,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                       value={formData.permanent_address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.permanent_address ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                      className={`w-full pl-12 pr-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none ${errors.permanent_address ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                         }`}
                       placeholder="Enter your permanent address including city, state, PIN code"
                     />
@@ -452,7 +452,7 @@ const EmployeeOnboardingForm = ({ encodedData }) => {
                         name={doc.key}
                         onChange={handleFileChange}
                         accept=".pdf,.jpg,.jpeg,.png"
-                        className={`w-full px-4 py-3 border rounded-xl bg-white/5/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 ${errors[doc.key] ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
+                        className={`w-full px-4 py-3 border rounded-xl bg-white/5 backdrop-blur-sm focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 ${errors[doc.key] ? 'border-red-500' : 'border-white/10 focus:border-indigo-500'
                           }`}
                       />
                       {formData[doc.key] && (
@@ -537,7 +537,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
   return (
     <div className="min-h-screen bg-[#070B14] dark:bg-slate-900 flex items-center justify-center">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 p-8 lg:p-12 text-center">
+        <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 p-8 lg:p-12 text-center">
           {/* Icon */}
           <div className="mb-6 flex justify-center">
             {statusInfo.icon}
@@ -564,7 +564,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
 
           {/* Employee Info */}
           {employee && (
-            <div className="bg-white/5/5 rounded-2xl p-6 mb-6">
+            <div className="bg-white/5 rounded-2xl p-6 mb-6">
               <h3 className="font-bold text-white mb-3">Employee Information</h3>
               <div className="space-y-2 text-sm text-slate-400">
                 <div><strong>Name:</strong> {employee.first_name} {employee.last_name}</div>
@@ -598,7 +598,7 @@ const LinkInvalidComponent = ({ status, employee, linkInfo }) => {
           </div>
 
           {/* Contact Information */}
-          <div className="bg-white/5/5 rounded-2xl p-6 border border-white/10">
+          <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
             <h3 className="font-bold text-white mb-3 flex items-center justify-center">
               <Phone className="h-5 w-5 mr-2" />
               HR Department Contact

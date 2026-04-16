@@ -397,7 +397,7 @@ const ResourceRequestForm = () => {
             <div className="h-4 bg-black/10 dark:bg-white/5/10 rounded w-2/3"></div>
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl"></div>
+                <div key={i} className="h-12 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl"></div>
               ))}
             </div>
           </div>
@@ -431,15 +431,15 @@ const ResourceRequestForm = () => {
 
   return (
     <div className="p-6">
-      <div className={`max-w-4xl mx-auto bg-white/5/5 backdrop-blur-md border ${theme.cardBorder} rounded-2xl shadow-xl p-8`}>
-        <div className="mb-8 border-b border-black/10 dark:border-white/10 pb-6">
+      <div className={`max-w-4xl mx-auto bg-white/5 backdrop-blur-md border ${theme.cardBorder} rounded-2xl shadow-xl p-8`}>
+        <div className="mb-8 border-b border-white/10 dark:border-white/10 pb-6">
           <h2 className={`text-2xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent mb-2`}>New Access Request</h2>
           <p className="text-gray-600 dark:text-gray-400">Submit a request for resource access, asset repair or IT support</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Request Type */}
-          <div className="bg-white/5/5 rounded-xl p-6 border border-black/10 dark:border-white/10">
+          <div className="bg-white/5 rounded-xl p-6 border border-white/10 dark:border-white/10">
             <label className="block text-sm font-bold text-gray-300 mb-4 tracking-wide uppercase">
               Request Type
             </label>
@@ -448,7 +448,7 @@ const ResourceRequestForm = () => {
                 relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${formData.request_type === 'NEW'
                   ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]'
-                  : 'border-black/10 dark:border-white/10 bg-white/5/5 hover:border-black/20 dark:border-white/20'
+                  : 'border-white/10 dark:border-white/10 bg-white/5 hover:border-black/20 dark:border-white/20'
                 }
               `}>
                 <input
@@ -470,7 +470,7 @@ const ResourceRequestForm = () => {
                 relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${formData.request_type === 'IT'
                   ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
-                  : 'border-black/10 dark:border-white/10 bg-white/5/5 hover:border-black/20 dark:border-white/20'
+                  : 'border-white/10 dark:border-white/10 bg-white/5 hover:border-black/20 dark:border-white/20'
                 }
               `}>
                 <input
@@ -492,7 +492,7 @@ const ResourceRequestForm = () => {
                 relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${formData.request_type === 'REPAIR'
                   ? 'border-orange-500 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
-                  : 'border-black/10 dark:border-white/10 bg-white/5/5 hover:border-black/20 dark:border-white/20'
+                  : 'border-white/10 dark:border-white/10 bg-white/5 hover:border-black/20 dark:border-white/20'
                 }
               `}>
                 <input
@@ -527,7 +527,7 @@ const ResourceRequestForm = () => {
                       onChange={handleInputChange}
                       required
                       disabled={resourceTypesLoading}
-                      className="w-full px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                     >
                       <option value="" className="bg-white/5 dark:bg-slate-800 text-white">
                         {resourceTypesLoading ? 'Loading...' : 'Select a resource type'}
@@ -555,7 +555,7 @@ const ResourceRequestForm = () => {
                       onChange={handleInputChange}
                       required
                       disabled={!formData.resource_type || resourcesLoading}
-                      className="w-full px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                     >
                       <option value="" className="bg-white/5 dark:bg-slate-800 text-white">
                         {resourcesLoading ? 'Loading...' : 'Select a resource'}
@@ -579,7 +579,7 @@ const ResourceRequestForm = () => {
                     onChange={handleInputChange}
                     required
                     disabled={accessLevelsLoading}
-                    className="w-full px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                   >
                     <option value="" className="bg-white/5 dark:bg-slate-800 text-white">
                       {accessLevelsLoading ? 'Loading...' : 'Select access level'}
@@ -608,7 +608,7 @@ const ResourceRequestForm = () => {
                   onChange={handleInputChange}
                   required
                   disabled={myAssetsLoading}
-                  className="w-full px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-50 appearance-none"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-50 appearance-none"
                 >
                   <option value="" className="bg-white/5 dark:bg-slate-800 text-white">
                     {myAssetsLoading ? 'Loading assets...' : 'Select an asset'}
@@ -629,7 +629,7 @@ const ResourceRequestForm = () => {
           }
 
           {/* Priority and Duration */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5/5 p-6 rounded-xl border border-black/10 dark:border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-xl border border-white/10 dark:border-white/10">
             <div>
               <label className="block text-sm font-bold text-gray-300 mb-2">
                 Priority
@@ -639,7 +639,7 @@ const ResourceRequestForm = () => {
                 value={formData.priority}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none"
               >
                 <option value="LOW" className="bg-white/5 dark:bg-slate-800 text-white">Low</option>
                 <option value="MEDIUM" className="bg-white/5 dark:bg-slate-800 text-white">Medium</option>
@@ -670,7 +670,7 @@ const ResourceRequestForm = () => {
                   min="1"
                   max="3650"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   placeholder="365"
                 />
               </div>
@@ -695,7 +695,7 @@ const ResourceRequestForm = () => {
               onContextMenu={(e) => e.preventDefault()}
               required
               rows={6}
-              className="w-full px-4 py-3 bg-white/5/5 text-white border border-black/10 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-white/5 text-white border border-white/10 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Please provide detailed justification for this request..."
             />
           </div>
@@ -705,7 +705,7 @@ const ResourceRequestForm = () => {
             <label className="block text-sm font-bold text-gray-300 mb-2">
               Supporting Images (optional)
             </label>
-            <div className={`border-2 border-dashed ${theme.cardBorder} rounded-xl p-8 text-center hover:bg-white/5/5 transition-all cursor-pointer group`}>
+            <div className={`border-2 border-dashed ${theme.cardBorder} rounded-xl p-8 text-center hover:bg-white/5 transition-all cursor-pointer group`}>
               <PhotoIcon className="mx-auto h-12 w-12 text-slate-400 group-hover:text-indigo-400 transition-colors" />
               <div className="mt-4">
                 <label htmlFor="image-upload" className="cursor-pointer">
@@ -733,7 +733,7 @@ const ResourceRequestForm = () => {
                     <img
                       src={image.preview}
                       alt="Preview"
-                      className="w-full h-24 object-cover rounded-xl border border-black/10 dark:border-white/10"
+                      className="w-full h-24 object-cover rounded-xl border border-white/10 dark:border-white/10"
                     />
                     <button
                       type="button"
@@ -751,7 +751,7 @@ const ResourceRequestForm = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-8 border-t border-black/10 dark:border-white/10">
+          <div className="flex justify-end pt-8 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={loading || createRequestMutation.isLoading}

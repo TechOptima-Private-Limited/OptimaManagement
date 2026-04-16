@@ -104,7 +104,7 @@ const ResourceList = () => {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className={`bg-white/5 dark:bg-slate-900 border ${theme.cardBorder} rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto`}>
-          <div className="sticky top-0 bg-white/5/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-black/10 dark:border-white/10 px-6 py-4 rounded-t-2xl z-10">
+          <div className="sticky top-0 bg-white/5/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-white/10 dark:border-white/10 px-6 py-4 rounded-t-2xl z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
@@ -130,7 +130,7 @@ const ResourceList = () => {
             {/* Basic Info */}
             <div>
               <h4 className="text-lg font-bold text-white mb-4">Resource Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5/5 p-5 rounded-2xl border border-black/10 dark:border-white/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-5 rounded-2xl border border-white/10 dark:border-white/10">
                 <div>
                   <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Environment</label>
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${getEnvironmentBadge(resource.environment)}`}>
@@ -164,7 +164,7 @@ const ResourceList = () => {
             {resource.endpoint && (
               <div>
                 <label className="block text-sm font-bold text-indigo-300 mb-3 uppercase tracking-wider">Endpoint</label>
-                <div className="flex items-center space-x-3 bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl p-4">
+                <div className="flex items-center space-x-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                   <GlobeAltIcon className="h-5 w-5 text-indigo-400" />
                   <code className="text-sm text-indigo-200 font-mono tracking-wide">{resource.endpoint}</code>
                 </div>
@@ -174,7 +174,7 @@ const ResourceList = () => {
             {/* Team Contact */}
             <div>
               <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wider">Resource Team</label>
-              <div className="flex items-center space-x-3 bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl p-4">
+              <div className="flex items-center space-x-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                 <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
@@ -183,7 +183,7 @@ const ResourceList = () => {
             </div>
 
             {/* Timestamps */}
-            <div className="border-t border-black/10 dark:border-white/10 pt-6">
+            <div className="border-t border-white/10 dark:border-white/10 pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-black/20 p-4 rounded-xl border border-white/10">
                 <div>
                   <span className="text-slate-400 block mb-1">Created</span>
@@ -218,7 +218,7 @@ const ResourceList = () => {
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className={`bg-white/5/5 border ${theme.cardBorder} rounded-2xl h-48 animate-pulse backdrop-blur-sm`}></div>
+            <div key={i} className={`bg-white/5 border ${theme.cardBorder} rounded-2xl h-48 animate-pulse backdrop-blur-sm`}></div>
           ))}
         </div>
       </div>
@@ -243,13 +243,13 @@ const ResourceList = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search resources..."
-              className="w-full pl-12 pr-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-500"
+              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-500"
             />
           </div>
 
           {/* Filter Dropdowns */}
           <div className="flex flex-wrap gap-4">
-            <div className="flex items-center space-x-3 bg-white/5/5 border border-black/10 dark:border-white/10 px-4 py-1.5 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors">
+            <div className="flex items-center space-x-3 bg-white/5 border border-white/10 dark:border-white/10 px-4 py-1.5 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors">
               <FunnelIcon className="h-5 w-5 text-indigo-400" />
               <select
                 value={typeFilter}
@@ -263,7 +263,7 @@ const ResourceList = () => {
               </select>
             </div>
 
-            <div className="flex items-center bg-white/5/5 border border-black/10 dark:border-white/10 px-4 py-1.5 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors">
+            <div className="flex items-center bg-white/5 border border-white/10 dark:border-white/10 px-4 py-1.5 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors">
               <select
                 value={environmentFilter}
                 onChange={(e) => setEnvironmentFilter(e.target.value)}
@@ -280,7 +280,7 @@ const ResourceList = () => {
 
       {/* Resources Grid */}
       {filteredResources.length === 0 ? (
-        <div className="text-center py-16 bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-sm">
+        <div className="text-center py-16 bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl backdrop-blur-sm">
           <ServerIcon className="mx-auto h-16 w-16 text-slate-400" />
           <h3 className="mt-4 text-lg font-bold text-white">No resources found</h3>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -295,12 +295,12 @@ const ResourceList = () => {
             return (
               <div
                 key={resource.id}
-                className={`bg-white/5/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 cursor-pointer group flex flex-col h-full`}
+                className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 cursor-pointer group flex flex-col h-full`}
                 onClick={() => setSelectedResource(resource)}
               >
                 <div className="flex items-start justify-between mb-5">
                   <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-white/5/5 rounded-xl group-hover:bg-indigo-500/20 group-hover:border-indigo-500/30 border border-transparent transition-all duration-300">
+                    <div className="p-3 bg-white/5 rounded-xl group-hover:bg-indigo-500/20 group-hover:border-indigo-500/30 border border-transparent transition-all duration-300">
                       <Icon className="h-6 w-6 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
                     </div>
                     <div>
@@ -315,7 +315,7 @@ const ResourceList = () => {
                     <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold shadow-sm ${getEnvironmentBadge(resource.environment)}`}>
                       {resource.environment}
                     </span>
-                    <div className="p-1.5 rounded-lg bg-white/5/5 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="p-1.5 rounded-lg bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <EyeIcon className="h-4 w-4 text-indigo-400" />
                     </div>
                   </div>
@@ -325,7 +325,7 @@ const ResourceList = () => {
                   {resource.description}
                 </p>
 
-                <div className="flex items-center justify-between text-sm pt-4 border-t border-black/10 dark:border-white/10 mt-auto">
+                <div className="flex items-center justify-between text-sm pt-4 border-t border-white/10 dark:border-white/10 mt-auto">
                   <div className="flex items-center bg-black/20 px-3 py-1.5 rounded-lg border border-white/10">
                     {resource.requires_approval ? (
                       <>
@@ -341,7 +341,7 @@ const ResourceList = () => {
                   </div>
 
                   {resource.endpoint && (
-                    <div className="flex items-center space-x-1.5 text-gray-600 dark:text-gray-400 bg-white/5/5 px-2.5 py-1.5 rounded-lg border border-white/10">
+                    <div className="flex items-center space-x-1.5 text-gray-600 dark:text-gray-400 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10">
                       <GlobeAltIcon className="h-4 w-4 text-indigo-400" />
                       <span className="text-xs font-bold text-indigo-200">API</span>
                     </div>

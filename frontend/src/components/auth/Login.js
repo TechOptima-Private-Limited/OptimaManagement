@@ -133,7 +133,7 @@ const Login = () => {
                   <div className="relative flex items-center">
                     <input
                       type="checkbox"
-                      className="peer h-5 w-5 bg-white/5/5 border-black/10 dark:border-white/10 rounded-lg text-indigo-600 focus:ring-indigo-500/30 transition-all cursor-pointer"
+                      className="peer h-5 w-5 bg-white/5 border-white/10 dark:border-white/10 rounded-lg text-indigo-600 focus:ring-indigo-500/30 transition-all cursor-pointer"
                     />
                   </div>
                   <span className="text-xs font-bold text-slate-400 group-hover:text-white transition-colors uppercase tracking-widest">Remember Me</span>

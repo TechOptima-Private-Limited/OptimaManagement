@@ -121,7 +121,7 @@ const LeaveTypesManagement = () => {
   };
 
   const LeaveTypeCard = ({ leaveType }) => (
-    <div className="bg-white/5/5 backdrop-blur-md rounded-[2rem] shadow-xl border border-black/10 dark:border-white/10 p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+    <div className="bg-white/5 backdrop-blur-md rounded-[2rem] shadow-xl border border-white/10 dark:border-white/10 p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
       <div className="flex items-start justify-between relative z-10">
         <div className="flex-1">
@@ -154,7 +154,7 @@ const LeaveTypesManagement = () => {
 
           <div className="flex items-center flex-wrap gap-2">
             {leaveType.start_date && (
-              <div className="text-[10px] text-slate-400 bg-white/5/5 p-2 px-3 rounded-xl border border-white/10 inline-block">
+              <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/10 inline-block">
                 <div className="flex items-center space-x-2">
                   <CalendarDaysIcon className="h-3 w-3 text-emerald-400" />
                   <span className="font-bold tracking-wider">Start: {formatDate(leaveType.start_date)}</span>
@@ -162,14 +162,14 @@ const LeaveTypesManagement = () => {
               </div>
             )}
             {leaveType.expiry_date && (
-              <div className="text-[10px] text-slate-400 bg-white/5/5 p-2 px-3 rounded-xl border border-white/10 inline-block">
+              <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/10 inline-block">
                 <div className="flex items-center space-x-2">
                   <CalendarDaysIcon className="h-3 w-3 text-indigo-300" />
                   <span className="font-bold tracking-wider">Expiry: {formatDate(leaveType.expiry_date)}</span>
                 </div>
               </div>
             )}
-            <div className="text-[10px] text-slate-400 bg-white/5/5 p-2 px-3 rounded-xl border border-white/10 inline-block">
+            <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/10 inline-block">
               <div className="flex items-center space-x-2">
                 <CheckCircleIcon className="h-3 w-3 text-emerald-400" />
                 <span className="font-bold tracking-wider">Created: {formatDate(leaveType.created_at)}</span>
@@ -205,7 +205,7 @@ const LeaveTypesManagement = () => {
   return (
     <div className="space-y-10 relative z-10">
       {/* Enhanced Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0A0F1A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-black/10 dark:border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0A0F1A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 dark:border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl point-events-none"></div>
         <div className="relative z-10">
@@ -304,7 +304,7 @@ const LeaveTypesManagement = () => {
         </div>
 
         {leaveTypes.length === 0 ? (
-          <div className="text-center py-24 bg-[#0A0F1A]/50 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-black/10 dark:border-white/10 relative overflow-hidden">
+          <div className="text-center py-24 bg-[#0A0F1A]/50 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/10 dark:border-white/10 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
             <div className="relative z-10">
               <div className="p-6 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
@@ -356,7 +356,7 @@ const LeaveTypesManagement = () => {
               <input
                 {...register('name', { required: 'Leave type name is required' })}
                 type="text"
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="e.g., Annual Leave, Sick Leave"
               />
               {errors.name && (
@@ -371,7 +371,7 @@ const LeaveTypesManagement = () => {
               <input
                 {...register('code', { required: 'Leave code is required' })}
                 type="text"
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all uppercase"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all uppercase"
                 placeholder="e.g., AL, SL, ML"
                 maxLength={10}
               />
@@ -394,7 +394,7 @@ const LeaveTypesManagement = () => {
                 })}
                 type="number"
                 min="0"
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />
               {errors.days_allowed_per_year && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.days_allowed_per_year.message}</p>
@@ -408,7 +408,7 @@ const LeaveTypesManagement = () => {
               <input
                 {...register('start_date', { required: 'Start date is required' })}
                 type="date"
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />
               {errors.start_date && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.start_date.message}</p>
@@ -422,7 +422,7 @@ const LeaveTypesManagement = () => {
               <input
                 {...register('expiry_date')}
                 type="date"
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />
               {errors.expiry_date && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.expiry_date.message}</p>
@@ -436,7 +436,7 @@ const LeaveTypesManagement = () => {
               <textarea
                 {...register('description')}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="Brief description of this leave type..."
               />
             </div>
@@ -472,7 +472,7 @@ const LeaveTypesManagement = () => {
                 {...register('max_carry_forward_days')}
                 type="number"
                 min="0"
-                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="0"
               />
             </div>
@@ -525,7 +525,7 @@ const LeaveTypesManagement = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-black/10 dark:border-white/10">
+          <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-white/10 dark:border-white/10">
             <button
               type="button"
               onClick={() => {
@@ -533,7 +533,7 @@ const LeaveTypesManagement = () => {
                 setEditingType(null);
                 reset();
               }}
-              className="px-8 py-4 bg-white/5/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
+              className="px-8 py-4 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
             >
               Cancel
             </button>
@@ -583,7 +583,7 @@ const LeaveTypesManagement = () => {
               <div className="relative">
                 <select
                   {...registerBalance('year', { required: 'Year is required' })}
-                  className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium text-lg p-4 transition-all appearance-none pr-10"
+                  className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium text-lg p-4 transition-all appearance-none pr-10"
                 >
                   <option value="" className="bg-white/5 dark:bg-slate-900 text-slate-400">Select Year</option>
                   {[2023, 2024, 2025, 2026].map(year => (
@@ -625,14 +625,14 @@ const LeaveTypesManagement = () => {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-black/10 dark:border-white/10">
+            <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-white/10 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => {
                   setShowBalanceModal(false);
                   resetBalance();
                 }}
-                className="px-8 py-4 bg-white/5/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
+                className="px-8 py-4 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
               >
                 Cancel
               </button>

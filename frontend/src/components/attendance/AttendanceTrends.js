@@ -42,7 +42,7 @@ const AttendanceTooltip = ({ active, payload, label }) => {
    Summary KPI Card
 ───────────────────────────────────────────── */
 const KpiCard = ({ label, value, suffix = '', icon: Icon, color, trend }) => (
-  <div className={`relative bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl p-5 overflow-hidden group hover:border-${color}-500/40 transition-all duration-300`}>
+  <div className={`relative bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl p-5 overflow-hidden group hover:border-${color}-500/40 transition-all duration-300`}>
     <div className={`absolute inset-0 bg-gradient-to-br from-${color}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
     <div className="relative flex items-start justify-between">
       <div>
@@ -252,7 +252,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
 
         <div className="flex items-center space-x-3">
           {/* Period Toggle */}
-          <div className="flex bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl p-1">
+          <div className="flex bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-1">
             {['weekly', 'monthly'].map(p => (
               <button
                 key={p}
@@ -272,7 +272,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
           <button
             onClick={() => fetchTrends(period)}
             disabled={loading}
-            className="p-2 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-slate-400 hover:text-white hover:border-indigo-500/40 transition-all"
+            className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-400 hover:text-white hover:border-indigo-500/40 transition-all"
             title="Refresh data"
           >
             <SparklesIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -316,7 +316,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
       </div>
 
       {/* ── Chart Type Selector ── */}
-      <div className="flex bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl p-1 w-fit">
+      <div className="flex bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-1 w-fit">
         {[
           { id: 'attendance', label: 'Attendance %', icon: ArrowTrendingUpIcon },
           { id: 'late', label: 'Late Arrivals', icon: ExclamationTriangleIcon },
@@ -338,7 +338,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
       </div>
 
       {/* ── Charts ── */}
-      <div className={`bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm ${loading ? 'opacity-60' : ''}`}>
+      <div className={`bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-sm ${loading ? 'opacity-60' : ''}`}>
         {loading && (
           <div className="flex items-center justify-center py-4 mb-4">
             <div className="text-xs text-indigo-400 animate-pulse font-semibold tracking-widest uppercase">Loading trend data…</div>
@@ -443,7 +443,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
       {/* ── Insights row ── */}
       {chartData.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl p-5">
+          <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl p-5">
             <div className="flex items-center space-x-2 mb-3">
               <ArrowTrendingUpIcon className="h-4 w-4 text-indigo-400" />
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Attendance Trend</p>
@@ -463,7 +463,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
             </p>
           </div>
 
-          <div className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl p-5">
+          <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl p-5">
             <div className="flex items-center space-x-2 mb-3">
               <ClockIcon className="h-4 w-4 text-amber-400" />
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Punctuality Insight</p>

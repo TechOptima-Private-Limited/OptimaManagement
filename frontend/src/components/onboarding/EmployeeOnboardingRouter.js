@@ -303,7 +303,7 @@ const EmployeeOnboardingForm = ({ encodedData, onNavigate, validation }) => {
 
       {/* Form Container */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+        <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
           <div className="p-8 lg:p-12 space-y-8">
             
             {/* Personal Information Section */}
@@ -541,12 +541,12 @@ const OnboardingSuccessPage = () => {
   return (
     <div className="min-h-screen bg-[#070B14] dark:bg-slate-900 flex items-center justify-center">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+        <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
           
           <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-8 py-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-black opacity-10"></div>
-            <div className="absolute top-0 left-0 w-32 h-32 bg-white/5/5/50 dark:bg-slate-800/20 rounded-full -translate-x-16 -translate-y-16"></div>
-            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5/5/50 dark:bg-slate-800/20 rounded-full translate-x-24 translate-y-24"></div>
+            <div className="absolute top-0 left-0 w-32 h-32 bg-white/5/50 dark:bg-slate-800/20 rounded-full -translate-x-16 -translate-y-16"></div>
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/5/50 dark:bg-slate-800/20 rounded-full translate-x-24 translate-y-24"></div>
             
             <div className="relative">
               <div className="mb-6">
@@ -666,7 +666,7 @@ const LinkInvalidComponent = ({ validation }) => {
   return (
     <div className="min-h-screen bg-[#070B14] dark:bg-slate-900 flex items-center justify-center">
       <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 p-8 lg:p-12 text-center">
+        <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 p-8 lg:p-12 text-center">
           <div className="mb-6">
             {statusInfo.icon}
           </div>

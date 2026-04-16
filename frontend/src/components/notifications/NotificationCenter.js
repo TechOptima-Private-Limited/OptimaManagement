@@ -174,7 +174,7 @@ const NotificationCenter = () => {
     <div
       className={`
         p-3 border-l-4 cursor-pointer transition-all duration-200
-        hover:bg-white/5/5
+        hover:bg-white/5
         ${notification.is_read ? 'opacity-60' : 'bg-white/5/3'}
         ${getAccentColor(notification.notification_type)}
       `}
@@ -255,10 +255,10 @@ const NotificationCenter = () => {
           <div className="fixed inset-0 z-30" onClick={() => setShowDropdown(false)} />
 
           {/* Panel */}
-          <div className="absolute right-0 mt-3 w-80 bg-[#0d1226]/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 z-50 border border-black/10 dark:border-white/10 max-h-[30rem] overflow-hidden transition-all duration-300">
+          <div className="absolute right-0 mt-3 w-80 bg-[#0d1226]/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 z-50 border border-white/10 dark:border-white/10 max-h-[30rem] overflow-hidden transition-all duration-300">
 
             {/* Header */}
-            <div className="px-4 py-3 border-b border-black/10 dark:border-white/10 bg-white/5/5">
+            <div className="px-4 py-3 border-b border-white/10 dark:border-white/10 bg-white/5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <h3 className="text-sm font-semibold text-white">Notifications</h3>
@@ -283,7 +283,7 @@ const NotificationCenter = () => {
                     onClick={() => setFilter('all')}
                     className={`px-3 py-1 text-xs rounded-lg font-medium transition-all duration-200 ${filter === 'all'
                       ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-white hover:bg-white/5/5'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                   >
                     All
@@ -292,7 +292,7 @@ const NotificationCenter = () => {
                     onClick={() => setFilter('unread')}
                     className={`px-3 py-1 text-xs rounded-lg font-medium transition-all duration-200 ${filter === 'unread'
                       ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-white hover:bg-white/5/5'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                   >
                     Unread ({unreadCount})
@@ -330,7 +330,7 @@ const NotificationCenter = () => {
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <div className="w-12 h-12 rounded-full bg-white/5/5 border border-black/10 dark:border-white/10 flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 dark:border-white/10 flex items-center justify-center mx-auto mb-3">
                     <BellIcon className="h-6 w-6 text-slate-400" />
                   </div>
                   <h3 className="text-sm font-medium text-gray-300">No notifications</h3>
@@ -349,7 +349,7 @@ const NotificationCenter = () => {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-black/10 dark:border-white/10 bg-white/5/5">
+              <div className="px-4 py-2.5 border-t border-white/10 dark:border-white/10 bg-white/5">
                 <button
                   onClick={() => {
                     setShowDropdown(false);

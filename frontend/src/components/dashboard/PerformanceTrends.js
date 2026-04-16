@@ -9,7 +9,7 @@ const PerformanceTrends = ({ data }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-slate-900/90 backdrop-blur-md border border-black/10 dark:border-white/10 p-3 rounded-xl shadow-2xl">
+        <div className="bg-white/5 dark:bg-slate-900/90 backdrop-blur-md border border-white/10 dark:border-white/10 p-3 rounded-xl shadow-2xl">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
           <p className="text-sm font-black text-white">
             {payload[0].value} {payload[0].name === 'hours' ? 'hours' : ''}

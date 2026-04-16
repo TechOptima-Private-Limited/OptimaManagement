@@ -63,7 +63,7 @@ const PermissionDetail = () => {
             Back to permissions registry
           </button>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/5/5 rounded-2xl border border-white/10">
+            <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
               <ShieldCheckIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div>
@@ -74,13 +74,13 @@ const PermissionDetail = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white/5/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden max-w-2xl">
+      <form onSubmit={handleSave} className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden max-w-2xl">
         <div className="p-8 space-y-8">
           <div className="space-y-2">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Display Name</label>
             <input
               type="text"
-              className="block w-full bg-white/5/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-inner font-bold"
+              className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-inner font-bold"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="System display title"
@@ -90,14 +90,14 @@ const PermissionDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Codename</label>
-              <div className="flex items-center space-x-3 bg-white/5/5 border border-white/10 rounded-2xl px-5 py-4 opacity-70">
+              <div className="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 opacity-70">
                 <KeyIcon className="h-4 w-4 text-slate-500" />
                 <span className="text-sm font-bold text-slate-400 tracking-tight">{permission.codename}</span>
               </div>
             </div>
             <div className="space-y-2">
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Content Classification</label>
-              <div className="flex items-center space-x-3 bg-white/5/5 border border-white/10 rounded-2xl px-5 py-4 opacity-70">
+              <div className="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 opacity-70">
                 <FingerPrintIcon className="h-4 w-4 text-slate-500" />
                 <span className="text-sm font-bold text-slate-400 tracking-tight">{permission.content_type}</span>
               </div>
@@ -105,7 +105,7 @@ const PermissionDetail = () => {
           </div>
         </div>
 
-        <div className="px-8 py-6 bg-white/5/5 border-t border-white/10 flex justify-end space-x-4">
+        <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex justify-end space-x-4">
           <button
             type="button"
             onClick={() => navigate('/users-auth/permissions')}

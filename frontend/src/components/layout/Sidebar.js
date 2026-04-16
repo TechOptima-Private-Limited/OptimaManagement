@@ -280,7 +280,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b ${theme.sidebarGradient}
         transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        shadow-2xl border-r border-black/10 dark:border-white/10 flex flex-col
+        shadow-2xl border-r border-white/10 dark:border-white/10 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="relative z-10 flex items-center justify-start h-20 px-6 bg-slate-900/50 backdrop-blur-md border-b border-white/5">
@@ -306,7 +306,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   key={section.name}
                   to={section.href}
                   onClick={onClose}
-                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all relative overflow-hidden ${active ? 'bg-indigo-500/10 text-white border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5/5 hover:text-white'
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all relative overflow-hidden ${active ? 'bg-indigo-500/10 text-white border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'
                     }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 bg-gradient-to-r ${section.color} opacity-80 group-hover:opacity-100`}>
@@ -326,7 +326,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <div key={section.name} className="space-y-1">
                 <button
                   onClick={() => toggleSection(section.name)}
-                  className={`w-full group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${hasActiveChild ? 'text-indigo-400' : 'text-slate-400 hover:text-white hover:bg-white/5/5'
+                  className={`w-full group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${hasActiveChild ? 'text-indigo-400' : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 bg-gradient-to-r ${section.color} opacity-80 group-hover:opacity-100`}>

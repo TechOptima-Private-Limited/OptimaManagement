@@ -184,7 +184,7 @@ const Navbar = ({ onMenuToggle }) => {
 
               {/* Dropdown Results */}
               {(showDropdown && searchQuery.trim()) && (
-                <div className="absolute mt-2 w-full bg-[#0B1120]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute mt-2 w-full bg-[#0B1120]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 dark:border-white/10 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="max-h-[min(80vh,500px)] overflow-y-auto custom-scrollbar px-3 py-3">
                     {/* Quick Links Section */}
                     {searchResults.links.length > 0 && (

@@ -78,7 +78,7 @@ const CompanyDocuments = () => {
         <p className="text-slate-400 mb-6">All employees can view and download documents.</p>
 
         {canUpload && (
-          <div className="bg-white/5 dark:bg-slate-900/60 border border-black/10 dark:border-white/10 rounded-xl p-4 mb-6">
+          <div className="bg-white/5 dark:bg-slate-900/60 border border-white/10 dark:border-white/10 rounded-xl p-4 mb-6">
             <h2 className="text-lg font-semibold text-white mb-3">Upload Document</h2>
             <div className="grid md:grid-cols-3 gap-3">
               <input
@@ -86,12 +86,12 @@ const CompanyDocuments = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Document title"
-                className="bg-black/20 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-white"
+                className="bg-black/20 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 text-white"
               />
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="bg-black/20 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-slate-300"
+                className="bg-black/20 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 text-slate-300"
               />
               <button
                 onClick={handleUpload}
@@ -104,7 +104,7 @@ const CompanyDocuments = () => {
           </div>
         )}
 
-        <div className="bg-white/5 dark:bg-slate-900/60 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-white/5 dark:bg-slate-900/60 border border-white/10 dark:border-white/10 rounded-xl overflow-hidden">
           {loading ? (
             <div className="p-6 text-slate-400">Loading documents...</div>
           ) : documents.length === 0 ? (

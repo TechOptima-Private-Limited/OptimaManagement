@@ -430,8 +430,8 @@
 //         <div className="absolute inset-0 bg-black opacity-10"></div>
 
 //         {/* Decorative elements */}
-//         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
-//         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
+//         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
+//         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
 
 //         <div className="relative px-4 py-12 sm:px-6 lg:px-8">
 //           <div className="flex items-center justify-between">
@@ -1501,8 +1501,8 @@ const WorkFromHomeRequests = () => {
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative px-4 py-12 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
@@ -1674,7 +1674,7 @@ const WorkFromHomeRequests = () => {
                     const employeeInitials = getEmployeeInitials(request.employee_name);
 
                     return (
-                      <div key={request.id} className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
+                      <div key={request.id} className="bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl p-6 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-start space-x-4">
                             <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg`}>
@@ -1760,7 +1760,7 @@ const WorkFromHomeRequests = () => {
                 type="month"
                 value={filters.month}
                 onChange={(e) => handleFilterChange('month', e.target.value)}
-                className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none placeholder-gray-500 [color-scheme:dark]"
+                className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none placeholder-gray-500 [color-scheme:dark]"
               />
             </div>
 
@@ -1781,7 +1781,7 @@ const WorkFromHomeRequests = () => {
             <div className="flex items-end">
               <button
                 onClick={clearFilters}
-                className="w-full bg-black/10 dark:bg-white/5/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 inline-flex items-center justify-center transform hover:scale-105 transition-all duration-200"
+                className="w-full bg-black/10 dark:bg-white/5/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 border border-white/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 inline-flex items-center justify-center transform hover:scale-105 transition-all duration-200"
               >
                 <FunnelIcon className="h-4 w-4 mr-2" />
                 Clear Filters
@@ -1792,7 +1792,7 @@ const WorkFromHomeRequests = () => {
 
         {/* Enhanced WFH Requests Table */}
         <div className={`${theme.cardBg} backdrop-blur-xl shadow-xl rounded-2xl border ${theme.cardBorder} overflow-hidden`}>
-          <div className="px-4 py-5 sm:px-6 border-b border-black/10 dark:border-white/10 bg-white/5/5">
+          <div className="px-4 py-5 sm:px-6 border-b border-white/10 dark:border-white/10 bg-white/5">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-white flex items-center">
                 <DocumentChartBarIcon className="h-6 w-6 mr-2 text-indigo-400" />
@@ -1848,7 +1848,7 @@ const WorkFromHomeRequests = () => {
                     {...register('start_date', { required: 'Start date is required' })}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
                   />
                   {errors.start_date && <p className="text-red-400 text-sm mt-1">{errors.start_date.message}</p>}
                 </div>
@@ -1861,7 +1861,7 @@ const WorkFromHomeRequests = () => {
                     {...register('end_date', { required: 'End date is required' })}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
                   />
                   {errors.end_date && <p className="text-red-400 text-sm mt-1">{errors.end_date.message}</p>}
                 </div>
@@ -1875,12 +1875,12 @@ const WorkFromHomeRequests = () => {
                   {...register('reason', { required: 'Reason is required' })}
                   rows={4}
                   placeholder="Please provide a reason for your work from home request..."
-                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none placeholder-gray-500"
+                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none placeholder-gray-500"
                 />
                 {errors.reason && <p className="text-red-400 text-sm mt-1">{errors.reason.message}</p>}
               </div>
 
-              <div className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl p-4">
+              <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <svg className="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
@@ -1920,7 +1920,7 @@ const WorkFromHomeRequests = () => {
                   setShowRequestModal(false);
                   reset();
                 }}
-                className="flex-1 bg-black/10 dark:bg-white/5/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
+                className="flex-1 bg-black/10 dark:bg-white/5/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 border border-white/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
               >
                 Cancel
               </button>
@@ -1935,9 +1935,9 @@ const WorkFromHomeRequests = () => {
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setSelectedRequest(null)}></div>
 
-            <div className="inline-block align-bottom bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               {/* Header */}
-              <div className={`bg-gradient-to-r ${theme.headerGradient} px-6 py-6 border-b border-black/10 dark:border-white/10`}>
+              <div className={`bg-gradient-to-r ${theme.headerGradient} px-6 py-6 border-b border-white/10 dark:border-white/10`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="ml-4">
@@ -1958,17 +1958,17 @@ const WorkFromHomeRequests = () => {
                 </div>
               </div>
 
-              <div className="bg-white/5/5 p-6">
+              <div className="bg-white/5 p-6">
                 <div className="space-y-4">
                   {canViewAllRequests() && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Department:</label>
-                        <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_department}</p>
+                        <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_department}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Employee ID:</label>
-                        <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_id}</p>
+                        <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_id}</p>
                       </div>
                     </div>
                   )}
@@ -1976,13 +1976,13 @@ const WorkFromHomeRequests = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Period:</label>
-                      <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">
+                      <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2">
                         {selectedRequest.formatted_start_date} to {selectedRequest.formatted_end_date}
                       </p>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Applied On:</label>
-                      <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
+                      <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
                     </div>
                   </div>
 
@@ -1995,7 +1995,7 @@ const WorkFromHomeRequests = () => {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Reason:</label>
-                    <div className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-3">
+                    <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-3">
                       <p className="text-sm text-white">{selectedRequest.reason}</p>
                     </div>
                   </div>
@@ -2003,7 +2003,7 @@ const WorkFromHomeRequests = () => {
                   {selectedRequest.approved_by_name && (
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Approved By:</label>
-                      <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.approved_by_name}</p>
+                      <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.approved_by_name}</p>
                     </div>
                   )}
 
@@ -2078,14 +2078,14 @@ const WorkFromHomeRequests = () => {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Department:</span>
-                  <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_department}</p>
+                  <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_department}</p>
                 </div>
                 <div>
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Employee ID:</span>
-                  <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_id}</p>
+                  <p className="text-sm text-white bg-white/5 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_id}</p>
                 </div>
               </div>
-              <div className="bg-white/5/5 border border-black/10 dark:border-white/10 p-4 rounded-xl">
+              <div className="bg-white/5 border border-white/10 dark:border-white/10 p-4 rounded-xl">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Reason:</p>
                 <p className="text-sm text-white">{selectedApproval.reason}</p>
               </div>
@@ -2100,7 +2100,7 @@ const WorkFromHomeRequests = () => {
                   {...registerApproval('rejection_reason')}
                   rows={3}
                   placeholder="Please provide a reason for rejection..."
-                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none"
+                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none"
                 />
               </div>
             )}
@@ -2133,7 +2133,7 @@ const WorkFromHomeRequests = () => {
                     setSelectedApproval(null);
                     resetApproval();
                   }}
-                  className="flex-1 bg-black/10 dark:bg-white/5/10 border border-black/10 dark:border-white/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
+                  className="flex-1 bg-black/10 dark:bg-white/5/10 border border-white/10 dark:border-white/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
                 >
                   Cancel
                 </button>
@@ -2147,7 +2147,7 @@ const WorkFromHomeRequests = () => {
                     setSelectedApproval(null);
                     resetApproval();
                   }}
-                  className="bg-black/10 dark:bg-white/5/10 border border-black/10 dark:border-white/10 text-white px-6 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
+                  className="bg-black/10 dark:bg-white/5/10 border border-white/10 dark:border-white/10 text-white px-6 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
                 >
                   Close
                 </button>

@@ -183,7 +183,7 @@ const LeaveManagement = () => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient}`}>
       {/* Hero Header */}
-      <div className={`border-b border-black/10 dark:border-white/10 text-white relative overflow-hidden`}>
+      <div className={`border-b border-white/10 dark:border-white/10 text-white relative overflow-hidden`}>
         <div className={`absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br ${theme.primaryGradient} opacity-10 rounded-full blur-3xl`}></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
@@ -239,7 +239,7 @@ const LeaveManagement = () => {
 
                 return (
                   <div key={item.name} className="group">
-                    <div className={`relative bg-white/5/5 rounded-[2.5rem] shadow-2xl border backdrop-blur-xl ${item.bgGradient} overflow-hidden transition-all duration-300 hover:shadow-indigo-500/10 hover:-translate-y-1`}>
+                    <div className={`relative bg-white/5 rounded-[2.5rem] shadow-2xl border backdrop-blur-xl ${item.bgGradient} overflow-hidden transition-all duration-300 hover:shadow-indigo-500/10 hover:-translate-y-1`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-between">
@@ -330,10 +330,10 @@ const LeaveManagement = () => {
         )}
 
         {/* Main Content Tabs */}
-        <div className="bg-[#0A0F1A] rounded-[2rem] shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden relative z-10 backdrop-blur-xl">
+        <div className="bg-[#0A0F1A] rounded-[2rem] shadow-2xl border border-white/10 dark:border-white/10 overflow-hidden relative z-10 backdrop-blur-xl">
           <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
             {/* Tab Navigation */}
-            <div className="bg-white/5/5 border-b border-black/10 dark:border-white/10 p-2">
+            <div className="bg-white/5 border-b border-white/10 dark:border-white/10 p-2">
               <Tab.List className="flex space-x-2">
                 {tabs.map((tab, index) => (
                   <Tab
@@ -343,7 +343,7 @@ const LeaveManagement = () => {
                         'flex-1 py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-2xl transition-all duration-300 focus:outline-none flex items-center justify-center space-x-3',
                         selected
                           ? 'bg-indigo-500/20 text-indigo-300 shadow-lg border border-indigo-500/30'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5/5 border border-transparent'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                       )
                     }
                   >
@@ -381,7 +381,7 @@ const LeaveManagement = () => {
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl z-10">
+        <div className="mt-8 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl z-10">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
           <div className="flex items-start space-x-6 relative z-10">
             <div className="p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl">

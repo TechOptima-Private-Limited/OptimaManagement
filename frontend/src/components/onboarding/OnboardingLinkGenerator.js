@@ -140,7 +140,7 @@ const OnboardingLinkGenerator = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Generator Card */}
-        <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+        <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
           <div className="p-8 lg:p-12">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
@@ -196,7 +196,7 @@ const OnboardingLinkGenerator = () => {
 
                 {/* Link Information Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+                  <div className="bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
                     <div className="flex items-center space-x-3 mb-4">
                       <Calendar className="w-6 h-6 text-slate-400" />
                       <h4 className="font-bold text-white">Creation Details</h4>
@@ -335,7 +335,7 @@ const OnboardingLinkGenerator = () => {
 
             {/* Help Section */}
             {!generatedLink && (
-              <div className="mt-12 bg-white/5/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+              <div className="mt-12 bg-white/5 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
                 <h3 className="font-bold text-white mb-4 text-lg">How it Works</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div className="text-center">

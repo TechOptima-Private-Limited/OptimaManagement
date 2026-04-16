@@ -1149,8 +1149,8 @@ const AdminForms = () => {
     };
 
     return (
-      <div className={`bg-white/5/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/10 dark:border-white/10">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">Add Resource Type</h3>
           <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
@@ -1168,7 +1168,7 @@ const AdminForms = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="e.g., Database, Application, Server"
             />
           </div>
@@ -1181,7 +1181,7 @@ const AdminForms = () => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Describe this resource type..."
             />
           </div>
@@ -1199,7 +1199,7 @@ const AdminForms = () => {
             </label>
           </div>
 
-          <div className="flex space-x-3 pt-6 border-t border-black/10 dark:border-white/10">
+          <div className="flex space-x-3 pt-6 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
@@ -1214,7 +1214,7 @@ const AdminForms = () => {
                 setFormData({ name: '', description: '', is_active: true });
               }}
               disabled={createMutation.isLoading}
-              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-black/10 dark:border-white/10"
+              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1259,8 +1259,8 @@ const AdminForms = () => {
     };
 
     return (
-      <div className={`bg-white/5/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/10 dark:border-white/10">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">Add Access Level</h3>
           <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
@@ -1278,7 +1278,7 @@ const AdminForms = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="e.g., Read, Write, Admin"
             />
           </div>
@@ -1291,12 +1291,12 @@ const AdminForms = () => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Describe the permissions for this access level..."
             />
           </div>
 
-          <div className="flex space-x-3 pt-6 border-t border-black/10 dark:border-white/10">
+          <div className="flex space-x-3 pt-6 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
@@ -1311,7 +1311,7 @@ const AdminForms = () => {
                 setFormData({ name: '', description: '' });
               }}
               disabled={createMutation.isLoading}
-              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-black/10 dark:border-white/10"
+              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1391,8 +1391,8 @@ const AdminForms = () => {
     ];
 
     return (
-      <div className={`bg-white/5/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/10 dark:border-white/10">
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">Add Resource</h3>
           <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
@@ -1411,7 +1411,7 @@ const AdminForms = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
                 placeholder="Resource name"
               />
             </div>
@@ -1425,7 +1425,7 @@ const AdminForms = () => {
                   value={formData.resource_type}
                   onChange={(e) => setFormData({ ...formData, resource_type: e.target.value })}
                   required
-                  className="flex-1 px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-white/5 dark:bg-slate-800 [&>option]:text-white"
+                  className="flex-1 px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-white/5 dark:bg-slate-800 [&>option]:text-white"
                 >
                   <option value="">--------</option>
                   {resourceTypes.map(type => (
@@ -1452,7 +1452,7 @@ const AdminForms = () => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Resource description..."
             />
           </div>
@@ -1466,7 +1466,7 @@ const AdminForms = () => {
                 type="url"
                 value={formData.endpoint}
                 onChange={(e) => setFormData({ ...formData, endpoint: e.target.value })}
-                className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
                 placeholder="https://example.com/api"
               />
             </div>
@@ -1478,7 +1478,7 @@ const AdminForms = () => {
               <select
                 value={formData.environment}
                 onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
-                className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-white/5 dark:bg-slate-800 [&>option]:text-white"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-white/5 dark:bg-slate-800 [&>option]:text-white"
                 required
               >
                 {environments.map(env => (
@@ -1496,7 +1496,7 @@ const AdminForms = () => {
               type="email"
               value={formData.resource_team_email}
               onChange={(e) => setFormData({ ...formData, resource_team_email: e.target.value })}
-              className="w-full px-4 py-3 bg-black/20 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="team@example.com"
             />
           </div>
@@ -1515,7 +1515,7 @@ const AdminForms = () => {
               </label>
             </div>
 
-            <div className="flex items-center pl-6 border-l border-black/10 dark:border-white/10">
+            <div className="flex items-center pl-6 border-l border-white/10 dark:border-white/10">
               <input
                 type="checkbox"
                 id="is_active_resource"
@@ -1529,7 +1529,7 @@ const AdminForms = () => {
             </div>
           </div>
 
-          <div className="flex space-x-3 pt-6 border-t border-black/10 dark:border-white/10">
+          <div className="flex space-x-3 pt-6 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
@@ -1553,7 +1553,7 @@ const AdminForms = () => {
                 });
               }}
               disabled={createMutation.isLoading}
-              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-black/10 dark:border-white/10"
+              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1575,7 +1575,7 @@ const AdminForms = () => {
     <div className="p-6 space-y-8">
       {/* Admin Header */}
       <div className={`bg-gradient-to-r ${theme.primaryGradient} border ${theme.cardBorder} rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden shadow-2xl`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="flex items-center justify-between relative z-10">
           <div>
             <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Administration Panel</h2>
@@ -1583,7 +1583,7 @@ const AdminForms = () => {
               Manage resource types, access levels, and system resources
             </p>
           </div>
-          <div className="flex items-center space-x-4 bg-black/20 px-6 py-4 rounded-2xl border border-black/10 dark:border-white/10 backdrop-blur-md">
+          <div className="flex items-center space-x-4 bg-black/20 px-6 py-4 rounded-2xl border border-white/10 dark:border-white/10 backdrop-blur-md">
             <div className="p-3 bg-black/10 dark:bg-white/5/10 rounded-xl">
               <ShieldCheckIcon className="h-8 w-8 text-white" />
             </div>
@@ -1598,7 +1598,7 @@ const AdminForms = () => {
       </div>
 
       {/* Form Selector */}
-      <div className={`bg-white/5/5 border ${theme.cardBorder} rounded-2xl p-5 shadow-xl backdrop-blur-sm`}>
+      <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-5 shadow-xl backdrop-blur-sm`}>
         <h3 className="text-xl font-bold text-white mb-4">Admin Forms</h3>
         <div className="flex flex-wrap gap-3">
           {adminForms.map((form) => {
@@ -1609,7 +1609,7 @@ const AdminForms = () => {
                 onClick={() => setActiveForm(form.id)}
                 className={`flex items-center px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 border ${activeForm === form.id
                     ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-lg shadow-indigo-500/10'
-                    : 'bg-white/5/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white border-transparent'
+                    : 'bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white border-transparent'
                   }`}
               >
                 <Icon className={`h-5 w-5 mr-2.5 ${activeForm === form.id ? 'text-indigo-400' : 'text-slate-400'}`} />

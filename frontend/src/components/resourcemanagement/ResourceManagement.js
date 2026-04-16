@@ -509,7 +509,7 @@ const ResourceManagement = () => {
                       flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap
                       ${isActive
                         ? `bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg transform scale-105`
-                        : 'text-gray-600 dark:text-gray-400 hover:text-white hover:bg-white/5/5 hover:scale-105'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-white hover:bg-white/5 hover:scale-105'
                       }
                     `}
                     title={tab.description}
@@ -553,7 +553,7 @@ const ResourceManagement = () => {
         {/* Footer Info */}
         {hasAdminAccess() && (
           <div className="mt-6 text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/5/5 backdrop-blur-xl rounded-full shadow-lg border border-black/10 dark:border-white/10">
+            <div className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full shadow-lg border border-white/10 dark:border-white/10">
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Administrative privileges active for {getUserRoleDisplay()}

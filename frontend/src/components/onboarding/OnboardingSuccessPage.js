@@ -16,7 +16,7 @@ const OnboardingSuccessPage = () => {
   return (
     <div className="min-h-screen bg-[#070B14] flex items-center justify-center">
       <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white/5/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+        <div className="bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
           
           {/* Header with gradient */}
           <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-8 py-12 text-center relative overflow-hidden">
@@ -121,7 +121,7 @@ const OnboardingSuccessPage = () => {
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-3 p-3 bg-white/5/5 rounded-lg">
+                <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
                   <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
                     <Users className="h-5 w-5 text-white" />
                   </div>
@@ -131,7 +131,7 @@ const OnboardingSuccessPage = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-3 p-3 bg-white/5/5 rounded-lg">
+                <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
                   <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
                     <FileText className="h-5 w-5 text-white" />
                   </div>
@@ -186,7 +186,7 @@ const OnboardingSuccessPage = () => {
             </div>
 
             {/* Contact Information */}
-            <div className="bg-white/5/5 rounded-2xl p-6 border border-white/10">
+            <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center">
                 <Building className="h-6 w-6 mr-2" />
                 Contact Information
@@ -215,26 +215,26 @@ const OnboardingSuccessPage = () => {
             </div>
 
             {/* Timeline Expectations */}
-            <div className="bg-white/5/5 rounded-2xl p-6 border border-white/10">
+            <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center">
                 <Calendar className="h-6 w-6 mr-2" />
                 Expected Timeline
               </h3>
               
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/5/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <span className="font-medium text-white">Document Review</span>
                   <span className="text-sm text-slate-400 bg-white/5/10 px-3 py-1 rounded-full">1-2 days</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <span className="font-medium text-white">Employment Setup</span>
                   <span className="text-sm text-slate-400 bg-white/5/10 px-3 py-1 rounded-full">2-3 days</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <span className="font-medium text-white">Asset Preparation</span>
                   <span className="text-sm text-slate-400 bg-white/5/10 px-3 py-1 rounded-full">3-5 days</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <span className="font-medium text-white">Joining Confirmation</span>
                   <span className="text-sm text-slate-400 bg-white/5/10 px-3 py-1 rounded-full">5-7 days</span>
                 </div>

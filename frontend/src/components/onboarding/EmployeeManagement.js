@@ -236,8 +236,8 @@ const EmployeeManagement = () => {
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -675,10 +675,10 @@ const EmployeeManagement = () => {
                 </div>
               </div>
 
-              <div className="bg-white/5/5 px-6 py-4 sm:flex sm:flex-row-reverse">
+              <div className="bg-white/5 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => setShowDetailsModal(false)}
-                  className="w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Close
                 </button>
@@ -713,7 +713,7 @@ const EmployeeManagement = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white/5/5 px-6 py-4 sm:flex sm:flex-row-reverse">
+              <div className="bg-white/5 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => softDeleteEmployee(selectedEmployee.id)}
                   className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-base font-semibold text-white hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-4 focus:ring-red-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
@@ -723,7 +723,7 @@ const EmployeeManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>
@@ -758,7 +758,7 @@ const EmployeeManagement = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white/5/5 px-6 py-4 sm:flex sm:flex-row-reverse">
+              <div className="bg-white/5 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => restoreEmployee(selectedEmployee.id)}
                   className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-base font-semibold text-white hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
@@ -768,7 +768,7 @@ const EmployeeManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowRestoreConfirm(false)}
-                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>

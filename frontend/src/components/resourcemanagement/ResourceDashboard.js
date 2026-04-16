@@ -178,7 +178,7 @@ const ResourceDashboard = () => {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.name} className={`${stat.bgColor} rounded-xl p-6 border border-black/10 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]`}>
+            <div key={stat.name} className={`${stat.bgColor} rounded-xl p-6 border border-white/10 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm font-medium ${stat.textColor}`}>{stat.name}</p>
@@ -207,8 +207,8 @@ const ResourceDashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Requests */}
-        <div className={`bg-white/5/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
-          <div className="p-6 border-b border-black/10 dark:border-white/10">
+        <div className={`bg-white/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
+          <div className="p-6 border-b border-white/10 dark:border-white/10">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white">Recent Requests</h3>
               <ChartBarIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -221,10 +221,10 @@ const ResourceDashboard = () => {
                   <div
                     key={request.id}
                     onClick={() => setSelectedRequest(request)}
-                    className="flex items-center justify-between p-4 bg-white/5/5 rounded-xl border border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all cursor-pointer group"
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all cursor-pointer group"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-white/5/5 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
+                      <div className="p-2 bg-white/5 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
                         {getStatusIcon(request.status)}
                       </div>
                       <div>
@@ -258,8 +258,8 @@ const ResourceDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className={`bg-white/5/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
-          <div className="p-6 border-b border-black/10 dark:border-white/10">
+        <div className={`bg-white/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
+          <div className="p-6 border-b border-white/10 dark:border-white/10">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white">Quick Actions</h3>
               <KeyIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -310,10 +310,10 @@ const ResourceDashboard = () => {
               type="button"
               onClick={() => navigate('/resource-management/requests')}
               aria-label="View all access requests"
-              className="w-full flex items-center justify-between p-4 bg-white/5/5 rounded-xl border border-black/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-lg transition-all duration-300 group"
+              className="w-full flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-lg transition-all duration-300 group"
             >
               <div className="flex items-center space-x-3">
-                <div className="bg-black/10 dark:bg-white/5/10 p-2.5 rounded-xl group-hover:scale-110 shadow-lg transition-transform border border-black/10 dark:border-white/10">
+                <div className="bg-black/10 dark:bg-white/5/10 p-2.5 rounded-xl group-hover:scale-110 shadow-lg transition-transform border border-white/10 dark:border-white/10">
                   <ClockIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
@@ -330,13 +330,13 @@ const ResourceDashboard = () => {
       </div>
 
       {/* System Status */}
-      <div className={`bg-white/5/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
-        <div className="p-6 border-b border-black/10 dark:border-white/10">
+      <div className={`bg-white/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
+        <div className="p-6 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">System Status</h3>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center space-x-3 p-4 bg-white/5/5 rounded-xl border border-white/10">
+            <div className="flex items-center space-x-3 p-4 bg-white/5 rounded-xl border border-white/10">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
               <div>
                 <p className="text-sm font-bold text-white">API Status</p>
@@ -344,7 +344,7 @@ const ResourceDashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-4 bg-white/5/5 rounded-xl border border-white/10">
+            <div className="flex items-center space-x-3 p-4 bg-white/5 rounded-xl border border-white/10">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
               <div>
                 <p className="text-sm font-bold text-white">Email Service</p>
@@ -352,7 +352,7 @@ const ResourceDashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-4 bg-white/5/5 rounded-xl border border-white/10">
+            <div className="flex items-center space-x-3 p-4 bg-white/5 rounded-xl border border-white/10">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
               <div>
                 <p className="text-sm font-bold text-white">Database</p>

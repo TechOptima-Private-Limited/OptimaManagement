@@ -26,7 +26,7 @@ import Modal from '../common/Modal';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api';
 
 const InfoCard = ({ title, children, className = '' }) => (
-  <div className={`bg-white/5/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-black/10 dark:border-white/10 p-6 ${className}`}>
+  <div className={`bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 dark:border-white/10 p-6 ${className}`}>
     <h3 className="text-lg font-black text-white mb-4 tracking-tight">{title}</h3>
     {children}
   </div>
@@ -34,7 +34,7 @@ const InfoCard = ({ title, children, className = '' }) => (
 
 const InfoItem = ({ icon: Icon, label, value }) => (
   <div className="flex items-start space-x-3">
-    <div className="p-2 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10">
+    <div className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10">
       <Icon className="h-4 w-4 text-slate-400" />
     </div>
     <div className="flex-1 min-w-0">
@@ -46,7 +46,7 @@ const InfoItem = ({ icon: Icon, label, value }) => (
 
 const quickActionStyles = {
   blue: {
-    card: 'bg-white/5/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-indigo-500/30',
+    card: 'bg-white/5 border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-indigo-500/30',
     icon: 'text-indigo-400',
     title: 'text-white',
     desc: 'text-slate-400',
@@ -70,7 +70,7 @@ const QuickActionCard = ({ title, description, href, icon: Icon, color = 'blue' 
   return (
     <Link to={href} className={`block p-4 rounded-2xl transition-colors ${styles.card}`}>
       <div className="flex items-center space-x-3">
-        <div className="p-2 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10">
+        <div className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10">
           <Icon className={`h-5 w-5 ${styles.icon}`} />
         </div>
         <div>
@@ -480,7 +480,7 @@ const EmployeeDetail = () => {
                     type="button"
                     onClick={cancelEditing}
                     disabled={saving}
-                    className="px-4 py-2 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/5/10 disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/5/10 disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -498,7 +498,7 @@ const EmployeeDetail = () => {
                   <button
                     type="button"
                     onClick={startEditing}
-                    className="px-4 py-2 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/5/10"
+                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/5/10"
                   >
                     Edit
                   </button>
@@ -529,7 +529,7 @@ const EmployeeDetail = () => {
                           name="first_name"
                           value={editData.first_name}
                           onChange={handleEditInputChange}
-                          className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                          className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                         />
                       ) : (
                         <div className="mt-2 text-sm font-semibold text-white">{employee.user?.first_name || employee.user_info?.first_name || 'N/A'}</div>
@@ -543,7 +543,7 @@ const EmployeeDetail = () => {
                           name="last_name"
                           value={editData.last_name}
                           onChange={handleEditInputChange}
-                          className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                          className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                         />
                       ) : (
                         <div className="mt-2 text-sm font-semibold text-white">{employee.user?.last_name || employee.user_info?.last_name || 'N/A'}</div>
@@ -563,7 +563,7 @@ const EmployeeDetail = () => {
                               name="email"
                               value={editData.email}
                               onChange={handleEditInputChange}
-                              className="w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                              className="w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                             />
                           ) : (
                             employee.user?.email || employee.user_info?.email
@@ -580,7 +580,7 @@ const EmployeeDetail = () => {
                               name="phone_number"
                               value={editData.phone_number}
                               onChange={handleEditInputChange}
-                              className="w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                              className="w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                             />
                           ) : (
                             formatPhoneNumber(employee.user?.profile?.phone_number)
@@ -597,7 +597,7 @@ const EmployeeDetail = () => {
                               value={editData.address}
                               onChange={handleEditInputChange}
                               rows={2}
-                              className="w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold resize-none"
+                              className="w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold resize-none"
                             />
                           ) : (
                             employee.user?.profile?.address
@@ -619,7 +619,7 @@ const EmployeeDetail = () => {
                             name="employee_id"
                             value={editData.employee_id}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                           />
                         ) : (
                           <div className="mt-2 text-sm font-semibold text-white">{employee.employee_id || 'N/A'}</div>
@@ -633,7 +633,7 @@ const EmployeeDetail = () => {
                             name="department_id"
                             value={editData.department_id}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                           >
                             <option value="" className="bg-[#0A0F1A]">Select Department</option>
                             {departments.map((dept) => (
@@ -653,7 +653,7 @@ const EmployeeDetail = () => {
                             name="position"
                             value={editData.position}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                           />
                         ) : (
                           <div className="mt-2 text-sm font-semibold text-white">{employee.position || 'N/A'}</div>
@@ -668,7 +668,7 @@ const EmployeeDetail = () => {
                             name="hire_date"
                             value={editData.hire_date}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold [color-scheme:dark]"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold [color-scheme:dark]"
                           />
                         ) : (
                           <div className="mt-2 text-sm font-semibold text-white">{formatDate(employee.hire_date)}</div>
@@ -682,7 +682,7 @@ const EmployeeDetail = () => {
                             name="manager"
                             value={editData.manager}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                           >
                             <option value="" className="bg-[#0A0F1A]">None</option>
                             {managers
@@ -707,7 +707,7 @@ const EmployeeDetail = () => {
                             name="status"
                             value={editData.status}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                           >
                             <option value="ACTIVE" className="bg-[#0A0F1A]">Active</option>
                             <option value="INACTIVE" className="bg-[#0A0F1A]">Inactive</option>
@@ -754,7 +754,7 @@ const EmployeeDetail = () => {
                             name="date_of_birth"
                             value={editData.date_of_birth}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold [color-scheme:dark]"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold [color-scheme:dark]"
                           />
                         ) : (
                           <div className="mt-2 text-sm font-semibold text-white">{formatDate(employee.user?.profile?.date_of_birth)}</div>
@@ -768,7 +768,7 @@ const EmployeeDetail = () => {
                             name="emergency_contact"
                             value={editData.emergency_contact}
                             onChange={handleEditInputChange}
-                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
+                            className="mt-2 w-full px-4 py-3 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-semibold"
                           />
                         ) : (
                           <div className="mt-2 text-sm font-semibold text-white">{employee.user?.profile?.emergency_contact || 'N/A'}</div>
@@ -782,8 +782,8 @@ const EmployeeDetail = () => {
 
             {isEditing && (
               <InfoCard title="Documents">
-                <div className="bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-inner">
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5/5">
+                <div className="bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-inner">
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-indigo-500/10 rounded-lg shrink-0">
                         <ArrowUpTrayIcon className="h-5 w-5 text-indigo-400" />
@@ -820,7 +820,7 @@ const EmployeeDetail = () => {
                             {documents.map((doc) => (
                               <div
                                 key={`${doc.field}-${doc.doc_type}`}
-                                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 bg-white/5/5 hover:bg-black/10 dark:bg-white/5/10 transition-colors group"
+                                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 transition-colors group"
                               >
                                 <div className="flex items-center space-x-2 truncate">
                                   <PaperClipIcon className="h-4 w-4 text-slate-400 shrink-0" />
@@ -852,7 +852,7 @@ const EmployeeDetail = () => {
                       {documentInputs.map((item) => (
                         <div
                           key={item.id}
-                          className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 bg-white/5/5 p-3 rounded-xl border border-white/10"
+                          className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 bg-white/5 p-3 rounded-xl border border-white/10"
                         >
                           <div className="w-full sm:w-1/3">
                             <input
@@ -860,7 +860,7 @@ const EmployeeDetail = () => {
                               value={item.docType}
                               onChange={(e) => updateDocumentInput(item.id, 'docType', e.target.value)}
                               placeholder="Document name"
-                              className="w-full bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 placeholder-slate-600 transition-all font-medium"
+                              className="w-full bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 placeholder-slate-600 transition-all font-medium"
                             />
                           </div>
                           <div className="w-full sm:flex-1 relative">
@@ -946,7 +946,7 @@ const EmployeeDetail = () => {
                       name="sub_department"
                       value={editData.sub_department}
                       onChange={handleEditInputChange}
-                      className="w-44 px-3 py-2 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none text-sm font-black text-right"
+                      className="w-44 px-3 py-2 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none text-sm font-black text-right"
                     />
                   ) : (
                     <span className="text-sm font-black text-white">{employee.sub_department || 'N/A'}</span>
@@ -960,7 +960,7 @@ const EmployeeDetail = () => {
                       name="location"
                       value={editData.location}
                       onChange={handleEditInputChange}
-                      className="w-44 px-3 py-2 bg-[#070B14] dark:bg-[#070B14] border border-black/10 dark:border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none text-sm font-black text-right"
+                      className="w-44 px-3 py-2 bg-[#070B14] dark:bg-[#070B14] border border-white/10 dark:border-white/10 rounded-xl text-white focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none text-sm font-black text-right"
                     />
                   ) : (
                     <span className="text-sm font-black text-white">{employee.location || 'N/A'}</span>

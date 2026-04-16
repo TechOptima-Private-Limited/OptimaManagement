@@ -56,7 +56,7 @@ const WorkingFormatCard = () => {
   };
 
   return (
-    <div className="bg-[#0b1221] rounded-3xl p-5 shadow-2xl relative overflow-hidden group border border-white/10 hover:border-black/10 dark:border-white/10 transition-all duration-300 min-h-[300px] card-hover-lift smooth-transition">
+    <div className="bg-[#0b1221] rounded-3xl p-5 shadow-2xl relative overflow-hidden group border border-white/10 hover:border-white/10 dark:border-white/10 transition-all duration-300 min-h-[300px] card-hover-lift smooth-transition">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-purple-500/10 blur-[100px] rounded-full pointer-events-none" />
       

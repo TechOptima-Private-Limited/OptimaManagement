@@ -167,7 +167,7 @@ const AttendanceCalendar = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigateMonth(-1)}
-              className="p-3 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
             >
               <ChevronLeftIcon className="h-5 w-5" />
             </button>
@@ -179,7 +179,7 @@ const AttendanceCalendar = () => {
             </button>
             <button
               onClick={() => navigateMonth(1)}
-              className="p-3 rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
             >
               <ChevronRightIcon className="h-5 w-5" />
             </button>
@@ -210,7 +210,7 @@ const AttendanceCalendar = () => {
                     ${!date ? 'opacity-0 pointer-events-none' : ''}
                     ${selectedDate?.toDateString() === date?.toDateString()
                       ? 'bg-indigo-500/20 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
-                      : 'bg-white/5 dark:bg-slate-900/60 border-white/10 hover:border-black/10 dark:border-white/10 hover:translate-y-[-2px]'}
+                      : 'bg-white/5 dark:bg-slate-900/60 border-white/10 hover:border-white/10 dark:border-white/10 hover:translate-y-[-2px]'}
                   `}
                   onClick={() => handleDateClick(date)}
                 >
@@ -284,7 +284,7 @@ const AttendanceCalendar = () => {
             </div>
             <button
               onClick={() => { setSelectedDate(null); setSelectedDateData(null); }}
-              className="p-2 rounded-full bg-white/5/5 text-slate-400 hover:text-white transition-colors border border-white/10"
+              className="p-2 rounded-full bg-white/5 text-slate-400 hover:text-white transition-colors border border-white/10"
             >
               <XCircleIcon className="w-8 h-8" />
             </button>
@@ -297,7 +297,7 @@ const AttendanceCalendar = () => {
                   <div key={index} className="bg-slate-950/40 p-6 rounded-[2rem] border border-white/10 relative group hover:border-indigo-500/20 transition-all text-slate-300">
                     {isHRManager() && (
                       <div className="flex items-center mb-6">
-                        <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-xl flex items-center justify-center mr-4 shadow-lg text-white font-black uppercase border border-black/10 dark:border-white/10">
+                        <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-xl flex items-center justify-center mr-4 shadow-lg text-white font-black uppercase border border-white/10 dark:border-white/10">
                           {a.employee?.user?.first_name?.[0]}{a.employee?.user?.last_name?.[0]}
                         </div>
                         <div>

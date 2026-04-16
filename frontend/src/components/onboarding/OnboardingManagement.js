@@ -493,7 +493,7 @@ const OnboardingManagement = () => {
       case 'rejected':
         return 'bg-rose-900/30 text-rose-400 border-rose-800/50';
       default:
-        return 'bg-white/5/5 dark:bg-slate-800 text-slate-400 border-slate-700';
+        return 'bg-white/5 dark:bg-slate-800 text-slate-400 border-slate-700';
     }
   };
 
@@ -504,7 +504,7 @@ const OnboardingManagement = () => {
       case 'employee':
         return 'bg-green-900/30 text-green-400 border-green-800/50';
       default:
-        return 'bg-white/5/5 dark:bg-slate-800 text-slate-400 border-slate-700';
+        return 'bg-white/5 dark:bg-slate-800 text-slate-400 border-slate-700';
     }
   };
 
@@ -583,8 +583,8 @@ const OnboardingManagement = () => {
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -641,7 +641,7 @@ const OnboardingManagement = () => {
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.key} className="group bg-white/5/5 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/10 overflow-hidden">
+              <div key={stat.key} className="group bg-white/5 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/10 overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -666,7 +666,7 @@ const OnboardingManagement = () => {
         </div>
 
         {/* Enhanced Filter and Search */}
-        <div className="bg-white/5/5 backdrop-blur-sm shadow-xl rounded-2xl border border-white/10 p-6 space-y-4">
+        <div className="bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl border border-white/10 p-6 space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             {/* Filter Tabs */}
             <div className="flex space-x-2">
@@ -682,7 +682,7 @@ const OnboardingManagement = () => {
                   onClick={() => setFilter(tab.key)}
                   className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
                     ? 'bg-indigo-600 text-white shadow-lg'
-                    : 'bg-white/5/5 text-slate-400 hover:bg-white/5/10 hover:text-white'
+                    : 'bg-white/5 text-slate-400 hover:bg-white/5/10 hover:text-white'
                     }`}
                 >
                   {tab.label} ({tab.count})
@@ -700,7 +700,7 @@ const OnboardingManagement = () => {
                 placeholder="Search employees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-white/10 rounded-xl bg-white/5/5 text-white placeholder-slate-600 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-white/10 rounded-xl bg-white/5 text-white placeholder-slate-600 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none"
               />
             </div>
           </div>
@@ -730,7 +730,7 @@ const OnboardingManagement = () => {
               return (
                 <div
                   key={employee.id}
-                  className={`group bg-white/5/5 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
+                  className={`group bg-white/5 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
                     }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
@@ -807,7 +807,7 @@ const OnboardingManagement = () => {
                             setSelectedEmployee(employee);
                             setShowDetailsModal(true);
                           }}
-                          className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-white/5/5 dark:bg-slate-800 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
+                          className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-white/5 dark:bg-slate-800 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
                           title="View Details"
                         >
                           <Eye className="h-5 w-5" />
@@ -883,12 +883,12 @@ const OnboardingManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-[#070B14] dark:bg-slate-900/80 backdrop-blur-sm" onClick={() => setShowDocumentListModal(false)}></div>
-            <div className="inline-block align-bottom bg-white/5/5 dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-700">
-              <div className="px-6 py-4 border-b border-slate-700 bg-white/5/5 dark:bg-slate-800/50">
+            <div className="inline-block align-bottom bg-white/5 dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-700">
+              <div className="px-6 py-4 border-b border-slate-700 bg-white/5 dark:bg-slate-800/50">
                 <h3 className="text-lg font-semibold text-white">Documents - {documentsList.employee_name}</h3>
                 <p className="text-sm text-slate-400">{documentsList.total_documents} uploaded</p>
               </div>
-              <div className="px-6 py-4 bg-white/5/5 dark:bg-slate-800">
+              <div className="px-6 py-4 bg-white/5 dark:bg-slate-800">
                 {documentsList.documents && documentsList.documents.length > 0 ? (
                   <ul className="divide-y divide-slate-700">
                     {documentsList.documents.map((doc, idx) => (
@@ -901,7 +901,7 @@ const OnboardingManagement = () => {
                           {doc.url ? (
                             <>
                               <a href={doc.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1 text-sm rounded-lg border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors">View</a>
-                              <a href={doc.url} download className="px-3 py-1 text-sm rounded-lg border border-blue-500/30 text-blue-400 bg-white/5/50/10 hover:bg-white/5/50/20 transition-colors">Download</a>
+                              <a href={doc.url} download className="px-3 py-1 text-sm rounded-lg border border-blue-500/30 text-blue-400 bg-white/50/10 hover:bg-white/50/20 transition-colors">Download</a>
                             </>
                           ) : (
                             <span className="text-xs text-slate-500">No URL</span>
@@ -920,7 +920,7 @@ const OnboardingManagement = () => {
                 )}
               </div>
               <div className="px-6 py-3 bg-[#070B14] dark:bg-slate-900/50 flex justify-end">
-                <button onClick={() => setShowDocumentListModal(false)} className="inline-flex items-center px-4 py-2 rounded-xl border border-slate-700 bg-white/5/5 dark:bg-slate-800 text-slate-300 text-sm font-medium hover:bg-white/5/10 dark:bg-slate-700 transition-colors">Close</button>
+                <button onClick={() => setShowDocumentListModal(false)} className="inline-flex items-center px-4 py-2 rounded-xl border border-slate-700 bg-white/5 dark:bg-slate-800 text-slate-300 text-sm font-medium hover:bg-white/5/10 dark:bg-slate-700 transition-colors">Close</button>
               </div>
             </div>
           </div>

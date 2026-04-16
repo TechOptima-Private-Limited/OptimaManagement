@@ -116,8 +116,8 @@ const RequestDetailModal = ({
 
   const modalContent = (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] transition-all duration-500">
-      <div className={`bg-slate-950 border ${theme.cardBorder || 'border-black/10 dark:border-white/10'} rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.9)] max-w-4xl w-full max-h-[85vh] overflow-y-auto custom-scrollbar relative border-black/10 dark:border-white/10 mt-10`}>
-        <div className={`sticky top-0 bg-white/5 dark:bg-slate-900 border-b border-black/10 dark:border-white/10 px-8 py-5 rounded-t-3xl z-30 flex items-center justify-between shadow-lg`}>
+      <div className={`bg-slate-950 border ${theme.cardBorder || 'border-white/10 dark:border-white/10'} rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.9)] max-w-4xl w-full max-h-[85vh] overflow-y-auto custom-scrollbar relative border-white/10 dark:border-white/10 mt-10`}>
+        <div className={`sticky top-0 bg-white/5 dark:bg-slate-900 border-b border-white/10 dark:border-white/10 px-8 py-5 rounded-t-3xl z-30 flex items-center justify-between shadow-lg`}>
           <div className="flex items-center space-x-4">
             <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
               <EyeIcon className="h-6 w-6 text-indigo-400" />
@@ -133,7 +133,7 @@ const RequestDetailModal = ({
           <button
             onClick={onClose}
             title="Close"
-            className="p-2 bg-black/10 dark:bg-white/5/10 hover:bg-indigo-500 text-white rounded-xl transition-all duration-300 group flex items-center justify-center border border-black/10 dark:border-white/10 hover:border-indigo-400 active:scale-95 shadow-xl"
+            className="p-2 bg-black/10 dark:bg-white/5/10 hover:bg-indigo-500 text-white rounded-xl transition-all duration-300 group flex items-center justify-center border border-white/10 dark:border-white/10 hover:border-indigo-400 active:scale-95 shadow-xl"
           >
             <XMarkIcon className="h-7 w-7 text-white" />
           </button>
@@ -145,7 +145,7 @@ const RequestDetailModal = ({
               <div>
                 <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Status</label>
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white/5/5 rounded-lg border border-white/10">
+                  <div className="p-2 bg-white/5 rounded-lg border border-white/10">
                     {getStatusIcon(request.status)}
                   </div>
                   <span className={getStatusBadge(request.status)}>
@@ -188,7 +188,7 @@ const RequestDetailModal = ({
           </div>
 
           {request.request_type !== 'IT' && (
-            <div className="border-t border-black/10 dark:border-white/10 pt-8">
+            <div className="border-t border-white/10 dark:border-white/10 pt-8">
               <h4 className="text-lg font-bold text-white mb-6">Resource Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -204,7 +204,7 @@ const RequestDetailModal = ({
             </div>
           )}
 
-          <div className="border-t border-black/10 dark:border-white/10 pt-10">
+          <div className="border-t border-white/10 dark:border-white/10 pt-10">
             <label className="block text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Justification</label>
             <div
               className="prose prose-invert max-w-none text-gray-300 bg-black/40 rounded-2xl p-8 border border-white/10 leading-relaxed shadow-inner"
@@ -213,7 +213,7 @@ const RequestDetailModal = ({
           </div>
 
           {(request.approved_by || request.approved_at || request.status === 'REJECTED') && (
-            <div className="border-t border-black/10 dark:border-white/10 pt-8">
+            <div className="border-t border-white/10 dark:border-white/10 pt-8">
               <h4 className="text-lg font-bold text-white mb-6">Approval Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-xl bg-black/20 border border-white/10">
                 {request.status === 'REJECTED' && request.rejected_by_name && (
@@ -239,7 +239,7 @@ const RequestDetailModal = ({
           )}
 
           {isAdminLike && (
-            <div className="border-t border-black/10 dark:border-white/10 pt-10 pb-6">
+            <div className="border-t border-white/10 dark:border-white/10 pt-10 pb-6">
               <div className="bg-gradient-to-br from-indigo-500/[0.08] to-purple-500/[0.08] border border-indigo-500/20 rounded-3xl p-8 shadow-[inset_0_0_40px_rgba(0,0,0,0.2)]">
                 <h4 className="text-sm font-black text-indigo-400/80 uppercase tracking-[0.2em] mb-8 flex items-center">
                   <div className="p-1.5 bg-indigo-500/10 rounded-lg mr-3">
@@ -252,7 +252,7 @@ const RequestDetailModal = ({
                     <label className="text-sm font-bold text-indigo-200">Assigned To</label>
                     <Combobox value={assignedTo} onChange={setAssignedTo}>
                       <div className="relative mt-1">
-                        <div className="relative w-full cursor-default overflow-hidden rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20">
+                        <div className="relative w-full cursor-default overflow-hidden rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20">
                           <Combobox.Input
                             className="w-full border-none py-3 pl-4 pr-10 text-sm leading-5 text-white bg-transparent focus:ring-0 placeholder-gray-500"
                             displayValue={(userId) => {
@@ -333,13 +333,13 @@ const RequestDetailModal = ({
                     </Combobox>
                   </div>
                   
-                  <div className="flex items-center gap-3 mt-7 border border-black/10 dark:border-white/10 bg-white/5/5 px-5 py-3 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors shadow-sm">
+                  <div className="flex items-center gap-3 mt-7 border border-white/10 dark:border-white/10 bg-white/5 px-5 py-3 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors shadow-sm">
                     <input
                       id="requiresApproval"
                       type="checkbox"
                       checked={requiresApproval}
                       onChange={(e) => setRequiresApproval(e.target.checked)}
-                      className="h-5 w-5 text-indigo-500 border-black/20 dark:border-white/20 rounded bg-white/5/5 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
+                      className="h-5 w-5 text-indigo-500 border-black/20 dark:border-white/20 rounded bg-white/5 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
                     />
                     <label htmlFor="requiresApproval" className="text-sm font-bold text-white cursor-pointer select-none">Requires Manager Approval</label>
                   </div>
@@ -370,7 +370,7 @@ const RequestDetailModal = ({
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Add internal notes or comments..."
-                      className="px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 placeholder-gray-500 resize-none shadow-sm"
+                      className="px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 placeholder-gray-500 resize-none shadow-sm"
                     />
                   </div>
                 </div>
@@ -410,7 +410,7 @@ const RequestDetailModal = ({
                       value={approverEmail}
                       onChange={(e) => setApproverEmail(e.target.value)}
                       placeholder="Manager email..."
-                      className="px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-w-[200px] flex-grow placeholder-gray-500 shadow-sm"
+                      className="px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-w-[200px] flex-grow placeholder-gray-500 shadow-sm"
                     />
                     <button
                       onClick={async () => {
