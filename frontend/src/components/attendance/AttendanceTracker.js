@@ -54,7 +54,7 @@ const getDefaultFilters = () => {
   };
 };
 const AttendanceVisual = ({ logs }) => {
-  if (!logs || logs.length === 0) return <div className="h-4 w-full bg-black/5 dark:bg-white/5 rounded-full border border-black/5 dark:border-white/5"></div>;
+  if (!logs || logs.length === 0) return <div className="h-4 w-full bg-white/5/5 rounded-full border border-white/10"></div>;
   const sortedLogs = [...logs].sort((a, b) => a.time.localeCompare(b.time));
   const START_MIN = 8 * 60; // 08:00
   const END_MIN = 20 * 60;   // 20:00
@@ -71,11 +71,11 @@ const AttendanceVisual = ({ logs }) => {
     segments.push({ start, end, startTime: sortedLogs[i].time, endTime: sortedLogs[i + 1]?.time });
   }
   return (
-    <div className="relative h-4 w-48 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden border border-black/5 dark:border-white/5 backdrop-blur-sm shadow-inner mt-1">
+    <div className="relative h-4 w-48 bg-white/5/5 rounded-full overflow-hidden border border-white/10 backdrop-blur-sm shadow-inner mt-1">
       {[...Array(11)].map((_, i) => (
         <div
           key={i}
-          className="absolute h-full border-l border-black/5 dark:border-white/5 z-10"
+          className="absolute h-full border-l border-white/10 z-10"
           style={{ left: `${((i + 1) * 60) / TOTAL_MIN * 100}%` }}
         ></div>
       ))}
@@ -594,7 +594,7 @@ const AttendanceTracker = () => {
     }
   };
   const StatCard = ({ title, value, icon: Icon, gradient, percentage, trend }) => (
-    <div className="relative bg-black/5 dark:bg-white/5 rounded-[2.5rem] border border-black/5 dark:border-white/5 overflow-hidden group hover:border-black/20 dark:border-white/20 transition-all duration-300 shadow-2xl backdrop-blur-xl">
+    <div className="relative bg-white/5/5 rounded-[2.5rem] border border-white/10 overflow-hidden group hover:border-black/20 dark:border-white/20 transition-all duration-300 shadow-2xl backdrop-blur-xl">
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5 group-hover:opacity-10 transition-opacity`}></div>
       <div className="relative p-8">
         <div className="flex items-center justify-between">
@@ -644,7 +644,7 @@ const AttendanceTracker = () => {
               {/* ✅ Use display_name from API - handles both employee and biometric */}
               {row.display_name || 'Unknown'}
             </div>
-            <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            <div className="text-sm font-medium text-slate-400">
               {row.display_id || 'N/A'}
             </div>
           </div>
@@ -740,7 +740,7 @@ const AttendanceTracker = () => {
         return (
           <div className="flex items-center">
             {type === 'BIOMETRIC' && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-black/10 dark:bg-white/10 text-slate-200 border border-black/20 dark:border-white/20">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-black/10 dark:bg-white/5/10 text-slate-200 border border-black/20 dark:border-white/20">
                 <ServerIcon className="w-3 h-3 mr-1" />
                 Biometric
               </span>
@@ -839,12 +839,12 @@ const AttendanceTracker = () => {
   return (
     <div className="min-h-screen bg-[#070B14] text-slate-200">
       {/* Hero Section */}
-      <div className={`relative overflow-hidden bg-gradient-to-br from-[#0B1120] to-[#070B14] border-b border-black/5 dark:border-white/5 p-12 mb-8`}>
+      <div className={`relative overflow-hidden bg-gradient-to-br from-[#0B1120] to-[#070B14] border-b border-white/10 p-12 mb-8`}>
         <div className={`absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br ${theme.primaryGradient} opacity-10 rounded-full blur-3xl`}></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center space-x-6">
-              <div className="p-5 bg-black/5 dark:bg-white/5 rounded-3xl border border-black/5 dark:border-white/5 shadow-2xl backdrop-blur-xl">
+              <div className="p-5 bg-white/5/5 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl">
                 <ClockIcon className="h-12 w-12 text-indigo-400 stroke-[1.5]" />
               </div>
               <div>
@@ -858,7 +858,7 @@ const AttendanceTracker = () => {
             </div>
             <div className="flex items-center space-x-4">
               {isManagementRole && biometricDevices.length > 0 && (
-                <div className="flex items-center space-x-3 px-6 py-4 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 backdrop-blur-xl transition-all">
+                <div className="flex items-center space-x-3 px-6 py-4 bg-white/5/5 rounded-2xl border border-white/10 backdrop-blur-xl transition-all">
                   <ServerIcon className="h-5 w-5 text-indigo-400" />
                   <div className="text-left">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Biometric Stream</p>
@@ -870,7 +870,7 @@ const AttendanceTracker = () => {
               )}
               <button
                 onClick={exportAttendance}
-                className="group flex items-center px-10 py-5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-white dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20 transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
+                className="group flex items-center px-10 py-5 bg-white/5/5 border border-black/10 dark:border-white/10 text-white dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
               >
                 <DocumentChartBarIcon className="h-5 w-5 mr-3 text-indigo-400 group-hover:scale-125 transition-transform" />
                 Export Dataset
@@ -880,7 +880,7 @@ const AttendanceTracker = () => {
                 className={`group flex items-center px-8 py-5 border text-white dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-2xl ${
                   showAnalytics
                     ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                    : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20'
+                    : 'bg-white/5/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20'
                 }`}
               >
                 <SparklesIcon className="h-5 w-5 mr-3 text-indigo-400 group-hover:scale-125 transition-transform" />
@@ -916,11 +916,11 @@ const AttendanceTracker = () => {
         {/* Overview Row: Stats Summary, Timings, Actions */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-12">
           {/* Attendance Stats (Me vs Team) - Redesigned to match sample */}
-          <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/5 p-8 shadow-2xl relative overflow-hidden group">
+          <div className="bg-white/5/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-black text-white uppercase tracking-tight">Attendance Stats</h3>
-              <div className="flex items-center space-x-2 px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full border border-black/10 dark:border-white/10">
-                <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Last Week</span>
+              <div className="flex items-center space-x-2 px-3 py-1 bg-white/5/5 rounded-full border border-black/10 dark:border-white/10">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Last Week</span>
                 <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
               </div>
             </div>
@@ -936,7 +936,7 @@ const AttendanceTracker = () => {
               </div>
 
               {/* Me Row */}
-              <div className="group/row flex items-center justify-between p-4 bg-black/5 dark:bg-white/5 rounded-[1.5rem] border border-black/5 dark:border-white/5 hover:border-indigo-500/30 transition-all">
+              <div className="group/row flex items-center justify-between p-4 bg-white/5/5 rounded-[1.5rem] border border-white/10 hover:border-indigo-500/30 transition-all">
                 <div className="w-1/3 flex items-center space-x-3">
                   <div className="h-10 w-10 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
                     <UserIcon className="h-5 w-5 text-amber-500" />
@@ -950,7 +950,7 @@ const AttendanceTracker = () => {
               </div>
 
               {/* Team Row */}
-              <div className="group/row flex items-center justify-between p-4 bg-black/5 dark:bg-white/5 rounded-[1.5rem] border border-black/5 dark:border-white/5 hover:border-blue-500/30 transition-all opacity-80 hover:opacity-100">
+              <div className="group/row flex items-center justify-between p-4 bg-white/5/5 rounded-[1.5rem] border border-white/10 hover:border-blue-500/30 transition-all opacity-80 hover:opacity-100">
                 <div className="w-1/3 flex items-center space-x-3">
                   <div className="h-10 w-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
                     <SparklesIcon className="h-5 w-5 text-blue-400" />
@@ -971,7 +971,7 @@ const AttendanceTracker = () => {
             </div>
           </div>
           {/* Timings */}
-          <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/5 p-8 shadow-2xl relative overflow-hidden group">
+          <div className="bg-white/5/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chronological Status</h3>
               <div className="flex space-x-1.5">
@@ -979,7 +979,7 @@ const AttendanceTracker = () => {
                   const jsDay = new Date().getDay();
                   const active = idx === jsDay;
                   return (
-                    <span key={idx} className={`text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-lg border transition-all ${active ? 'bg-indigo-500 text-white dark:text-white border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-black/5 dark:bg-white/5 text-slate-600 border-black/5 dark:border-white/5 grayscale'}`}>{d}</span>
+                    <span key={idx} className={`text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-lg border transition-all ${active ? 'bg-indigo-500 text-white dark:text-white border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/5/5 text-slate-600 border-white/10 grayscale'}`}>{d}</span>
                   );
                 })}
               </div>
@@ -993,7 +993,7 @@ const AttendanceTracker = () => {
                   {todayRecord?.check_in_time ? `${formatTimeDisplay(todayRecord.check_in_time)} - ${todayRecord?.check_out_time ? formatTimeDisplay(todayRecord.check_out_time) : 'Active'}` : 'Inactive'}
                 </span>
               </div>
-              <div className="h-4 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden border border-black/5 dark:border-white/5 shadow-inner p-1">
+              <div className="h-4 w-full bg-white/5/5 rounded-full overflow-hidden border border-white/10 shadow-inner p-1">
                 {(() => {
                   const percent = Math.max(0, Math.min(100, Math.round((todayDurationMinutes / (9 * 60)) * 100)));
                   return <div className={`h-full bg-gradient-to-r ${theme.primaryGradient} rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]`} style={{ width: `${percent}%` }} />
@@ -1006,17 +1006,17 @@ const AttendanceTracker = () => {
             </div>
           </div>
           {/* Actions */}
-          <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/5 p-8 shadow-2xl relative overflow-hidden group">
+          <div className="bg-white/5/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Control Interface</h3>
               <button
                 type="button"
                 onClick={() => setUse24Hour(!use24Hour)}
-                className={`group flex items-center space-x-2 px-3 py-1 rounded-full border transition-all ${use24Hour ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/5'}`}
+                className={`group flex items-center space-x-2 px-3 py-1 rounded-full border transition-all ${use24Hour ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5/5 border-white/10'}`}
               >
                 <span className={`text-[9px] font-black uppercase tracking-tighter ${use24Hour ? 'text-indigo-400' : 'text-slate-500'}`}>24H Format</span>
-                <div className={`w-6 h-3.5 rounded-full relative transition-colors ${use24Hour ? 'bg-indigo-500' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                  <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white rounded-full transition-transform ${use24Hour ? 'left-[13px]' : 'left-[3px]'}`} />
+                <div className={`w-6 h-3.5 rounded-full relative transition-colors ${use24Hour ? 'bg-indigo-500' : 'bg-white/5 dark:bg-slate-800'}`}>
+                  <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white/5 rounded-full transition-transform ${use24Hour ? 'left-[13px]' : 'left-[3px]'}`} />
                 </div>
               </button>
             </div>
@@ -1026,10 +1026,10 @@ const AttendanceTracker = () => {
               <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-4">Node Clock: {new Date().toDateString()}</p>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              <button onClick={() => handleQuickAction('clockin')} className="w-full text-left px-5 py-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/10 hover:text-white dark:text-white hover:border-black/20 dark:border-white/20 transition-all flex items-center group/btn">
+              <button onClick={() => handleQuickAction('clockin')} className="w-full text-left px-5 py-3 rounded-2xl bg-white/5/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white dark:text-white hover:border-black/20 dark:border-white/20 transition-all flex items-center group/btn">
                 <ClockIcon className="h-4 w-4 text-indigo-400 mr-3 group-hover/btn:scale-125 transition-transform" /> Quick Clock-In
               </button>
-              <button onClick={() => handleQuickAction('wfh')} className="w-full text-left px-5 py-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/10 hover:text-white dark:text-white hover:border-black/20 dark:border-white/20 transition-all flex items-center group/btn">
+              <button onClick={() => handleQuickAction('wfh')} className="w-full text-left px-5 py-3 rounded-2xl bg-white/5/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white dark:text-white hover:border-black/20 dark:border-white/20 transition-all flex items-center group/btn">
                 <CalendarIcon className="h-4 w-4 text-indigo-400 mr-3 group-hover/btn:scale-125 transition-transform" /> Sync Remote Node
               </button>
             </div>
@@ -1077,7 +1077,7 @@ const AttendanceTracker = () => {
 
         {/* ── Analytics Section ── */}
         {showAnalytics && (
-          <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/5 p-8 mb-12 shadow-2xl">
+          <div className="bg-white/5/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 mb-12 shadow-2xl">
             <AttendanceTrends
               theme={theme}
               attendanceRecords={attendanceRecords}
@@ -1135,16 +1135,16 @@ const AttendanceTracker = () => {
           </div>
         )}
         {canViewApprovals && (
-          <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/5 p-10 mb-12 shadow-2xl relative overflow-hidden" data-approvals-section>
+          <div className="bg-white/5/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-10 mb-12 shadow-2xl relative overflow-hidden" data-approvals-section>
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center space-x-4">
-                <div className="p-4 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 shadow-2xl">
+                <div className="p-4 bg-white/5/5 rounded-2xl border border-white/10 shadow-2xl">
                   <CheckCircleIcon className="h-8 w-8 text-emerald-400" />
                 </div>
                 <div>
                   <h3 className="text-3xl font-black text-white dark:text-white uppercase tracking-tight flex items-center">
                     Registry Verification Queue
-                    {isManager() && <span className="text-[10px] font-black text-slate-500 ml-4 uppercase tracking-[0.2em] bg-black/5 dark:bg-white/5 px-3 py-1 rounded-full border border-black/5 dark:border-white/5">Team Nodes</span>}
+                    {isManager() && <span className="text-[10px] font-black text-slate-500 ml-4 uppercase tracking-[0.2em] bg-white/5/5 px-3 py-1 rounded-full border border-white/10">Team Nodes</span>}
                   </h3>
                   <p className="text-sm font-black text-slate-500 uppercase tracking-widest mt-1">Pending presence validation requests</p>
                 </div>
@@ -1160,7 +1160,7 @@ const AttendanceTracker = () => {
                 {attendanceRecords
                   .filter(record => record.is_pending_approval)
                   .map((record) => (
-                    <div key={record.id} className="bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-[2rem] p-8 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 shadow-inner group">
+                    <div key={record.id} className="bg-white/5/5 border border-white/10 rounded-[2rem] p-8 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 shadow-inner group">
                       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
                         <div className="flex items-center space-x-5">
                           <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 text-xl font-black text-white dark:text-white uppercase transform group-hover:rotate-6 transition-transform">
@@ -1171,7 +1171,7 @@ const AttendanceTracker = () => {
                               {record.display_name || 'Unknown Node'}
                             </h4>
                             <div className="flex items-center space-x-3 mt-2">
-                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-black/5 dark:bg-white/5 px-3 py-1 rounded-full border border-black/5 dark:border-white/5">ID: {record.display_id || 'N/A'}</span>
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-white/5/5 px-3 py-1 rounded-full border border-white/10">ID: {record.display_id || 'N/A'}</span>
                               <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">{formatDate(record.date)}</span>
                             </div>
                           </div>
@@ -1188,7 +1188,7 @@ const AttendanceTracker = () => {
                           <button
                             onClick={() => openApprovalModal(record, 'reject')}
                             disabled={submitting || !canActOnApprovals}
-                            className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-red-500/10 hover:border-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 flex items-center space-x-3 transform hover:scale-105 active:scale-95"
+                            className="bg-white/5/5 border border-black/10 dark:border-white/10 hover:bg-red-500/10 hover:border-red-500/20 text-slate-400 hover:text-red-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 flex items-center space-x-3 transform hover:scale-105 active:scale-95"
                           >
                             <XCircleIcon className="h-4 w-4 stroke-[3]" />
                             <span>Abort Request</span>
@@ -1196,8 +1196,8 @@ const AttendanceTracker = () => {
                         </div>
                       </div>
                       {record.edit_reason && (
-                        <div className="mb-8 p-6 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl shadow-inner relative">
-                          <div className="absolute top-0 right-4 -translate-y-1/2 bg-[#1A1F2E] px-3 py-1 rounded-full border border-black/5 dark:border-white/5">
+                        <div className="mb-8 p-6 bg-white/5/5 border border-white/10 rounded-2xl shadow-inner relative">
+                          <div className="absolute top-0 right-4 -translate-y-1/2 bg-[#1A1F2E] px-3 py-1 rounded-full border border-white/10">
                             <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Employee Rationalization</span>
                           </div>
                           <p className="text-sm font-bold text-slate-200 italic leading-relaxed">
@@ -1207,23 +1207,23 @@ const AttendanceTracker = () => {
                       )}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* ORIGINAL VALUES */}
-                        <div className="bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl p-6 shadow-inner flex flex-col grayscale opacity-50">
+                        <div className="bg-white/5/5 border border-white/10 rounded-2xl p-6 shadow-inner flex flex-col grayscale opacity-50">
                           <h5 className="text-[10px] font-black text-slate-500 mb-6 flex items-center uppercase tracking-[0.2em]">
                             <XCircleIcon className="h-4 w-4 mr-2" />
                             Baseline Registry State
                           </h5>
                           <div className="space-y-4">
-                            <div className="flex justify-between items-center pb-2 border-b border-black/5 dark:border-white/5">
+                            <div className="flex justify-between items-center pb-2 border-b border-white/10">
                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Check In</span>
-                              <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase font-mono">{record.original_check_in_time || 'Null'}</span>
+                              <span className="text-xs font-black text-slate-400 uppercase font-mono">{record.original_check_in_time || 'Null'}</span>
                             </div>
-                            <div className="flex justify-between items-center pb-2 border-b border-black/5 dark:border-white/5">
+                            <div className="flex justify-between items-center pb-2 border-b border-white/10">
                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Check Out</span>
-                              <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase font-mono">{record.original_check_out_time || 'Null'}</span>
+                              <span className="text-xs font-black text-slate-400 uppercase font-mono">{record.original_check_out_time || 'Null'}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Protocol Status</span>
-                              <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase">{record.original_status || 'Null'}</span>
+                              <span className="text-xs font-black text-slate-400 uppercase">{record.original_status || 'Null'}</span>
                             </div>
                           </div>
                         </div>
@@ -1253,7 +1253,7 @@ const AttendanceTracker = () => {
                   ))}
               </div>
             ) : (
-              <div className="py-24 text-center bg-black/5 dark:bg-white/5 rounded-[2.5rem] border border-dashed border-black/10 dark:border-white/10">
+              <div className="py-24 text-center bg-white/5/5 rounded-[2.5rem] border border-dashed border-black/10 dark:border-white/10">
                 <div className="p-6 bg-emerald-500/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center border border-emerald-500/20 shadow-2xl">
                   <CheckCircleIcon className="h-10 w-10 text-emerald-400" />
                 </div>
@@ -1295,7 +1295,7 @@ const AttendanceTracker = () => {
                   <input
                     {...register('date', { required: 'Date is required' })}
                     type="date"
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-black/5 dark:bg-white/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-white/5/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
                     max={getLocalDateString()}
                   />
                   {errors.date && <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>}
@@ -1305,7 +1305,7 @@ const AttendanceTracker = () => {
                   <input
                     {...register('check_in_time')}
                     type="time"
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-black/5 dark:bg-white/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-white/5/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
                   />
                 </div>
                 <div>
@@ -1313,7 +1313,7 @@ const AttendanceTracker = () => {
                   <input
                     {...register('check_out_time')}
                     type="time"
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-black/5 dark:bg-white/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-white/5/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
                   />
                 </div>
                 <div>
@@ -1335,7 +1335,7 @@ const AttendanceTracker = () => {
                     {...register('notes')}
                     type="text"
                     placeholder="Optional notes..."
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-black/5 dark:bg-white/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors placeholder-gray-500"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-xl bg-white/5/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors placeholder-gray-500"
                   />
                 </div>
               </div>
@@ -1351,7 +1351,7 @@ const AttendanceTracker = () => {
                     })}
                     rows={3}
                     placeholder="Please explain why you need to edit this attendance record..."
-                    className="w-full px-4 py-3 border border-amber-500/30 rounded-xl bg-black/5 dark:bg-white/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors placeholder-amber-500/40 resize-none"
+                    className="w-full px-4 py-3 border border-amber-500/30 rounded-xl bg-white/5/5 text-white dark:text-white shadow-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors placeholder-amber-500/40 resize-none"
                   />
                   {errors.edit_reason && <p className="text-red-400 text-sm mt-1">{errors.edit_reason.message}</p>}
                   <p className="text-xs text-amber-400/80 mt-2 flex items-center">
@@ -1391,7 +1391,7 @@ const AttendanceTracker = () => {
         {/* Admin / HR / C-level: explicit filters (defaults to last 7 days vs. full history) */}
         {isOrgWideAttendanceRole() && (
           <div className="mb-8 rounded-3xl overflow-hidden border border-indigo-500/20 bg-indigo-500/5 backdrop-blur-xl shadow-2xl">
-            <div className="px-6 py-4 border-b border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5">
+            <div className="px-6 py-4 border-b border-white/10 bg-white/5/5">
               <div className="flex items-center gap-3">
                 <FunnelIcon className="h-5 w-5 text-indigo-400" />
                 <div>
@@ -1408,7 +1408,7 @@ const AttendanceTracker = () => {
                 <select
                   value={filters.employee_id}
                   onChange={(e) => handleFilterChange('employee_id', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 [color-scheme:dark]"
                 >
                   <option value="">All employees</option>
                   {orgEmployeeOptions.map((emp) => {
@@ -1427,7 +1427,7 @@ const AttendanceTracker = () => {
                   type="date"
                   value={filters.start_date}
                   onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
                 />
               </div>
               <div>
@@ -1436,7 +1436,7 @@ const AttendanceTracker = () => {
                   type="date"
                   value={filters.end_date}
                   onChange={(e) => handleFilterChange('end_date', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
                 />
               </div>
               <div>
@@ -1444,7 +1444,7 @@ const AttendanceTracker = () => {
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5/5 border border-black/10 dark:border-white/10 text-white dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
                 >
                   <option value="">All statuses</option>
                   <option value="PRESENT">Present</option>
@@ -1457,7 +1457,7 @@ const AttendanceTracker = () => {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-200 hover:bg-white/15 hover:text-white dark:text-white transition-all"
+                  className="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-white/5/10 border border-black/10 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-200 hover:bg-white/5/15 hover:text-white dark:text-white transition-all"
                 >
                   Reset filters
                 </button>
@@ -1518,7 +1518,7 @@ const AttendanceTracker = () => {
                 ? `${months[activeMonthIndex].label} ${months[activeMonthIndex].year}`
                 : 'CUSTOM SPEC';
           return (
-            <div className="mb-8 rounded-3xl overflow-hidden border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 backdrop-blur-xl shadow-2xl">
+            <div className="mb-8 rounded-3xl overflow-hidden border border-white/10 bg-white/5/5 backdrop-blur-xl shadow-2xl">
               <div className="flex flex-col md:flex-row md:items-center px-10 py-6 gap-6">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
@@ -1533,7 +1533,7 @@ const AttendanceTracker = () => {
                     <button
                       type="button"
                       onClick={setLast7}
-                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast7Active ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-black/5 dark:bg-white/5 text-slate-500 border border-black/5 dark:border-white/5 hover:border-black/20 dark:border-white/20'}`}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast7Active ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5/5 text-slate-500 border border-white/10 hover:border-black/20 dark:border-white/20'}`}
                     >
                       7 DAYS
                     </button>
@@ -1541,7 +1541,7 @@ const AttendanceTracker = () => {
                   <button
                     type="button"
                     onClick={setLast30}
-                    className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast30Active ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-black/5 dark:bg-white/5 text-slate-500 border border-black/5 dark:border-white/5 hover:border-black/20 dark:border-white/20'}`}
+                    className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast30Active ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5/5 text-slate-500 border border-white/10 hover:border-black/20 dark:border-white/20'}`}
                   >
                     30 CYCLES
                   </button>
@@ -1550,7 +1550,7 @@ const AttendanceTracker = () => {
                       type="button"
                       key={i}
                       onClick={() => setMonth(m)}
-                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${activeMonthIndex === i ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-black/5 dark:bg-white/5 text-slate-500 border border-black/5 dark:border-white/5 hover:border-black/20 dark:border-white/20 hover:text-white dark:text-white'}`}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${activeMonthIndex === i ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5/5 text-slate-500 border border-white/10 hover:border-black/20 dark:border-white/20 hover:text-white dark:text-white'}`}
                     >
                       {m.label}
                     </button>
@@ -1560,11 +1560,11 @@ const AttendanceTracker = () => {
             </div>
           );
         })()}
-        <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/5 overflow-hidden shadow-2xl">
-          <div className="px-10 py-8 border-b border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5">
+        <div className="bg-white/5/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
+          <div className="px-10 py-8 border-b border-white/10 bg-white/5/5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5">
+                <div className="p-3 bg-white/5/5 rounded-2xl border border-white/10">
                   <DocumentChartBarIcon className="h-6 w-6 text-indigo-400" />
                 </div>
                 <div>
@@ -1572,7 +1572,7 @@ const AttendanceTracker = () => {
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Lifecycle event logs for current node query</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 px-4 py-2 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5">
+              <div className="flex items-center space-x-3 px-4 py-2 bg-white/5/5 rounded-2xl border border-white/10">
                 <CalendarIcon className="h-4 w-4 text-indigo-400" />
                 <span className="text-xs font-black text-white uppercase tracking-[0.15em]">{getDisplayRecords().length} LOGS</span>
               </div>
@@ -1816,7 +1816,7 @@ const AttendanceTracker = () => {
             >
               <div className="relative">
                 <ClockIcon className="h-6 w-6" />
-                <span className="absolute -top-2 -right-2 bg-white text-red-700 rounded-full text-xs font-bold w-6 h-6 flex items-center justify-center border-2 border-red-600">
+                <span className="absolute -top-2 -right-2 bg-white/5 text-red-700 rounded-full text-xs font-bold w-6 h-6 flex items-center justify-center border-2 border-red-600">
                   {attendanceRecords.filter(r => r.is_pending_approval).length}
                 </span>
               </div>

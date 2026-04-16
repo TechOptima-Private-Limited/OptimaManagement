@@ -128,13 +128,13 @@ const EmployeeManagement = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-amber-100 text-amber-400 border-amber-200';
       case 'accepted':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        return 'bg-emerald-100 text-emerald-400 border-emerald-500/20';
       case 'rejected':
         return 'bg-rose-100 text-rose-800 border-rose-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-white/5/10 text-white border-white/10';
     }
   };
 
@@ -236,20 +236,20 @@ const EmployeeManagement = () => {
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-black/5 dark:bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/5 dark:bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-black/20 dark:bg-white/20 rounded-lg backdrop-blur-sm">
-                  <Shield className="h-8 w-8 text-slate-900 dark:text-white" />
+                <div className="p-2 bg-black/20 dark:bg-[#070B14]/20 rounded-lg backdrop-blur-sm">
+                  <Shield className="h-8 w-8 text-white" />
                 </div>
                 <Star className="h-6 w-6 text-yellow-300 animate-pulse" />
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-3">
+              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
                 Employee Management
               </h1>
               <p className="text-xl text-blue-100 mb-6">
@@ -282,15 +282,15 @@ const EmployeeManagement = () => {
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.key} className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/50 overflow-hidden">
+              <div key={stat.key} className="group bg-[#070B14]/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/50 overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <Icon className="h-6 w-6 text-slate-900 dark:text-white" />
+                        <Icon className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <p className="text-3xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">
+                        <p className="text-3xl font-bold text-white group-hover:text-indigo-600 transition-colors duration-300">
                           {stat.count}
                         </p>
                         <p className="text-sm font-medium text-gray-600">
@@ -307,7 +307,7 @@ const EmployeeManagement = () => {
         </div>
 
         {/* Enhanced Filter and Search */}
-        <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/50 p-6 space-y-4">
+        <div className="bg-[#070B14]/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/50 p-6 space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             {/* Filter Tabs */}
             <div className="flex space-x-2">
@@ -320,8 +320,8 @@ const EmployeeManagement = () => {
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
                   className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
-                    ? 'bg-indigo-600 text-slate-900 dark:text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-indigo-600 text-white shadow-lg'
+                    : 'bg-white/5/10 text-gray-600 hover:bg-white/5/10'
                     }`}
                 >
                   {tab.label} ({tab.count})
@@ -339,7 +339,7 @@ const EmployeeManagement = () => {
                 placeholder="Search employees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
+                className="w-full pl-10 pr-4 py-2 border-2 border-white/10 rounded-xl bg-[#070B14]/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
               />
             </div>
           </div>
@@ -353,8 +353,8 @@ const EmployeeManagement = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full animate-pulse"></div>
                 <Users className="absolute inset-4 text-indigo-300" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No employees found</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
+              <h3 className="text-2xl font-bold text-white mb-2">No employees found</h3>
+              <p className="text-slate-400 mb-6 max-w-md mx-auto">
                 No employees match your current search and filter criteria.
               </p>
             </div>
@@ -367,7 +367,7 @@ const EmployeeManagement = () => {
               return (
                 <div
                   key={employee.id}
-                  className={`group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/50 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
+                  className={`group bg-[#070B14]/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/50 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
                     }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
@@ -379,7 +379,7 @@ const EmployeeManagement = () => {
                         <div className="relative">
                           <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 ${employee.is_deleted ? 'grayscale' : ''
                             }`}>
-                            <span className="text-slate-900 dark:text-white font-bold text-lg">
+                            <span className="text-white font-bold text-lg">
                               {employeeInitials}
                             </span>
                           </div>
@@ -390,14 +390,14 @@ const EmployeeManagement = () => {
 
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <h3 className={`text-xl font-bold group-hover:text-indigo-600 transition-colors duration-300 ${employee.is_deleted ? 'line-through text-gray-500' : 'text-gray-900'
+                            <h3 className={`text-xl font-bold group-hover:text-indigo-600 transition-colors duration-300 ${employee.is_deleted ? 'line-through text-slate-400' : 'text-white'
                               }`}>
                               {employee.first_name} {employee.last_name}
                               {employee.is_deleted && <span className="text-rose-500 ml-2">[DELETED]</span>}
                             </h3>
 
                             {employee.is_self_submitted && (
-                              <span className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200">
+                              <span className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border bg-emerald-100 text-emerald-400 border-emerald-500/20">
                                 ✓ Self-Submitted
                               </span>
                             )}
@@ -411,21 +411,21 @@ const EmployeeManagement = () => {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600">
                             <div>
-                              <span className="font-semibold text-gray-800">Email:</span> {employee.email}
+                              <span className="font-semibold text-white">Email:</span> {employee.email}
                             </div>
                             {employee.department && (
                               <div>
-                                <span className="font-semibold text-gray-800">Department:</span> {employee.department}
+                                <span className="font-semibold text-white">Department:</span> {employee.department}
                               </div>
                             )}
                             {employee.position && (
                               <div>
-                                <span className="font-semibold text-gray-800">Position:</span> {employee.position}
+                                <span className="font-semibold text-white">Position:</span> {employee.position}
                               </div>
                             )}
                             {employee.joining_date && (
                               <div>
-                                <span className="font-semibold text-gray-800">Joining:</span> {new Date(employee.joining_date).toLocaleDateString()}
+                                <span className="font-semibold text-white">Joining:</span> {new Date(employee.joining_date).toLocaleDateString()}
                               </div>
                             )}
                           </div>
@@ -433,7 +433,7 @@ const EmployeeManagement = () => {
                           {/* Document Status */}
                           <div className="mt-3 flex items-center space-x-4">
                             <div className="flex items-center space-x-2">
-                              <FileText className="h-4 w-4 text-gray-500" />
+                              <FileText className="h-4 w-4 text-slate-400" />
                               <span className="text-sm text-gray-600">
                                 Documents: {documentStatus.documentsCollected}/{documentStatus.totalRequired} collected
                               </span>
@@ -442,7 +442,7 @@ const EmployeeManagement = () => {
                               )}
                             </div>
                             <div className="flex items-center space-x-2">
-                              <Download className="h-4 w-4 text-gray-500" />
+                              <Download className="h-4 w-4 text-slate-400" />
                               <span className="text-sm text-gray-600">
                                 Files: {documentStatus.filesUploaded}/{documentStatus.totalRequired} uploaded
                               </span>
@@ -469,7 +469,7 @@ const EmployeeManagement = () => {
                               setSelectedEmployee(employee);
                               setShowRestoreConfirm(true);
                             }}
-                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transition-all duration-200 transform hover:scale-105"
+                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transition-all duration-200 transform hover:scale-105"
                             title="Restore Employee"
                           >
                             <RotateCcw className="h-4 w-4 mr-2" />
@@ -503,15 +503,15 @@ const EmployeeManagement = () => {
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDetailsModal(false)}></div>
 
-            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-gray-100">
+            <div className="inline-block align-bottom bg-[#070B14] rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-gray-100">
               {/* Header */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                    <Eye className="h-6 w-6 text-slate-900 dark:text-white" />
+                  <div className="w-12 h-12 bg-[#070B14] bg-opacity-20 rounded-xl flex items-center justify-center">
+                    <Eye className="h-6 w-6 text-white" />
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-2xl font-bold text-white">
                       Employee Details
                     </h3>
                     <p className="text-blue-100">
@@ -526,48 +526,48 @@ const EmployeeManagement = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Basic Information */}
                   <div className="space-y-4">
-                    <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2">Basic Information</h4>
+                    <h4 className="text-lg font-bold text-white border-b border-white/10 pb-2">Basic Information</h4>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">
                         {selectedEmployee.first_name} {selectedEmployee.last_name}
                       </p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.email}</p>
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">{selectedEmployee.email}</p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.phone_number || 'Not provided'}</p>
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">{selectedEmployee.phone_number || 'Not provided'}</p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Employee Type</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.employee_type || 'Not specified'}</p>
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">{selectedEmployee.employee_type || 'Not specified'}</p>
                     </div>
                   </div>
 
                   {/* Employment Details */}
                   <div className="space-y-4">
-                    <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2">Employment Details</h4>
+                    <h4 className="text-lg font-bold text-white border-b border-white/10 pb-2">Employment Details</h4>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Department</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.department || 'Not assigned'}</p>
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">{selectedEmployee.department || 'Not assigned'}</p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Position</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedEmployee.position || 'Not assigned'}</p>
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">{selectedEmployee.position || 'Not assigned'}</p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Joining Date</label>
-                      <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">
+                      <p className="text-sm text-white bg-[#070B14]/70 rounded-lg px-3 py-2">
                         {selectedEmployee.joining_date ? new Date(selectedEmployee.joining_date).toLocaleDateString() : 'Not specified'}
                       </p>
                     </div>
@@ -576,45 +576,45 @@ const EmployeeManagement = () => {
 
                 {/* Status Information */}
                 <div className="mt-6 space-y-4">
-                  <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2">Status Information</h4>
+                  <h4 className="text-lg font-bold text-white border-b border-white/10 pb-2">Status Information</h4>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white/70 rounded-lg p-4">
+                    <div className="bg-[#070B14]/70 rounded-lg p-4">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Submission Status</label>
                       {selectedEmployee.is_self_submitted ? (
                         <div className="flex items-center space-x-2">
                           <CheckCircle className="h-5 w-5 text-emerald-500" />
-                          <span className="text-sm font-medium text-emerald-700">Self-Submitted</span>
+                          <span className="text-sm font-medium text-emerald-300">Self-Submitted</span>
                         </div>
                       ) : (
                         <div className="flex items-center space-x-2">
                           <Clock className="h-5 w-5 text-amber-500" />
-                          <span className="text-sm font-medium text-amber-700">Pending</span>
+                          <span className="text-sm font-medium text-amber-300">Pending</span>
                         </div>
                       )}
                       {selectedEmployee.submitted_at && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           Submitted: {new Date(selectedEmployee.submitted_at).toLocaleString()}
                         </p>
                       )}
                     </div>
 
-                    <div className="bg-white/70 rounded-lg p-4">
+                    <div className="bg-[#070B14]/70 rounded-lg p-4">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">IT Notification</label>
                       {selectedEmployee.it_notification_sent ? (
                         <div className="flex items-center space-x-2">
                           <CheckCircle className="h-5 w-5 text-blue-500" />
-                          <span className="text-sm font-medium text-blue-700">Notified</span>
+                          <span className="text-sm font-medium text-blue-400">Notified</span>
                         </div>
                       ) : (
                         <div className="flex items-center space-x-2">
-                          <XCircle className="h-5 w-5 text-gray-500" />
+                          <XCircle className="h-5 w-5 text-slate-400" />
                           <span className="text-sm font-medium text-gray-700">Not Notified</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="bg-white/70 rounded-lg p-4">
+                    <div className="bg-[#070B14]/70 rounded-lg p-4">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Account Status</label>
                       {selectedEmployee.is_deleted ? (
                         <div className="flex items-center space-x-2">
@@ -624,11 +624,11 @@ const EmployeeManagement = () => {
                       ) : (
                         <div className="flex items-center space-x-2">
                           <CheckCircle className="h-5 w-5 text-emerald-500" />
-                          <span className="text-sm font-medium text-emerald-700">Active</span>
+                          <span className="text-sm font-medium text-emerald-300">Active</span>
                         </div>
                       )}
                       {selectedEmployee.deleted_at && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           Deleted: {new Date(selectedEmployee.deleted_at).toLocaleString()}
                         </p>
                       )}
@@ -638,7 +638,7 @@ const EmployeeManagement = () => {
 
                 {/* Document Status */}
                 <div className="mt-6">
-                  <h4 className="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Document Status</h4>
+                  <h4 className="text-lg font-bold text-white border-b border-white/10 pb-2 mb-4">Document Status</h4>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
@@ -653,7 +653,7 @@ const EmployeeManagement = () => {
                       const file = selectedEmployee[`${doc.key}_file`];
 
                       return (
-                        <div key={doc.key} className="bg-white/70 rounded-lg p-3">
+                        <div key={doc.key} className="bg-[#070B14]/70 rounded-lg p-3">
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700">{doc.label}</span>
                             <div className="flex items-center space-x-2">
@@ -675,10 +675,10 @@ const EmployeeManagement = () => {
                 </div>
               </div>
 
-              <div className="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
+              <div className="bg-white/5/5 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => setShowDetailsModal(false)}
-                  className="w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Close
                 </button>
@@ -694,36 +694,36 @@ const EmployeeManagement = () => {
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowDeleteConfirm(false)}></div>
 
-            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+            <div className="inline-block align-bottom bg-[#070B14] rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
               <div className="bg-gradient-to-br from-gray-50 to-red-50/30 px-6 py-6">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                     <AlertTriangle className="h-6 w-6 text-red-600" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-white">
                       Delete Employee
                     </h3>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Are you sure you want to delete <strong className="text-gray-900">{selectedEmployee.first_name} {selectedEmployee.last_name}</strong>?
+                      <p className="text-sm text-slate-400">
+                        Are you sure you want to delete <strong className="text-white">{selectedEmployee.first_name} {selectedEmployee.last_name}</strong>?
                         This will soft delete the employee record. You can restore it later if needed.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
+              <div className="bg-white/5/5 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => softDeleteEmployee(selectedEmployee.id)}
-                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-base font-semibold text-slate-900 dark:text-white hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-4 focus:ring-red-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-base font-semibold text-white hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-4 focus:ring-red-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>
@@ -739,36 +739,36 @@ const EmployeeManagement = () => {
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setShowRestoreConfirm(false)}></div>
 
-            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+            <div className="inline-block align-bottom bg-[#070B14] rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
               <div className="bg-gradient-to-br from-gray-50 to-green-50/30 px-6 py-6">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                     <RotateCcw className="h-6 w-6 text-green-600" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-white">
                       Restore Employee
                     </h3>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Are you sure you want to restore <strong className="text-gray-900">{selectedEmployee.first_name} {selectedEmployee.last_name}</strong>?
+                      <p className="text-sm text-slate-400">
+                        Are you sure you want to restore <strong className="text-white">{selectedEmployee.first_name} {selectedEmployee.last_name}</strong>?
                         This will reactivate the employee record and make it visible in the active employees list.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
+              <div className="bg-white/5/5 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => restoreEmployee(selectedEmployee.id)}
-                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-base font-semibold text-slate-900 dark:text-white hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-base font-semibold text-white hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Restore
                 </button>
                 <button
                   onClick={() => setShowRestoreConfirm(false)}
-                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-[#070B14] text-base font-medium text-gray-700 hover:bg-white/5/5 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>

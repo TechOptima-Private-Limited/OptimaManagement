@@ -266,15 +266,15 @@
 //   };
 
 //   const StatCard = ({ title, value, icon: Icon, color, percentage }) => (
-//     <div className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/50 overflow-hidden">
+//     <div className="group bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-white/50 overflow-hidden">
 //       <div className="p-6">
 //         <div className="flex items-center justify-between">
 //           <div className="flex items-center space-x-4">
 //             <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-//               <Icon className="h-6 w-6 text-slate-900 dark:text-white" />
+//               <Icon className="h-6 w-6 text-white" />
 //             </div>
 //             <div>
-//               <p className="text-3xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">
+//               <p className="text-3xl font-bold text-white group-hover:text-indigo-600 transition-colors duration-300">
 //                 {value}
 //               </p>
 //               <p className="text-sm font-medium text-gray-600">
@@ -304,13 +304,13 @@
 //         return (
 //           <div className="flex items-center">
 //             <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-md mr-3`}>
-//               <span className="text-slate-900 dark:text-white text-sm font-bold">
+//               <span className="text-white text-sm font-bold">
 //                 {employeeInitials}
 //               </span>
 //             </div>
 //             <div>
-//               <div className="text-sm font-medium text-gray-900">{name}</div>
-//               <div className="text-sm text-gray-500">{row.employee_id} • {row.employee_department}</div>
+//               <div className="text-sm font-medium text-white">{name}</div>
+//               <div className="text-sm text-slate-400">{row.employee_id} • {row.employee_department}</div>
 //             </div>
 //           </div>
 //         );
@@ -323,9 +323,9 @@
 //         <div className="flex items-center">
 //           <CalendarDaysIcon className="h-4 w-4 text-gray-600 dark:text-gray-400 mr-2" />
 //           <div>
-//             <div className="text-sm font-medium text-gray-900">{date}</div>
+//             <div className="text-sm font-medium text-white">{date}</div>
 //             {row.days_until_request >= 0 && (
-//               <div className="text-xs text-gray-500">
+//               <div className="text-xs text-slate-400">
 //                 {row.days_until_request === 0 ? 'Today' : 
 //                  row.days_until_request === 1 ? 'Tomorrow' : 
 //                  `In ${row.days_until_request} days`}
@@ -430,17 +430,17 @@
 //         <div className="absolute inset-0 bg-black opacity-10"></div>
 
 //         {/* Decorative elements */}
-//         <div className="absolute top-0 left-0 w-64 h-64 bg-black/5 dark:bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
-//         <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/5 dark:bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+//         <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
+//         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
 
 //         <div className="relative px-4 py-12 sm:px-6 lg:px-8">
 //           <div className="flex items-center justify-between">
 //             <div className="flex items-center">
-//               <div className="p-3 bg-black/20 dark:bg-white/20 rounded-xl backdrop-blur-sm mr-4">
-//                 <HomeIcon className="w-8 h-8 text-slate-900 dark:text-white" />
+//               <div className="p-3 bg-black/20 dark:bg-white/5/20 rounded-xl backdrop-blur-sm mr-4">
+//                 <HomeIcon className="w-8 h-8 text-white" />
 //               </div>
 //               <div>
-//                 <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Work From Home Requests</h1>
+//                 <h1 className="text-4xl font-bold text-white">Work From Home Requests</h1>
 //                 <p className="mt-1 text-xl text-blue-100">
 //                   {isHRManager() ? 'Manage work from home requests for all employees' : 'Track your work from home requests'}
 //                 </p>
@@ -459,7 +459,7 @@
 //             <div className="flex space-x-3">
 //               <button
 //                 onClick={exportWFHRequests}
-//                 className="group relative inline-flex items-center px-6 py-3 bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white rounded-xl font-medium backdrop-blur-sm border border-black/20 dark:border-white/20 hover:bg-black/20 dark:bg-white/20 transform hover:scale-105 transition-all duration-300"
+//                 className="group relative inline-flex items-center px-6 py-3 bg-black/10 dark:bg-white/5/10 text-white rounded-xl font-medium backdrop-blur-sm border border-black/20 dark:border-white/20 hover:bg-black/20 dark:bg-white/5/20 transform hover:scale-105 transition-all duration-300"
 //               >
 //                 <DocumentChartBarIcon className="h-5 w-5 mr-2 group-hover:animate-bounce" />
 //                 Export
@@ -467,7 +467,7 @@
 //               {!isHRManager() && (
 //                 <button
 //                   onClick={() => setShowRequestModal(true)}
-//                   className="group relative inline-flex items-center px-8 py-3 bg-white text-blue-600 rounded-xl font-semibold shadow-2xl hover:shadow-white/25 transform hover:scale-105 transition-all duration-300"
+//                   className="group relative inline-flex items-center px-8 py-3 bg-white/5 text-blue-600 rounded-xl font-semibold shadow-2xl hover:shadow-white/25 transform hover:scale-105 transition-all duration-300"
 //                 >
 //                   <PlusIcon className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
 //                   New Request
@@ -488,7 +488,7 @@
 //               <div className="flex items-center">
 //                 <div className="flex-shrink-0">
 //                   <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-//                     <ExclamationTriangleIcon className="h-6 w-6 text-slate-900 dark:text-white animate-pulse" />
+//                     <ExclamationTriangleIcon className="h-6 w-6 text-white animate-pulse" />
 //                   </div>
 //                 </div>
 //                 <div className="ml-4">
@@ -535,8 +535,8 @@
 
 //         {/* Employee Pending Requests Section */}
 //         {!isHRManager() && (
-//           <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50">
-//             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+//           <div className="bg-white/5/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50">
+//             <h3 className="text-xl font-bold text-white mb-4 flex items-center">
 //               <ClockIcon className="h-6 w-6 mr-2 text-amber-500" />
 //               Your Pending Requests
 //             </h3>
@@ -549,7 +549,7 @@
 //                     <div key={request.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
 //                       <div className="flex items-center space-x-3">
 //                         <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
-//                           <ClockIcon className="h-5 w-5 text-slate-900 dark:text-white" />
+//                           <ClockIcon className="h-5 w-5 text-white" />
 //                         </div>
 //                         <div>
 //                           <p className="text-sm font-medium text-amber-800">
@@ -570,7 +570,7 @@
 //                   ))}
 //               </div>
 //             ) : (
-//               <div className="text-center py-4 text-gray-500">
+//               <div className="text-center py-4 text-slate-400">
 //                 <CheckCircleIcon className="mx-auto h-8 w-8 text-gray-600 dark:text-gray-400 mb-2" />
 //                 <p className="text-sm">No pending requests</p>
 //               </div>
@@ -580,9 +580,9 @@
 
 //         {/* HR Approval Section */}
 //         {isHRManager() && (
-//           <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50" data-approvals-section>
+//           <div className="bg-white/5/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50" data-approvals-section>
 //             <div className="flex items-center justify-between mb-4">
-//               <h3 className="text-xl font-bold text-gray-900 flex items-center">
+//               <h3 className="text-xl font-bold text-white flex items-center">
 //                 <UserIcon className="h-6 w-6 mr-2 text-indigo-500" />
 //                 Pending Approval Requests
 //               </h3>
@@ -604,12 +604,12 @@
 //                         <div className="flex justify-between items-start mb-3">
 //                           <div className="flex items-start space-x-4">
 //                             <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg`}>
-//                               <span className="text-slate-900 dark:text-white font-bold text-lg">
+//                               <span className="text-white font-bold text-lg">
 //                                 {employeeInitials}
 //                               </span>
 //                             </div>
 //                             <div>
-//                               <h4 className="text-md font-medium text-gray-900">
+//                               <h4 className="text-md font-medium text-white">
 //                                 {request.employee_name}
 //                               </h4>
 //                               <p className="text-sm text-gray-600">Employee ID: {request.employee_id}</p>
@@ -624,7 +624,7 @@
 //                             <button
 //                               onClick={() => handleApprove(request.id)}
 //                               disabled={processingRequest === request.id}
-//                               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-slate-900 dark:text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
+//                               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
 //                             >
 //                               {processingRequest === request.id ? (
 //                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
@@ -636,7 +636,7 @@
 //                             <button
 //                               onClick={() => openApprovalModal(request, 'reject')}
 //                               disabled={processingRequest === request.id}
-//                               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-slate-900 dark:text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-rose-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
+//                               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-rose-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
 //                             >
 //                               {processingRequest === request.id ? (
 //                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
@@ -654,8 +654,8 @@
 //             ) : (
 //               <div className="text-center py-8">
 //                 <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-600 dark:text-gray-400" />
-//                 <h3 className="mt-2 text-sm font-medium text-gray-900">No pending approvals</h3>
-//                 <p className="mt-1 text-sm text-gray-500">
+//                 <h3 className="mt-2 text-sm font-medium text-white">No pending approvals</h3>
+//                 <p className="mt-1 text-sm text-slate-400">
 //                   All work from home requests have been processed.
 //                 </p>
 //               </div>
@@ -664,8 +664,8 @@
 //         )}
 
 //         {/* Enhanced Filters */}
-//         <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50">
-//           <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+//         <div className="bg-white/5/80 backdrop-blur-sm shadow-xl rounded-2xl p-6 mb-6 border border-white/50">
+//           <h3 className="text-xl font-bold text-white mb-4 flex items-center">
 //             <FunnelIcon className="h-6 w-6 mr-2 text-indigo-500" />
 //             Filter Requests
 //           </h3>
@@ -676,7 +676,7 @@
 //                 type="date"
 //                 value={filters.start_date}
 //                 onChange={(e) => handleFilterChange('start_date', e.target.value)}
-//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
+//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/5/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
 //               />
 //             </div>
 
@@ -686,7 +686,7 @@
 //                 type="date"
 //                 value={filters.end_date}
 //                 onChange={(e) => handleFilterChange('end_date', e.target.value)}
-//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
+//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/5/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
 //               />
 //             </div>
 
@@ -695,7 +695,7 @@
 //               <select
 //                 value={filters.status}
 //                 onChange={(e) => handleFilterChange('status', e.target.value)}
-//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
+//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/5/70 backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none"
 //               >
 //                 <option value="">All Status</option>
 //                 <option value="PENDING">Pending</option>
@@ -707,7 +707,7 @@
 //             <div className="flex items-end">
 //               <button
 //                 onClick={clearFilters}
-//                 className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-slate-900 dark:text-white px-4 py-3 rounded-xl hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-200 inline-flex items-center justify-center transform hover:scale-105 transition-all duration-200"
+//                 className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white px-4 py-3 rounded-xl hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-200 inline-flex items-center justify-center transform hover:scale-105 transition-all duration-200"
 //               >
 //                 <FunnelIcon className="h-4 w-4 mr-2" />
 //                 Clear Filters
@@ -717,10 +717,10 @@
 //         </div>
 
 //         {/* Enhanced WFH Requests Table */}
-//         <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/50 overflow-hidden">
+//         <div className="bg-white/5/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/50 overflow-hidden">
 //           <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
 //             <div className="flex items-center justify-between">
-//               <h3 className="text-xl font-bold text-gray-900 flex items-center">
+//               <h3 className="text-xl font-bold text-white flex items-center">
 //                 <DocumentChartBarIcon className="h-6 w-6 mr-2 text-indigo-500" />
 //                 Work From Home Requests
 //               </h3>
@@ -753,7 +753,7 @@
 //               <PlusIcon className="h-6 w-6 text-blue-600" />
 //             </div>
 //             <div>
-//               <h3 className="text-xl font-bold text-gray-900">Submit Work From Home Request</h3>
+//               <h3 className="text-xl font-bold text-white">Submit Work From Home Request</h3>
 //               <p className="text-sm text-gray-600">Request approval for remote work</p>
 //             </div>
 //           </div>
@@ -769,7 +769,7 @@
 //                 {...register('request_date', { required: 'Request date is required' })}
 //                 type="date"
 //                 min={new Date().toISOString().split('T')[0]}
-//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/5/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
 //               />
 //               {errors.request_date && <p className="text-red-500 text-sm mt-1">{errors.request_date.message}</p>}
 //             </div>
@@ -782,7 +782,7 @@
 //                 {...register('reason', { required: 'Reason is required' })}
 //                 rows={4}
 //                 placeholder="Please provide a reason for your work from home request..."
-//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none resize-none"
+//                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/5/70 backdrop-blur-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none resize-none"
 //               />
 //               {errors.reason && <p className="text-red-500 text-sm mt-1">{errors.reason.message}</p>}
 //             </div>
@@ -810,7 +810,7 @@
 //             <button
 //               type="submit"
 //               disabled={submitting}
-//               className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-slate-900 dark:text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200"
+//               className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200"
 //             >
 //               {submitting ? (
 //                 <div className="flex items-center justify-center">
@@ -841,16 +841,16 @@
 //           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 //             <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity duration-300" onClick={() => setSelectedRequest(null)}></div>
 
-//             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+//             <div className="inline-block align-bottom bg-white/5 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
 //               {/* Header */}
 //               <div className={`bg-gradient-to-r ${theme.primaryGradient} px-6 py-6`}>
 //                 <div className="flex items-center justify-between">
 //                   <div className="flex items-center">
-//                     {/* <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-//                       <EyeIcon className="h-6 w-6 text-slate-900 dark:text-white" />
+//                     {/* <div className="w-12 h-12 bg-white/5 bg-opacity-20 rounded-xl flex items-center justify-center">
+//                       <EyeIcon className="h-6 w-6 text-white" />
 //                     </div> */}
 //                     <div className="ml-4">
-//                       <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+//                       <h3 className="text-2xl font-bold text-white">
 //                         Work From Home Request Details
 //                       </h3>
 //                       <p className="text-blue-100">
@@ -860,7 +860,7 @@
 //                   </div>
 //                   <button
 //                     onClick={() => setSelectedRequest(null)}
-//                     className="text-slate-900 dark:text-white hover:text-blue-200 transition-colors duration-200"
+//                     className="text-white hover:text-blue-200 transition-colors duration-200"
 //                   >
 //                     <XCircleIcon className="h-6 w-6" />
 //                   </button>
@@ -873,11 +873,11 @@
 //                     <div className="grid grid-cols-2 gap-4">
 //                       <div>
 //                         <label className="block text-sm font-semibold text-gray-700 mb-1">Department:</label>
-//                         <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.employee_department}</p>
+//                         <p className="text-sm text-white bg-white/5/70 rounded-lg px-3 py-2">{selectedRequest.employee_department}</p>
 //                       </div>
 //                       <div>
 //                         <label className="block text-sm font-semibold text-gray-700 mb-1">Employee ID:</label>
-//                         <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.employee_id}</p>
+//                         <p className="text-sm text-white bg-white/5/70 rounded-lg px-3 py-2">{selectedRequest.employee_id}</p>
 //                       </div>
 //                     </div>
 //                   )}
@@ -885,11 +885,11 @@
 //                   <div className="grid grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-1">Request Date:</label>
-//                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.formatted_request_date}</p>
+//                       <p className="text-sm text-white bg-white/5/70 rounded-lg px-3 py-2">{selectedRequest.formatted_request_date}</p>
 //                     </div>
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-1">Applied On:</label>
-//                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
+//                       <p className="text-sm text-white bg-white/5/70 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
 //                     </div>
 //                   </div>
 
@@ -902,15 +902,15 @@
 
 //                   <div>
 //                     <label className="block text-sm font-semibold text-gray-700 mb-1">Reason:</label>
-//                     <div className="bg-white/70 rounded-lg px-3 py-3">
-//                       <p className="text-sm text-gray-900">{selectedRequest.reason}</p>
+//                     <div className="bg-white/5/70 rounded-lg px-3 py-3">
+//                       <p className="text-sm text-white">{selectedRequest.reason}</p>
 //                     </div>
 //                   </div>
 
 //                   {selectedRequest.approved_by_name && (
 //                     <div>
 //                       <label className="block text-sm font-semibold text-gray-700 mb-1">Approved By:</label>
-//                       <p className="text-sm text-gray-900 bg-white/70 rounded-lg px-3 py-2">{selectedRequest.approved_by_name}</p>
+//                       <p className="text-sm text-white bg-white/5/70 rounded-lg px-3 py-2">{selectedRequest.approved_by_name}</p>
 //                     </div>
 //                   )}
 
@@ -935,7 +935,7 @@
 //               <div className="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
 //                 <button
 //                   onClick={() => setSelectedRequest(null)}
-//                   className="w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+//                   className="w-full inline-flex justify-center rounded-xl border-2 border-gray-300 shadow-sm px-6 py-3 bg-white/5 text-base font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
 //                 >
 //                   Close
 //                 </button>
@@ -968,7 +968,7 @@
 //               )}
 //             </div>
 //             <div>
-//               <h3 className="text-xl font-bold text-gray-900">
+//               <h3 className="text-xl font-bold text-white">
 //                 {selectedApproval?.action === 'approve' ? 'Approve Work From Home Request' : 
 //                  selectedApproval?.action === 'reject' ? 'Reject Work From Home Request' : 
 //                  'Work From Home Request Details'}
@@ -986,16 +986,16 @@
 //               <div className="grid grid-cols-2 gap-4 mb-4">
 //                 <div>
 //                   <span className="text-sm font-semibold text-gray-700">Department:</span>
-//                   <p className="text-sm text-gray-900 bg-gray-50 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_department}</p>
+//                   <p className="text-sm text-white bg-gray-50 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_department}</p>
 //                 </div>
 //                 <div>
 //                   <span className="text-sm font-semibold text-gray-700">Employee ID:</span>
-//                   <p className="text-sm text-gray-900 bg-gray-50 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_id}</p>
+//                   <p className="text-sm text-white bg-gray-50 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_id}</p>
 //                 </div>
 //               </div>
 //               <div className="bg-gray-50 p-4 rounded-xl">
 //                 <p className="text-sm font-medium text-gray-700 mb-1">Reason:</p>
-//                 <p className="text-sm text-gray-900">{selectedApproval.reason}</p>
+//                 <p className="text-sm text-white">{selectedApproval.reason}</p>
 //               </div>
 //             </div>
 
@@ -1008,7 +1008,7 @@
 //                   {...registerApproval('rejection_reason')}
 //                   rows={3}
 //                   placeholder="Please provide a reason for rejection..."
-//                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/70 backdrop-blur-sm focus:border-rose-500 focus:ring-4 focus:ring-rose-100 transition-all duration-200 outline-none resize-none"
+//                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/5/70 backdrop-blur-sm focus:border-rose-500 focus:ring-4 focus:ring-rose-100 transition-all duration-200 outline-none resize-none"
 //                 />
 //               </div>
 //             )}
@@ -1022,8 +1022,8 @@
 //                   disabled={submitting}
 //                   className={`flex-1 px-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 transform hover:scale-105 transition-all duration-200 ${
 //                     selectedApproval.action === 'approve'
-//                       ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
-//                       : 'bg-gradient-to-r from-rose-600 to-red-600 text-slate-900 dark:text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
+//                       ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
+//                       : 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
 //                   }`}
 //                 >
 //                   {submitting ? (
@@ -1073,12 +1073,12 @@
 //             onClick={() => {
 //               document.querySelector('[data-approvals-section]')?.scrollIntoView({ behavior: 'smooth' });
 //             }}
-//             className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-slate-900 dark:text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110"
+//             className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110"
 //             title={`${requests.filter(r => r.status === 'PENDING').length} pending approvals`}
 //           >
 //             <div className="relative">
 //               <ClockIcon className="h-6 w-6" />
-//               <span className="absolute -top-2 -right-2 bg-white text-red-600 rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center animate-pulse">
+//               <span className="absolute -top-2 -right-2 bg-white/5 text-red-600 rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center animate-pulse">
 //                 {requests.filter(r => r.status === 'PENDING').length}
 //               </span>
 //             </div>
@@ -1379,10 +1379,10 @@ const WorkFromHomeRequests = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-            <Icon className="h-6 w-6 text-slate-900 dark:text-white" />
+            <Icon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors duration-300">
+            <p className="text-3xl font-bold text-white group-hover:text-indigo-400 transition-colors duration-300">
               {value}
             </p>
             <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -1411,13 +1411,13 @@ const WorkFromHomeRequests = () => {
         return (
           <div className="flex items-center">
             <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-md mr-3`}>
-              <span className="text-slate-900 dark:text-white text-sm font-bold">
+              <span className="text-white text-sm font-bold">
                 {employeeInitials}
               </span>
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-900">{name}</div>
-              <div className="text-sm text-gray-500">{row.employee_id} • {row.employee_department}</div>
+              <div className="text-sm font-medium text-white">{name}</div>
+              <div className="text-sm text-slate-400">{row.employee_id} • {row.employee_department}</div>
             </div>
           </div>
         );
@@ -1430,11 +1430,11 @@ const WorkFromHomeRequests = () => {
         <div className="flex items-center">
           <CalendarDaysIcon className="h-4 w-4 text-gray-600 dark:text-gray-400 mr-2" />
           <div>
-            <div className="text-sm font-medium text-gray-900">
+            <div className="text-sm font-medium text-white">
               {row.formatted_start_date === row.formatted_end_date ? row.formatted_start_date : `${row.formatted_start_date} - ${row.formatted_end_date}`}
             </div>
             {row.days_until_start >= 0 && (
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-slate-400">
                 {row.days_until_start === 0 ? 'Starts Today' :
                   row.days_until_start === 1 ? 'Starts Tomorrow' :
                     `Starts in ${row.days_until_start} days`}
@@ -1501,17 +1501,17 @@ const WorkFromHomeRequests = () => {
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-black/5 dark:bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/5 dark:bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative px-4 py-12 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="p-3 bg-black/20 dark:bg-white/20 rounded-xl backdrop-blur-sm mr-4">
-                <HomeIcon className="w-8 h-8 text-slate-900 dark:text-white" />
+              <div className="p-3 bg-black/20 dark:bg-white/5/20 rounded-xl backdrop-blur-sm mr-4">
+                <HomeIcon className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Work From Home Requests</h1>
+                <h1 className="text-4xl font-bold text-white">Work From Home Requests</h1>
                 <p className="mt-1 text-xl text-blue-100">
                   {getHeaderText()}
                 </p>
@@ -1530,7 +1530,7 @@ const WorkFromHomeRequests = () => {
             <div className="flex space-x-3">
               <button
                 onClick={exportWFHRequests}
-                className="group relative inline-flex items-center px-6 py-3 bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white rounded-xl font-medium backdrop-blur-sm border border-black/20 dark:border-white/20 hover:bg-black/20 dark:bg-white/20 transform hover:scale-105 transition-all duration-300"
+                className="group relative inline-flex items-center px-6 py-3 bg-black/10 dark:bg-white/5/10 text-white rounded-xl font-medium backdrop-blur-sm border border-black/20 dark:border-white/20 hover:bg-black/20 dark:bg-white/5/20 transform hover:scale-105 transition-all duration-300"
               >
                 <DocumentChartBarIcon className="h-5 w-5 mr-2 group-hover:animate-bounce" />
                 Export
@@ -1538,11 +1538,11 @@ const WorkFromHomeRequests = () => {
               {!canViewAllRequests() && (
                 <button
                   onClick={() => setShowRequestModal(true)}
-                  className={`group relative inline-flex items-center px-8 py-3 bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transform hover:scale-105 transition-all duration-300`}
+                  className={`group relative inline-flex items-center px-8 py-3 bg-gradient-to-r ${theme.primaryGradient} text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transform hover:scale-105 transition-all duration-300`}
                 >
                   <PlusIcon className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                   New Request
-                  <div className="absolute inset-0 bg-black/20 dark:bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-black/20 dark:bg-white/5/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               )}
             </div>
@@ -1559,7 +1559,7 @@ const WorkFromHomeRequests = () => {
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-                    <ExclamationTriangleIcon className="h-6 w-6 text-slate-900 dark:text-white animate-pulse" />
+                    <ExclamationTriangleIcon className="h-6 w-6 text-white animate-pulse" />
                   </div>
                 </div>
                 <div className="ml-4">
@@ -1607,7 +1607,7 @@ const WorkFromHomeRequests = () => {
         {/* Employee Pending Requests Section - Only for employees */}
         {!canViewAllRequests() && (
           <div className={`${theme.cardBg} backdrop-blur-xl shadow-xl rounded-2xl p-6 mb-6 border ${theme.cardBorder}`}>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center">
               <ClockIcon className="h-6 w-6 mr-2 text-amber-400" />
               Your Pending Requests
             </h3>
@@ -1641,7 +1641,7 @@ const WorkFromHomeRequests = () => {
                   ))}
               </div>
             ) : (
-              <div className="text-center py-4 text-gray-500">
+              <div className="text-center py-4 text-slate-400">
                 <CheckCircleIcon className="mx-auto h-8 w-8 text-gray-600 dark:text-gray-400 mb-2" />
                 <p className="text-sm">No pending requests</p>
               </div>
@@ -1653,7 +1653,7 @@ const WorkFromHomeRequests = () => {
         {canApprove() && (
           <div className={`${theme.cardBg} backdrop-blur-xl shadow-xl rounded-2xl p-6 mb-6 border ${theme.cardBorder}`} data-approvals-section>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center">
+              <h3 className="text-xl font-bold text-white flex items-center">
                 <UserIcon className="h-6 w-6 mr-2 text-indigo-400" />
                 Pending Approval Requests
                 {isManager() && (
@@ -1674,16 +1674,16 @@ const WorkFromHomeRequests = () => {
                     const employeeInitials = getEmployeeInitials(request.employee_name);
 
                     return (
-                      <div key={request.id} className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
+                      <div key={request.id} className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-start space-x-4">
                             <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg`}>
-                              <span className="text-slate-900 dark:text-white font-bold text-lg">
+                              <span className="text-white font-bold text-lg">
                                 {employeeInitials}
                               </span>
                             </div>
                             <div>
-                              <h4 className="text-md font-medium text-slate-900 dark:text-white">
+                              <h4 className="text-md font-medium text-white">
                                 {request.employee_name}
                               </h4>
 
@@ -1708,7 +1708,7 @@ const WorkFromHomeRequests = () => {
                             <button
                               onClick={() => handleApprove(request.id)}
                               disabled={processingRequest === request.id}
-                              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-slate-900 dark:text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
+                              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
                             >
                               {processingRequest === request.id ? (
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
@@ -1720,7 +1720,7 @@ const WorkFromHomeRequests = () => {
                             <button
                               onClick={() => openApprovalModal(request, 'reject')}
                               disabled={processingRequest === request.id}
-                              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-slate-900 dark:text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-rose-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
+                              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 focus:outline-none focus:ring-4 focus:ring-rose-200 disabled:opacity-50 transform hover:scale-105 transition-all duration-200"
                             >
                               {processingRequest === request.id ? (
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></div>
@@ -1737,8 +1737,8 @@ const WorkFromHomeRequests = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-500" />
-                <h3 className="mt-2 text-sm font-medium text-slate-900 dark:text-white">No pending approvals</h3>
+                <CheckCircleIcon className="mx-auto h-12 w-12 text-slate-400" />
+                <h3 className="mt-2 text-sm font-medium text-white">No pending approvals</h3>
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                   All work from home requests have been processed.
                 </p>
@@ -1749,7 +1749,7 @@ const WorkFromHomeRequests = () => {
 
         {/* Enhanced Filters */}
         <div className={`${theme.cardBg} backdrop-blur-xl shadow-xl rounded-2xl p-6 mb-6 border ${theme.cardBorder}`}>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center">
             <FunnelIcon className="h-6 w-6 mr-2 text-indigo-400" />
             Filter Requests
           </h3>
@@ -1760,7 +1760,7 @@ const WorkFromHomeRequests = () => {
                 type="month"
                 value={filters.month}
                 onChange={(e) => handleFilterChange('month', e.target.value)}
-                className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-black/5 dark:bg-white/5 text-slate-900 dark:text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none placeholder-gray-500 [color-scheme:dark]"
+                className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none placeholder-gray-500 [color-scheme:dark]"
               />
             </div>
 
@@ -1769,7 +1769,7 @@ const WorkFromHomeRequests = () => {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-slate-50 dark:bg-[#1e1e2d] text-slate-900 dark:text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none"
+                className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-[#070B14] dark:bg-[#1e1e2d] text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none"
               >
                 <option value="">All Status</option>
                 <option value="PENDING">Pending</option>
@@ -1781,7 +1781,7 @@ const WorkFromHomeRequests = () => {
             <div className="flex items-end">
               <button
                 onClick={clearFilters}
-                className="w-full bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 inline-flex items-center justify-center transform hover:scale-105 transition-all duration-200"
+                className="w-full bg-black/10 dark:bg-white/5/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 inline-flex items-center justify-center transform hover:scale-105 transition-all duration-200"
               >
                 <FunnelIcon className="h-4 w-4 mr-2" />
                 Clear Filters
@@ -1792,9 +1792,9 @@ const WorkFromHomeRequests = () => {
 
         {/* Enhanced WFH Requests Table */}
         <div className={`${theme.cardBg} backdrop-blur-xl shadow-xl rounded-2xl border ${theme.cardBorder} overflow-hidden`}>
-          <div className="px-4 py-5 sm:px-6 border-b border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
+          <div className="px-4 py-5 sm:px-6 border-b border-black/10 dark:border-white/10 bg-white/5/5">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center">
+              <h3 className="text-xl font-bold text-white flex items-center">
                 <DocumentChartBarIcon className="h-6 w-6 mr-2 text-indigo-400" />
                 Work From Home Requests
                 {isManager() && (
@@ -1831,7 +1831,7 @@ const WorkFromHomeRequests = () => {
                 <PlusIcon className="h-6 w-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Submit Work From Home Request</h3>
+                <h3 className="text-xl font-bold text-white">Submit Work From Home Request</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Request approval for remote work</p>
               </div>
             </div>
@@ -1848,7 +1848,7 @@ const WorkFromHomeRequests = () => {
                     {...register('start_date', { required: 'Start date is required' })}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-black/5 dark:bg-white/5 text-slate-900 dark:text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
                   />
                   {errors.start_date && <p className="text-red-400 text-sm mt-1">{errors.start_date.message}</p>}
                 </div>
@@ -1861,7 +1861,7 @@ const WorkFromHomeRequests = () => {
                     {...register('end_date', { required: 'End date is required' })}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-black/5 dark:bg-white/5 text-slate-900 dark:text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none [color-scheme:dark]"
                   />
                   {errors.end_date && <p className="text-red-400 text-sm mt-1">{errors.end_date.message}</p>}
                 </div>
@@ -1875,12 +1875,12 @@ const WorkFromHomeRequests = () => {
                   {...register('reason', { required: 'Reason is required' })}
                   rows={4}
                   placeholder="Please provide a reason for your work from home request..."
-                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-black/5 dark:bg-white/5 text-slate-900 dark:text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none placeholder-gray-500"
+                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none placeholder-gray-500"
                 />
                 {errors.reason && <p className="text-red-400 text-sm mt-1">{errors.reason.message}</p>}
               </div>
 
-              <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-4">
+              <div className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-xl p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <svg className="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
@@ -1888,7 +1888,7 @@ const WorkFromHomeRequests = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-slate-900 dark:text-white">
+                    <h3 className="text-sm font-medium text-white">
                       Please Note
                     </h3>
                     <div className="mt-2 text-sm text-gray-300">
@@ -1903,7 +1903,7 @@ const WorkFromHomeRequests = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className={`flex-1 bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white px-4 py-3 rounded-xl hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200`}
+                className={`flex-1 bg-gradient-to-r ${theme.primaryGradient} text-white px-4 py-3 rounded-xl hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200`}
               >
                 {submitting ? (
                   <div className="flex items-center justify-center">
@@ -1920,7 +1920,7 @@ const WorkFromHomeRequests = () => {
                   setShowRequestModal(false);
                   reset();
                 }}
-                className="flex-1 bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/20 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
+                className="flex-1 bg-black/10 dark:bg-white/5/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
               >
                 Cancel
               </button>
@@ -1941,7 +1941,7 @@ const WorkFromHomeRequests = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="ml-4">
-                      <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="text-2xl font-bold text-white">
                         Work From Home Request Details
                       </h3>
                       <p className="text-red-50">
@@ -1951,24 +1951,24 @@ const WorkFromHomeRequests = () => {
                   </div>
                   <button
                     onClick={() => setSelectedRequest(null)}
-                    className="text-slate-900 dark:text-white/70 hover:text-slate-900 dark:text-white transition-colors duration-200"
+                    className="text-white/70 hover:text-white transition-colors duration-200"
                   >
                     <XCircleIcon className="h-6 w-6" />
                   </button>
                 </div>
               </div>
 
-              <div className="bg-black/5 dark:bg-white/5 p-6">
+              <div className="bg-white/5/5 p-6">
                 <div className="space-y-4">
                   {canViewAllRequests() && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Department:</label>
-                        <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_department}</p>
+                        <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_department}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Employee ID:</label>
-                        <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_id}</p>
+                        <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.employee_id}</p>
                       </div>
                     </div>
                   )}
@@ -1976,13 +1976,13 @@ const WorkFromHomeRequests = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Period:</label>
-                      <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">
+                      <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">
                         {selectedRequest.formatted_start_date} to {selectedRequest.formatted_end_date}
                       </p>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Applied On:</label>
-                      <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
+                      <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.formatted_applied_at}</p>
                     </div>
                   </div>
 
@@ -1995,15 +1995,15 @@ const WorkFromHomeRequests = () => {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Reason:</label>
-                    <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-3">
-                      <p className="text-sm text-slate-900 dark:text-white">{selectedRequest.reason}</p>
+                    <div className="bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-3">
+                      <p className="text-sm text-white">{selectedRequest.reason}</p>
                     </div>
                   </div>
 
                   {selectedRequest.approved_by_name && (
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Approved By:</label>
-                      <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.approved_by_name}</p>
+                      <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2">{selectedRequest.approved_by_name}</p>
                     </div>
                   )}
 
@@ -2012,7 +2012,7 @@ const WorkFromHomeRequests = () => {
                       <div className="flex items-center">
                         <CalendarDaysIcon className="h-5 w-5 text-indigo-400 mr-2" />
                         <div>
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">Time Until Start Date</p>
+                          <p className="text-sm font-medium text-white">Time Until Start Date</p>
                           <p className="text-sm text-gray-300">
                             {selectedRequest.days_until_start === 0 ? 'Today' :
                               selectedRequest.days_until_start === 1 ? 'Tomorrow' :
@@ -2025,10 +2025,10 @@ const WorkFromHomeRequests = () => {
                 </div>
               </div>
 
-              <div className="bg-[#05080f] px-6 py-4 border-t border-black/5 dark:border-white/5 sm:flex sm:flex-row-reverse">
+              <div className="bg-[#05080f] px-6 py-4 border-t border-white/10 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => setSelectedRequest(null)}
-                  className="w-full inline-flex justify-center rounded-xl bg-black/10 dark:bg-white/10 border border-black/20 dark:border-white/20 shadow-sm px-6 py-3 text-base font-medium text-slate-900 dark:text-white hover:bg-black/20 dark:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-xl bg-black/10 dark:bg-white/5/10 border border-black/20 dark:border-white/20 shadow-sm px-6 py-3 text-base font-medium text-white hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Close
                 </button>
@@ -2060,7 +2060,7 @@ const WorkFromHomeRequests = () => {
               )}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+              <h3 className="text-xl font-bold text-white">
                 {selectedApproval?.action === 'approve' ? 'Approve Work From Home Request' :
                   selectedApproval?.action === 'reject' ? 'Reject Work From Home Request' :
                     'Work From Home Request Details'}
@@ -2078,16 +2078,16 @@ const WorkFromHomeRequests = () => {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Department:</span>
-                  <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_department}</p>
+                  <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_department}</p>
                 </div>
                 <div>
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Employee ID:</span>
-                  <p className="text-sm text-slate-900 dark:text-white bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_id}</p>
+                  <p className="text-sm text-white bg-white/5/5 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 mt-1">{selectedApproval.employee_id}</p>
                 </div>
               </div>
-              <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 rounded-xl">
+              <div className="bg-white/5/5 border border-black/10 dark:border-white/10 p-4 rounded-xl">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Reason:</p>
-                <p className="text-sm text-slate-900 dark:text-white">{selectedApproval.reason}</p>
+                <p className="text-sm text-white">{selectedApproval.reason}</p>
               </div>
             </div>
 
@@ -2100,7 +2100,7 @@ const WorkFromHomeRequests = () => {
                   {...registerApproval('rejection_reason')}
                   rows={3}
                   placeholder="Please provide a reason for rejection..."
-                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-black/5 dark:bg-white/5 text-slate-900 dark:text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none"
+                  className="w-full px-4 py-3 border border-black/20 dark:border-white/20 rounded-xl bg-white/5/5 text-white backdrop-blur-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200 outline-none resize-none"
                 />
               </div>
             )}
@@ -2113,8 +2113,8 @@ const WorkFromHomeRequests = () => {
                   type="submit"
                   disabled={submitting}
                   className={`flex-1 px-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-offset-2 disabled:opacity-50 transform hover:scale-105 transition-all duration-200 ${selectedApproval.action === 'approve'
-                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
-                    : 'bg-gradient-to-r from-rose-600 to-red-600 text-slate-900 dark:text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
+                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 focus:ring-emerald-200'
+                    : 'bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-700 hover:to-red-700 focus:ring-rose-200'
                     }`}
                 >
                   {submitting ? (
@@ -2133,7 +2133,7 @@ const WorkFromHomeRequests = () => {
                     setSelectedApproval(null);
                     resetApproval();
                   }}
-                  className="flex-1 bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
+                  className="flex-1 bg-black/10 dark:bg-white/5/10 border border-black/10 dark:border-white/10 text-white px-4 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
                 >
                   Cancel
                 </button>
@@ -2147,7 +2147,7 @@ const WorkFromHomeRequests = () => {
                     setSelectedApproval(null);
                     resetApproval();
                   }}
-                  className="bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white px-6 py-3 rounded-xl hover:bg-black/20 dark:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
+                  className="bg-black/10 dark:bg-white/5/10 border border-black/10 dark:border-white/10 text-white px-6 py-3 rounded-xl hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-200"
                 >
                   Close
                 </button>
@@ -2164,12 +2164,12 @@ const WorkFromHomeRequests = () => {
             onClick={() => {
               document.querySelector('[data-approvals-section]')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className={`bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110`}
+            className={`bg-gradient-to-r ${theme.primaryGradient} text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110`}
             title={`${requests.filter(r => r.status === 'PENDING').length} pending approvals`}
           >
             <div className="relative">
               <ClockIcon className="h-6 w-6" />
-              <span className="absolute -top-2 -right-2 bg-amber-500 text-slate-900 dark:text-white rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center animate-pulse shadow-lg">
+              <span className="absolute -top-2 -right-2 bg-amber-500 text-white rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center animate-pulse shadow-lg">
                 {requests.filter(r => r.status === 'PENDING').length}
               </span>
             </div>

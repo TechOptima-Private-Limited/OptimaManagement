@@ -146,7 +146,7 @@ const BirthdayBanner = ({ data, theme }) => {
             <div className="space-y-2">
               {data.birthdays.todays_birthdays.map((birthday) => (
                 <div key={birthday.id} className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-white/30">
+                  <div className="w-12 h-12 bg-white/5/20 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-white/30">
                     {birthday.avatar_initials}
                   </div>
                   <div>
@@ -283,7 +283,7 @@ const BirthdayCard = ({ birthday }) => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
       </div>
 
-      <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 h-full border border-white/20">
+      <div className="relative bg-white/5/10 backdrop-blur-sm rounded-2xl p-4 h-full border border-white/20">
         <div className="flex items-start space-x-4 mb-2">
           <div className="relative">
             <div className="w-14 h-14 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/30">
@@ -296,7 +296,7 @@ const BirthdayCard = ({ birthday }) => {
             <h3 className="text-lg font-bold text-white drop-shadow-md mb-0.5">{birthday.employee_name}</h3>
             <div className="text-indigo-200 text-sm mb-2">{birthday.employee_department}</div>
             <div className="flex items-center space-x-2">
-              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white/90 backdrop-blur-sm border border-white/30">
+              <span className="px-3 py-1 bg-white/5/20 rounded-full text-xs font-medium text-white/90 backdrop-blur-sm border border-white/30">
                 🎂 BIRTHDAY
               </span>
             </div>
@@ -310,7 +310,7 @@ const BirthdayCard = ({ birthday }) => {
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 mb-2">
+        <div className="bg-white/5/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 mb-2">
           <div className="text-white/90 text-center">
             <div className="text-lg font-semibold mb-1">🎉 Happy Birthday! 🎉</div>
             <div className="text-sm">Wishing you joy, success, and happiness on your special day! 🌟</div>
@@ -337,7 +337,7 @@ const BirthdayCard = ({ birthday }) => {
 
 const QuickAccessCard = ({ title, children, className = "", gradient = false, headerAction = null }) => {
   const hasCustomBg = className.includes('bg-');
-  const defaultBg = gradient ? 'bg-white/10 backdrop-blur-xl border border-white/5 shadow-2xl' : 'bg-white/5 backdrop-blur-lg border border-white/5';
+  const defaultBg = gradient ? 'bg-white/5/10 backdrop-blur-xl border border-white/5 shadow-2xl' : 'bg-white/5 backdrop-blur-lg border border-white/5';
 
   return (
     <div className={`${hasCustomBg ? '' : defaultBg} rounded-2xl p-5 hover:border-white/10 transition-all duration-300 group card-hover-lift smooth-transition ${className}`}>
@@ -532,7 +532,7 @@ const AutoAlerts = ({ alerts, dismissedAlerts, onDismiss }) => {
               {alert.actionLabel && (
                 <button
                   onClick={alert.action}
-                  className={`mt-2 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${alert.icon_bg} ${alert.accent} border ${alert.border} hover:bg-white/10 transition-colors`}
+                  className={`mt-2 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${alert.icon_bg} ${alert.accent} border ${alert.border} hover:bg-white/5/10 transition-colors`}
                 >
                   {alert.actionLabel}
                 </button>
@@ -623,27 +623,27 @@ const DailySummaryCard = ({ attendanceState, todayWindow, isManagerOnly, theme }
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-5 border border-white/5 shadow-lg group relative overflow-hidden transition-all duration-300 hover:border-white/10 mb-6">
+    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-lg group relative overflow-hidden transition-all duration-300 hover:border-white/20 mb-6">
       <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
         <ClockIcon className="w-12 h-12 text-white" />
       </div>
       <div className="relative z-10">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
           <SparklesIcon className="w-3 h-3 mr-2" />
           Today's Summary
         </h3>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter mb-1">Check-in</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Check-in</p>
             <p className="text-lg font-black text-white">{formattedCheckIn}</p>
           </div>
           <div>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter mb-1">Status</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Status</p>
             <p className={`text-lg font-black ${statusColor}`}>{status}</p>
           </div>
           <div className="col-span-2">
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter mb-1">Work Hours so far</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Work Hours so far</p>
             <div className="flex items-center gap-3">
               <p className="text-2xl font-black text-white">
                 {workHours}h {workMinutes}m
@@ -674,15 +674,15 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
       
       <div className="relative z-10">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
           <ChartBarIcon className="w-3 h-3 mr-2" />
           Performance Hub
         </h3>
 
         <div className="grid grid-cols-3 gap-3">
           {/* Streak */}
-          <div className="bg-white/5 p-3 rounded-xl border border-white/5 hover:bg-white/10 transition-colors group">
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter mb-1">Streak</p>
+          <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors group">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Streak</p>
             <div className="flex items-center gap-1">
               {streak > 0 ? (
                 <>
@@ -708,20 +708,20 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
           </div>
 
           {/* On-Time Score */}
-          <div className="bg-white/5 p-3 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter mb-1">Punctuality</p>
+          <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Punctuality</p>
             <div className="flex items-center gap-1">
               <span className="text-xl font-black text-emerald-400">
                 {onTimeScore}%
               </span>
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
             </div>
-            <p className="text-[9px] text-slate-500 font-bold uppercase mt-1">This Month</p>
+            <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">This Month</p>
           </div>
 
           {/* Monthly Badge */}
           {badge ? (
-            <div className="bg-white/5 p-3 rounded-xl border border-white/5 hover:bg-white/10 transition-colors flex flex-col items-center justify-center text-center">
+            <div className="bg-white/5 p-3 rounded-xl border border-white/5 hover:bg-white/5/10 transition-colors flex flex-col items-center justify-center text-center">
               <div className="text-2xl mb-1 drop-shadow-xl transform group-hover:scale-110 transition-transform">
                 {badge.icon}
               </div>
@@ -730,9 +730,9 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
               </p>
             </div>
           ) : (
-             <div className="bg-white/5 p-3 rounded-xl border border-white/5 border-dashed flex flex-col items-center justify-center text-center opacity-40">
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-tighter">No Badge</div>
-                <p className="text-[7px] text-slate-600 mt-1">Keep it up!</p>
+             <div className="bg-white/5 p-3 rounded-xl border border-white/10 border-dashed flex flex-col items-center justify-center text-center">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-tighter">No Badge</div>
+                <p className="text-[7px] text-slate-500 mt-1">Keep it up!</p>
              </div>
           )}
         </div>
@@ -753,6 +753,7 @@ const Dashboard = () => {
     leaveBalances: [],
     upcomingLeaves: [],
     recentActivity: [],
+    allAttendance: [],
     attendanceStats: null,
     currentTime: new Date(),
     onLeaveToday: [],
@@ -1114,6 +1115,7 @@ const Dashboard = () => {
           leaveBalances: p1[0]?.data?.leave_balances || [],
           leaveSummary: p1[0]?.data,
           recentActivity: earlyActivity,
+          allAttendance: earlyActivity,
           currentTime: new Date(),
           loading: false,
         }));
@@ -1164,6 +1166,7 @@ const Dashboard = () => {
         setDashboardData(prev => ({
           ...prev,
           recentActivity: myRecentAttendance,
+          allAttendance: allAttendance,
           attendanceStats: stats,
           dailyStats: dailyStats,
           onLeaveToday: onLeaveTodayData,
@@ -1176,6 +1179,7 @@ const Dashboard = () => {
       } else {
         setDashboardData(prev => ({
           ...prev,
+          allAttendance: allAttendance,
           attendanceStats: stats,
           dailyStats: dailyStats,
           onLeaveToday: onLeaveTodayData,
@@ -1775,8 +1779,8 @@ const Dashboard = () => {
 
         {/* Gamification Hub */}
         <GamificationCard
-          records={dashboardData.recentActivity}
-          targetEmployeeId={user?.id}
+          records={dashboardData.allAttendance || []}
+          targetEmployeeId={user?.employee_id || user?.employee_pk || user?.id}
           isManagerOnly={isManagerOnly}
         />
 
@@ -1793,7 +1797,7 @@ const Dashboard = () => {
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar-holiday">
               {(dashboardData.onLeaveToday?.length || 0) > 0 ? (
                 dashboardData.onLeaveToday.map((leave, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all duration-300">
+                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/5/10 transition-all duration-300">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 text-xs font-black">
                         {leave.initials}
@@ -1824,7 +1828,7 @@ const Dashboard = () => {
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar-holiday">
               {(dashboardData.wfhToday?.length || 0) > 0 ? (
                 dashboardData.wfhToday.map((wfh, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all duration-300">
+                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/5/10 transition-all duration-300">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center text-amber-400 text-xs font-black">
                         {wfh.initials}
@@ -1881,7 +1885,7 @@ const Dashboard = () => {
                         : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:brightness-110 shadow-xl shadow-indigo-700/30 border border-indigo-400/20 btn-glow-primary'
                         }`}
                     >
-                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10" />
+                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/5/10" />
                       <span className="relative">{effectiveIsCheckedIn ? '🛑' : '✅'}</span>
                       <span className="relative">
                         {submittingAttendance ? 'PROCESSING...' : (effectiveIsCheckedIn ? 'CHECK OUT' : 'CHECK IN')}
@@ -1893,14 +1897,14 @@ const Dashboard = () => {
                       disabled={submittingAttendance || effectiveIsCheckedIn}
                       className="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:brightness-110 border border-amber-300/30 shadow-lg shadow-amber-600/25 disabled:opacity-50 disabled:cursor-not-allowed card-hover-lift smooth-transition btn-glow-primary"
                     >
-                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10" />
+                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/5/10" />
                       <span className="relative">🏠</span>
                       <span className="relative">WORK FROM HOME</span>
                     </button>
 
                     <Link
                       to="/leave"
-                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200 hover:bg-white/10 hover:border-white/20"
+                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200 hover:bg-white/5/10 hover:border-white/20"
                     >
                       <span>📝</span>
                       <span>APPLY LEAVE</span>
@@ -1908,7 +1912,7 @@ const Dashboard = () => {
 
                     <Link
                       to="/attendance"
-                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200 hover:bg-white/10 hover:border-white/20"
+                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200 hover:bg-white/5/10 hover:border-white/20"
                     >
                       <span>📅</span>
                       <span>VIEW ATTENDANCE</span>
@@ -1934,7 +1938,7 @@ const Dashboard = () => {
                 {isManagerOrAbove && (
                   <Link
                     to="/leave"
-                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/10"
+                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/5/10"
                   >
                     <div className="text-center">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-all duration-500 bg-gradient-to-r ${theme.primaryGradient} group-hover:scale-110`}>
@@ -1949,7 +1953,7 @@ const Dashboard = () => {
                 <>
                   <Link
                     to="/attendance"
-                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/10"
+                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/5/10"
                   >
                     <div className="text-center">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-all duration-500 bg-gradient-to-r ${theme.secondaryGradient} group-hover:scale-110`}>
@@ -1965,7 +1969,7 @@ const Dashboard = () => {
                   <>
                     <Link
                       to="/leave"
-                      className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/10"
+                      className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/5/10"
                     >
                       <div className="text-center">
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-all duration-500 bg-gradient-to-r ${theme.primaryGradient} group-hover:scale-110`}>
@@ -2214,7 +2218,7 @@ const Dashboard = () => {
                     <>
                       <Link
                         to="/leave"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Manage Team Leaves</span>
                         <CalendarDaysIcon className="w-5 h-5 transition-colors duration-300 text-indigo-400 group-hover:text-indigo-300" />
@@ -2222,7 +2226,7 @@ const Dashboard = () => {
 
                       <Link
                         to="/attendance"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Team Attendance Reports</span>
                         <ChartBarIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />
@@ -2241,7 +2245,7 @@ const Dashboard = () => {
                       {/* Employee and HR Manager Quick Actions */}
                       <Link
                         to="/attendance"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">View Attendance Records</span>
                         <ChartBarIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />
@@ -2249,7 +2253,7 @@ const Dashboard = () => {
 
                       <Link
                         to="/leave"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Apply for Leave</span>
                         <CalendarDaysIcon className="w-5 h-5 transition-colors duration-300 text-indigo-400 group-hover:text-indigo-300" />
@@ -2257,7 +2261,7 @@ const Dashboard = () => {
 
                       <Link
                         to="/work-from-home"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Work From Home</span>
                         <HomeIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />

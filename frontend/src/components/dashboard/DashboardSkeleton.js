@@ -2,12 +2,12 @@ import React from 'react';
 
 // Reusable shimmer pulse block
 const Shimmer = ({ className = '' }) => (
-  <div className={`animate-pulse bg-black/5 dark:bg-white/5 rounded-xl ${className}`} />
+  <div className={`animate-pulse bg-white/5/5 rounded-xl ${className}`} />
 );
 
 // A card-shaped skeleton wrapper
 const SkeletonCard = ({ children, className = '' }) => (
-  <div className={`bg-black/5 dark:bg-white/5 backdrop-blur-sm border border-black/5 dark:border-white/5 rounded-2xl p-5 ${className}`}>
+  <div className={`bg-white/5/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 ${className}`}>
     {children}
   </div>
 );
@@ -16,7 +16,7 @@ const DashboardSkeleton = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 animate-in fade-in duration-300">
       {/* Header skeleton */}
-      <div className="bg-white dark:bg-slate-900 border-b border-black/5 dark:border-white/5 px-4 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+      <div className="bg-white/5 dark:bg-slate-900 border-b border-white/10 px-4 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-[120px] -mr-48 -mt-48" />
         </div>
@@ -106,7 +106,7 @@ const DashboardSkeleton = () => {
       </div>
 
       {/* Subtle loading indicator at bottom */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800/80 backdrop-blur-md rounded-full border border-black/10 dark:border-white/10 shadow-xl z-50">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 bg-white/5 dark:bg-slate-800/80 backdrop-blur-md rounded-full border border-black/10 dark:border-white/10 shadow-xl z-50">
         <div className="flex gap-1">
           {[0, 1, 2].map((i) => (
             <div
@@ -116,7 +116,7 @@ const DashboardSkeleton = () => {
             />
           ))}
         </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">Loading dashboard</span>
+        <span className="text-xs text-slate-400 font-medium tracking-wide">Loading dashboard</span>
       </div>
     </div>
   );

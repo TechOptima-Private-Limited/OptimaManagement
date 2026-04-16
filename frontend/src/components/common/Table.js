@@ -39,7 +39,7 @@ const Table = ({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={`hover:bg-black/5 dark:bg-white/5 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`hover:bg-white/5/5 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick && onRowClick(row)}
               >
                 {columns.map((column, colIndex) => (

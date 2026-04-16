@@ -140,14 +140,14 @@ const UsersAuthHome = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Users and Authentication</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <h1 className="text-2xl font-bold text-white tracking-tight">Users and Authentication</h1>
+          <p className="mt-1 text-sm text-slate-400">
             Manage application users, basic permissions and roles.
           </p>
         </div>
         <Link
           to="/users-auth/add"
-          className={`inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white text-sm font-bold shadow-lg hover:shadow-indigo-500/20 transition-all transform hover:scale-105 active:scale-95`}
+          className={`inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white text-sm font-bold shadow-lg hover:shadow-indigo-500/20 transition-all transform hover:scale-105 active:scale-95`}
         >
           <span className="mr-2 text-lg">+</span> Add user
         </Link>
@@ -157,13 +157,13 @@ const UsersAuthHome = () => {
         {/* Groups card */}
         <Link
           to="/users-auth/groups"
-          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-2xl hover:-translate-y-1"
         >
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
               <div className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">Groups</div>
-              <div className="text-lg text-slate-900 dark:text-white font-bold mb-2">Manage role-based access</div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              <div className="text-lg text-white font-bold mb-2">Manage role-based access</div>
+              <p className="text-sm text-slate-400 leading-relaxed">
                 Add and edit groups and the permissions they contain.
               </p>
             </div>
@@ -177,13 +177,13 @@ const UsersAuthHome = () => {
         {/* Permissions card */}
         <Link
           to="/users-auth/permissions"
-          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-2xl hover:-translate-y-1"
         >
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
               <div className="text-xs font-black text-purple-400 uppercase tracking-widest mb-2">Permissions</div>
-              <div className="text-lg text-slate-900 dark:text-white font-bold mb-2">System permissions</div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              <div className="text-lg text-white font-bold mb-2">System permissions</div>
+              <p className="text-sm text-slate-400 leading-relaxed">
                 Review and edit individual permission definitions.
               </p>
             </div>
@@ -196,39 +196,39 @@ const UsersAuthHome = () => {
       </div>
 
       {/* User list below groups/permissions */}
-      <div className="bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden backdrop-blur-xl">
-        <div className="px-6 py-4 border-b border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest">User Profiles</h2>
+      <div className="bg-white/5/5 rounded-2xl border border-white/10 shadow-2xl overflow-hidden backdrop-blur-xl">
+        <div className="px-6 py-4 border-b border-white/10 bg-white/5/5 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-widest">User Profiles</h2>
           {loading && (
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Loading...</span>
+              <span className="text-xs text-slate-400 font-medium">Loading...</span>
             </div>
           )}
         </div>
         <div className="max-h-[600px] overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5">
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+              <tr className="bg-white/5/5 border-b border-white/10">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Username
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Email
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   First name
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Last name
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Role
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">
                   Status
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">
                   Actions
                 </th>
               </tr>
@@ -238,14 +238,14 @@ const UsersAuthHome = () => {
                 <tr
                   key={user.id}
                   onClick={() => handleUserClick(user.id)}
-                  className="group hover:bg-black/5 dark:bg-white/5 cursor-pointer transition-colors"
+                  className="group hover:bg-white/5/5 cursor-pointer transition-colors"
                 >
                   <td className="px-6 py-4 text-indigo-400 font-bold truncate max-w-[160px]">
                     {user.username || '—'}
                   </td>
-                  <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-medium truncate max-w-[220px]">{user.email}</td>
-                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{user.first_name || '—'}</td>
-                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{user.last_name || '—'}</td>
+                  <td className="px-6 py-4 text-slate-200 font-medium truncate max-w-[220px]">{user.email}</td>
+                  <td className="px-6 py-4 text-slate-400">{user.first_name || '—'}</td>
+                  <td className="px-6 py-4 text-slate-400">{user.last_name || '—'}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 rounded-md bg-indigo-500/10 text-indigo-300 text-[10px] font-black uppercase tracking-widest border border-indigo-500/20">
                       {getUserRoleLabel(user)}
@@ -260,7 +260,7 @@ const UsersAuthHome = () => {
                       </div>
                     ) : (
                       <div className="flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-slate-500/10 flex items-center justify-center text-slate-500 border border-black/5 dark:border-white/5">
+                        <div className="w-8 h-8 rounded-full bg-slate-400/10 flex items-center justify-center text-slate-400 border border-white/5">
                           <XMarkIcon className="h-4 w-4" />
                         </div>
                       </div>
@@ -271,7 +271,7 @@ const UsersAuthHome = () => {
                       type="button"
                       onClick={(e) => openConfirm(user, e)}
                       disabled={deletingId === user.id}
-                      className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-red-500 hover:text-slate-900 dark:text-white hover:border-red-500 transition-all duration-300 disabled:opacity-50 transform hover:scale-105"
+                      className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5/5 text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 disabled:opacity-50 transform hover:scale-105"
                     >
                       Delete
                     </button>
@@ -282,7 +282,7 @@ const UsersAuthHome = () => {
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-6 py-12 text-sm text-slate-500 text-center font-medium italic"
+                    className="px-6 py-12 text-sm text-slate-400 text-center font-medium italic"
                   >
                     No users found in the system.
                   </td>
@@ -294,23 +294,23 @@ const UsersAuthHome = () => {
       </div>
       {showConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-50 dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={closeConfirm}></div>
-          <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl w-full max-w-sm border border-black/10 dark:border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
-            <div className="px-6 py-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
-              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Delete user</h3>
-              <button onClick={closeConfirm} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
+          <div className="absolute inset-0 bg-[#070B14]/80 backdrop-blur-sm" onClick={closeConfirm}></div>
+          <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl w-full max-w-sm border border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
+            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/5/5">
+              <h3 className="text-sm font-black text-white uppercase tracking-widest">Delete user</h3>
+              <button onClick={closeConfirm} className="text-slate-400 hover:text-white transition-colors">
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
-            <div className="px-6 py-8 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <div className="px-6 py-8 text-sm text-slate-200 leading-relaxed">
               Are you sure you want to delete
-              <span className="font-black text-slate-900 dark:text-white mx-1"> {confirmUser?.username || confirmUser?.email}</span>?
+              <span className="font-black text-white mx-1"> {confirmUser?.username || confirmUser?.email}</span>?
               <p className="mt-2 text-red-400 font-bold">This action cannot be undone.</p>
             </div>
-            <div className="px-6 py-4 bg-black/5 dark:bg-white/5 border-t border-black/5 dark:border-white/5 flex justify-end space-x-3">
+            <div className="px-6 py-4 bg-white/5/5 border-t border-white/5 flex justify-end space-x-3">
               <button
                 type="button"
-                className="px-4 py-2 text-xs font-bold rounded-xl border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all"
+                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/5/10 hover:text-white transition-all"
                 onClick={closeConfirm}
                 disabled={!!deletingId}
               >
@@ -318,7 +318,7 @@ const UsersAuthHome = () => {
               </button>
               <button
                 type="button"
-                className="px-6 py-2 text-xs font-black rounded-xl bg-red-600 text-slate-900 dark:text-white hover:bg-red-500 shadow-lg shadow-red-900/20 transition-all disabled:opacity-60 transform hover:scale-105 active:scale-95"
+                className="px-6 py-2 text-xs font-black rounded-xl bg-red-600 text-white hover:bg-red-500 shadow-lg shadow-red-900/20 transition-all disabled:opacity-60 transform hover:scale-105 active:scale-95"
                 onClick={() => handleDelete(confirmUser)}
                 disabled={!!deletingId}
               >

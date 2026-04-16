@@ -37,7 +37,7 @@ const PermissionsManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#070B14] p-8 space-y-8">
+    <div className="min-h-screen bg-[#070B14] dark:bg-[#070B14] p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <button
@@ -49,11 +49,11 @@ const PermissionsManagement = () => {
             Back to Users and Authentication
           </button>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5">
+            <div className="p-3 bg-white/5/5 rounded-2xl border border-white/10">
               <ShieldCheckIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">System Permissions</h1>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">System Permissions</h1>
               <p className="text-sm text-slate-500 font-medium tracking-tight">Granular control oversight for all application access nodes.</p>
             </div>
           </div>
@@ -66,21 +66,21 @@ const PermissionsManagement = () => {
           <input
             type="text"
             placeholder="Search permissions..."
-            className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+            className="block w-full bg-white/5/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <button
           type="submit"
-          className="px-8 py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all transform active:scale-95"
+          className="px-8 py-4 rounded-2xl bg-white/5/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all transform active:scale-95"
         >
           SEARCH
         </button>
       </form>
 
-      <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden">
-        <div className="px-8 py-4 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
+      <div className="bg-white/5/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+        <div className="px-8 py-4 bg-white/5/5 border-b border-white/10 flex items-center justify-between">
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">REGISTRY ENTRY</span>
           <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{loading ? 'SCANNING…' : `${permissions.length} NODES IDENTIFIED`}</span>
         </div>
@@ -92,13 +92,13 @@ const PermissionsManagement = () => {
                 key={p.id}
                 type="button"
                 onClick={() => navigate(`/users-auth/permissions/${p.id}`)}
-                className="group w-full px-8 py-4 text-sm flex items-center justify-between hover:bg-black/5 dark:bg-white/5 text-left transition-all duration-300"
+                className="group w-full px-8 py-4 text-sm flex items-center justify-between hover:bg-white/5/5 text-left transition-all duration-300"
               >
                 <div>
-                  <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{label}</div>
+                  <div className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{label}</div>
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1 opacity-70">{p.codename}</div>
                 </div>
-                <div className="h-8 w-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                <div className="h-8 w-8 rounded-full bg-white/5/5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
                   <ArrowLeftIcon className="h-4 w-4 text-slate-600 rotate-180" />
                 </div>
               </button>

@@ -80,11 +80,11 @@ const LeaveBalance = () => {
     const remainingPercentage = balance.total_days > 0 ? (balance.remaining_days / balance.total_days) * 100 : 0;
     
     return (
-      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+      <div className="bg-white/5 rounded-3xl shadow-xl border border-gray-100 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{balance.leave_type_name || balance.leave_type?.name}</h3>
-            <p className="text-sm text-gray-500 font-semibold">{balance.leave_type?.code}</p>
+            <h3 className="text-xl font-bold text-white">{balance.leave_type_name || balance.leave_type?.name}</h3>
+            <p className="text-sm text-slate-400 font-semibold">{balance.leave_type?.code}</p>
           </div>
           <div className={`px-4 py-2 rounded-full border ${getBalanceColor(balance.remaining_days, balance.total_days)}`}>
             <span className="text-sm font-bold">
@@ -97,12 +97,12 @@ const LeaveBalance = () => {
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 font-semibold">Total Allocated:</span>
-            <span className="font-bold text-gray-900 text-lg">{balance.total_days} days</span>
+            <span className="font-bold text-white text-lg">{balance.total_days} days</span>
           </div>
 
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 font-semibold">Used:</span>
-            <span className="font-bold text-gray-900 text-lg">{balance.used_days} days</span>
+            <span className="font-bold text-white text-lg">{balance.used_days} days</span>
           </div>
 
           {balance.carried_forward_days > 0 && (
@@ -129,7 +129,7 @@ const LeaveBalance = () => {
 
         {/* Enhanced Status Indicator */}
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500 font-semibold">Year: {balance.year}</span>
+          <span className="text-slate-400 font-semibold">Year: {balance.year}</span>
           {remainingPercentage <= 20 && (
             <div className="flex items-center text-red-600 bg-red-100 px-3 py-1 rounded-full">
               <ExclamationTriangleIcon className="h-4 w-4 mr-1" />
@@ -156,7 +156,7 @@ const LeaveBalance = () => {
       {/* Enhanced Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-3xl font-bold text-gray-900">Leave Balance</h3>
+          <h3 className="text-3xl font-bold text-white">Leave Balance</h3>
           <p className="mt-2 text-gray-600 text-lg">
             View your current leave balance and usage for {selectedYear}
           </p>
@@ -186,12 +186,12 @@ const LeaveBalance = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
-                  <CalendarDaysIcon className="h-10 w-10 text-slate-900 dark:text-white" />
+                  <CalendarDaysIcon className="h-10 w-10 text-white" />
                 </div>
               </div>
               <div className="ml-6">
                 <p className="text-sm font-bold text-blue-700 uppercase tracking-wider">Pending Requests</p>
-                <p className="text-3xl font-black text-gray-900">
+                <p className="text-3xl font-black text-white">
                   {leaveSummary.pending_requests_count}
                 </p>
               </div>
@@ -202,12 +202,12 @@ const LeaveBalance = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg">
-                  <CheckCircleIcon className="h-10 w-10 text-slate-900 dark:text-white" />
+                  <CheckCircleIcon className="h-10 w-10 text-white" />
                 </div>
               </div>
               <div className="ml-6">
                 <p className="text-sm font-bold text-green-700 uppercase tracking-wider">Approved This Year</p>
-                <p className="text-3xl font-black text-gray-900">
+                <p className="text-3xl font-black text-white">
                   {leaveSummary.approved_requests_count}
                 </p>
               </div>
@@ -218,12 +218,12 @@ const LeaveBalance = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="p-4 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl shadow-lg">
-                  <ChartBarIcon className="h-10 w-10 text-slate-900 dark:text-white" />
+                  <ChartBarIcon className="h-10 w-10 text-white" />
                 </div>
               </div>
               <div className="ml-6">
                 <p className="text-sm font-bold text-purple-700 uppercase tracking-wider">Total Days Taken</p>
-                <p className="text-3xl font-black text-gray-900">
+                <p className="text-3xl font-black text-white">
                   {leaveSummary.total_days_taken}
                 </p>
               </div>
@@ -234,12 +234,12 @@ const LeaveBalance = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="p-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-lg">
-                  <ClockIcon className="h-10 w-10 text-slate-900 dark:text-white" />
+                  <ClockIcon className="h-10 w-10 text-white" />
                 </div>
               </div>
               <div className="ml-6">
                 <p className="text-sm font-bold text-orange-700 uppercase tracking-wider">Total Balance</p>
-                <p className="text-3xl font-black text-gray-900">
+                <p className="text-3xl font-black text-white">
                   {leaveSummary.leave_balances?.reduce((acc, bal) => acc + parseFloat(bal.remaining_days || 0), 0) || 0}
                 </p>
               </div>
@@ -252,9 +252,9 @@ const LeaveBalance = () => {
       <div>
         <div className="flex items-center space-x-4 mb-8">
           <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-            <SparklesIcon className="h-8 w-8 text-slate-900 dark:text-white" />
+            <SparklesIcon className="h-8 w-8 text-white" />
           </div>
-          <h4 className="text-2xl font-bold text-gray-900">Leave Types & Balances</h4>
+          <h4 className="text-2xl font-bold text-white">Leave Types & Balances</h4>
         </div>
         
         {leaveBalances.length === 0 ? (
@@ -262,7 +262,7 @@ const LeaveBalance = () => {
             <div className="p-6 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
               <CalendarDaysIcon className="h-12 w-12 text-blue-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No leave balances found</h3>
+            <h3 className="text-xl font-bold text-white mb-2">No leave balances found</h3>
             <p className="text-gray-600">
               Leave balances for {selectedYear} are not available.
             </p>
@@ -278,14 +278,14 @@ const LeaveBalance = () => {
 
       {/* Enhanced Recent Leave Requests */}
       {leaveSummary && leaveSummary.recent_requests && leaveSummary.recent_requests.length > 0 && (
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white/5 rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-8 py-6 border-b border-gray-200">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-                <ClockIcon className="h-8 w-8 text-slate-900 dark:text-white" />
+                <ClockIcon className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h4 className="text-2xl font-bold text-gray-900">Recent Leave Requests</h4>
+                <h4 className="text-2xl font-bold text-white">Recent Leave Requests</h4>
                 <p className="text-gray-600">Your latest leave request activity</p>
               </div>
             </div>
@@ -297,11 +297,11 @@ const LeaveBalance = () => {
                   <div className="flex items-center space-x-6">
                     <div className="flex-shrink-0">
                       <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                        <CalendarDaysIcon className="h-6 w-6 text-slate-900 dark:text-white" />
+                        <CalendarDaysIcon className="h-6 w-6 text-white" />
                       </div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-lg font-bold text-white">
                         {request.leave_type?.name}
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
@@ -312,7 +312,7 @@ const LeaveBalance = () => {
                   </div>
                   <div className="flex items-center space-x-4">
                     <StatusBadge status={request.status} />
-                    <div className="text-sm text-gray-500 font-semibold">
+                    <div className="text-sm text-slate-400 font-semibold">
                       {formatDate(request.applied_on)}
                     </div>
                   </div>
@@ -328,32 +328,32 @@ const LeaveBalance = () => {
         <div className="flex items-start space-x-6">
           <div className="flex-shrink-0">
             <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-              <ExclamationTriangleIcon className="h-8 w-8 text-slate-900 dark:text-white" />
+              <ExclamationTriangleIcon className="h-8 w-8 text-white" />
             </div>
           </div>
           <div className="ml-3">
             <h4 className="text-xl font-bold text-blue-900 mb-4">Leave Policy Reminders</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <ul className="space-y-3 text-blue-800">
-                <li className="flex items-center space-x-3 bg-white/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
                   <span>Leave requests should be submitted at least 7 days in advance</span>
                 </li>
-                <li className="flex items-center space-x-3 bg-white/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></span>
                   <span>Unused annual leave may be carried forward (check policy for limits)</span>
                 </li>
-                <li className="flex items-center space-x-3 bg-white/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></span>
                   <span>Medical certificates required for sick leave exceeding 3 days</span>
                 </li>
               </ul>
               <ul className="space-y-3 text-blue-800">
-                <li className="flex items-center space-x-3 bg-white/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></span>
                   <span>Emergency leave can be applied retroactively with manager approval</span>
                 </li>
-                <li className="flex items-center space-x-3 bg-white/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></span>
                   <span>Half-day leaves are available for most leave types</span>
                 </li>
@@ -365,12 +365,12 @@ const LeaveBalance = () => {
 
       {/* Enhanced Balance Insights */}
       {leaveBalances.length > 0 && (
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
+        <div className="bg-white/5 rounded-3xl shadow-xl border border-gray-100 p-8">
           <div className="flex items-center space-x-4 mb-8">
             <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl shadow-lg">
-              <TrophyIcon className="h-8 w-8 text-slate-900 dark:text-white" />
+              <TrophyIcon className="h-8 w-8 text-white" />
             </div>
-            <h4 className="text-2xl font-bold text-gray-900">Balance Insights</h4>
+            <h4 className="text-2xl font-bold text-white">Balance Insights</h4>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -386,9 +386,9 @@ const LeaveBalance = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <FireIcon className="h-6 w-6 text-red-500" />
-                        <span className="text-lg font-bold text-gray-900">{mostUsed.leave_type_name || mostUsed.leave_type?.name}</span>
+                        <span className="text-lg font-bold text-white">{mostUsed.leave_type_name || mostUsed.leave_type?.name}</span>
                       </div>
-                      <span className="text-lg font-bold text-gray-700 bg-white px-4 py-2 rounded-xl shadow">
+                      <span className="text-lg font-bold text-gray-700 bg-white/5 px-4 py-2 rounded-xl shadow">
                         {mostUsed.used_days} days used
                       </span>
                     </div>
@@ -411,11 +411,11 @@ const LeaveBalance = () => {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <ChartBarIcon className="h-6 w-6 text-purple-500" />
-                          <span className="text-lg font-bold text-gray-900">
+                          <span className="text-lg font-bold text-white">
                             {totalUsed} of {totalAllocated} days used
                           </span>
                         </div>
-                        <span className="text-lg font-bold text-gray-700 bg-white px-4 py-2 rounded-xl shadow">
+                        <span className="text-lg font-bold text-gray-700 bg-white/5 px-4 py-2 rounded-xl shadow">
                           {Math.round(utilizationPercentage)}%
                         </span>
                       </div>
@@ -449,7 +449,7 @@ const LeaveBalance = () => {
 
                 if (lowBalanceTypes.length > 0) {
                   return (
-                    <div className="bg-white/70 p-4 rounded-xl">
+                    <div className="bg-white/5/70 p-4 rounded-xl">
                       <p className="font-semibold">
                         ⚠️ <strong>Plan Ahead:</strong> Consider planning ahead for {lowBalanceTypes.map(b => b.leave_type_name || b.leave_type?.name).join(', ')} as you have low remaining balance.
                       </p>
@@ -457,7 +457,7 @@ const LeaveBalance = () => {
                   );
                 } else if (highBalanceTypes.length > 0) {
                   return (
-                    <div className="bg-white/70 p-4 rounded-xl">
+                    <div className="bg-white/5/70 p-4 rounded-xl">
                       <p className="font-semibold">
                         🌟 <strong>Take a Break:</strong> You have substantial unused leave in {highBalanceTypes.map(b => b.leave_type_name || b.leave_type?.name).join(', ')}. Consider taking some time off!
                       </p>
@@ -465,7 +465,7 @@ const LeaveBalance = () => {
                   );
                 } else {
                   return (
-                    <div className="bg-white/70 p-4 rounded-xl">
+                    <div className="bg-white/5/70 p-4 rounded-xl">
                       <p className="font-semibold">
                         ✅ <strong>Perfect Balance:</strong> Your leave usage is well balanced. Keep maintaining a good work-life balance!
                       </p>

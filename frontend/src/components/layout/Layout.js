@@ -59,11 +59,11 @@ const Layout = ({ children }) => {
               <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
                 <div className="flex items-center space-x-3 sm:space-x-6 text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                   <span>© 2024 OptimaManagement</span>
-                  <span className="text-slate-800">•</span>
+                  <span className="text-slate-200">•</span>
                   <a href="/privacy" className="hover:text-indigo-400 transition-colors">
                     Privacy
                   </a>
-                  <span className="text-slate-800">•</span>
+                  <span className="text-slate-200">•</span>
                   <a href="/terms" className="hover:text-indigo-400 transition-colors">
                     Terms
                   </a>

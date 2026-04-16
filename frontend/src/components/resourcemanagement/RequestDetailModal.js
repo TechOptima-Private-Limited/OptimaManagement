@@ -25,7 +25,7 @@ export const getStatusIcon = (status) => {
     case 'REJECTED':
       return <XCircleIcon className="h-5 w-5 text-red-500" />;
     default:
-      return <ClockIcon className="h-5 w-5 text-gray-500" />;
+      return <ClockIcon className="h-5 w-5 text-slate-400" />;
   }
 };
 
@@ -117,7 +117,7 @@ const RequestDetailModal = ({
   const modalContent = (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] transition-all duration-500">
       <div className={`bg-slate-950 border ${theme.cardBorder || 'border-black/10 dark:border-white/10'} rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.9)] max-w-4xl w-full max-h-[85vh] overflow-y-auto custom-scrollbar relative border-black/10 dark:border-white/10 mt-10`}>
-        <div className={`sticky top-0 bg-white dark:bg-slate-900 border-b border-black/10 dark:border-white/10 px-8 py-5 rounded-t-3xl z-30 flex items-center justify-between shadow-lg`}>
+        <div className={`sticky top-0 bg-white/5 dark:bg-slate-900 border-b border-black/10 dark:border-white/10 px-8 py-5 rounded-t-3xl z-30 flex items-center justify-between shadow-lg`}>
           <div className="flex items-center space-x-4">
             <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
               <EyeIcon className="h-6 w-6 text-indigo-400" />
@@ -133,9 +133,9 @@ const RequestDetailModal = ({
           <button
             onClick={onClose}
             title="Close"
-            className="p-2 bg-black/10 dark:bg-white/10 hover:bg-indigo-500 text-slate-900 dark:text-white rounded-xl transition-all duration-300 group flex items-center justify-center border border-black/10 dark:border-white/10 hover:border-indigo-400 active:scale-95 shadow-xl"
+            className="p-2 bg-black/10 dark:bg-white/5/10 hover:bg-indigo-500 text-white rounded-xl transition-all duration-300 group flex items-center justify-center border border-black/10 dark:border-white/10 hover:border-indigo-400 active:scale-95 shadow-xl"
           >
-            <XMarkIcon className="h-7 w-7 text-slate-900 dark:text-white" />
+            <XMarkIcon className="h-7 w-7 text-white" />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ const RequestDetailModal = ({
               <div>
                 <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Status</label>
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5">
+                  <div className="p-2 bg-white/5/5 rounded-lg border border-white/10">
                     {getStatusIcon(request.status)}
                   </div>
                   <span className={getStatusBadge(request.status)}>
@@ -163,19 +163,19 @@ const RequestDetailModal = ({
 
               <div>
                 <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Request Type</label>
-                <p className="text-slate-900 dark:text-white font-medium text-lg">{request.request_type === 'IT' ? 'IT Support' : 'New Access'}</p>
+                <p className="text-white font-medium text-lg">{request.request_type === 'IT' ? 'IT Support' : 'New Access'}</p>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Requested At</label>
-                <p className="text-slate-900 dark:text-white font-mono">{formatDate(request.requested_at)}</p>
+                <p className="text-white font-mono">{formatDate(request.requested_at)}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Duration</label>
-                <p className="text-slate-900 dark:text-white font-medium">{request.duration} days</p>
+                <p className="text-white font-medium">{request.duration} days</p>
               </div>
 
               {request.expires_at && (
@@ -189,33 +189,33 @@ const RequestDetailModal = ({
 
           {request.request_type !== 'IT' && (
             <div className="border-t border-black/10 dark:border-white/10 pt-8">
-              <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Resource Information</h4>
+              <h4 className="text-lg font-bold text-white mb-6">Resource Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Resource</label>
-                  <p className="text-slate-900 dark:text-white text-lg font-medium">{request.resource_name || 'N/A'}</p>
+                  <p className="text-white text-lg font-medium">{request.resource_name || 'N/A'}</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Access Level</label>
-                  <p className="text-slate-900 dark:text-white text-lg font-medium">{request.access_level_name || 'N/A'}</p>
+                  <p className="text-white text-lg font-medium">{request.access_level_name || 'N/A'}</p>
                 </div>
               </div>
             </div>
           )}
 
           <div className="border-t border-black/10 dark:border-white/10 pt-10">
-            <label className="block text-sm font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Justification</label>
+            <label className="block text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Justification</label>
             <div
-              className="prose prose-invert max-w-none text-gray-300 bg-black/40 rounded-2xl p-8 border border-black/5 dark:border-white/5 leading-relaxed shadow-inner"
-              dangerouslySetInnerHTML={{ __html: request.justification || '<span class="text-gray-500 italic font-light font-serif">No justification provided.</span>' }}
+              className="prose prose-invert max-w-none text-gray-300 bg-black/40 rounded-2xl p-8 border border-white/10 leading-relaxed shadow-inner"
+              dangerouslySetInnerHTML={{ __html: request.justification || '<span class="text-slate-400 italic font-light font-serif">No justification provided.</span>' }}
             />
           </div>
 
           {(request.approved_by || request.approved_at || request.status === 'REJECTED') && (
             <div className="border-t border-black/10 dark:border-white/10 pt-8">
-              <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Approval Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-xl bg-black/20 border border-black/5 dark:border-white/5">
+              <h4 className="text-lg font-bold text-white mb-6">Approval Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-xl bg-black/20 border border-white/10">
                 {request.status === 'REJECTED' && request.rejected_by_name && (
                   <div>
                     <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Rejected By</label>
@@ -231,7 +231,7 @@ const RequestDetailModal = ({
                 {request.approved_at && (
                   <div>
                     <label className="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Approved At</label>
-                    <p className="text-slate-900 dark:text-white font-mono">{formatDate(request.approved_at)}</p>
+                    <p className="text-white font-mono">{formatDate(request.approved_at)}</p>
                   </div>
                 )}
               </div>
@@ -252,9 +252,9 @@ const RequestDetailModal = ({
                     <label className="text-sm font-bold text-indigo-200">Assigned To</label>
                     <Combobox value={assignedTo} onChange={setAssignedTo}>
                       <div className="relative mt-1">
-                        <div className="relative w-full cursor-default overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20">
+                        <div className="relative w-full cursor-default overflow-hidden rounded-xl bg-white/5/5 border border-black/10 dark:border-white/10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20">
                           <Combobox.Input
-                            className="w-full border-none py-3 pl-4 pr-10 text-sm leading-5 text-slate-900 dark:text-white bg-transparent focus:ring-0 placeholder-gray-500"
+                            className="w-full border-none py-3 pl-4 pr-10 text-sm leading-5 text-white bg-transparent focus:ring-0 placeholder-gray-500"
                             displayValue={(userId) => {
                               const user = users.find(u => u.id === userId);
                               if (!user) return 'Unassigned';
@@ -274,7 +274,7 @@ const RequestDetailModal = ({
                           leaveTo="opacity-0"
                           afterLeave={() => setQuery('')}
                         >
-                          <Combobox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-xl bg-slate-100 dark:bg-slate-800 py-1 text-base shadow-2xl ring-1 ring-white/10 focus:outline-none sm:text-sm z-50 backdrop-blur-xl">
+                          <Combobox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-xl bg-white/5 dark:bg-slate-800 py-1 text-base shadow-2xl ring-1 ring-white/10 focus:outline-none sm:text-sm z-50 backdrop-blur-xl">
                             <Combobox.Option
                               value={null}
                               className={({ active }) =>
@@ -333,15 +333,15 @@ const RequestDetailModal = ({
                     </Combobox>
                   </div>
                   
-                  <div className="flex items-center gap-3 mt-7 border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-5 py-3 rounded-xl hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20 transition-colors shadow-sm">
+                  <div className="flex items-center gap-3 mt-7 border border-black/10 dark:border-white/10 bg-white/5/5 px-5 py-3 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors shadow-sm">
                     <input
                       id="requiresApproval"
                       type="checkbox"
                       checked={requiresApproval}
                       onChange={(e) => setRequiresApproval(e.target.checked)}
-                      className="h-5 w-5 text-indigo-500 border-black/20 dark:border-white/20 rounded bg-black/5 dark:bg-white/5 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
+                      className="h-5 w-5 text-indigo-500 border-black/20 dark:border-white/20 rounded bg-white/5/5 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
                     />
-                    <label htmlFor="requiresApproval" className="text-sm font-bold text-slate-900 dark:text-white cursor-pointer select-none">Requires Manager Approval</label>
+                    <label htmlFor="requiresApproval" className="text-sm font-bold text-white cursor-pointer select-none">Requires Manager Approval</label>
                   </div>
                   
                   <div className="flex flex-col gap-2">
@@ -349,7 +349,7 @@ const RequestDetailModal = ({
                     <input
                       value={request.status_display || request.status}
                       disabled
-                      className="px-4 py-3 border border-black/5 dark:border-white/5 rounded-xl bg-black/20 text-gray-600 dark:text-gray-400 cursor-not-allowed font-medium"
+                      className="px-4 py-3 border border-white/10 rounded-xl bg-black/20 text-gray-600 dark:text-gray-400 cursor-not-allowed font-medium"
                     />
                   </div>
                   
@@ -358,7 +358,7 @@ const RequestDetailModal = ({
                     <input
                       value={(request.status === 'REJECTED' ? (request.rejected_by_name || '') : (request.approved_by_name || ''))}
                       disabled
-                      className="px-4 py-3 border border-black/5 dark:border-white/5 rounded-xl bg-black/20 text-gray-600 dark:text-gray-400 cursor-not-allowed placeholder-gray-600 font-medium"
+                      className="px-4 py-3 border border-white/10 rounded-xl bg-black/20 text-gray-600 dark:text-gray-400 cursor-not-allowed placeholder-gray-600 font-medium"
                       placeholder="Pending..."
                     />
                   </div>
@@ -370,7 +370,7 @@ const RequestDetailModal = ({
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Add internal notes or comments..."
-                      className="px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20 placeholder-gray-500 resize-none shadow-sm"
+                      className="px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 placeholder-gray-500 resize-none shadow-sm"
                     />
                   </div>
                 </div>
@@ -410,7 +410,7 @@ const RequestDetailModal = ({
                       value={approverEmail}
                       onChange={(e) => setApproverEmail(e.target.value)}
                       placeholder="Manager email..."
-                      className="px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-w-[200px] flex-grow placeholder-gray-500 shadow-sm"
+                      className="px-4 py-3 bg-white/5/5 border border-black/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-w-[200px] flex-grow placeholder-gray-500 shadow-sm"
                     />
                     <button
                       onClick={async () => {
@@ -446,7 +446,7 @@ const RequestDetailModal = ({
                         }
                       }}
                       disabled={!updateRequestMutation || updateRequestMutation.isLoading}
-                      className="w-full px-8 py-3 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 hover:from-blue-500 hover:to-indigo-500 text-slate-900 dark:text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]"
+                      className="w-full px-8 py-3 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.4)]"
                     >
                       {updateRequestMutation?.isLoading ? 'Saving...' : 'Save Changes'}
                     </button>
