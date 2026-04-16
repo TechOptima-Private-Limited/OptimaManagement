@@ -21,24 +21,24 @@ const OnboardingSuccessPage = () => {
           {/* Header with gradient */}
           <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-8 py-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-black opacity-10"></div>
-            <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-16 -translate-y-16"></div>
-            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full translate-x-24 translate-y-24"></div>
+            <div className="absolute top-0 left-0 w-32 h-32 bg-black/10 dark:bg-white/10 rounded-full -translate-x-16 -translate-y-16"></div>
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-black/10 dark:bg-white/10 rounded-full translate-x-24 translate-y-24"></div>
             
             <div className="relative">
               {/* Success Icon with Animation */}
               <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-white/20 rounded-full backdrop-blur-sm animate-pulse">
-                  <CheckCircle className="h-16 w-16 text-white animate-bounce" />
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-black/20 dark:bg-white/20 rounded-full backdrop-blur-sm animate-pulse">
+                  <CheckCircle className="h-16 w-16 text-slate-900 dark:text-white animate-bounce" />
                 </div>
               </div>
               
               {/* Company Header */}
               <div className="flex items-center justify-center space-x-3 mb-4">
-                <Building className="h-10 w-10 text-white" />
+                <Building className="h-10 w-10 text-slate-900 dark:text-white" />
                 <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
               </div>
               
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
                 Techoptima Pvt Ltd
               </h1>
               
@@ -65,7 +65,7 @@ const OnboardingSuccessPage = () => {
               <div className="space-y-4">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">1</span>
+                    <span className="text-slate-900 dark:text-white font-bold text-sm">1</span>
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-800 mb-1">HR Review</h4>
@@ -77,7 +77,7 @@ const OnboardingSuccessPage = () => {
                 
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">2</span>
+                    <span className="text-slate-900 dark:text-white font-bold text-sm">2</span>
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-800 mb-1">Employment Details</h4>
@@ -89,7 +89,7 @@ const OnboardingSuccessPage = () => {
                 
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">3</span>
+                    <span className="text-slate-900 dark:text-white font-bold text-sm">3</span>
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-800 mb-1">IT Setup & Assets</h4>
@@ -101,7 +101,7 @@ const OnboardingSuccessPage = () => {
                 
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">4</span>
+                    <span className="text-slate-900 dark:text-white font-bold text-sm">4</span>
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-800 mb-1">Welcome Communication</h4>
@@ -123,7 +123,7 @@ const OnboardingSuccessPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-lg">
                   <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                    <Users className="h-5 w-5 text-white" />
+                    <Users className="h-5 w-5 text-slate-900 dark:text-white" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-green-800">Personal Information</h4>
@@ -133,7 +133,7 @@ const OnboardingSuccessPage = () => {
                 
                 <div className="flex items-center space-x-3 p-3 bg-white/70 rounded-lg">
                   <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-white" />
+                    <FileText className="h-5 w-5 text-slate-900 dark:text-white" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-green-800">Required Documents</h4>

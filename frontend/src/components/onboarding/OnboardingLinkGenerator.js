@@ -99,25 +99,25 @@ const OnboardingLinkGenerator = () => {
   const remainingTime = getRemainingTime();
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Enhanced Header Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-slate-900/50/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-slate-900/50/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-white dark:bg-slate-900/50/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white dark:bg-slate-900/50/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="p-3 bg-slate-900/50/20 rounded-xl backdrop-blur-sm">
-                <Link2 className="h-10 w-10 text-white" />
+              <div className="p-3 bg-white dark:bg-slate-900/50/20 rounded-xl backdrop-blur-sm">
+                <Link2 className="h-10 w-10 text-slate-900 dark:text-white" />
               </div>
               <Sparkles className="h-8 w-8 text-yellow-300 animate-pulse" />
             </div>
 
-            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
+            <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-3">
               Onboarding Link Generator
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
@@ -140,15 +140,15 @@ const OnboardingLinkGenerator = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Generator Card */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+        <div className="bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
           <div className="p-8 lg:p-12">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
-                <Link2 className="w-10 h-10 text-white" />
+                <Link2 className="w-10 h-10 text-slate-900 dark:text-white" />
               </div>
 
-              <h2 className="text-3xl font-bold text-white mb-4">Generate Onboarding Link</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Generate Onboarding Link</h2>
+              <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
                 Create a secure onboarding link that employees can use to submit their information.
                 Each link is valid for 7 days from the time of generation.
               </p>
@@ -162,7 +162,7 @@ const OnboardingLinkGenerator = () => {
                 className={`inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 transform ${isGenerating
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-105 hover:shadow-indigo-500/25'
-                  } text-white`}
+                  } text-slate-900 dark:text-white`}
               >
                 {isGenerating ? (
                   <>
@@ -184,7 +184,7 @@ const OnboardingLinkGenerator = () => {
                 {/* Success Header */}
                 <div className="text-center p-6 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border-2 border-emerald-200">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-600 to-green-600 rounded-xl mb-4 shadow-lg">
-                    <CheckCircle className="w-8 h-8 text-white" />
+                    <CheckCircle className="w-8 h-8 text-slate-900 dark:text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-emerald-800 mb-2">
                     Link Generated Successfully!
@@ -196,19 +196,19 @@ const OnboardingLinkGenerator = () => {
 
                 {/* Link Information Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+                  <div className="bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
                     <div className="flex items-center space-x-3 mb-4">
-                      <Calendar className="w-6 h-6 text-slate-400" />
-                      <h4 className="font-bold text-white">Creation Details</h4>
+                      <Calendar className="w-6 h-6 text-slate-500 dark:text-slate-400" />
+                      <h4 className="font-bold text-slate-900 dark:text-white">Creation Details</h4>
                     </div>
                     <div className="space-y-2 text-sm">
                       <div>
                         <span className="font-semibold text-blue-700">Created:</span>
-                        <p className="text-slate-400">{linkInfo.created.toLocaleString()}</p>
+                        <p className="text-slate-500 dark:text-slate-400">{linkInfo.created.toLocaleString()}</p>
                       </div>
                       <div>
                         <span className="font-semibold text-blue-700">Expires:</span>
-                        <p className="text-slate-400">{linkInfo.expires.toLocaleString()}</p>
+                        <p className="text-slate-500 dark:text-slate-400">{linkInfo.expires.toLocaleString()}</p>
                       </div>
                     </div>
                   </div>
@@ -235,11 +235,11 @@ const OnboardingLinkGenerator = () => {
                     <textarea
                       value={generatedLink}
                       readOnly
-                      className="w-full h-24 p-4 font-mono text-sm bg-slate-900/50 border-2 border-slate-700/50 rounded-xl resize-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 text-white transition-all duration-200"
+                      className="w-full h-24 p-4 font-mono text-sm bg-white dark:bg-slate-900/50 border-2 border-slate-700/50 rounded-xl resize-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 text-slate-900 dark:text-white transition-all duration-200"
                       placeholder="Your generated link will appear here..."
                     />
                     <div className="absolute top-2 right-2">
-                      <ExternalLink className="w-5 h-5 text-gray-400" />
+                      <ExternalLink className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     </div>
                   </div>
 
@@ -248,8 +248,8 @@ const OnboardingLinkGenerator = () => {
                     <button
                       onClick={copyToClipboard}
                       className={`inline-flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${copyStatus === 'success'
-                        ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white'
-                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
+                        ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white'
+                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-slate-900 dark:text-white'
                         } shadow-lg`}
                     >
                       {copyStatus === 'success' ? (
@@ -293,7 +293,7 @@ const OnboardingLinkGenerator = () => {
                           <span>Multiple employees can use the same link</span>
                         </li>
                         <li className="flex items-start space-x-2">
-                          <span className="text-white font-bold">2</span>
+                          <span className="text-slate-900 dark:text-white font-bold">2</span>
                         </li>
                         <li className="flex items-start space-x-2">
                           <span className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-2 flex-shrink-0"></span>
@@ -313,7 +313,7 @@ const OnboardingLinkGenerator = () => {
                   <summary className="p-4 font-semibold text-gray-800 cursor-pointer hover:bg-gray-100 rounded-2xl transition-colors duration-200">
                     Technical Details (Click to expand)
                   </summary>
-                  <div className="p-4 pt-0 space-y-3 text-sm text-slate-400">
+                  <div className="p-4 pt-0 space-y-3 text-sm text-slate-500 dark:text-slate-400">
                     <div>
                       <span className="font-semibold">Encoded Data:</span>
                       <code className="ml-2 px-2 py-1 bg-gray-200 rounded font-mono text-xs">{linkInfo.encoded}</code>
@@ -335,29 +335,29 @@ const OnboardingLinkGenerator = () => {
 
             {/* Help Section */}
             {!generatedLink && (
-              <div className="mt-12 bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-                <h3 className="font-bold text-white mb-4 text-lg">How it Works</h3>
+              <div className="mt-12 bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+                <h3 className="font-bold text-slate-900 dark:text-white mb-4 text-lg">How it Works</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span className="text-white font-bold">1</span>
+                      <span className="text-slate-900 dark:text-white font-bold">1</span>
                     </div>
-                    <h4 className="font-semibold text-white mb-2">Generate Link</h4>
-                    <p className="text-slate-400">Click the button to create a unique, timestamped onboarding link</p>
+                    <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Generate Link</h4>
+                    <p className="text-slate-500 dark:text-slate-400">Click the button to create a unique, timestamped onboarding link</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span className="text-white font-bold">2</span>
+                      <span className="text-slate-900 dark:text-white font-bold">2</span>
                     </div>
-                    <h4 className="font-semibold text-white mb-2">Share with Employees</h4>
-                    <p className="text-slate-400">Send the link via email to employees who need to complete onboarding</p>
+                    <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Share with Employees</h4>
+                    <p className="text-slate-500 dark:text-slate-400">Send the link via email to employees who need to complete onboarding</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span className="text-white font-bold">3</span>
+                      <span className="text-slate-900 dark:text-white font-bold">3</span>
                     </div>
-                    <h4 className="font-semibold text-white mb-2">Track Submissions</h4>
-                    <p className="text-slate-400">Monitor employee submissions through the employee management system</p>
+                    <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Track Submissions</h4>
+                    <p className="text-slate-500 dark:text-slate-400">Monitor employee submissions through the employee management system</p>
                   </div>
                 </div>
               </div>

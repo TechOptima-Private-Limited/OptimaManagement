@@ -72,26 +72,26 @@ const CompanyDocuments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-6">
+    <div className="min-h-screen bg-slate-950 text-slate-800 dark:text-slate-200 p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-2">Company Documents</h1>
-        <p className="text-slate-400 mb-6">All employees can view and download documents.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Company Documents</h1>
+        <p className="text-slate-500 dark:text-slate-400 mb-6">All employees can view and download documents.</p>
 
         {canUpload && (
-          <div className="bg-slate-900/60 border border-white/10 rounded-xl p-4 mb-6">
-            <h2 className="text-lg font-semibold text-white mb-3">Upload Document</h2>
+          <div className="bg-white dark:bg-slate-900/60 border border-black/10 dark:border-white/10 rounded-xl p-4 mb-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Upload Document</h2>
             <div className="grid md:grid-cols-3 gap-3">
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Document title"
-                className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white"
+                className="bg-black/20 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white"
               />
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-slate-300"
+                className="bg-black/20 border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-300"
               />
               <button
                 onClick={handleUpload}
@@ -104,18 +104,18 @@ const CompanyDocuments = () => {
           </div>
         )}
 
-        <div className="bg-slate-900/60 border border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-white dark:bg-slate-900/60 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden">
           {loading ? (
-            <div className="p-6 text-slate-400">Loading documents...</div>
+            <div className="p-6 text-slate-500 dark:text-slate-400">Loading documents...</div>
           ) : documents.length === 0 ? (
-            <div className="p-6 text-slate-400">No documents uploaded yet.</div>
+            <div className="p-6 text-slate-500 dark:text-slate-400">No documents uploaded yet.</div>
           ) : (
             <ul className="divide-y divide-white/10">
               {documents.map((doc) => (
                 <li key={doc.id} className="p-4 flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-white font-medium">{doc.title}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-slate-900 dark:text-white font-medium">{doc.title}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       Uploaded by {doc.uploaded_by_name || 'Unknown'}
                     </p>
                   </div>
@@ -124,14 +124,14 @@ const CompanyDocuments = () => {
                       href={doc.file_url || doc.file}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-900 dark:text-white text-sm"
                     >
                       View
                     </a>
                     {canUpload && (
                       <button
                         onClick={() => handleDelete(doc.id)}
-                        className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-600 text-white text-sm"
+                        className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-600 text-slate-900 dark:text-white text-sm"
                       >
                         Delete
                       </button>

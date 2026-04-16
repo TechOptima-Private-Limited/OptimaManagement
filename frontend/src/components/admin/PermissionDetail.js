@@ -44,14 +44,14 @@ const PermissionDetail = () => {
 
   if (!permission) {
     return (
-      <div className="min-h-screen bg-[#070B14] p-8 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#070B14] p-8 flex items-center justify-center">
         <div className="text-indigo-400 text-xs font-black uppercase tracking-widest animate-pulse">Initializing Node…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#070B14] p-8 space-y-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#070B14] p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <button
@@ -63,24 +63,24 @@ const PermissionDetail = () => {
             Back to permissions registry
           </button>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+            <div className="p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5">
               <ShieldCheckIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-white uppercase tracking-tight">Configure Access Node</h1>
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Configure Access Node</h1>
               <p className="text-sm text-slate-500 font-medium tracking-tight">Override display name for granular system permissions.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden max-w-2xl">
+      <form onSubmit={handleSave} className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden max-w-2xl">
         <div className="p-8 space-y-8">
           <div className="space-y-2">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Display Name</label>
             <input
               type="text"
-              className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-inner font-bold"
+              className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl px-5 py-4 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 transition-all shadow-inner font-bold"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="System display title"
@@ -90,33 +90,33 @@ const PermissionDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Codename</label>
-              <div className="flex items-center space-x-3 bg-white/5 border border-white/5 rounded-2xl px-5 py-4 opacity-70">
+              <div className="flex items-center space-x-3 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl px-5 py-4 opacity-70">
                 <KeyIcon className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-bold text-slate-400 tracking-tight">{permission.codename}</span>
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-400 tracking-tight">{permission.codename}</span>
               </div>
             </div>
             <div className="space-y-2">
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Content Classification</label>
-              <div className="flex items-center space-x-3 bg-white/5 border border-white/5 rounded-2xl px-5 py-4 opacity-70">
+              <div className="flex items-center space-x-3 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl px-5 py-4 opacity-70">
                 <FingerPrintIcon className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-bold text-slate-400 tracking-tight">{permission.content_type}</span>
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-400 tracking-tight">{permission.content_type}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex justify-end space-x-4">
+        <div className="px-8 py-6 bg-black/5 dark:bg-white/5 border-t border-black/5 dark:border-white/5 flex justify-end space-x-4">
           <button
             type="button"
             onClick={() => navigate('/users-auth/permissions')}
-            className="px-8 py-3 text-xs font-black rounded-2xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all transform active:scale-95 uppercase tracking-widest"
+            className="px-8 py-3 text-xs font-black rounded-2xl border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all transform active:scale-95 uppercase tracking-widest"
           >
             CANCEL
           </button>
           <button
             type="submit"
             disabled={saving}
-            className={`px-10 py-3 text-xs font-black rounded-2xl bg-gradient-to-r ${theme.primaryGradient} text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95 uppercase tracking-widest`}
+            className={`px-10 py-3 text-xs font-black rounded-2xl bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95 uppercase tracking-widest`}
           >
             {saving ? 'UPDATING…' : 'COMMIT REGISTRY UPDATE'}
           </button>

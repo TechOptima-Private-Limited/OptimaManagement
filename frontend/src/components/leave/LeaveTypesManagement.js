@@ -121,12 +121,12 @@ const LeaveTypesManagement = () => {
   };
 
   const LeaveTypeCard = ({ leaveType }) => (
-    <div className="bg-white/5 backdrop-blur-md rounded-[2rem] shadow-xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+    <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md rounded-[2rem] shadow-xl border border-black/10 dark:border-white/10 p-6 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
       <div className="flex items-start justify-between relative z-10">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-3">
-            <h3 className="text-xl font-black text-white">{leaveType.name}</h3>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white">{leaveType.name}</h3>
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
               {leaveType.code}
             </span>
@@ -137,16 +137,16 @@ const LeaveTypesManagement = () => {
             )}
           </div>
 
-          <p className="text-slate-300 mb-4 leading-relaxed font-medium text-sm">{leaveType.description}</p>
+          <p className="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed font-medium text-sm">{leaveType.description}</p>
 
           <div className="grid grid-cols-2 gap-4 text-sm mb-5">
-            <div className="bg-[#0A0F1A] p-3 rounded-2xl border border-white/5 shadow-inner">
+            <div className="bg-[#0A0F1A] p-3 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
               <span className="font-bold text-indigo-400 block mb-0.5 uppercase tracking-wider text-[10px]">Days per year</span>
-              <span className="text-white text-lg font-black">{leaveType.is_unpaid ? '∞' : leaveType.days_allowed_per_year}</span>
+              <span className="text-slate-900 dark:text-white text-lg font-black">{leaveType.is_unpaid ? '∞' : leaveType.days_allowed_per_year}</span>
             </div>
-            <div className="bg-[#0A0F1A] p-3 rounded-2xl border border-white/5 shadow-inner">
+            <div className="bg-[#0A0F1A] p-3 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
               <span className="font-bold text-emerald-400 block mb-0.5 uppercase tracking-wider text-[10px]">Type</span>
-              <span className={`font-bold text-base ${leaveType.is_unpaid ? 'text-rose-400' : 'text-white'}`}>
+              <span className={`font-bold text-base ${leaveType.is_unpaid ? 'text-rose-400' : 'text-slate-900 dark:text-white'}`}>
                 {leaveType.is_unpaid ? 'Unpaid (LOP)' : 'Paid'}
               </span>
             </div>
@@ -154,7 +154,7 @@ const LeaveTypesManagement = () => {
 
           <div className="flex items-center flex-wrap gap-2">
             {leaveType.start_date && (
-              <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/5 inline-block">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 bg-black/5 dark:bg-white/5 p-2 px-3 rounded-xl border border-black/5 dark:border-white/5 inline-block">
                 <div className="flex items-center space-x-2">
                   <CalendarDaysIcon className="h-3 w-3 text-emerald-400" />
                   <span className="font-bold tracking-wider">Start: {formatDate(leaveType.start_date)}</span>
@@ -162,14 +162,14 @@ const LeaveTypesManagement = () => {
               </div>
             )}
             {leaveType.expiry_date && (
-              <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/5 inline-block">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 bg-black/5 dark:bg-white/5 p-2 px-3 rounded-xl border border-black/5 dark:border-white/5 inline-block">
                 <div className="flex items-center space-x-2">
                   <CalendarDaysIcon className="h-3 w-3 text-indigo-300" />
                   <span className="font-bold tracking-wider">Expiry: {formatDate(leaveType.expiry_date)}</span>
                 </div>
               </div>
             )}
-            <div className="text-[10px] text-slate-400 bg-white/5 p-2 px-3 rounded-xl border border-white/5 inline-block">
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 bg-black/5 dark:bg-white/5 p-2 px-3 rounded-xl border border-black/5 dark:border-white/5 inline-block">
               <div className="flex items-center space-x-2">
                 <CheckCircleIcon className="h-3 w-3 text-emerald-400" />
                 <span className="font-bold tracking-wider">Created: {formatDate(leaveType.created_at)}</span>
@@ -205,11 +205,11 @@ const LeaveTypesManagement = () => {
   return (
     <div className="space-y-10 relative z-10">
       {/* Enhanced Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0A0F1A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0A0F1A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-black/10 dark:border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl point-events-none"></div>
         <div className="relative z-10">
-          <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">
+          <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-slate-800 dark:from-white dark:to-slate-400 tracking-tight">
             Leave Types & Balances
           </h3>
           <p className="mt-2 text-indigo-200/80 text-lg font-medium">
@@ -230,7 +230,7 @@ const LeaveTypesManagement = () => {
               reset();
               setShowTypeModal(true);
             }}
-            className="inline-flex justify-center items-center px-6 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)]"
+            className="inline-flex justify-center items-center px-6 py-4 bg-indigo-500 hover:bg-indigo-600 text-slate-900 dark:text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)]"
           >
             <PlusIcon className="h-6 w-6 mr-3" />
             Add Leave Type
@@ -252,7 +252,7 @@ const LeaveTypesManagement = () => {
             </div>
             <div className="ml-6">
               <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Total Leave Types</p>
-              <p className="text-4xl font-black text-white mt-1">{leaveTypes.length}</p>
+              <p className="text-4xl font-black text-slate-900 dark:text-white mt-1">{leaveTypes.length}</p>
             </div>
           </div>
         </div>
@@ -269,7 +269,7 @@ const LeaveTypesManagement = () => {
             </div>
             <div className="ml-6">
               <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Total Employees</p>
-              <p className="text-4xl font-black text-white mt-1">{employees.length}</p>
+              <p className="text-4xl font-black text-slate-900 dark:text-white mt-1">{employees.length}</p>
             </div>
           </div>
         </div>
@@ -286,7 +286,7 @@ const LeaveTypesManagement = () => {
             </div>
             <div className="ml-6">
               <p className="text-xs font-bold text-purple-400 uppercase tracking-wider">Active Leave Types</p>
-              <p className="text-4xl font-black text-white mt-1">
+              <p className="text-4xl font-black text-slate-900 dark:text-white mt-1">
                 {leaveTypes.filter(type => type.is_active).length}
               </p>
             </div>
@@ -300,18 +300,18 @@ const LeaveTypesManagement = () => {
           <div className="p-3 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl shadow-[0_0_15px_rgba(79,70,229,0.3)]">
             <SparklesIcon className="h-8 w-8 text-indigo-400" />
           </div>
-          <h4 className="text-2xl font-black text-white tracking-wide">Available Leave Types</h4>
+          <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-wide">Available Leave Types</h4>
         </div>
 
         {leaveTypes.length === 0 ? (
-          <div className="text-center py-24 bg-[#0A0F1A]/50 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/10 relative overflow-hidden">
+          <div className="text-center py-24 bg-[#0A0F1A]/50 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-black/10 dark:border-white/10 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
             <div className="relative z-10">
               <div className="p-6 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
                 <CalendarDaysIcon className="h-16 w-16 text-indigo-400" />
               </div>
-              <h3 className="text-3xl font-black text-white mb-4">No Leave Types Yet</h3>
-              <p className="text-slate-400 mb-10 text-xl font-medium max-w-md mx-auto">
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-4">No Leave Types Yet</h3>
+              <p className="text-slate-500 dark:text-slate-400 mb-10 text-xl font-medium max-w-md mx-auto">
                 Get started by creating your first leave type for employees to request.
               </p>
               <button
@@ -320,7 +320,7 @@ const LeaveTypesManagement = () => {
                   reset();
                   setShowTypeModal(true);
                 }}
-                className="inline-flex justify-center items-center px-8 py-5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] text-lg"
+                className="inline-flex justify-center items-center px-8 py-5 bg-indigo-500 hover:bg-indigo-600 text-slate-900 dark:text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] text-lg"
               >
                 <PlusIcon className="h-6 w-6 mr-3" />
                 Create First Leave Type
@@ -350,13 +350,13 @@ const LeaveTypesManagement = () => {
         <form onSubmit={handleSubmit(onSubmitType)} className="space-y-8 relative z-10">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Leave Type Name <span className="text-rose-400">*</span>
               </label>
               <input
                 {...register('name', { required: 'Leave type name is required' })}
                 type="text"
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="e.g., Annual Leave, Sick Leave"
               />
               {errors.name && (
@@ -365,13 +365,13 @@ const LeaveTypesManagement = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Leave Code <span className="text-rose-400">*</span>
               </label>
               <input
                 {...register('code', { required: 'Leave code is required' })}
                 type="text"
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all uppercase"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all uppercase"
                 placeholder="e.g., AL, SL, ML"
                 maxLength={10}
               />
@@ -384,7 +384,7 @@ const LeaveTypesManagement = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Days Allowed Per Year <span className="text-rose-400">*</span>
               </label>
               <input
@@ -394,7 +394,7 @@ const LeaveTypesManagement = () => {
                 })}
                 type="number"
                 min="0"
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />
               {errors.days_allowed_per_year && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.days_allowed_per_year.message}</p>
@@ -402,13 +402,13 @@ const LeaveTypesManagement = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Start Date <span className="text-rose-400">*</span>
               </label>
               <input
                 {...register('start_date', { required: 'Start date is required' })}
                 type="date"
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />
               {errors.start_date && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.start_date.message}</p>
@@ -416,13 +416,13 @@ const LeaveTypesManagement = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Expiry Date
               </label>
               <input
                 {...register('expiry_date')}
                 type="date"
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
               />
               {errors.expiry_date && (
                 <p className="mt-2 text-sm text-rose-400 font-bold ml-1">{errors.expiry_date.message}</p>
@@ -430,13 +430,13 @@ const LeaveTypesManagement = () => {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Description
               </label>
               <textarea
                 {...register('description')}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="Brief description of this leave type..."
               />
             </div>
@@ -454,10 +454,10 @@ const LeaveTypesManagement = () => {
                     />
                     <label
                       htmlFor="is_carry_forward"
-                      className="relative h-6 w-11 cursor-pointer rounded-full bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-indigo-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-white/20"
+                      className="relative h-6 w-11 cursor-pointer rounded-full bg-black/10 dark:bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-indigo-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-black/20 dark:border-white/20"
                     ></label>
                   </div>
-                  <label htmlFor="is_carry_forward" className="ml-4 block text-lg font-bold text-white cursor-pointer">
+                  <label htmlFor="is_carry_forward" className="ml-4 block text-lg font-bold text-slate-900 dark:text-white cursor-pointer">
                     Allow carry forward to next year
                   </label>
                 </div>
@@ -465,14 +465,14 @@ const LeaveTypesManagement = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Max Carry Forward Days
               </label>
               <input
                 {...register('max_carry_forward_days')}
                 type="number"
                 min="0"
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-indigo-500 focus:border-indigo-500 font-medium text-lg placeholder-slate-500 p-4 transition-all"
                 placeholder="0"
               />
             </div>
@@ -490,10 +490,10 @@ const LeaveTypesManagement = () => {
                     />
                     <label
                       htmlFor="is_unpaid"
-                      className="relative h-6 w-11 cursor-pointer rounded-full bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-rose-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-white/20"
+                      className="relative h-6 w-11 cursor-pointer rounded-full bg-black/10 dark:bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-rose-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-black/20 dark:border-white/20"
                     ></label>
                   </div>
-                  <label htmlFor="is_unpaid" className="ml-4 block text-lg font-bold text-white cursor-pointer">
+                  <label htmlFor="is_unpaid" className="ml-4 block text-lg font-bold text-slate-900 dark:text-white cursor-pointer">
                     Mark as Unpaid <span className="text-rose-400/80 font-medium text-base ml-2">(triggers automated salary deduction)</span>
                   </label>
                 </div>
@@ -514,10 +514,10 @@ const LeaveTypesManagement = () => {
                     />
                     <label
                       htmlFor="is_active"
-                      className="relative h-6 w-11 cursor-pointer rounded-full bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-emerald-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-white/20"
+                      className="relative h-6 w-11 cursor-pointer rounded-full bg-black/10 dark:bg-white/10 transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow before:transition-transform before:content-[''] peer-checked:bg-emerald-500 peer-checked:before:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-gray-900 border border-black/20 dark:border-white/20"
                     ></label>
                   </div>
-                  <label htmlFor="is_active" className="ml-4 block text-lg font-bold text-white cursor-pointer">
+                  <label htmlFor="is_active" className="ml-4 block text-lg font-bold text-slate-900 dark:text-white cursor-pointer">
                     Active <span className="text-emerald-400 font-medium text-base ml-2">(employees can apply for this leave)</span>
                   </label>
                 </div>
@@ -525,7 +525,7 @@ const LeaveTypesManagement = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-black/10 dark:border-white/10">
             <button
               type="button"
               onClick={() => {
@@ -533,14 +533,14 @@ const LeaveTypesManagement = () => {
                 setEditingType(null);
                 reset();
               }}
-              className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 transition-all transform hover:-translate-y-1"
+              className="px-8 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-2xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] disabled:opacity-50 disabled:transform-none"
+              className="px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-slate-900 dark:text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] disabled:opacity-50 disabled:transform-none"
             >
               {submitting ? 'Saving...' : (editingType ? 'Update Leave Type' : 'Create Leave Type')}
             </button>
@@ -577,20 +577,20 @@ const LeaveTypesManagement = () => {
 
           <form onSubmit={handleSubmitBalance(onSubmitBalanceInit)} className="space-y-6">
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
                 Year <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <select
                   {...registerBalance('year', { required: 'Year is required' })}
-                  className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium text-lg p-4 transition-all appearance-none pr-10"
+                  className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium text-lg p-4 transition-all appearance-none pr-10"
                 >
-                  <option value="" className="bg-slate-900 text-slate-400">Select Year</option>
+                  <option value="" className="bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">Select Year</option>
                   {[2023, 2024, 2025, 2026].map(year => (
-                    <option key={year} value={year} className="bg-slate-900">{year}</option>
+                    <option key={year} value={year} className="bg-white dark:bg-slate-900">{year}</option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -607,32 +607,32 @@ const LeaveTypesManagement = () => {
                 <div className="p-2 bg-emerald-500/20 rounded-xl">
                   <RocketLaunchIcon className="h-6 w-6 text-emerald-400" />
                 </div>
-                <h4 className="text-xl font-black text-white">Initialization Summary</h4>
+                <h4 className="text-xl font-black text-slate-900 dark:text-white">Initialization Summary</h4>
               </div>
               <div className="space-y-4 relative z-10">
-                <div className="flex items-center justify-between bg-[#0A0F1A]/80 border border-white/5 p-4 rounded-xl shadow-inner">
-                  <span className="font-bold text-slate-300">Active employees to receive balances:</span>
+                <div className="flex items-center justify-between bg-[#0A0F1A]/80 border border-black/5 dark:border-white/5 p-4 rounded-xl shadow-inner">
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Active employees to receive balances:</span>
                   <span className="font-black text-2xl text-emerald-300">{employees.length}</span>
                 </div>
-                <div className="flex items-center justify-between bg-[#0A0F1A]/80 border border-white/5 p-4 rounded-xl shadow-inner">
-                  <span className="font-bold text-slate-300">Active leave types to assign:</span>
+                <div className="flex items-center justify-between bg-[#0A0F1A]/80 border border-black/5 dark:border-white/5 p-4 rounded-xl shadow-inner">
+                  <span className="font-bold text-slate-700 dark:text-slate-300">Active leave types to assign:</span>
                   <span className="font-black text-2xl text-emerald-300">{leaveTypes.filter(t => t.is_active).length}</span>
                 </div>
                 <div className="flex items-center justify-between bg-emerald-500/20 border border-emerald-500/30 p-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.15)] mt-6">
-                  <span className="font-bold text-white uppercase tracking-wider text-sm">Total balance records to create:</span>
+                  <span className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-sm">Total balance records to create:</span>
                   <span className="font-black text-3xl text-emerald-400">{employees.length * leaveTypes.filter(t => t.is_active).length}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-black/10 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => {
                   setShowBalanceModal(false);
                   resetBalance();
                 }}
-                className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 transition-all transform hover:-translate-y-1"
+                className="px-8 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-2xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
               >
                 Cancel
               </button>

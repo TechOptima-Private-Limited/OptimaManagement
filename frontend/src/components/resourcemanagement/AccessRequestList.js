@@ -134,10 +134,10 @@ const AccessRequestList = () => {
   if (error) {
     return (
       <div className="p-6">
-        <div className="text-center py-12 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+        <div className="text-center py-12 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-sm">
           <XCircleIcon className="mx-auto h-12 w-12 text-rose-400" />
           <h3 className="mt-4 text-lg font-bold text-rose-400">Error loading requests</h3>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             There was a problem loading your access requests. Please try again.
           </p>
         </div>
@@ -149,7 +149,7 @@ const AccessRequestList = () => {
     <div className="p-6">
       <div className="mb-8">
         <h2 className={`text-2xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent mb-2`}>My Access Requests</h2>
-        <p className="text-gray-400">Track the status of your resource access requests</p>
+        <p className="text-gray-600 dark:text-gray-400">Track the status of your resource access requests</p>
       </div>
 
       {/* Filters and Search */}
@@ -164,7 +164,7 @@ const AccessRequestList = () => {
                 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center space-x-2
                 ${statusFilter === option.value
                   ? `bg-indigo-500/20 text-indigo-400 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]`
-                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:border-white/20'
+                  : 'bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-400 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20'
                 }
               `}
             >
@@ -173,7 +173,7 @@ const AccessRequestList = () => {
                 px-2 py-0.5 rounded-full text-xs font-bold
                 ${statusFilter === option.value
                   ? 'bg-indigo-500/30 text-indigo-300'
-                  : 'bg-white/10 text-gray-500'
+                  : 'bg-black/10 dark:bg-white/10 text-gray-500'
                 }
               `}>
                 {option.count}
@@ -190,17 +190,17 @@ const AccessRequestList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by ticket number, resource..."
-            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-500"
+            className="w-full pl-12 pr-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-500"
           />
         </div>
       </div>
 
       {/* Requests List */}
       {filteredRequests.length === 0 ? (
-        <div className="text-center py-16 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+        <div className="text-center py-16 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-sm">
           <ClockIcon className="mx-auto h-16 w-16 text-gray-500" />
-          <h3 className="mt-4 text-lg font-bold text-white">No requests found</h3>
-          <p className="mt-2 text-sm text-gray-400 flex items-center justify-center">
+          <h3 className="mt-4 text-lg font-bold text-slate-900 dark:text-white">No requests found</h3>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center">
             {searchTerm || statusFilter !== 'ALL'
               ? 'Try adjusting your filters or search term.'
               : 'You haven\'t submitted any access requests yet.'
@@ -212,18 +212,18 @@ const AccessRequestList = () => {
           {filteredRequests.map((request) => (
             <div
               key={request.id}
-              className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group`}
+              className={`bg-black/5 dark:bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 group`}
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-white/5 rounded-xl group-hover:bg-white/10 transition-colors">
+                  <div className="p-3 bg-black/5 dark:bg-white/5 rounded-xl group-hover:bg-black/10 dark:bg-white/10 transition-colors">
                     {getStatusIcon(request.status)}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-300 transition-colors">
                       #{request.ticket_number}
                     </h3>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                       {request.request_type === 'IT' ? 'IT Support Request' : `Access to ${request.resource_name || 'Resource'}`}
                     </p>
                   </div>
@@ -238,7 +238,7 @@ const AccessRequestList = () => {
                   </span>
                   <button
                     onClick={() => setSelectedRequest(request)}
-                    className="p-2.5 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
+                    className="p-2.5 text-gray-600 dark:text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
                     title="View details"
                   >
                     <EyeIcon className="h-5 w-5" />
@@ -246,7 +246,7 @@ const AccessRequestList = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm bg-black/20 p-5 rounded-xl border border-white/5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm bg-black/20 p-5 rounded-xl border border-black/5 dark:border-white/5">
                 <div>
                   <span className="text-gray-500 block mb-1">Requested</span>
                   <span className="text-indigo-100 font-medium font-mono">{formatDate(request.requested_at)}</span>
@@ -266,8 +266,8 @@ const AccessRequestList = () => {
               </div>
 
               {request.justification && (
-                <div className="mt-5 pt-5 border-t border-white/10">
-                  <p className="text-sm text-gray-400 line-clamp-2 italic">
+                <div className="mt-5 pt-5 border-t border-black/10 dark:border-white/10">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 italic">
                     "{request.justification.replace(/<[^>]*>/g, '').substring(0, 150)}..."
                   </p>
                 </div>

@@ -12,7 +12,7 @@ from django.conf import settings
 from .serializers import (
     UserRegistrationSerializer, UserSerializer, EmployeeRegistrationSerializer, 
     UserDetailSerializer, UserUpdateSerializer, AdminUserSerializer,
-    LoginSerializer
+    LoginSerializer, LoginUserSerializer
 )
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
@@ -235,9 +235,15 @@ def login(request):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
     _bind_access_token_to_user(user, access_token)
+    user = (
+        User.objects
+        .select_related('profile', 'employee')
+        .prefetch_related('groups')
+        .get(pk=user.pk)
+    )
 
     response = Response({
-        'user': UserSerializer(user).data,
+        'user': LoginUserSerializer(user).data,
         'access': access_token,
     })
 

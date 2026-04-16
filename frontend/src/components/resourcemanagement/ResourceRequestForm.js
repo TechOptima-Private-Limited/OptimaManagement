@@ -393,11 +393,11 @@ const ResourceRequestForm = () => {
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-white/10 rounded w-1/3"></div>
-            <div className="h-4 bg-white/10 rounded w-2/3"></div>
+            <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+            <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-2/3"></div>
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-white/5 border border-white/10 rounded-xl"></div>
+                <div key={i} className="h-12 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl"></div>
               ))}
             </div>
           </div>
@@ -431,15 +431,15 @@ const ResourceRequestForm = () => {
 
   return (
     <div className="p-6">
-      <div className={`max-w-4xl mx-auto bg-white/5 backdrop-blur-md border ${theme.cardBorder} rounded-2xl shadow-xl p-8`}>
-        <div className="mb-8 border-b border-white/10 pb-6">
+      <div className={`max-w-4xl mx-auto bg-black/5 dark:bg-white/5 backdrop-blur-md border ${theme.cardBorder} rounded-2xl shadow-xl p-8`}>
+        <div className="mb-8 border-b border-black/10 dark:border-white/10 pb-6">
           <h2 className={`text-2xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent mb-2`}>New Access Request</h2>
-          <p className="text-gray-400">Submit a request for resource access, asset repair or IT support</p>
+          <p className="text-gray-600 dark:text-gray-400">Submit a request for resource access, asset repair or IT support</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Request Type */}
-          <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+          <div className="bg-black/5 dark:bg-white/5 rounded-xl p-6 border border-black/10 dark:border-white/10">
             <label className="block text-sm font-bold text-gray-300 mb-4 tracking-wide uppercase">
               Request Type
             </label>
@@ -448,7 +448,7 @@ const ResourceRequestForm = () => {
                 relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${formData.request_type === 'NEW'
                   ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]'
-                  : 'border-white/10 bg-white/5 hover:border-white/20'
+                  : 'border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:border-black/20 dark:border-white/20'
                 }
               `}>
                 <input
@@ -459,9 +459,9 @@ const ResourceRequestForm = () => {
                   onChange={handleInputChange}
                   className="sr-only"
                 />
-                <ServerIcon className={`h-6 w-6 mr-3 ${formData.request_type === 'NEW' ? 'text-indigo-400' : 'text-gray-400'}`} />
+                <ServerIcon className={`h-6 w-6 mr-3 ${formData.request_type === 'NEW' ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400'}`} />
                 <div>
-                  <div className={`font-bold ${formData.request_type === 'NEW' ? 'text-white' : 'text-gray-300'}`}>New Access</div>
+                  <div className={`font-bold ${formData.request_type === 'NEW' ? 'text-slate-900 dark:text-white' : 'text-gray-300'}`}>New Access</div>
                   <div className="text-xs text-gray-500 mt-1">Request access to a resource</div>
                 </div>
               </label>
@@ -470,7 +470,7 @@ const ResourceRequestForm = () => {
                 relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${formData.request_type === 'IT'
                   ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
-                  : 'border-white/10 bg-white/5 hover:border-white/20'
+                  : 'border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:border-black/20 dark:border-white/20'
                 }
               `}>
                 <input
@@ -481,9 +481,9 @@ const ResourceRequestForm = () => {
                   onChange={handleInputChange}
                   className="sr-only"
                 />
-                <Cog6ToothIcon className={`h-6 w-6 mr-3 ${formData.request_type === 'IT' ? 'text-purple-400' : 'text-gray-400'}`} />
+                <Cog6ToothIcon className={`h-6 w-6 mr-3 ${formData.request_type === 'IT' ? 'text-purple-400' : 'text-gray-600 dark:text-gray-400'}`} />
                 <div>
-                  <div className={`font-bold ${formData.request_type === 'IT' ? 'text-white' : 'text-gray-300'}`}>IT Support</div>
+                  <div className={`font-bold ${formData.request_type === 'IT' ? 'text-slate-900 dark:text-white' : 'text-gray-300'}`}>IT Support</div>
                   <div className="text-xs text-gray-500 mt-1">Request IT assistance</div>
                 </div>
               </label>
@@ -492,7 +492,7 @@ const ResourceRequestForm = () => {
                 relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
                 ${formData.request_type === 'REPAIR'
                   ? 'border-orange-500 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
-                  : 'border-white/10 bg-white/5 hover:border-white/20'
+                  : 'border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:border-black/20 dark:border-white/20'
                 }
               `}>
                 <input
@@ -503,9 +503,9 @@ const ResourceRequestForm = () => {
                   onChange={handleInputChange}
                   className="sr-only"
                 />
-                <WrenchScrewdriverIcon className={`h-6 w-6 mr-3 ${formData.request_type === 'REPAIR' ? 'text-orange-400' : 'text-gray-400'}`} />
+                <WrenchScrewdriverIcon className={`h-6 w-6 mr-3 ${formData.request_type === 'REPAIR' ? 'text-orange-400' : 'text-gray-600 dark:text-gray-400'}`} />
                 <div>
-                  <div className={`font-bold ${formData.request_type === 'REPAIR' ? 'text-white' : 'text-gray-300'}`}>Asset Repair</div>
+                  <div className={`font-bold ${formData.request_type === 'REPAIR' ? 'text-slate-900 dark:text-white' : 'text-gray-300'}`}>Asset Repair</div>
                   <div className="text-xs text-gray-500 mt-1">Report issue with your equipment</div>
                 </div>
               </label>
@@ -527,13 +527,13 @@ const ResourceRequestForm = () => {
                       onChange={handleInputChange}
                       required
                       disabled={resourceTypesLoading}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
+                      className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                     >
-                      <option value="" className="bg-slate-800 text-white">
+                      <option value="" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                         {resourceTypesLoading ? 'Loading...' : 'Select a resource type'}
                       </option>
                       {resourceTypes.map(type => (
-                        <option key={type.id} value={type.id} className="bg-slate-800 text-white">
+                        <option key={type.id} value={type.id} className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                           {type.name}
                         </option>
                       ))}
@@ -555,13 +555,13 @@ const ResourceRequestForm = () => {
                       onChange={handleInputChange}
                       required
                       disabled={!formData.resource_type || resourcesLoading}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
+                      className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                     >
-                      <option value="" className="bg-slate-800 text-white">
+                      <option value="" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                         {resourcesLoading ? 'Loading...' : 'Select a resource'}
                       </option>
                       {resources.map(resource => (
-                        <option key={resource.id} value={resource.id} className="bg-slate-800 text-white">
+                        <option key={resource.id} value={resource.id} className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                           {resource.name} ({resource.environment})
                         </option>
                       ))}
@@ -579,13 +579,13 @@ const ResourceRequestForm = () => {
                     onChange={handleInputChange}
                     required
                     disabled={accessLevelsLoading}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
+                    className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none"
                   >
-                    <option value="" className="bg-slate-800 text-white">
+                    <option value="" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                       {accessLevelsLoading ? 'Loading...' : 'Select access level'}
                     </option>
                     {accessLevels.map(level => (
-                      <option key={level.id} value={level.id} className="bg-slate-800 text-white">
+                      <option key={level.id} value={level.id} className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                         {level.name} - {level.description}
                       </option>
                     ))}
@@ -608,13 +608,13 @@ const ResourceRequestForm = () => {
                   onChange={handleInputChange}
                   required
                   disabled={myAssetsLoading}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-50 appearance-none"
+                  className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-50 appearance-none"
                 >
-                  <option value="" className="bg-slate-800 text-white">
+                  <option value="" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                     {myAssetsLoading ? 'Loading assets...' : 'Select an asset'}
                   </option>
                   {myAssets.map(asset => (
-                    <option key={asset.id} value={asset.id} disabled={asset.is_under_repair} className="bg-slate-800 text-white">
+                    <option key={asset.id} value={asset.id} disabled={asset.is_under_repair} className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
                       {asset.asset_tag} - {asset.name} {asset.is_under_repair ? '(Under Repair)' : ''}
                     </option>
                   ))}
@@ -629,7 +629,7 @@ const ResourceRequestForm = () => {
           }
 
           {/* Priority and Duration */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-xl border border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-black/5 dark:bg-white/5 p-6 rounded-xl border border-black/10 dark:border-white/10">
             <div>
               <label className="block text-sm font-bold text-gray-300 mb-2">
                 Priority
@@ -639,12 +639,12 @@ const ResourceRequestForm = () => {
                 value={formData.priority}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none"
+                className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none"
               >
-                <option value="LOW" className="bg-slate-800 text-white">Low</option>
-                <option value="MEDIUM" className="bg-slate-800 text-white">Medium</option>
-                <option value="HIGH" className="bg-slate-800 text-white">High</option>
-                <option value="URGENT" className="bg-slate-800 text-white">Urgent</option>
+                <option value="LOW" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">Low</option>
+                <option value="MEDIUM" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">Medium</option>
+                <option value="HIGH" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">High</option>
+                <option value="URGENT" className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">Urgent</option>
               </select>
               <div className={`mt-3 px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center border ${formData.priority === 'LOW' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
                 formData.priority === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' :
@@ -670,11 +670,11 @@ const ResourceRequestForm = () => {
                   min="1"
                   max="3650"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full pl-12 pr-4 py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   placeholder="365"
                 />
               </div>
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
                 How long do you need access? (1-3650 days)
               </p>
             </div>
@@ -695,7 +695,7 @@ const ResourceRequestForm = () => {
               onContextMenu={(e) => e.preventDefault()}
               required
               rows={6}
-              className="w-full px-4 py-3 bg-white/5 text-white border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 text-slate-900 dark:text-white border border-black/10 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Please provide detailed justification for this request..."
             />
           </div>
@@ -705,11 +705,11 @@ const ResourceRequestForm = () => {
             <label className="block text-sm font-bold text-gray-300 mb-2">
               Supporting Images (optional)
             </label>
-            <div className={`border-2 border-dashed ${theme.cardBorder} rounded-xl p-8 text-center hover:bg-white/5 transition-all cursor-pointer group`}>
+            <div className={`border-2 border-dashed ${theme.cardBorder} rounded-xl p-8 text-center hover:bg-black/5 dark:bg-white/5 transition-all cursor-pointer group`}>
               <PhotoIcon className="mx-auto h-12 w-12 text-gray-500 group-hover:text-indigo-400 transition-colors" />
               <div className="mt-4">
                 <label htmlFor="image-upload" className="cursor-pointer">
-                  <span className="mt-2 block text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+                  <span className="mt-2 block text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-300 transition-colors">
                     Upload images to support your request
                   </span>
                   <span className="text-xs text-gray-500 mt-1 block">PNG, JPG, GIF up to 5MB each</span>
@@ -733,12 +733,12 @@ const ResourceRequestForm = () => {
                     <img
                       src={image.preview}
                       alt="Preview"
-                      className="w-full h-24 object-cover rounded-xl border border-white/10"
+                      className="w-full h-24 object-cover rounded-xl border border-black/10 dark:border-white/10"
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(image.id)}
-                      className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      className="absolute -top-2 -right-2 bg-rose-500 text-slate-900 dark:text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -751,15 +751,15 @@ const ResourceRequestForm = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-8 border-t border-white/10">
+          <div className="flex justify-end pt-8 border-t border-black/10 dark:border-white/10">
             <button
               type="submit"
               disabled={loading || createRequestMutation.isLoading}
-              className={`px-8 py-3 bg-gradient-to-r ${theme.primaryGradient} text-white font-bold rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`px-8 py-3 bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white font-bold rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {loading || createRequestMutation.isLoading ? (
                 <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-slate-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>

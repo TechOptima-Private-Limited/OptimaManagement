@@ -7,7 +7,7 @@ const StatusBadge = ({ status, type = 'default' }) => {
       PENDING: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
       APPROVED: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
       REJECTED: 'bg-rose-500/20 text-rose-400 border border-rose-500/30',
-      CANCELLED: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
+      CANCELLED: 'bg-slate-500/20 text-slate-500 dark:text-slate-400 border border-slate-500/30',
 
       // Attendance statuses
       PRESENT: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
@@ -27,7 +27,7 @@ const StatusBadge = ({ status, type = 'default' }) => {
       IN_PROGRESS: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
     };
 
-    return colors[status] || 'bg-slate-500/20 text-slate-400 border border-slate-500/30';
+    return colors[status] || 'bg-slate-500/20 text-slate-500 dark:text-slate-400 border border-slate-500/30';
   };
 
   const formatStatus = (s) => {

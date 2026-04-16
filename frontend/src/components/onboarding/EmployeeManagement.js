@@ -236,20 +236,20 @@ const EmployeeManagement = () => {
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-black/5 dark:bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/5 dark:bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  <Shield className="h-8 w-8 text-white" />
+                <div className="p-2 bg-black/20 dark:bg-white/20 rounded-lg backdrop-blur-sm">
+                  <Shield className="h-8 w-8 text-slate-900 dark:text-white" />
                 </div>
                 <Star className="h-6 w-6 text-yellow-300 animate-pulse" />
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
+              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-3">
                 Employee Management
               </h1>
               <p className="text-xl text-blue-100 mb-6">
@@ -287,7 +287,7 @@ const EmployeeManagement = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <Icon className="h-6 w-6 text-white" />
+                        <Icon className="h-6 w-6 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <p className="text-3xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">
@@ -298,7 +298,7 @@ const EmployeeManagement = () => {
                         </p>
                       </div>
                     </div>
-                    <TrendingUp className="h-5 w-5 text-gray-400 group-hover:text-indigo-500 transition-colors duration-300" />
+                    <TrendingUp className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-500 transition-colors duration-300" />
                   </div>
                 </div>
               </div>
@@ -320,7 +320,7 @@ const EmployeeManagement = () => {
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
                   className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
-                    ? 'bg-indigo-600 text-white shadow-lg'
+                    ? 'bg-indigo-600 text-slate-900 dark:text-white shadow-lg'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
@@ -332,7 +332,7 @@ const EmployeeManagement = () => {
             {/* Search */}
             <div className="relative lg:w-80">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </div>
               <input
                 type="text"
@@ -379,7 +379,7 @@ const EmployeeManagement = () => {
                         <div className="relative">
                           <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 ${employee.is_deleted ? 'grayscale' : ''
                             }`}>
-                            <span className="text-white font-bold text-lg">
+                            <span className="text-slate-900 dark:text-white font-bold text-lg">
                               {employeeInitials}
                             </span>
                           </div>
@@ -457,7 +457,7 @@ const EmployeeManagement = () => {
                             setSelectedEmployee(employee);
                             setShowDetailsModal(true);
                           }}
-                          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
+                          className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
                           title="View Details"
                         >
                           <Eye className="h-5 w-5" />
@@ -469,7 +469,7 @@ const EmployeeManagement = () => {
                               setSelectedEmployee(employee);
                               setShowRestoreConfirm(true);
                             }}
-                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transition-all duration-200 transform hover:scale-105"
+                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transition-all duration-200 transform hover:scale-105"
                             title="Restore Employee"
                           >
                             <RotateCcw className="h-4 w-4 mr-2" />
@@ -481,7 +481,7 @@ const EmployeeManagement = () => {
                               setSelectedEmployee(employee);
                               setShowDeleteConfirm(true);
                             }}
-                            className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
                             title="Delete Employee"
                           >
                             <Trash2 className="h-5 w-5" />
@@ -508,10 +508,10 @@ const EmployeeManagement = () => {
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                    <Eye className="h-6 w-6 text-white" />
+                    <Eye className="h-6 w-6 text-slate-900 dark:text-white" />
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-2xl font-bold text-white">
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                       Employee Details
                     </h3>
                     <p className="text-blue-100">
@@ -664,7 +664,7 @@ const EmployeeManagement = () => {
                                 <FileText className="h-4 w-4 text-blue-500" title="File Uploaded" />
                               )}
                               {!collected && !file && (
-                                <XCircle className="h-4 w-4 text-gray-400" title="Not Collected" />
+                                <XCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" title="Not Collected" />
                               )}
                             </div>
                           </div>
@@ -716,7 +716,7 @@ const EmployeeManagement = () => {
               <div className="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => softDeleteEmployee(selectedEmployee.id)}
-                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-base font-semibold text-white hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-4 focus:ring-red-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-base font-semibold text-slate-900 dark:text-white hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-4 focus:ring-red-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
@@ -761,7 +761,7 @@ const EmployeeManagement = () => {
               <div className="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={() => restoreEmployee(selectedEmployee.id)}
-                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-base font-semibold text-white hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
+                  className="w-full inline-flex justify-center items-center rounded-xl border border-transparent shadow-lg px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-base font-semibold text-slate-900 dark:text-white hover:from-emerald-700 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 transform hover:scale-105 transition-all duration-200 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Restore

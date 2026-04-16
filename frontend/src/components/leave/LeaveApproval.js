@@ -166,7 +166,7 @@ const LeaveApproval = () => {
     const daysUntilStart = getDaysUntilStart(request.start_date);
 
     return (
-      <div className={`border-l-4 p-8 mb-6 rounded-r-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-white/5 backdrop-blur-xl border border-white/10 ${getUrgencyColor(request)}`}>
+      <div className={`border-l-4 p-8 mb-6 rounded-r-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-black/5 dark:bg-white/5 backdrop-blur-xl border border-black/10 dark:border-white/10 ${getUrgencyColor(request)}`}>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-6 flex-1">
             <div className="flex-shrink-0">
@@ -179,7 +179,7 @@ const LeaveApproval = () => {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-4 mb-3">
-                <h4 className="text-xl font-bold text-white tracking-wide">
+                <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-wide">
                   {request.employee?.user_info?.first_name} {request.employee?.user_info?.last_name}
                 </h4>
                 <StatusBadge status={request.status} />
@@ -191,7 +191,7 @@ const LeaveApproval = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium text-slate-400 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">
                 <div className="flex items-center">
                   <CalendarDaysIcon className="h-5 w-5 mr-2 text-indigo-400" />
                   <div className="flex items-center space-x-2">
@@ -208,13 +208,13 @@ const LeaveApproval = () => {
                   <span>{request.days_requested} day{request.days_requested !== 1 ? 's' : ''}</span>
                 </div>
                 <div className="col-span-1 md:col-span-1">
-                  <span className="text-white">
+                  <span className="text-slate-900 dark:text-white">
                     {formatDate(request.start_date)} - {formatDate(request.end_date)}
                   </span>
                 </div>
               </div>
 
-              <div className="text-sm text-slate-300 mb-3 bg-[#0A0F1A] p-4 rounded-2xl border border-white/5 shadow-inner">
+              <div className="text-sm text-slate-700 dark:text-slate-300 mb-3 bg-[#0A0F1A] p-4 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
                 <span className="font-bold text-slate-500 uppercase tracking-wider text-xs block mb-1">Reason:</span>
                 <span className="leading-relaxed">
                   {request.reason.length > 120 ? `${request.reason.substring(0, 120)}...` : request.reason}
@@ -225,7 +225,7 @@ const LeaveApproval = () => {
                 <CheckCircleIcon className="h-4 w-4 mr-1 opacity-50" />
                 Applied on {formatDate(request.applied_on)}
                 {request.employee?.employee_id && (
-                  <span className="ml-4 pl-4 border-l border-white/10 flex items-center">
+                  <span className="ml-4 pl-4 border-l border-black/10 dark:border-white/10 flex items-center">
                     <UserIcon className="h-4 w-4 mr-1 opacity-50" />
                     ID: {request.employee.employee_id}
                   </span>
@@ -295,8 +295,8 @@ const LeaveApproval = () => {
       {/* Enhanced Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-2xl font-black text-white tracking-tight">Leave Approvals</h3>
-          <p className="mt-1 font-medium text-slate-400">
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Leave Approvals</h3>
+          <p className="mt-1 font-medium text-slate-500 dark:text-slate-400">
             Review and approve employee leave requests
           </p>
         </div>
@@ -317,7 +317,7 @@ const LeaveApproval = () => {
               <ExclamationTriangleIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div>
-              <p className="text-white text-lg">
+              <p className="text-slate-900 dark:text-white text-lg">
                 <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Action Required:</span> You have{' '}
                 <span className="font-black text-2xl mx-1">{pendingRequests.length}</span> pending request{pendingRequests.length !== 1 ? 's' : ''} waiting for approval.
               </p>
@@ -334,14 +334,14 @@ const LeaveApproval = () => {
       )}
 
       {/* Enhanced Filters */}
-      <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 shadow-2xl">
+      <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-black/10 dark:border-white/10 shadow-2xl">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Status</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Status</label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-xl text-slate-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Status</option>
               <option value="PENDING">Pending</option>
@@ -352,11 +352,11 @@ const LeaveApproval = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Leave Type</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Leave Type</label>
             <select
               value={filters.leave_type}
               onChange={(e) => handleFilterChange('leave_type', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-xl text-slate-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Types</option>
               {leaveTypes.map((type) => (
@@ -368,20 +368,20 @@ const LeaveApproval = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Employee</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Employee</label>
             <input
               type="text"
               value={filters.employee}
               onChange={(e) => handleFilterChange('employee', e.target.value)}
               placeholder="Search employee..."
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
+              className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-xl text-slate-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
             />
           </div>
 
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="w-full px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl shadow-lg border border-white/10 transition-all transform hover:scale-105"
+              className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:scale-105"
             >
               Clear Filters
             </button>
@@ -390,18 +390,18 @@ const LeaveApproval = () => {
       </div>
 
       {/* Enhanced Tabs */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-black/10 dark:border-white/10">
         <nav className="-mb-px flex space-x-10">
           <button
             onClick={() => setActiveTab('pending')}
             className={`py-4 px-2 border-b-2 font-bold text-[15px] uppercase tracking-wider transition-all ${activeTab === 'pending'
               ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-white/20'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:border-black/20 dark:border-white/20'
               }`}
           >
             <div className="flex items-center">
               Pending Approvals
-              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'pending' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/5 text-slate-400'
+              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'pending' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-black/5 dark:bg-white/5 text-slate-500 dark:text-slate-400'
                 }`}>
                 {pendingRequests.length}
               </span>
@@ -411,12 +411,12 @@ const LeaveApproval = () => {
             onClick={() => setActiveTab('all')}
             className={`py-4 px-2 border-b-2 font-bold text-[15px] uppercase tracking-wider transition-all ${activeTab === 'all'
               ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-white/20'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:border-black/20 dark:border-white/20'
               }`}
           >
             <div className="flex items-center">
               All Requests
-              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'all' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/5 text-slate-400'
+              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'all' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-black/5 dark:bg-white/5 text-slate-500 dark:text-slate-400'
                 }`}>
                 {allRequests.length}
               </span>
@@ -429,14 +429,14 @@ const LeaveApproval = () => {
       <div>
         {activeTab === 'pending' ? (
           pendingRequests.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
+            <div className="text-center py-20 bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-black/10 dark:border-white/10 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
                 <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
                   <ClockIcon className="h-16 w-16 text-indigo-400" />
                 </div>
-                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">No pending requests</h3>
-                <p className="text-slate-400 text-lg font-medium">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">No pending requests</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">
                   All leave requests have been processed. Outstanding work! 🎉
                 </p>
               </div>
@@ -448,7 +448,7 @@ const LeaveApproval = () => {
                 <div className="mb-10">
                   <div className="flex items-center space-x-4 mb-6">
                     <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl shadow-lg">
-                      <FireIcon className="h-8 w-8 text-white" />
+                      <FireIcon className="h-8 w-8 text-slate-900 dark:text-white" />
                     </div>
                     <h4 className="text-2xl font-bold text-red-700">Urgent - Starting Soon</h4>
                   </div>
@@ -465,7 +465,7 @@ const LeaveApproval = () => {
               <div>
                 <div className="flex items-center space-x-4 mb-6">
                   <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-                    <SparklesIcon className="h-8 w-8 text-white" />
+                    <SparklesIcon className="h-8 w-8 text-slate-900 dark:text-white" />
                   </div>
                   <h4 className="text-2xl font-bold text-gray-700">Other Pending Requests</h4>
                 </div>
@@ -480,14 +480,14 @@ const LeaveApproval = () => {
           )
         ) : (
           allRequests.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
+            <div className="text-center py-20 bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-black/10 dark:border-white/10 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
                 <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
                   <UserIcon className="h-16 w-16 text-indigo-400" />
                 </div>
-                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">No requests found</h3>
-                <p className="text-slate-400 text-lg font-medium">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">No requests found</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">
                   No leave requests have been submitted yet.
                 </p>
               </div>
@@ -519,59 +519,59 @@ const LeaveApproval = () => {
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white tracking-wide">
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-wide">
                     {selectedRequest.employee?.user_info?.first_name} {selectedRequest.employee?.user_info?.last_name}
                   </h3>
                   <p className="text-indigo-300 font-bold mt-1 tracking-wider">{selectedRequest.employee?.employee_id}</p>
-                  <p className="text-slate-400 font-medium">{selectedRequest.employee?.position}</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium">{selectedRequest.employee?.position}</p>
                 </div>
               </div>
             </div>
 
             {/* Leave Details Grid */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-black/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors">
                 <label className="block text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Leave Type</label>
-                <p className="text-xl font-bold text-white">{selectedRequest.leave_type?.name}</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{selectedRequest.leave_type?.name}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-black/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors">
                 <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Duration</label>
-                <p className="text-xl font-bold text-white capitalize">
+                <p className="text-xl font-bold text-slate-900 dark:text-white capitalize">
                   {selectedRequest.leave_duration?.replace('_', ' ')}
                 </p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-black/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors">
                 <label className="block text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Start Date</label>
-                <p className="text-xl font-bold text-white">{formatDate(selectedRequest.start_date)}</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatDate(selectedRequest.start_date)}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-black/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors">
                 <label className="block text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">End Date</label>
-                <p className="text-xl font-bold text-white">{formatDate(selectedRequest.end_date)}</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatDate(selectedRequest.end_date)}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-black/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors">
                 <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">Days Requested</label>
-                <p className="text-xl font-bold text-white">{selectedRequest.days_requested} days</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{selectedRequest.days_requested} days</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Applied On</label>
-                <p className="text-xl font-bold text-white">{formatDate(selectedRequest.applied_on)}</p>
+              <div className="bg-black/5 dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-black/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors">
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Applied On</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatDate(selectedRequest.applied_on)}</p>
               </div>
             </div>
 
             {/* Reason block */}
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Reason</label>
-              <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/5 shadow-inner">
-                <p className="text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.reason}</p>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Reason</label>
+              <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.reason}</p>
               </div>
             </div>
 
             {/* Employee Comments */}
             {selectedRequest.employee_comments && (
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Employee Comments</label>
-                <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/5 shadow-inner">
-                  <p className="text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.employee_comments}</p>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Employee Comments</label>
+                <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.employee_comments}</p>
                 </div>
               </div>
             )}
@@ -579,7 +579,7 @@ const LeaveApproval = () => {
             {/* Supporting Document */}
             {selectedRequest.supporting_document && (
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Supporting Document</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Supporting Document</label>
                 <a
                   href={selectedRequest.supporting_document}
                   target="_blank"
@@ -594,7 +594,7 @@ const LeaveApproval = () => {
 
             {/* Quick Actions Footer */}
             {selectedRequest.status === 'PENDING' && (
-              <div className="border-t border-white/10 pt-8 mt-4">
+              <div className="border-t border-black/10 dark:border-white/10 pt-8 mt-4">
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
                   <button
                     onClick={() => setShowApprovalModal(true)}
@@ -636,7 +636,7 @@ const LeaveApproval = () => {
                   <h4 className="text-xl font-black text-emerald-400 mb-1">Confirmation Required</h4>
                   <p className="text-emerald-100/80 leading-relaxed">
                     You are about to <strong className="text-emerald-300">approve</strong> the leave request for{' '}
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {selectedRequest.employee?.user_info?.first_name} {selectedRequest.employee?.user_info?.last_name}
                     </span>{' '}
                     from {formatDate(selectedRequest.start_date)} to {formatDate(selectedRequest.end_date)}.
@@ -663,22 +663,22 @@ const LeaveApproval = () => {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">
                 Approval Comments <span className="text-slate-500 lowercase normal-case">(Optional)</span>
               </label>
               <textarea
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium placeholder-slate-500 p-4 transition-all"
                 placeholder="Add any comments for the employee..."
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-black/10 dark:border-white/10">
               <button
                 onClick={() => setShowApprovalModal(false)}
-                className="flex-1 px-6 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 transition-all transform hover:-translate-y-1"
+                className="flex-1 px-6 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-2xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
               >
                 Cancel
               </button>
@@ -713,7 +713,7 @@ const LeaveApproval = () => {
                   <h4 className="text-xl font-black text-rose-400 mb-1">Rejection Notice</h4>
                   <p className="text-rose-100/80 leading-relaxed">
                     You are about to <strong className="text-rose-300">reject</strong> the leave request for{' '}
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {selectedRequest.employee?.user_info?.first_name} {selectedRequest.employee?.user_info?.last_name}
                     </span>.
                     Please provide a clear reason for the rejection below.
@@ -723,23 +723,23 @@ const LeaveApproval = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1 flex items-center">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1 flex items-center">
                 Rejection Reason <span className="text-rose-400 ml-1 text-lg leading-none">*</span>
               </label>
               <textarea
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-rose-500 focus:border-rose-500 font-medium placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-black/10 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-rose-500 focus:border-rose-500 font-medium placeholder-slate-500 p-4 transition-all"
                 placeholder="Examine the reason for rejection here..."
                 required
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-black/10 dark:border-white/10">
               <button
                 onClick={() => setShowRejectionModal(false)}
-                className="flex-1 px-6 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 transition-all transform hover:-translate-y-1"
+                className="flex-1 px-6 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-2xl shadow-lg border border-black/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
               >
                 Cancel
               </button>

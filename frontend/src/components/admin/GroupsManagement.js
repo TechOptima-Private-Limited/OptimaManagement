@@ -70,7 +70,7 @@ const GroupsManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] p-8 space-y-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#070B14] p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <button
@@ -82,11 +82,11 @@ const GroupsManagement = () => {
             Back to Users and Authentication
           </button>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+            <div className="p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5">
               <UserGroupIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-white uppercase tracking-tight">System Groups</h1>
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">System Groups</h1>
               <p className="text-sm text-slate-500 font-medium tracking-tight">Manage role-based permissions and group memberships.</p>
             </div>
           </div>
@@ -94,7 +94,7 @@ const GroupsManagement = () => {
         <button
           type="button"
           onClick={() => navigate('/users-auth/groups/add')}
-          className={`inline-flex items-center px-6 py-3 rounded-2xl bg-gradient-to-r ${theme.primaryGradient} text-white text-xs font-black uppercase tracking-widest shadow-lg hover:shadow-indigo-500/20 transition-all transform hover:scale-105 active:scale-95`}
+          className={`inline-flex items-center px-6 py-3 rounded-2xl bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white text-xs font-black uppercase tracking-widest shadow-lg hover:shadow-indigo-500/20 transition-all transform hover:scale-105 active:scale-95`}
         >
           Add new group
         </button>
@@ -106,21 +106,21 @@ const GroupsManagement = () => {
           <input
             type="text"
             placeholder="Search groups..."
-            className="block w-full bg-white/5 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+            className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <button
           type="submit"
-          className="px-8 py-4 rounded-2xl bg-white/5 border border-white/5 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
+          className="px-8 py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all transform active:scale-95"
         >
           SEARCH
         </button>
       </form>
 
-      <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
-        <div className="px-8 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+      <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden">
+        <div className="px-8 py-4 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">GROUP IDENTITY</span>
           <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{loading ? 'SYNCHRONIZING…' : `${groups.length} TOTAL GROUPS`}</span>
         </div>
@@ -128,21 +128,21 @@ const GroupsManagement = () => {
           {groups.map((group) => (
             <div
               key={group.id}
-              className="group w-full px-8 py-4 flex items-center justify-between hover:bg-white/5 transition-all duration-300"
+              className="group w-full px-8 py-4 flex items-center justify-between hover:bg-black/5 dark:bg-white/5 transition-all duration-300"
             >
               <button
                 type="button"
                 onClick={() => navigate(`/users-auth/groups/${group.id}`)}
                 className="text-left flex-1"
               >
-                <div className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{group.name}</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{group.name}</div>
               </button>
               <div className="flex items-center space-x-6">
-                <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full">{group.permissions_count} permissions</span>
+                <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest bg-black/5 dark:bg-white/5 px-3 py-1 rounded-full">{group.permissions_count} permissions</span>
                 <button
                   type="button"
                   onClick={(e) => openConfirm(group, e)}
-                  className="px-4 py-2 text-[10px] font-black rounded-xl border border-red-500/30 text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white transition-all transform active:scale-95 uppercase tracking-widest"
+                  className="px-4 py-2 text-[10px] font-black rounded-xl border border-red-500/30 text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-slate-900 dark:text-white transition-all transform active:scale-95 uppercase tracking-widest"
                 >
                   Delete
                 </button>
@@ -158,19 +158,19 @@ const GroupsManagement = () => {
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={closeConfirm}></div>
-          <div className="relative bg-[#0B1120] rounded-3xl border border-white/10 shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="px-8 py-6 border-b border-white/5">
-              <h3 className="text-lg font-black text-white uppercase tracking-tight">System Deletion</h3>
+          <div className="relative bg-[#0B1120] rounded-3xl border border-black/10 dark:border-white/10 shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="px-8 py-6 border-b border-black/5 dark:border-white/5">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">System Deletion</h3>
             </div>
             <div className="px-8 py-8">
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 Confirm deletion of security group <span className="text-indigo-400 font-bold">{confirmGroup?.name}</span>? This operation is permanent.
               </p>
             </div>
-            <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex justify-end space-x-4">
+            <div className="px-8 py-6 bg-black/5 dark:bg-white/5 border-t border-black/5 dark:border-white/5 flex justify-end space-x-4">
               <button
                 type="button"
-                className="px-6 py-2 text-xs font-black rounded-xl border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
+                className="px-6 py-2 text-xs font-black rounded-xl border border-black/10 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all"
                 onClick={closeConfirm}
                 disabled={!!deletingId}
               >
@@ -178,7 +178,7 @@ const GroupsManagement = () => {
               </button>
               <button
                 type="button"
-                className="px-6 py-2 text-xs font-black rounded-xl bg-red-500 text-white hover:bg-red-600 disabled:opacity-30 transition-all shadow-lg shadow-red-500/20"
+                className="px-6 py-2 text-xs font-black rounded-xl bg-red-500 text-slate-900 dark:text-white hover:bg-red-600 disabled:opacity-30 transition-all shadow-lg shadow-red-500/20"
                 onClick={(e) => handleDelete(confirmGroup, e)}
                 disabled={!!deletingId}
               >

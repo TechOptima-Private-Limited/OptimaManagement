@@ -56,31 +56,31 @@ const MyAssets = () => {
     if (status === 'AVAILABLE') return `${base} bg-blue-500/10 text-blue-400 border-blue-500/20`;
     if (status === 'DAMAGED') return `${base} bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]`;
     if (status === 'LOST') return `${base} bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]`;
-    return `${base} bg-slate-500/10 text-slate-400 border-slate-500/20`;
+    return `${base} bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/20`;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070B14] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#070B14] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto shadow-[0_0_15px_rgba(99,102,241,0.2)]"></div>
-          <p className="mt-4 text-slate-400 font-bold tracking-wide animate-pulse uppercase text-xs">Loading your assets...</p>
+          <p className="mt-4 text-slate-500 dark:text-slate-400 font-bold tracking-wide animate-pulse uppercase text-xs">Loading your assets...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#070B14] py-8 transition-colors duration-500">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#070B14] py-8 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 p-8 flex items-center justify-between group overflow-hidden relative">
+        <div className="mb-10 bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-black/10 dark:border-white/10 p-8 flex items-center justify-between group overflow-hidden relative">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 h-40 w-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
           <div className="relative z-10">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">My Assets</h1>
-            <p className="text-lg text-slate-400 font-medium">Assets currently assigned to you</p>
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-slate-800 dark:from-white dark:to-slate-400">My Assets</h1>
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">Assets currently assigned to you</p>
           </div>
-          <div className="relative z-10 h-16 w-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl transform transition-transform group-hover:scale-110 group-hover:rotate-6 border border-white/20">
-            <ComputerDesktopIcon className="h-8 w-8 text-white" />
+          <div className="relative z-10 h-16 w-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl transform transition-transform group-hover:scale-110 group-hover:rotate-6 border border-black/20 dark:border-white/20">
+            <ComputerDesktopIcon className="h-8 w-8 text-slate-900 dark:text-white" />
           </div>
         </div>
 
@@ -94,22 +94,22 @@ const MyAssets = () => {
         )}
 
         {assets.length === 0 ? (
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-20 text-center">
-            <ComputerDesktopIcon className="h-20 w-20 text-white/5 mx-auto mb-6" />
-            <h3 className="text-2xl font-bold text-white tracking-tight">No assets assigned</h3>
-            <p className="mt-2 text-slate-400 font-medium">When assets are assigned to you, they will appear here.</p>
+          <div className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-black/10 dark:border-white/10 shadow-2xl p-20 text-center">
+            <ComputerDesktopIcon className="h-20 w-20 text-slate-900 dark:text-white/5 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">No assets assigned</h3>
+            <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">When assets are assigned to you, they will appear here.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {assets.map((a) => (
-              <div key={a.id} className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl p-6 hover:bg-white/10 transition-all duration-300 group">
+              <div key={a.id} className="bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-black/10 dark:border-white/10 shadow-xl p-6 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 group">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl shadow-lg ring-1 ring-white/10 group-hover:scale-110 transition-transform">
-                      <ComputerDesktopIcon className="h-6 w-6 text-white" />
+                      <ComputerDesktopIcon className="h-6 w-6 text-slate-900 dark:text-white" />
                     </div>
                     <div>
-                      <div className="text-white font-bold tracking-tight text-lg">{a.name}</div>
+                      <div className="text-slate-900 dark:text-white font-bold tracking-tight text-lg">{a.name}</div>
                       <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-0.5">#{a.id}</div>
                     </div>
                   </div>
@@ -117,54 +117,54 @@ const MyAssets = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center px-4 py-3 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                  <div className="flex items-center px-4 py-3 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group-hover:border-black/20 dark:border-white/20 transition-all">
                     <TagIcon className="h-4 w-4 text-indigo-400 mr-3" />
                     <div>
                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Asset Tag</div>
-                      <div className="text-slate-200 font-black tracking-tight">{a.asset_tag}</div>
+                      <div className="text-slate-800 dark:text-slate-200 font-black tracking-tight">{a.asset_tag}</div>
                     </div>
                   </div>
                   {a.serial_number ? (
-                    <div className="flex items-center px-4 py-3 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                    <div className="flex items-center px-4 py-3 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group-hover:border-black/20 dark:border-white/20 transition-all">
                       <HashtagIcon className="h-4 w-4 text-indigo-400 mr-3" />
                       <div>
                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Serial Number</div>
-                        <div className="text-slate-200 font-black tracking-tight">{a.serial_number}</div>
+                        <div className="text-slate-800 dark:text-slate-200 font-black tracking-tight">{a.serial_number}</div>
                       </div>
                     </div>
                   ) : null}
                   {a.purchased_date ? (
-                    <div className="flex items-center px-4 py-3 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                    <div className="flex items-center px-4 py-3 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group-hover:border-black/20 dark:border-white/20 transition-all">
                       <ClockIcon className="h-4 w-4 text-indigo-400 mr-3" />
                       <div>
                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Purchased</div>
-                        <div className="text-slate-200 font-black tracking-tight">{a.purchased_date}</div>
+                        <div className="text-slate-800 dark:text-slate-200 font-black tracking-tight">{a.purchased_date}</div>
                       </div>
                     </div>
                   ) : null}
                   {a.laptop_age_pretty ? (
-                    <div className="flex items-center px-4 py-3 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                    <div className="flex items-center px-4 py-3 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group-hover:border-black/20 dark:border-white/20 transition-all">
                       <ClockIcon className="h-4 w-4 text-indigo-400 mr-3" />
                       <div>
                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Duration In Use</div>
-                        <div className="text-slate-200 font-black tracking-tight">{a.laptop_age_pretty}</div>
+                        <div className="text-slate-800 dark:text-slate-200 font-black tracking-tight">{a.laptop_age_pretty}</div>
                       </div>
                     </div>
                   ) : null}
                   {/* Show previous user only for non-software assets */}
                   {a.previously_used_by_info && assetTypeCategory[a.asset_type] !== 'SOFTWARE' ? (
-                    <div className="flex items-center px-4 py-3 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                    <div className="flex items-center px-4 py-3 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group-hover:border-black/20 dark:border-white/20 transition-all">
                       <CheckCircleIcon className="h-4 w-4 text-emerald-400 mr-3" />
                       <div>
                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Previous User</div>
-                        <div className="text-slate-200 font-black tracking-tight">{a.previously_used_by_info.name}</div>
+                        <div className="text-slate-800 dark:text-slate-200 font-black tracking-tight">{a.previously_used_by_info.name}</div>
                       </div>
                     </div>
                   ) : null}
                 </div>
 
                 {assignments.length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-white/5">
+                  <div className="mt-6 pt-6 border-t border-black/5 dark:border-white/5">
                     <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 italic opacity-60">
                       <span>Assigned via {assignments[0]?.employee_info?.name || 'assignment'}</span>
                       <span>{new Date(assignments[0]?.assigned_at || Date.now()).toLocaleDateString()}</span>

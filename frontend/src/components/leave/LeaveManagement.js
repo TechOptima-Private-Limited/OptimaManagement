@@ -183,13 +183,13 @@ const LeaveManagement = () => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient}`}>
       {/* Hero Header */}
-      <div className={`border-b border-white/10 text-white relative overflow-hidden`}>
+      <div className={`border-b border-black/10 dark:border-white/10 text-slate-900 dark:text-white relative overflow-hidden`}>
         <div className={`absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br ${theme.primaryGradient} opacity-10 rounded-full blur-3xl`}></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-4 mb-4">
-                <div className="p-3 bg-white/20 rounded-2xl">
+                <div className="p-3 bg-black/20 dark:bg-white/20 rounded-2xl">
                   <CalendarDaysIcon className="h-10 w-10" />
                 </div>
                 <div>
@@ -209,14 +209,14 @@ const LeaveManagement = () => {
               {isHROrManager() && stats.pendingApprovals > 0 && (
                 <div className="flex items-center space-x-3 mt-4">
                   <SparklesIcon className="h-6 w-6 text-yellow-300" />
-                  <span className="text-lg font-medium bg-white/20 px-4 py-2 rounded-full">
+                  <span className="text-lg font-medium bg-black/20 dark:bg-white/20 px-4 py-2 rounded-full">
                     {stats.pendingApprovals} {isManager() ? 'team ' : ''}requests need your attention
                   </span>
                 </div>
               )}
             </div>
             <div className="mt-6 md:mt-0 md:ml-6">
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
+              <div className="bg-black/20 dark:bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-black/30 dark:border-white/30">
                 <div className="flex items-center space-x-3">
                   <CalendarDaysIcon className="h-6 w-6" />
                   <span className="text-lg font-semibold">
@@ -239,7 +239,7 @@ const LeaveManagement = () => {
 
                 return (
                   <div key={item.name} className="group">
-                    <div className={`relative bg-white/5 rounded-[2.5rem] shadow-2xl border backdrop-blur-xl ${item.bgGradient} overflow-hidden transition-all duration-300 hover:shadow-indigo-500/10 hover:-translate-y-1`}>
+                    <div className={`relative bg-black/5 dark:bg-white/5 rounded-[2.5rem] shadow-2xl border backdrop-blur-xl ${item.bgGradient} overflow-hidden transition-all duration-300 hover:shadow-indigo-500/10 hover:-translate-y-1`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-between">
@@ -247,12 +247,12 @@ const LeaveManagement = () => {
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
                               {item.name}
                             </p>
-                            <p className="text-3xl font-black text-white uppercase tracking-tight">
+                            <p className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
                               {item.value}
                             </p>
                             <div className="mt-3">
                               <div className={`inline-flex items-center text-sm font-semibold ${item.changeType === 'increase' ? 'text-emerald-400' :
-                                item.changeType === 'decrease' ? 'text-red-400' : 'text-slate-400'
+                                item.changeType === 'decrease' ? 'text-red-400' : 'text-slate-500 dark:text-slate-400'
                                 }`}>
                                 {item.changeType === 'increase' && (
                                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -263,8 +263,8 @@ const LeaveManagement = () => {
                               </div>
                             </div>
                           </div>
-                          <div className={`p-4 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-[0_0_20px_rgba(0,0,0,0.3)] border border-white/20`}>
-                            <IconComponent className="h-8 w-8 text-white" />
+                          <div className={`p-4 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-[0_0_20px_rgba(0,0,0,0.3)] border border-black/20 dark:border-white/20`}>
+                            <IconComponent className="h-8 w-8 text-slate-900 dark:text-white" />
                           </div>
                         </div>
                       </div>
@@ -286,8 +286,8 @@ const LeaveManagement = () => {
                     <RocketLaunchIcon className="h-6 w-6 text-indigo-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white tracking-wide">Quick Actions</h3>
-                    <p className="text-sm text-slate-400 mt-1 font-medium">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-wide">Quick Actions</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
                       {stats.pendingApprovals > 0 ? (
                         <>
                           <span className="font-bold text-indigo-300">{stats.pendingApprovals}</span>
@@ -303,7 +303,7 @@ const LeaveManagement = () => {
                   {stats.pendingApprovals > 0 && (
                     <button
                       onClick={() => setSelectedIndex(isHRManager() ? 2 : 1)} // Adjust for tab index
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)] border border-indigo-400/50 px-4 py-2 rounded-xl font-medium transition-all flex items-center space-x-2"
+                      className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white shadow-[0_0_15px_rgba(79,70,229,0.4)] border border-indigo-400/50 px-4 py-2 rounded-xl font-medium transition-all flex items-center space-x-2"
                     >
                       <ClockIcon className="h-4 w-4" />
                       <span>Review Now</span>
@@ -312,7 +312,7 @@ const LeaveManagement = () => {
                   {isHRManager() && (
                     <button
                       onClick={() => setSelectedIndex(2)} // Leave Types tab for HR
-                      className="bg-purple-600 hover:bg-purple-500 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)] border border-purple-400/50 px-4 py-2 rounded-xl font-medium transition-all flex items-center space-x-2"
+                      className="bg-purple-600 hover:bg-purple-500 text-slate-900 dark:text-white shadow-[0_0_15px_rgba(147,51,234,0.4)] border border-purple-400/50 px-4 py-2 rounded-xl font-medium transition-all flex items-center space-x-2"
                     >
                       <CogIcon className="h-4 w-4" />
                       <span>Manage Types</span>
@@ -330,10 +330,10 @@ const LeaveManagement = () => {
         )}
 
         {/* Main Content Tabs */}
-        <div className="bg-[#0A0F1A] rounded-[2rem] shadow-2xl border border-white/10 overflow-hidden relative z-10 backdrop-blur-xl">
+        <div className="bg-[#0A0F1A] rounded-[2rem] shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden relative z-10 backdrop-blur-xl">
           <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
             {/* Tab Navigation */}
-            <div className="bg-white/5 border-b border-white/10 p-2">
+            <div className="bg-black/5 dark:bg-white/5 border-b border-black/10 dark:border-white/10 p-2">
               <Tab.List className="flex space-x-2">
                 {tabs.map((tab, index) => (
                   <Tab
@@ -343,17 +343,17 @@ const LeaveManagement = () => {
                         'flex-1 py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-2xl transition-all duration-300 focus:outline-none flex items-center justify-center space-x-3',
                         selected
                           ? 'bg-indigo-500/20 text-indigo-300 shadow-lg border border-indigo-500/30'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                          : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-black/5 dark:bg-white/5 border border-transparent'
                       )
                     }
                   >
-                    <div className={`p-2 rounded-xl ${selectedIndex === index ? `bg-gradient-to-r ${tab.gradient} shadow-lg shadow-indigo-500/20` : 'bg-white/10'}`}>
-                      <tab.icon className={`h-5 w-5 ${selectedIndex === index ? 'text-white' : 'text-slate-400'}`} />
+                    <div className={`p-2 rounded-xl ${selectedIndex === index ? `bg-gradient-to-r ${tab.gradient} shadow-lg shadow-indigo-500/20` : 'bg-black/10 dark:bg-white/10'}`}>
+                      <tab.icon className={`h-5 w-5 ${selectedIndex === index ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                     </div>
                     <span>{tab.name}</span>
                     {/* Notification Badge */}
                     {tab.name === 'Approvals' && stats.pendingApprovals > 0 && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500 text-white shadow-[0_0_10px_rgba(244,63,94,0.5)] animate-pulse">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500 text-slate-900 dark:text-white shadow-[0_0_10px_rgba(244,63,94,0.5)] animate-pulse">
                         {stats.pendingApprovals}
                       </span>
                     )}
@@ -368,8 +368,8 @@ const LeaveManagement = () => {
                 <Tab.Panel key={index} className="p-8">
                   {/* Tab Header */}
                   <div className="mb-8">
-                    <h2 className="text-2xl font-black text-white tracking-tight">{tab.name}</h2>
-                    <p className="text-slate-400 mt-1 font-medium">{tab.description}</p>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{tab.name}</h2>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">{tab.description}</p>
                   </div>
 
                   {/* Component Content */}
@@ -381,20 +381,20 @@ const LeaveManagement = () => {
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-[#0A0F1A] border border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl z-10">
+        <div className="mt-8 bg-[#0A0F1A] border border-black/10 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl z-10">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
           <div className="flex items-start space-x-6 relative z-10">
             <div className="p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl">
               <CalendarDaysIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-white mb-6">Leave Management Guide</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Leave Management Guide</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <h4 className="font-bold text-indigo-300 tracking-wide uppercase text-xs">
                     {isHRManager() ? '👑 HR Manager Tips' : isManager() ? '🎯 Manager Guide' : '📝 Employee Guide'}
                   </h4>
-                  <ul className="space-y-3 text-sm text-slate-300 font-medium">
+                  <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300 font-medium">
                     {isHRManager() ? (
                       <>
                         <li className="flex items-center space-x-2">
@@ -445,7 +445,7 @@ const LeaveManagement = () => {
                 </div>
                 <div className="space-y-4">
                   <h4 className="font-bold text-purple-300 tracking-wide uppercase text-xs">🚀 Pro Features</h4>
-                  <ul className="space-y-3 text-sm text-slate-300 font-medium">
+                  <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300 font-medium">
                     <li className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
                       <span>Real-time notifications for status updates</span>
@@ -508,7 +508,7 @@ const SetupWarning = ({ onSetupClick }) => {
           </div>
           <button
             onClick={onSetupClick}
-            className="bg-amber-600 hover:bg-amber-500 text-white shadow-[0_0_15px_rgba(217,119,6,0.4)] border border-amber-400/50 px-6 py-3 rounded-xl font-bold transition-all flex items-center space-x-2"
+            className="bg-amber-600 hover:bg-amber-500 text-slate-900 dark:text-white shadow-[0_0_15px_rgba(217,119,6,0.4)] border border-amber-400/50 px-6 py-3 rounded-xl font-bold transition-all flex items-center space-x-2"
           >
             <CogIcon className="h-5 w-5" />
             <span>Setup Now</span>

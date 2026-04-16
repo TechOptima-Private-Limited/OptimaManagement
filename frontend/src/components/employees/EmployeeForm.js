@@ -109,10 +109,10 @@ const EmployeeForm = () => {
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8">
           <div className="flex items-center space-x-4">
             <div className="h-16 w-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
-              <UserIcon className="h-8 w-8 text-white" />
+              <UserIcon className="h-8 w-8 text-slate-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
                 {isEdit ? 'Edit Employee' : 'Add New Employee'}
               </h1>
               <p className="text-blue-100 mt-1">
@@ -127,7 +127,7 @@ const EmployeeForm = () => {
           {/* Personal Information */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <UserIcon className="h-5 w-5 text-gray-400" />
+              <UserIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -225,7 +225,7 @@ const EmployeeForm = () => {
           {/* Employment Information */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <BuildingOfficeIcon className="h-5 w-5 text-gray-400" />
+              <BuildingOfficeIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               <h3 className="text-lg font-medium text-gray-900">Employment Information</h3>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -334,7 +334,7 @@ const EmployeeForm = () => {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-slate-900 dark:text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Employee' : 'Create Employee')}
             </button>

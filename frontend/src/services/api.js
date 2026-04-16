@@ -208,6 +208,7 @@ export const attendanceAPI = {
 
   // Analytics
   getAttendanceTrends: (params) => api.get('/attendance/analytics/', { params }),
+  getWorkingFormatStats: () => api.get('/attendance/working-format-stats/'),
 };
 
 

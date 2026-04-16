@@ -64,7 +64,7 @@
 
 //         {/* Header */}
 //         <div className="mb-8">
-//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-6">
 //             <div className="flex items-center justify-between">
 //               <div>
 //                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -76,7 +76,7 @@
 //               </div>
 //               <div className="flex items-center space-x-3">
 //                 <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-//                   <KeyIcon className="h-6 w-6 text-white" />
+//                   <KeyIcon className="h-6 w-6 text-slate-900 dark:text-white" />
 //                 </div>
 //               </div>
 //             </div>
@@ -85,7 +85,7 @@
 
 //         {/* Navigation Tabs */}
 //         <div className="mb-8">
-//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-2">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-2">
 //             <nav className="flex space-x-2">
 //               {tabs.map((tab) => {
 //                 const Icon = tab.icon;
@@ -98,12 +98,12 @@
 //                     className={`
 //                       flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
 //                       ${isActive
-//                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
+//                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-slate-900 dark:text-white shadow-lg transform scale-105'
 //                         : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:scale-105'
 //                       }
 //                     `}
 //                   >
-//                     <Icon className={`h-5 w-5 mr-2 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+//                     <Icon className={`h-5 w-5 mr-2 ${isActive ? 'text-slate-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'}`} />
 //                     {tab.name}
 //                   </Link>
 //                 );
@@ -113,7 +113,7 @@
 //         </div>
 
 //         {/* Content */}
-//         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 min-h-[600px]">
+//         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 min-h-[600px]">
 //           <Routes>
 //             <Route path="/" element={<ResourceDashboard />} />
 //             <Route path="/request" element={<ResourceRequestForm />} />
@@ -220,7 +220,7 @@
 
 //         {/* Header */}
 //         <div className="mb-8">
-//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-6">
 //             <div className="flex items-center justify-between">
 //               <div>
 //                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -240,7 +240,7 @@
 //               </div>
 //               <div className="flex items-center space-x-3">
 //                 <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-//                   <KeyIcon className="h-6 w-6 text-white" />
+//                   <KeyIcon className="h-6 w-6 text-slate-900 dark:text-white" />
 //                 </div>
 //               </div>
 //             </div>
@@ -249,7 +249,7 @@
 
 //         {/* Navigation Tabs */}
 //         <div className="mb-8">
-//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-2">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-2">
 //             <nav className="flex space-x-2">
 //               {tabs.map((tab) => {
 //                 const Icon = tab.icon;
@@ -263,12 +263,12 @@
 //                     className={`
 //                       flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
 //                       ${isActive
-//                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
+//                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-slate-900 dark:text-white shadow-lg transform scale-105'
 //                         : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:scale-105'
 //                       }
 //                     `}
 //                   >
-//                     <Icon className={`h-5 w-5 mr-2 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+//                     <Icon className={`h-5 w-5 mr-2 ${isActive ? 'text-slate-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'}`} />
 //                     {tab.name}
 //                     {isAdminTab && (
 //                       <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
@@ -283,7 +283,7 @@
 //         </div>
 
 //         {/* Content */}
-//         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 min-h-[600px]">
+//         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 min-h-[600px]">
 //           <Routes>
 //             <Route path="/" element={<ResourceDashboard />} />
 //             <Route path="/request" element={<ResourceRequestForm />} />
@@ -468,7 +468,7 @@ const ResourceManagement = () => {
                 <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.primaryGradient} bg-clip-text text-transparent`}>
                   Support 24/7
                 </h1>
-                <p className="text-gray-400 mt-2">
+                <p className="text-gray-600 dark:text-gray-400 mt-2">
                   Manage access requests, resources, and permissions
                 </p>
                 {hasAdminAccess() && (
@@ -485,7 +485,7 @@ const ResourceManagement = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <div className={`h-12 w-12 bg-gradient-to-r ${theme.primaryGradient} rounded-xl flex items-center justify-center shadow-lg`}>
-                  <KeyIcon className="h-6 w-6 text-white" />
+                  <KeyIcon className="h-6 w-6 text-slate-900 dark:text-white" />
                 </div>
               </div>
             </div>
@@ -508,18 +508,18 @@ const ResourceManagement = () => {
                     className={`
                       flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap
                       ${isActive
-                        ? `bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg transform scale-105`
-                        : 'text-gray-400 hover:text-white hover:bg-white/5 hover:scale-105'
+                        ? `bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white shadow-lg transform scale-105`
+                        : 'text-gray-600 dark:text-gray-400 hover:text-slate-900 dark:text-white hover:bg-black/5 dark:bg-white/5 hover:scale-105'
                       }
                     `}
                     title={tab.description}
                   >
-                    <Icon className={`h-5 w-5 mr-2 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                    <Icon className={`h-5 w-5 mr-2 ${isActive ? 'text-slate-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'}`} />
                     <span>{tab.name}</span>
                     {isAdminTab && (
                       <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium
                         ${isActive
-                          ? 'bg-white/20 text-white border border-white/30'
+                          ? 'bg-black/20 dark:bg-white/20 text-slate-900 dark:text-white border border-black/30 dark:border-white/30'
                           : 'bg-purple-100 text-purple-700 border border-purple-200'
                         }`}>
                         Admin
@@ -553,9 +553,9 @@ const ResourceManagement = () => {
         {/* Footer Info */}
         {hasAdminAccess() && (
           <div className="mt-6 text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full shadow-lg border border-white/10">
+            <div className="inline-flex items-center px-4 py-2 bg-black/5 dark:bg-white/5 backdrop-blur-xl rounded-full shadow-lg border border-black/10 dark:border-white/10">
               <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 Administrative privileges active for {getUserRoleDisplay()}
               </span>
             </div>

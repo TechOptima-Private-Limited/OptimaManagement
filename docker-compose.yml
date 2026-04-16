@@ -4,14 +4,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=hrm_db
-      - POSTGRES_USER=hrm_user
-      - POSTGRES_PASSWORD=hrm_pass
+      - POSTGRES_DB=${DB_NAME:-hrm_db}
+      - POSTGRES_USER=${DB_USER:-hrm_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-hrm_pass}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-hrm_user} -d ${DB_NAME:-hrm_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
   redis:
     image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
@@ -26,47 +36,21 @@ services:
       - media_volume:/app/hrm_keka/media
     environment:
       - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=hrm_db
-      - DB_USER=hrm_user
-      - DB_PASSWORD=hrm_pass
+      - DB_NAME=${DB_NAME:-hrm_db}
+      - DB_USER=${DB_USER:-hrm_user}
+      - DB_PASSWORD=${DB_PASSWORD:-hrm_pass}
       - DB_HOST=db
       - DB_PORT=5432
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - DEBUG=True
-      - SECRET_KEY=django-insecure-docker-dev-key-change-me
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-dev-key}
       - ALLOWED_HOSTS=localhost,127.0.0.1,backend
-      - IT_SUPPORT_EMAIL=support@yourdomain.com
-      - TEAM_EMAILS=team@yourdomain.com
     ports:
       - "8080:8080"
     depends_on:
-      - db
-      - redis
-    networks:
-      - app-network
-
-  celery-worker:
-    build:
-      context: ./hrms-backend
-      dockerfile: Dockerfile
-    command: celery -A hrm_keka worker --loglevel=info
-    volumes:
-      - ./hrms-backend/hrm_keka:/app/hrm_keka
-      - media_volume:/app/hrm_keka/media
-    environment:
-      - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=hrm_db
-      - DB_USER=hrm_user
-      - DB_PASSWORD=hrm_pass
-      - DB_HOST=db
-      - DB_PORT=5432
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
-      - backend
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -75,7 +59,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=http://localhost:8080/api
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8080/api}
     ports:
       - "3002:80"
     depends_on:

@@ -493,7 +493,7 @@ const OnboardingManagement = () => {
       case 'rejected':
         return 'bg-rose-900/30 text-rose-400 border-rose-800/50';
       default:
-        return 'bg-slate-800 text-slate-400 border-slate-700';
+        return 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-700';
     }
   };
 
@@ -504,7 +504,7 @@ const OnboardingManagement = () => {
       case 'employee':
         return 'bg-green-900/30 text-green-400 border-green-800/50';
       default:
-        return 'bg-slate-800 text-slate-400 border-slate-700';
+        return 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-700';
     }
   };
 
@@ -563,40 +563,40 @@ const OnboardingManagement = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex justify-center items-center">
+      <div className="min-h-screen bg-white dark:bg-slate-900 flex justify-center items-center">
         <div className="text-center">
           <div className="relative">
             <div className="w-20 h-20 border-4 border-slate-800 rounded-full animate-spin">
               <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-indigo-500 rounded-full animate-spin"></div>
             </div>
           </div>
-          <p className="mt-4 text-lg font-medium text-slate-400">Loading onboarding data...</p>
+          <p className="mt-4 text-lg font-medium text-slate-500 dark:text-slate-400">Loading onboarding data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Enhanced Header Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700">
         <div className="absolute inset-0 bg-black opacity-10"></div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-black/5 dark:bg-white/5 rounded-full -translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-black/5 dark:bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  <UserPlus className="h-8 w-8 text-white" />
+                <div className="p-2 bg-black/20 dark:bg-white/20 rounded-lg backdrop-blur-sm">
+                  <UserPlus className="h-8 w-8 text-slate-900 dark:text-white" />
                 </div>
                 <Star className="h-6 w-6 text-yellow-300 animate-pulse" />
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
+              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-3">
                 Onboarding Management
               </h1>
               <p className="text-xl text-blue-100 mb-6">
@@ -618,7 +618,7 @@ const OnboardingManagement = () => {
             <div className="mt-8 lg:mt-0 flex flex-col lg:flex-row gap-4">
               <Link
                 to="/onboarding/link-generator"
-                className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300"
+                className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-slate-900 dark:text-white rounded-xl font-semibold shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300"
               >
                 <LinkIcon className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                 Generate Link
@@ -641,18 +641,18 @@ const OnboardingManagement = () => {
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.key} className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700/50 overflow-hidden">
+              <div key={stat.key} className="group bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-700/50 overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <Icon className="h-6 w-6 text-white" />
+                        <Icon className="h-6 w-6 text-slate-900 dark:text-white" />
                       </div>
                       <div>
-                        <p className="text-3xl font-bold text-white group-hover:text-indigo-400 transition-colors duration-300">
+                        <p className="text-3xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-400 transition-colors duration-300">
                           {stat.count}
                         </p>
-                        <p className="text-sm font-medium text-slate-400">
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                           {stat.label}
                         </p>
                       </div>
@@ -666,7 +666,7 @@ const OnboardingManagement = () => {
         </div>
 
         {/* Enhanced Filter and Search */}
-        <div className="bg-slate-800/50 backdrop-blur-sm shadow-xl rounded-2xl border border-slate-700/50 p-6 space-y-4">
+        <div className="bg-slate-100 dark:bg-slate-800/50 backdrop-blur-sm shadow-xl rounded-2xl border border-slate-700/50 p-6 space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             {/* Filter Tabs */}
             <div className="flex space-x-2">
@@ -681,8 +681,8 @@ const OnboardingManagement = () => {
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
                   className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${filter === tab.key
-                    ? 'bg-indigo-600 text-white shadow-lg'
-                    : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                    ? 'bg-indigo-600 text-slate-900 dark:text-white shadow-lg'
+                    : 'bg-slate-200 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:bg-slate-700 hover:text-slate-800 dark:text-slate-200'
                     }`}
                 >
                   {tab.label} ({tab.count})
@@ -700,7 +700,7 @@ const OnboardingManagement = () => {
                 placeholder="Search employees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border-2 border-slate-700/50 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none"
+                className="w-full pl-10 pr-4 py-2 border-2 border-slate-700/50 rounded-xl bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-600 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 outline-none"
               />
             </div>
           </div>
@@ -714,7 +714,7 @@ const OnboardingManagement = () => {
                 <div className="absolute inset-0 bg-indigo-500/10 rounded-full animate-pulse"></div>
                 <UserPlus className="absolute inset-4 text-indigo-500/30" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">No candidates found</h3>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">No candidates found</h3>
               <p className="text-slate-500 mb-6 max-w-md mx-auto">
                 {employees.length === 0
                   ? "No candidates have been added to the onboarding process yet."
@@ -730,7 +730,7 @@ const OnboardingManagement = () => {
               return (
                 <div
                   key={employee.id}
-                  className={`group bg-slate-800/40 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-slate-700/50 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
+                  className={`group bg-slate-100 dark:bg-slate-800/40 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-slate-700/50 overflow-hidden transform hover:-translate-y-1 ${employee.is_deleted ? 'opacity-75' : ''
                     }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
@@ -742,7 +742,7 @@ const OnboardingManagement = () => {
                         <div className="relative">
                           <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${profileGradient} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 ${employee.is_deleted ? 'grayscale' : ''
                             }`}>
-                            <span className="text-white font-bold text-lg">
+                            <span className="text-slate-900 dark:text-white font-bold text-lg">
                               {employeeInitials}
                             </span>
                           </div>
@@ -759,7 +759,7 @@ const OnboardingManagement = () => {
 
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <h3 className={`text-xl font-bold group-hover:text-indigo-400 transition-colors duration-300 ${employee.is_deleted ? 'line-through text-slate-500' : 'text-white'
+                            <h3 className={`text-xl font-bold group-hover:text-indigo-400 transition-colors duration-300 ${employee.is_deleted ? 'line-through text-slate-500' : 'text-slate-900 dark:text-white'
                               }`}>
                               {employee.first_name} {employee.last_name}
                               {employee.is_deleted && <span className="text-rose-500 ml-2">[DELETED]</span>}
@@ -783,8 +783,8 @@ const OnboardingManagement = () => {
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center space-x-4 text-sm text-slate-400">
-                            <span className="font-medium text-slate-300">{employee.email}</span>
+                          <div className="flex items-center space-x-4 text-sm text-slate-500 dark:text-slate-400">
+                            <span className="font-medium text-slate-700 dark:text-slate-300">{employee.email}</span>
                             {employee.phone_number && <span>• {employee.phone_number}</span>}
                             {employee.department && <span>• {employee.department}</span>}
                             {employee.position && <span>• {employee.position}</span>}
@@ -808,7 +808,7 @@ const OnboardingManagement = () => {
                             setSelectedEmployee(employee);
                             setShowDetailsModal(true);
                           }}
-                          className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-slate-800 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
+                          className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-slate-100 dark:bg-slate-800 rounded-xl transition-all duration-200 opacity-0 group-hover:opacity-100"
                           title="View Details"
                         >
                           <Eye className="h-5 w-5" />
@@ -820,7 +820,7 @@ const OnboardingManagement = () => {
                               setDeletingEmployee(employee);
                               setShowRestoreConfirm(true);
                             }}
-                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transition-all duration-200 transform hover:scale-105"
+                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transition-all duration-200 transform hover:scale-105"
                             title="Restore Employee"
                           >
                             <RotateCcw className="h-4 w-4 mr-2" />
@@ -833,7 +833,7 @@ const OnboardingManagement = () => {
                                 setEditingEmployee({ ...employee });
                                 setShowEditModal(true);
                               }}
-                              className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 opacity-0 group-hover:opacity-100"
+                              className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 opacity-0 group-hover:opacity-100"
                               title="Edit Employee"
                             >
                               <Edit className="h-4 w-4 mr-1" />
@@ -845,7 +845,7 @@ const OnboardingManagement = () => {
                                 setDeletingEmployee(employee);
                                 setShowDeleteConfirm(true);
                               }}
-                              className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-rose-600 to-red-600 text-white rounded-xl font-medium hover:from-rose-700 hover:to-red-700 transition-all duration-200 transform hover:scale-105 opacity-0 group-hover:opacity-100"
+                              className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-rose-600 to-red-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-rose-700 hover:to-red-700 transition-all duration-200 transform hover:scale-105 opacity-0 group-hover:opacity-100"
                               title="Delete Employee"
                             >
                               <Trash2 className="h-4 w-4 mr-1" />
@@ -854,7 +854,7 @@ const OnboardingManagement = () => {
 
                             <button
                               onClick={() => fetchDocumentsList(employee.id)}
-                              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105"
+                              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105"
                               title="Check Document Status"
                             >
                               <FileText className="h-4 w-4 mr-2" />
@@ -883,19 +883,19 @@ const OnboardingManagement = () => {
       {showDocumentListModal && documentsList && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setShowDocumentListModal(false)}></div>
-            <div className="inline-block align-bottom bg-slate-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-700">
-              <div className="px-6 py-4 border-b border-slate-700 bg-slate-800/50">
-                <h3 className="text-lg font-semibold text-white">Documents - {documentsList.employee_name}</h3>
-                <p className="text-sm text-slate-400">{documentsList.total_documents} uploaded</p>
+            <div className="fixed inset-0 bg-white dark:bg-slate-900/80 backdrop-blur-sm" onClick={() => setShowDocumentListModal(false)}></div>
+            <div className="inline-block align-bottom bg-slate-100 dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-700">
+              <div className="px-6 py-4 border-b border-slate-700 bg-slate-100 dark:bg-slate-800/50">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Documents - {documentsList.employee_name}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{documentsList.total_documents} uploaded</p>
               </div>
-              <div className="px-6 py-4 bg-slate-800">
+              <div className="px-6 py-4 bg-slate-100 dark:bg-slate-800">
                 {documentsList.documents && documentsList.documents.length > 0 ? (
                   <ul className="divide-y divide-slate-700">
                     {documentsList.documents.map((doc, idx) => (
                       <li key={idx} className="py-3 flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-slate-200">{doc.doc_type}</p>
+                          <p className="font-medium text-slate-800 dark:text-slate-200">{doc.doc_type}</p>
                           {doc.name && <p className="text-xs text-slate-500 break-all">{doc.name}</p>}
                         </div>
                         <div className="flex items-center space-x-2">
@@ -913,15 +913,15 @@ const OnboardingManagement = () => {
                   </ul>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-slate-400">No documents uploaded yet.</p>
+                    <p className="text-slate-500 dark:text-slate-400">No documents uploaded yet.</p>
                     <div className="mt-4 flex items-center justify-center space-x-2">
-                      <button onClick={() => { setShowDocumentListModal(false); fetchDocumentStatus(documentsList.employee_id); }} className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">View Status</button>
+                      <button onClick={() => { setShowDocumentListModal(false); fetchDocumentStatus(documentsList.employee_id); }} className="px-4 py-2 rounded-xl bg-indigo-600 text-slate-900 dark:text-white font-medium hover:bg-indigo-700 transition-colors">View Status</button>
                     </div>
                   </div>
                 )}
               </div>
-              <div className="px-6 py-3 bg-slate-900/50 flex justify-end">
-                <button onClick={() => setShowDocumentListModal(false)} className="inline-flex items-center px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">Close</button>
+              <div className="px-6 py-3 bg-white dark:bg-slate-900/50 flex justify-end">
+                <button onClick={() => setShowDocumentListModal(false)} className="inline-flex items-center px-4 py-2 rounded-xl border border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:bg-slate-700 transition-colors">Close</button>
               </div>
             </div>
           </div>
@@ -956,8 +956,8 @@ const PendingEmployeeActions = ({ employee, onStatusUpdate, checkDocumentStatus 
         disabled={!isComplete}
         className={`inline-flex items-center px-3 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 ${
           isComplete 
-            ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700' 
-            : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+            ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-slate-900 dark:text-white hover:from-emerald-700 hover:to-green-700' 
+            : 'bg-slate-200 dark:bg-slate-700 text-slate-500 cursor-not-allowed'
         }`}
         title={isComplete ? "Accept Candidate" : "Documents incomplete"}
       >
@@ -966,7 +966,7 @@ const PendingEmployeeActions = ({ employee, onStatusUpdate, checkDocumentStatus 
       </button>
       <button
         onClick={() => onStatusUpdate(employee.id, 'rejected')}
-        className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-rose-600 to-red-600 text-white rounded-xl font-medium hover:from-rose-700 hover:to-red-700 transition-all duration-200 transform hover:scale-105"
+        className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-rose-600 to-red-600 text-slate-900 dark:text-white rounded-xl font-medium hover:from-rose-700 hover:to-red-700 transition-all duration-200 transform hover:scale-105"
         title="Reject Candidate"
       >
         <XCircle className="h-4 w-4 mr-1" />

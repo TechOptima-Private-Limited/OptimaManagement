@@ -346,8 +346,8 @@ const UsersAuthManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Users and Authentication</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Users and Authentication</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Manage application users, basic permissions and roles.
           </p>
         </div>
@@ -359,10 +359,10 @@ const UsersAuthManagement = () => {
         <button
           type="button"
           onClick={() => window.location.assign('/users-auth/groups')}
-          className="group relative flex flex-col items-stretch text-left bg-white/5 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-xl hover:border-white/20 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
+          className="group relative flex flex-col items-stretch text-left bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 shadow-2xl backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="px-6 py-4 flex items-center justify-between">
-            <span className="text-sm font-bold text-white uppercase tracking-widest">Groups</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Groups</span>
             <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border border-indigo-500/30 text-indigo-400 bg-indigo-500/10">
               Auth System
             </span>
@@ -381,10 +381,10 @@ const UsersAuthManagement = () => {
         <button
           type="button"
           onClick={() => window.location.assign('/users-auth/permissions')}
-          className="group relative flex flex-col items-stretch text-left bg-white/5 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-xl hover:border-white/20 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
+          className="group relative flex flex-col items-stretch text-left bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 shadow-2xl backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="px-6 py-4 flex items-center justify-between">
-            <span className="text-sm font-bold text-white uppercase tracking-widest">Permissions</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Permissions</span>
             <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-black rounded-full border border-purple-500/30 text-purple-400 bg-purple-500/10">
               Security
             </span>
@@ -403,31 +403,31 @@ const UsersAuthManagement = () => {
       {
         showConfirmModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-[#070B14]/80 backdrop-blur-sm" onClick={() => { setShowConfirmModal(false); setPendingChanges([]); }}></div>
-            <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl max-w-md w-full border border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
-              <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/5">
-                <h3 className="text-sm font-black text-white uppercase tracking-widest">Confirm changes</h3>
-                <button onClick={() => { setShowConfirmModal(false); setPendingChanges([]); }} className="text-slate-400 hover:text-white transition-colors">
+            <div className="absolute inset-0 bg-slate-50 dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => { setShowConfirmModal(false); setPendingChanges([]); }}></div>
+            <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl max-w-md w-full border border-black/10 dark:border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
+              <div className="px-6 py-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Confirm changes</h3>
+                <button onClick={() => { setShowConfirmModal(false); setPendingChanges([]); }} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
                   <XMarkIcon className="h-5 w-5" />
                 </button>
               </div>
               <div className="px-6 py-6 space-y-4">
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                   You are about to save the following changes:
                 </p>
                 <ul className="space-y-2">
                   {pendingChanges.map((c) => (
-                    <li key={c} className="flex items-center text-sm text-slate-200">
+                    <li key={c} className="flex items-center text-sm text-slate-800 dark:text-slate-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-3"></span>
                       {c}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex justify-end space-x-3">
+              <div className="px-6 py-4 bg-black/5 dark:bg-white/5 border-t border-black/5 dark:border-white/5 flex justify-end space-x-3">
                 <button
                   type="button"
-                  className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
+                  className="px-4 py-2 text-xs font-bold rounded-xl border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all"
                   onClick={() => {
                     setShowConfirmModal(false);
                     setPendingChanges([]);
@@ -438,7 +438,7 @@ const UsersAuthManagement = () => {
                 </button>
                 <button
                   type="button"
-                  className={`px-6 py-2 text-xs font-black rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg transition-all disabled:opacity-60 transform hover:scale-105 active:scale-95`}
+                  className={`px-6 py-2 text-xs font-black rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white shadow-lg transition-all disabled:opacity-60 transform hover:scale-105 active:scale-95`}
                   onClick={handleConfirmSave}
                   disabled={saving}
                 >
@@ -453,9 +453,9 @@ const UsersAuthManagement = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-20">
         {/* User list (hidden in single user mode) */}
         {!singleUserMode && (
-          <div className="lg:col-span-1 bg-white/5 rounded-2xl shadow-2xl border border-white/5 overflow-hidden backdrop-blur-xl">
-            <div className="px-6 py-5 border-b border-white/5 bg-white/5 flex items-center justify-between">
-              <h2 className="text-xs font-black text-slate-200 uppercase tracking-widest">User Profiles</h2>
+          <div className="lg:col-span-1 bg-black/5 dark:bg-white/5 rounded-2xl shadow-2xl border border-black/5 dark:border-white/5 overflow-hidden backdrop-blur-xl">
+            <div className="px-6 py-5 border-b border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex items-center justify-between">
+              <h2 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">User Profiles</h2>
               {loading && <span className="text-[10px] text-indigo-400 animate-pulse font-black uppercase">Loading...</span>}
             </div>
             <div className="divide-y divide-white/5 max-h-[600px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-white/10">
@@ -466,11 +466,11 @@ const UsersAuthManagement = () => {
                     key={user.id}
                     type="button"
                     onClick={() => handleSelectUser(user.id)}
-                    className={`w-full text-left px-6 py-5 flex items-center justify-between hover:bg-white/5 focus:outline-none transition-all duration-300 ${isActive ? 'bg-indigo-500/10 border-l-4 border-indigo-500' : ''
+                    className={`w-full text-left px-6 py-5 flex items-center justify-between hover:bg-black/5 dark:bg-white/5 focus:outline-none transition-all duration-300 ${isActive ? 'bg-indigo-500/10 border-l-4 border-indigo-500' : ''
                       }`}
                   >
                     <div className="min-w-0 flex-1">
-                      <div className={`text-sm font-bold truncate ${isActive ? 'text-white' : 'text-slate-300'}`}>
+                      <div className={`text-sm font-bold truncate ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
                         {user.email}
                       </div>
                       <div className="text-[10px] text-slate-500 font-black uppercase truncate mt-1 tracking-wider">
@@ -495,25 +495,25 @@ const UsersAuthManagement = () => {
 
         {/* User details */}
         <div
-          className={`bg-white/5 rounded-2xl shadow-2xl border border-white/5 overflow-hidden backdrop-blur-xl ${singleUserMode ? 'lg:col-span-3' : 'lg:col-span-2'
+          className={`bg-black/5 dark:bg-white/5 rounded-2xl shadow-2xl border border-black/5 dark:border-white/5 overflow-hidden backdrop-blur-xl ${singleUserMode ? 'lg:col-span-3' : 'lg:col-span-2'
             }`}
         >
           {selectedUser ? (
             <div className="divide-y divide-white/5">
               {/* Account section */}
-              <div className="px-8 py-6 bg-white/5 flex items-center justify-between border-b border-white/5">
+              <div className="px-8 py-6 bg-black/5 dark:bg-white/5 flex items-center justify-between border-b border-black/5 dark:border-white/5">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
                     <UserIcon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Account</h2>
-                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">Primary access credentials</p>
+                    <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Account</h2>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mt-0.5">Primary access credentials</p>
                   </div>
                 </div>
                 <button
                   type="button"
-                  className="inline-flex items-center px-4 py-2 rounded-xl border border-indigo-500/30 text-[11px] font-black text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500 hover:text-white transition-all transform hover:scale-105"
+                  className="inline-flex items-center px-4 py-2 rounded-xl border border-indigo-500/30 text-[11px] font-black text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500 hover:text-slate-900 dark:text-white transition-all transform hover:scale-105"
                   onClick={() => setShowPasswordModal(true)}
                 >
                   <KeyIcon className="h-3.5 w-3.5 mr-2" />
@@ -525,7 +525,7 @@ const UsersAuthManagement = () => {
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Username</label>
                   <input
                     type="text"
-                    className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                    className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                     value={selectedUser.username || ''}
                     onChange={(e) => handleFieldChange('username', e.target.value)}
                   />
@@ -534,7 +534,7 @@ const UsersAuthManagement = () => {
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
                   <input
                     type="email"
-                    className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                    className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                     value={selectedUser.email || ''}
                     onChange={(e) => handleFieldChange('email', e.target.value)}
                   />
@@ -542,16 +542,16 @@ const UsersAuthManagement = () => {
               </div>
 
               {/* Personal info */}
-              <div className="px-8 py-4 bg-white/5 flex items-center space-x-3 border-y border-white/5">
+              <div className="px-8 py-4 bg-black/5 dark:bg-white/5 flex items-center space-x-3 border-y border-black/5 dark:border-white/5">
                 <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-                <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest">Personal Identification</h3>
+                <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Personal Identification</h3>
               </div>
               <div className="px-8 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">First Name</label>
                   <input
                     type="text"
-                    className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                    className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                     value={selectedUser.first_name || ''}
                     onChange={(e) => handleFieldChange('first_name', e.target.value)}
                   />
@@ -560,7 +560,7 @@ const UsersAuthManagement = () => {
                   <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Last Name</label>
                   <input
                     type="text"
-                    className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                    className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                     value={selectedUser.last_name || ''}
                     onChange={(e) => handleFieldChange('last_name', e.target.value)}
                   />
@@ -568,7 +568,7 @@ const UsersAuthManagement = () => {
               </div>
 
               {/* Permissions */}
-              <div className="px-8 py-4 bg-white/5 flex items-center space-x-3 border-y border-white/5 font-black uppercase tracking-widest text-xs text-slate-200">
+              <div className="px-8 py-4 bg-black/5 dark:bg-white/5 flex items-center space-x-3 border-y border-black/5 dark:border-white/5 font-black uppercase tracking-widest text-xs text-slate-800 dark:text-slate-200">
                 <ShieldCheckIcon className="h-4 w-4 text-indigo-400" />
                 <span>System Permissions</span>
               </div>
@@ -578,28 +578,28 @@ const UsersAuthManagement = () => {
                   { id: 'is_staff', label: 'Staff status', desc: 'Allows user to access admin areas.' },
                   { id: 'is_superuser', label: 'Superuser status', desc: 'User has all permissions without assigning them explicitly.' }
                 ].map((item) => (
-                  <div key={item.id} className="flex items-start space-x-4 p-3 rounded-xl hover:bg-white/5 transition-colors">
+                  <div key={item.id} className="flex items-start space-x-4 p-3 rounded-xl hover:bg-black/5 dark:bg-white/5 transition-colors">
                     <input
                       type="checkbox"
-                      className="mt-1 w-4 h-4 rounded border-white/10 bg-white/5 text-indigo-500 focus:ring-offset-0 focus:ring-indigo-500/50"
+                      className="mt-1 w-4 h-4 rounded border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-indigo-500 focus:ring-offset-0 focus:ring-indigo-500/50"
                       checked={!!selectedUser[item.id]}
                       onChange={() => handleToggle(item.id)}
                     />
                     <div className="flex-1">
-                      <label className="text-xs font-bold text-white uppercase tracking-wider">{item.label}</label>
+                      <label className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">{item.label}</label>
                       <p className="text-[10px] text-slate-500 font-medium mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 ))}
                 {/* Role selector */}
-                <div className="px-8 py-4 bg-white/5 flex items-center space-x-3 border-y border-white/5 font-black uppercase tracking-widest text-xs text-slate-200">
+                <div className="px-8 py-4 bg-black/5 dark:bg-white/5 flex items-center space-x-3 border-y border-black/5 dark:border-white/5 font-black uppercase tracking-widest text-xs text-slate-800 dark:text-slate-200">
                   <UserIcon className="h-4 w-4 text-indigo-400" />
                   <span>Assign Role</span>
                 </div>
                 <div className="px-8 py-6">
                   <div className="relative">
                     <select
-                      className="appearance-none block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                      className="appearance-none block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                       value={selectedUser?.profile?.role || 'INTERN'}
                       onChange={async (e) => {
                         const newRole = e.target.value;
@@ -632,7 +632,7 @@ const UsersAuthManagement = () => {
                         </optgroup>
                       ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
                       <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
                     </div>
                   </div>
@@ -643,7 +643,7 @@ const UsersAuthManagement = () => {
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Phone</label>
                     <input
                       type="text"
-                      className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                      className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                       value={selectedUser.profile?.phone_number || ''}
                       onChange={(e) => handleProfileFieldChange('phone_number', e.target.value)}
                     />
@@ -651,7 +651,7 @@ const UsersAuthManagement = () => {
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Address</label>
                     <textarea
-                      className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                      className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                       rows={2}
                       value={selectedUser.profile?.address || ''}
                       onChange={(e) => handleProfileFieldChange('address', e.target.value)}
@@ -662,7 +662,7 @@ const UsersAuthManagement = () => {
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Date of birth</label>
                       <input
                         type="date"
-                        className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner [color-scheme:dark]"
+                        className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner [color-scheme:dark]"
                         value={selectedUser.profile?.date_of_birth || ''}
                         onChange={(e) => handleProfileFieldChange('date_of_birth', e.target.value)}
                       />
@@ -672,7 +672,7 @@ const UsersAuthManagement = () => {
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Emergency Contact</label>
                     <input
                       type="text"
-                      className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                      className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                       value={selectedUser.profile?.emergency_contact || ''}
                       onChange={(e) => handleProfileFieldChange('emergency_contact', e.target.value)}
                     />
@@ -681,9 +681,9 @@ const UsersAuthManagement = () => {
               </div>
 
               {/* Access (role-based + extras) */}
-              <div className="px-8 py-4 bg-white/5 flex items-center space-x-3 border-y border-white/5">
+              <div className="px-8 py-4 bg-black/5 dark:bg-white/5 flex items-center space-x-3 border-y border-black/5 dark:border-white/5">
                 <ShieldCheckIcon className="h-4 w-4 text-purple-400" />
-                <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest">Access Control</h3>
+                <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Access Control</h3>
                 <span className="ml-auto text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
                   Baseline: <span className="text-indigo-400">{roleAccess?.role || '—'}</span>
                 </span>
@@ -695,18 +695,18 @@ const UsersAuthManagement = () => {
                 {roleAccess && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Granted (baseline + extras) */}
-                    <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden flex flex-col shadow-inner">
-                      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-white/5">
-                        <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">Granted permissions</span>
+                    <div className="bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 overflow-hidden flex flex-col shadow-inner">
+                      <div className="px-4 py-3 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
+                        <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Granted permissions</span>
                         <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-400">
                           {computedGranted.length}
                         </span>
                       </div>
-                      <div className="px-4 py-2 bg-white/5">
+                      <div className="px-4 py-2 bg-black/5 dark:bg-white/5">
                         <input
                           type="text"
                           placeholder="Filter granted..."
-                          className="block w-full bg-transparent border-none focus:ring-0 text-xs text-white placeholder-slate-600 px-0 py-1"
+                          className="block w-full bg-transparent border-none focus:ring-0 text-xs text-slate-900 dark:text-white placeholder-slate-600 px-0 py-1"
                           value={accessFilterGranted}
                           onChange={(e) => setAccessFilterGranted(e.target.value)}
                         />
@@ -724,20 +724,20 @@ const UsersAuthManagement = () => {
                             return (
                               <div
                                 key={p.id}
-                                className="px-4 py-3 hover:bg-white/5 flex items-center justify-between group transition-colors"
+                                className="px-4 py-3 hover:bg-black/5 dark:bg-white/5 flex items-center justify-between group transition-colors"
                               >
                                 <div className="min-w-0 pr-2">
-                                  <div className="text-[11px] font-bold text-slate-200 truncate">{p.content_type} | {p.name}</div>
+                                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{p.content_type} | {p.name}</div>
                                   <div className="text-[9px] text-slate-500 font-black uppercase tracking-tighter truncate">{p.codename}</div>
                                 </div>
                                 <div className="flex items-center space-x-2 shrink-0">
                                   {isBaseline && (
-                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black border border-white/10 text-slate-400 bg-white/5 uppercase tracking-tighter">Role</span>
+                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black border border-black/10 dark:border-white/10 text-slate-500 dark:text-slate-400 bg-black/5 dark:bg-white/5 uppercase tracking-tighter">Role</span>
                                   )}
                                   {isExtra && (
                                     <button
                                       type="button"
-                                      className="px-2 py-0.5 rounded-lg border border-red-500/30 text-[9px] font-black text-red-400 hover:bg-red-500 hover:text-white transition-all transform hover:scale-110"
+                                      className="px-2 py-0.5 rounded-lg border border-red-500/30 text-[9px] font-black text-red-400 hover:bg-red-500 hover:text-slate-900 dark:text-white transition-all transform hover:scale-110"
                                       onClick={() => handleAccessRemove(p.id)}
                                       disabled={isBaseline}
                                     >
@@ -755,18 +755,18 @@ const UsersAuthManagement = () => {
                     </div>
 
                     {/* Available (not baseline and not extra) */}
-                    <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden flex flex-col shadow-inner">
-                      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-indigo-500/10">
+                    <div className="bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 overflow-hidden flex flex-col shadow-inner">
+                      <div className="px-4 py-3 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-indigo-500/10">
                         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Available to Grant</span>
-                        <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-black text-slate-400">
+                        <span className="px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[10px] font-black text-slate-500 dark:text-slate-400">
                           {computedAvailable.length}
                         </span>
                       </div>
-                      <div className="px-4 py-2 bg-white/5">
+                      <div className="px-4 py-2 bg-black/5 dark:bg-white/5">
                         <input
                           type="text"
                           placeholder="Search available..."
-                          className="block w-full bg-transparent border-none focus:ring-0 text-xs text-white placeholder-slate-600 px-0 py-1"
+                          className="block w-full bg-transparent border-none focus:ring-0 text-xs text-slate-900 dark:text-white placeholder-slate-600 px-0 py-1"
                           value={accessFilterAvailable}
                           onChange={(e) => setAccessFilterAvailable(e.target.value)}
                         />
@@ -781,15 +781,15 @@ const UsersAuthManagement = () => {
                           .map((p) => (
                             <div
                               key={p.id}
-                              className="px-4 py-3 hover:bg-white/5 flex items-center justify-between group transition-colors"
+                              className="px-4 py-3 hover:bg-black/5 dark:bg-white/5 flex items-center justify-between group transition-colors"
                             >
                               <div className="min-w-0 pr-2">
-                                <div className="text-[11px] font-bold text-slate-200 truncate">{p.content_type} | {p.name}</div>
+                                <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{p.content_type} | {p.name}</div>
                                 <div className="text-[9px] text-slate-500 font-black uppercase tracking-tighter truncate">{p.codename}</div>
                               </div>
                               <button
                                 type="button"
-                                className="px-2 py-0.5 rounded-lg border border-indigo-500/30 text-[9px] font-black text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all transform hover:scale-110 shadow-lg"
+                                className="px-2 py-0.5 rounded-lg border border-indigo-500/30 text-[9px] font-black text-indigo-400 hover:bg-indigo-500 hover:text-slate-900 dark:text-white transition-all transform hover:scale-110 shadow-lg"
                                 onClick={() => handleAccessAdd(p.id)}
                               >
                                 ADD
@@ -806,31 +806,31 @@ const UsersAuthManagement = () => {
               </div>
 
               {/* Important dates */}
-              <div className="px-8 py-4 bg-white/5 flex items-center space-x-3 border-y border-white/5">
-                <ClockIcon className="h-4 w-4 text-slate-400" />
-                <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest">Audit Timeline</h3>
+              <div className="px-8 py-4 bg-black/5 dark:bg-white/5 flex items-center space-x-3 border-y border-black/5 dark:border-white/5">
+                <ClockIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">Audit Timeline</h3>
               </div>
               <div className="px-8 py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Last Authentication</div>
-                  <div className="text-sm font-bold text-white">
+                  <div className="text-sm font-bold text-slate-900 dark:text-white">
                     {selectedUser.last_login ? new Date(selectedUser.last_login).toLocaleString() : 'Never'}
                   </div>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Account Created</div>
-                  <div className="text-sm font-bold text-white">
+                  <div className="text-sm font-bold text-slate-900 dark:text-white">
                     {selectedUser.date_joined ? new Date(selectedUser.date_joined).toLocaleDateString() : '—'}
                   </div>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-[#070B14]/50 border-t border-white/5 flex justify-end space-x-4">
+              <div className="px-8 py-6 bg-slate-50 dark:bg-[#070B14]/50 border-t border-black/5 dark:border-white/5 flex justify-end space-x-4">
                 <button
                   type="button"
                   onClick={handleCancel}
                   disabled={saving}
-                  className="px-6 py-2.5 text-xs font-black rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 text-xs font-black rounded-xl border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all disabled:opacity-50"
                 >
                   DISCARD CHANGES
                 </button>
@@ -838,7 +838,7 @@ const UsersAuthManagement = () => {
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className={`px-8 py-2.5 text-xs font-black rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95`}
+                  className={`px-8 py-2.5 text-xs font-black rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95`}
                 >
                   {saving ? 'PROCESSING...' : 'SAVE CONFIGURATION'}
                 </button>
@@ -846,11 +846,11 @@ const UsersAuthManagement = () => {
             </div>
           ) : (
             <div className="px-8 py-20 text-center flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-slate-600">
+              <div className="w-16 h-16 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-slate-600">
                 <UserIcon className="h-8 w-8" />
               </div>
               <div className="max-w-xs">
-                <h3 className="text-sm font-black text-white uppercase tracking-widest mb-1">No Profile Selected</h3>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">No Profile Selected</h3>
                 <p className="text-[11px] text-slate-500 font-bold uppercase tracking-tighter">Choose a user from the left panel to begin managing their account and permissions.</p>
               </div>
             </div>
@@ -860,30 +860,30 @@ const UsersAuthManagement = () => {
 
       {showPasswordModal && selectedUser && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowPasswordModal(false)}></div>
-          <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl w-full max-w-md border border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
-            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/5">
+          <div className="absolute inset-0 bg-slate-50 dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowPasswordModal(false)}></div>
+          <div className="relative bg-[#0B1120] rounded-2xl shadow-2xl w-full max-w-md border border-black/10 dark:border-white/10 overflow-hidden transform animate-in fade-in zoom-in duration-300">
+            <div className="px-6 py-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
               <div className="flex items-center space-x-3">
                 <KeyIcon className="h-5 w-5 text-indigo-400" />
-                <h2 className="text-sm font-black text-white uppercase tracking-widest">Update Security</h2>
+                <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Update Security</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowPasswordModal(false)}
-                className="text-slate-500 hover:text-white transition-colors"
+                className="text-slate-500 hover:text-slate-900 dark:text-white transition-colors"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
             <div className="px-8 py-8 space-y-6">
-              <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-lg">
-                Setting password for: <span className="text-white">{selectedUser.email}</span>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-lg">
+                Setting password for: <span className="text-slate-900 dark:text-white">{selectedUser.email}</span>
               </div>
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">New Password</label>
                 <input
                   type="password"
-                  className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={passwordForm.password}
                   onChange={(e) => handlePasswordChange('password', e.target.value)}
                   placeholder="••••••••"
@@ -893,7 +893,7 @@ const UsersAuthManagement = () => {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Confirm Password</label>
                 <input
                   type="password"
-                  className="block w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={passwordForm.password_confirm}
                   onChange={(e) => handlePasswordChange('password_confirm', e.target.value)}
                   placeholder="••••••••"
@@ -904,11 +904,11 @@ const UsersAuthManagement = () => {
                 <span>Min 8 characters, non-numeric requirement applies.</span>
               </p>
             </div>
-            <div className="px-8 py-4 bg-white/5 border-t border-white/5 flex justify-end space-x-3">
+            <div className="px-8 py-4 bg-black/5 dark:bg-white/5 border-t border-black/5 dark:border-white/5 flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={() => setShowPasswordModal(false)}
-                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
+                className="px-4 py-2 text-xs font-bold rounded-xl border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-slate-900 dark:text-white transition-all"
               >
                 CANCEL
               </button>
@@ -916,7 +916,7 @@ const UsersAuthManagement = () => {
                 type="button"
                 disabled={passwordSaving}
                 onClick={handlePasswordSave}
-                className={`px-6 py-2 text-xs font-black rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95`}
+                className={`px-6 py-2 text-xs font-black rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-slate-900 dark:text-white shadow-lg transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95`}
               >
                 {passwordSaving ? 'UPDATING...' : 'UPDATE PASSWORD'}
               </button>

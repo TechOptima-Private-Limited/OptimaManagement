@@ -31,7 +31,7 @@ const Table = ({
         <tbody className="bg-transparent divide-y divide-white/5">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-6 py-4 text-center text-gray-500">
+              <td colSpan={columns.length} className="px-6 py-4 text-center text-slate-500">
                 {emptyMessage}
               </td>
             </tr>
@@ -39,7 +39,7 @@ const Table = ({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={`hover:bg-white/5 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`hover:bg-black/5 dark:bg-white/5 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick && onRowClick(row)}
               >
                 {columns.map((column, colIndex) => (

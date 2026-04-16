@@ -280,7 +280,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b ${theme.sidebarGradient}
         transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        shadow-2xl border-r border-white/10 flex flex-col
+        shadow-2xl border-r border-black/10 dark:border-white/10 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="relative z-10 flex items-center justify-start h-20 px-6 bg-slate-900/50 backdrop-blur-md border-b border-white/5">
@@ -346,7 +346,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           key={child.name}
                           to={child.href}
                           onClick={onClose}
-                          className={`block py-2 text-xs font-bold transition-all uppercase tracking-widest ${childActive ? 'text-indigo-400' : 'text-slate-500 hover:text-white'
+                          className={`block py-2 text-xs font-bold transition-all uppercase tracking-widest ${childActive ? 'text-indigo-400' : 'text-slate-400 hover:text-white'
                             }`}
                         >
                           {child.name}
@@ -360,7 +360,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           })}
         </nav>
 
-        <div className="relative z-10 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-sm">
+        <div className="relative z-10 p-4 border-t border-white/5 bg-slate-900/50 backdrop-blur-sm">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-slate-500">
               <span>Status</span>

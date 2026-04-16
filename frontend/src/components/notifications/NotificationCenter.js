@@ -174,7 +174,7 @@ const NotificationCenter = () => {
     <div
       className={`
         p-3 border-l-4 cursor-pointer transition-all duration-200
-        hover:bg-white/5
+        hover:bg-black/5 dark:bg-white/5
         ${notification.is_read ? 'opacity-60' : 'bg-white/3'}
         ${getAccentColor(notification.notification_type)}
       `}
@@ -184,7 +184,7 @@ const NotificationCenter = () => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-1">
             <span className="text-base flex-shrink-0">{getNotificationIcon(notification.notification_type)}</span>
-            <h4 className={`text-xs font-semibold truncate ${notification.is_read ? 'text-gray-400' : 'text-white'}`}>
+            <h4 className={`text-xs font-semibold truncate ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-slate-900 dark:text-white'}`}>
               {notification.title}
             </h4>
             {!notification.is_read && (
@@ -192,7 +192,7 @@ const NotificationCenter = () => {
             )}
           </div>
 
-          <p className="text-xs text-gray-400 mb-2 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2 leading-relaxed">
             {notification.message}
           </p>
 
@@ -237,12 +237,12 @@ const NotificationCenter = () => {
       {/* Bell Button */}
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="p-2.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl relative focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 backdrop-blur-sm border border-white/20"
+        className="p-2.5 text-slate-900 dark:text-white/80 hover:text-slate-900 dark:text-white hover:bg-black/20 dark:bg-white/20 rounded-xl relative focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 backdrop-blur-sm border border-black/20 dark:border-white/20"
         aria-label="View notifications"
       >
         <BellIcon className="h-6 w-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 h-5 w-5 bg-indigo-500 text-white text-xs rounded-full flex items-center justify-center border-2 border-[#0B1120] shadow-lg font-bold animate-pulse">
+          <span className="absolute -top-1 -right-1 h-5 w-5 bg-indigo-500 text-slate-900 dark:text-white text-xs rounded-full flex items-center justify-center border-2 border-[#0B1120] shadow-lg font-bold animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -255,13 +255,13 @@ const NotificationCenter = () => {
           <div className="fixed inset-0 z-30" onClick={() => setShowDropdown(false)} />
 
           {/* Panel */}
-          <div className="absolute right-0 mt-3 w-80 bg-[#0d1226]/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 z-50 border border-white/10 max-h-[30rem] overflow-hidden transition-all duration-300">
+          <div className="absolute right-0 mt-3 w-80 bg-[#0d1226]/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 z-50 border border-black/10 dark:border-white/10 max-h-[30rem] overflow-hidden transition-all duration-300">
 
             {/* Header */}
-            <div className="px-4 py-3 border-b border-white/10 bg-white/5">
+            <div className="px-4 py-3 border-b border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-sm font-semibold text-white">Notifications</h3>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h3>
                   {unreadCount > 0 && (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 border border-indigo-500/30 text-indigo-300">
                       {unreadCount} new
@@ -270,7 +270,7 @@ const NotificationCenter = () => {
                 </div>
                 <button
                   onClick={() => setShowDropdown(false)}
-                  className="text-gray-500 hover:text-white transition-colors duration-200"
+                  className="text-gray-500 hover:text-slate-900 dark:text-white transition-colors duration-200"
                 >
                   <XMarkIcon className="h-4 w-4" />
                 </button>
@@ -283,7 +283,7 @@ const NotificationCenter = () => {
                     onClick={() => setFilter('all')}
                     className={`px-3 py-1 text-xs rounded-lg font-medium transition-all duration-200 ${filter === 'all'
                       ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-slate-900 dark:text-white hover:bg-black/5 dark:bg-white/5'
                       }`}
                   >
                     All
@@ -292,7 +292,7 @@ const NotificationCenter = () => {
                     onClick={() => setFilter('unread')}
                     className={`px-3 py-1 text-xs rounded-lg font-medium transition-all duration-200 ${filter === 'unread'
                       ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-slate-900 dark:text-white hover:bg-black/5 dark:bg-white/5'
                       }`}
                   >
                     Unread ({unreadCount})
@@ -313,7 +313,7 @@ const NotificationCenter = () => {
               <div className="mt-3">
                 <button
                   onClick={handleEnableNotifications}
-                  className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-xs font-medium text-white bg-gradient-to-r from-indigo-600 to-violet-700 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/20"
+                  className="w-full flex items-center justify-center px-3 py-2 rounded-xl text-xs font-medium text-slate-900 dark:text-white bg-gradient-to-r from-indigo-600 to-violet-700 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/20"
                 >
                   <BellIcon className="h-3.5 w-3.5 mr-2" />
                   Enable Desktop Notifications
@@ -330,7 +330,7 @@ const NotificationCenter = () => {
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center mx-auto mb-3">
                     <BellIcon className="h-6 w-6 text-gray-500" />
                   </div>
                   <h3 className="text-sm font-medium text-gray-300">No notifications</h3>
@@ -349,7 +349,7 @@ const NotificationCenter = () => {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-white/10 bg-white/5">
+              <div className="px-4 py-2.5 border-t border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
                 <button
                   onClick={() => {
                     setShowDropdown(false);
