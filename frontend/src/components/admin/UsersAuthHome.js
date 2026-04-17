@@ -157,7 +157,7 @@ const UsersAuthHome = () => {
         {/* Groups card */}
         <Link
           to="/users-auth/groups"
-          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/5 backdrop-blur-xl hover:border-white/20 hover:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-2xl hover:-translate-y-1"
         >
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
@@ -177,7 +177,7 @@ const UsersAuthHome = () => {
         {/* Permissions card */}
         <Link
           to="/users-auth/permissions"
-          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/5 backdrop-blur-xl hover:border-white/20 hover:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-2xl hover:-translate-y-1"
         >
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
@@ -196,8 +196,8 @@ const UsersAuthHome = () => {
       </div>
 
       {/* User list below groups/permissions */}
-      <div className="bg-white/5 rounded-2xl border border-white/5 shadow-2xl overflow-hidden backdrop-blur-xl">
-        <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+      <div className="bg-white/5 rounded-2xl border border-white/10 shadow-2xl overflow-hidden backdrop-blur-xl">
+        <div className="px-6 py-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
           <h2 className="text-sm font-bold text-slate-200 uppercase tracking-widest">User Profiles</h2>
           {loading && (
             <div className="flex items-center space-x-2">
@@ -209,26 +209,26 @@ const UsersAuthHome = () => {
         <div className="max-h-[600px] overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="bg-white/5 border-b border-white/5">
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+              <tr className="bg-white/5 border-b border-white/10">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Username
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Email
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   First name
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Last name
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">
                   Role
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">
                   Status
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-black text-slate-500 uppercase tracking-widest">
+                <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">
                   Actions
                 </th>
               </tr>
@@ -243,7 +243,7 @@ const UsersAuthHome = () => {
                   <td className="px-6 py-4 text-indigo-400 font-bold truncate max-w-[160px]">
                     {user.username || '—'}
                   </td>
-                  <td className="px-6 py-4 text-slate-300 font-medium truncate max-w-[220px]">{user.email}</td>
+                  <td className="px-6 py-4 text-slate-200 font-medium truncate max-w-[220px]">{user.email}</td>
                   <td className="px-6 py-4 text-slate-400">{user.first_name || '—'}</td>
                   <td className="px-6 py-4 text-slate-400">{user.last_name || '—'}</td>
                   <td className="px-6 py-4">
@@ -260,7 +260,7 @@ const UsersAuthHome = () => {
                       </div>
                     ) : (
                       <div className="flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-slate-500/10 flex items-center justify-center text-slate-500 border border-white/5">
+                        <div className="w-8 h-8 rounded-full bg-slate-400/10 flex items-center justify-center text-slate-400 border border-white/5">
                           <XMarkIcon className="h-4 w-4" />
                         </div>
                       </div>
@@ -271,7 +271,7 @@ const UsersAuthHome = () => {
                       type="button"
                       onClick={(e) => openConfirm(user, e)}
                       disabled={deletingId === user.id}
-                      className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold border border-white/5 bg-white/5 text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 disabled:opacity-50 transform hover:scale-105"
+                      className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 disabled:opacity-50 transform hover:scale-105"
                     >
                       Delete
                     </button>
@@ -282,7 +282,7 @@ const UsersAuthHome = () => {
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-6 py-12 text-sm text-slate-500 text-center font-medium italic"
+                    className="px-6 py-12 text-sm text-slate-400 text-center font-medium italic"
                   >
                     No users found in the system.
                   </td>
@@ -302,7 +302,7 @@ const UsersAuthHome = () => {
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
-            <div className="px-6 py-8 text-sm text-slate-300 leading-relaxed">
+            <div className="px-6 py-8 text-sm text-slate-200 leading-relaxed">
               Are you sure you want to delete
               <span className="font-black text-white mx-1"> {confirmUser?.username || confirmUser?.email}</span>?
               <p className="mt-2 text-red-400 font-bold">This action cannot be undone.</p>
@@ -310,7 +310,7 @@ const UsersAuthHome = () => {
             <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex justify-end space-x-3">
               <button
                 type="button"
-                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
+                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/5/10 hover:text-white transition-all"
                 onClick={closeConfirm}
                 disabled={!!deletingId}
               >

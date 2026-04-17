@@ -142,7 +142,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
           onClick={onClose}
         ></div>
 
-        <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 px-6 pt-6 pb-4">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center mr-4">
@@ -152,7 +152,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Apply for Work From Home</h2>
-                <p className="text-sm text-gray-400">Submit your request to work remotely</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Submit your request to work remotely</p>
               </div>
             </div>
 
@@ -168,7 +168,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                     value={formData.start_date}
                     onChange={handleInputChange}
                     min={today}
-                    className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.start_date ? 'border-red-500' : 'border-white/20'
+                    className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.start_date ? 'border-red-500' : 'border-black/20 dark:border-white/20'
                       } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 [color-scheme:dark]`}
                     required
                   />
@@ -187,7 +187,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                     value={formData.end_date}
                     onChange={handleInputChange}
                     min={formData.start_date || today}
-                    className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.end_date ? 'border-red-500' : 'border-white/20'
+                    className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.end_date ? 'border-red-500' : 'border-black/20 dark:border-white/20'
                       } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 [color-scheme:dark]`}
                     required
                   />
@@ -206,7 +206,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                   value={formData.reason}
                   onChange={handleInputChange}
                   rows="4"
-                  className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.reason ? 'border-red-500' : 'border-white/20'
+                  className={`w-full px-3 py-2 bg-white/5 text-white backdrop-blur-sm border ${errors.reason ? 'border-red-500' : 'border-black/20 dark:border-white/20'
                     } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 resize-none`}
                   placeholder="Please provide a reason for working from home (e.g., medical appointment, family emergency, etc.)"
                   required
@@ -214,7 +214,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                 {errors.reason && (
                   <p className="text-red-400 text-xs mt-1">{errors.reason}</p>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Minimum 10 characters required
                 </p>
               </div>
@@ -226,7 +226,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                   </svg>
                   <div className="text-sm text-gray-300">
                     <p className="font-medium text-white">Important Notes:</p>
-                    <ul className="mt-2 list-disc list-inside text-xs space-y-1 text-gray-400">
+                    <ul className="mt-2 list-disc list-inside text-xs space-y-1 text-gray-600 dark:text-gray-400">
                       <li>Your request will be sent to HR for approval</li>
                       <li>You'll receive an email notification once approved/rejected</li>
                       <li>Only approved requests allow work from home check-in</li>
@@ -237,7 +237,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          <div className="bg-[#05080f] px-6 py-4 border-t border-white/5 sm:flex sm:flex-row-reverse rounded-b-2xl">
+          <div className="bg-[#05080f] px-6 py-4 border-t border-white/10 sm:flex sm:flex-row-reverse rounded-b-2xl">
             <button
               type="button"
               onClick={handleSubmit}
@@ -259,7 +259,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 shadow-sm px-6 py-3 bg-white/10 text-base font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
+              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-3 bg-black/10 dark:bg-white/5/10 text-base font-medium text-white hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
             >
               Cancel
             </button>

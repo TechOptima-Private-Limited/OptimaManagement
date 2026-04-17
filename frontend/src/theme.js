@@ -5,7 +5,7 @@
 const theme = {
     id: 'midnight-royal',
     name: 'Midnight Royal',
-    navbarGradient: 'from-white to-gray-50',
+    navbarGradient: 'from-[#0B1120] to-[#070B14]',
     headerGradient: 'from-[#0a0f1e] via-indigo-950/60 to-[#070B14]',
     sidebarGradient: 'from-[#0B1120] to-[#070B14]',
     surfaceGradient: 'from-[#0B1120] to-[#070B14]',

@@ -1742,5 +1742,73 @@ def attendance_analytics(request):
             'total_late_arrivals': sum(all_late),
             'best_attendance_pct': max(all_pcts) if all_pcts else 0,
             'worst_attendance_pct': min(all_pcts) if all_pcts else 0,
+            'total_expected_person_days': sum(d['expected_employee_days'] for d in trend_data),
+            'total_present_person_days': sum(d['present_employee_days'] for d in trend_data),
         }
     })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def working_format_stats(request):
+    """
+    Returns working format distribution (Office, Remote, Hybrid) for the logged-in user.
+    """
+    from datetime import timedelta
+    try:
+        employee = Employee.objects.get(user=request.user)
+        hire_date = employee.hire_date or employee.created_at.date()
+        
+        records = AttendanceRecord.objects.filter(
+            employee=employee,
+            is_pending_approval=False
+        ).only('attendance_type', 'notes')
+        
+        office_count = 0
+        remote_count = 0
+        hybrid_count = 0
+        
+        for rec in records:
+            atype = (rec.attendance_type or '').upper()
+            notes = (rec.notes or '').lower()
+            
+            if atype == 'BIOMETRIC' or atype == 'QR_CODE':
+                office_count += 1
+            elif atype == 'MANUAL':
+                if 'remote' in notes or 'wfh' in notes or 'work from home' in notes:
+                    remote_count += 1
+                elif 'remote login' in notes:
+                    hybrid_count += 1
+                else:
+                    office_count += 1
+            else:
+                office_count += 1
+        
+        total_tracked = office_count + remote_count + hybrid_count
+        
+        # Default distribution for new users
+        if total_tracked == 0:
+            return Response({
+                'total_days': 0,
+                'office_pct': 0,
+                'hybrid_pct': 0,
+                'remote_pct': 0,
+                'counts': {'office': 0, 'hybrid': 0, 'remote': 0}
+            })
+
+        return Response({
+            'total_days': total_tracked,
+            'office_pct': round((office_count / total_tracked) * 100) if total_tracked > 0 else 0,
+            'hybrid_pct': round((hybrid_count / total_tracked) * 100) if total_tracked > 0 else 0,
+            'remote_pct': round((remote_count / total_tracked) * 100) if total_tracked > 0 else 0,
+            'counts': {
+                'office': office_count,
+                'hybrid': hybrid_count,
+                'remote': remote_count
+            }
+        })
+        
+    except Employee.DoesNotExist:
+        return Response({'error': 'Employee profile not found'}, status=404)
+    except Exception as e:
+        logger.error(f"Error in working_format_stats: {str(e)}", exc_info=True)
+        return Response({'error': 'Internal server error'}, status=500)

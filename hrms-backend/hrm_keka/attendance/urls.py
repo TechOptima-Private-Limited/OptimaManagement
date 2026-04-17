@@ -47,4 +47,5 @@ urlpatterns = [
 
     # Analytics
     path('analytics/', views.attendance_analytics, name='attendance_analytics'),
-]
+    path('working-format-stats/', views.working_format_stats, name='working_format_stats'),
+]

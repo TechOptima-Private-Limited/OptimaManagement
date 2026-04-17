@@ -572,7 +572,7 @@ const MyTeam = () => {
         {teamSize > 0 && (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl group hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 p-6 shadow-xl group hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute top-0 right-0 h-24 w-24 bg-rose-500/10 rounded-full blur-3xl group-hover:bg-rose-500/20 transition-all duration-500 -mr-12 -mt-12"></div>
                 <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center">
                   <div className="w-1.5 h-6 bg-rose-500 rounded-full mr-3"></div>
@@ -581,7 +581,7 @@ const MyTeam = () => {
                 {attendanceStats.onLeave.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {attendanceStats.onLeave.map(member => (
-                      <div key={member.id} className="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                      <div key={member.id} className="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/10 group-hover:border-black/20 dark:border-white/20 transition-all">
                         <div className="w-8 h-8 bg-rose-500/10 rounded-lg flex items-center justify-center text-rose-400 font-bold text-[10px] border border-rose-500/20">
                           {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
                         </div>
@@ -592,13 +592,13 @@ const MyTeam = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="py-6 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
+                  <div className="py-6 text-center bg-white/5 rounded-2xl border border-dashed border-white/10 dark:border-white/10">
                     <p className="text-xs text-slate-500 font-bold italic opacity-60">No team members are on leave today.</p>
                   </div>
                 )}
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl group hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 p-6 shadow-xl group hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute top-0 right-0 h-24 w-24 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-500 -mr-12 -mt-12"></div>
                 <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center">
                   <div className="w-1.5 h-6 bg-amber-500 rounded-full mr-3"></div>
@@ -622,7 +622,7 @@ const MyTeam = () => {
                   return notArrived.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {notArrived.map(member => (
-                        <div key={member.id} className="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/5 group-hover:border-white/20 transition-all">
+                        <div key={member.id} className="flex items-center space-x-3 p-2 bg-white/5 rounded-xl border border-white/10 group-hover:border-black/20 dark:border-white/20 transition-all">
                           <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-400 font-bold text-[10px] border border-amber-500/20">
                             {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
                           </div>
@@ -633,7 +633,7 @@ const MyTeam = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="py-6 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
+                    <div className="py-6 text-center bg-white/5 rounded-2xl border border-dashed border-white/10 dark:border-white/10">
                       <p className="text-xs text-slate-500 font-bold italic opacity-60 uppercase tracking-widest">Everyone has checked in</p>
                     </div>
                   );
@@ -643,7 +643,7 @@ const MyTeam = () => {
 
             {/* Stats row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300">
                 <div>
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">On Time</div>
                   <div className="text-4xl font-black text-emerald-400 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.onTime.length}</div>
@@ -659,7 +659,7 @@ const MyTeam = () => {
                 )}
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300">
                 <div>
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Late Arrival</div>
                   <div className="text-4xl font-black text-rose-500 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.late.length}</div>
@@ -675,7 +675,7 @@ const MyTeam = () => {
                 )}
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300">
                 <div>
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Work from Home</div>
                   <div className="text-4xl font-black text-indigo-400 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.workFromHome.length}</div>
@@ -691,7 +691,7 @@ const MyTeam = () => {
                 )}
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-white/10 transition-all duration-300">
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 p-6 shadow-xl flex items-center justify-between group hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300">
                 <div>
                   <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Remote Login</div>
                   <div className="text-4xl font-black text-purple-400 tracking-tight group-hover:scale-110 transition-transform origin-left">{attendanceStats.remoteLogin.length}</div>
@@ -717,11 +717,11 @@ const MyTeam = () => {
                 </h2>
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
-                <div className="px-8 py-6 flex items-center justify-between border-b border-white/10 bg-white/5">
+              <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 dark:border-white/10 overflow-hidden shadow-2xl">
+                <div className="px-8 py-6 flex items-center justify-between border-b border-white/10 dark:border-white/10 bg-white/5">
                   <button
                     onClick={() => navigateMonth(-1)}
-                    className="p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-lg active:scale-95"
+                    className="p-3 rounded-2xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg active:scale-95"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
                   </button>
@@ -730,7 +730,7 @@ const MyTeam = () => {
                   </div>
                   <button
                     onClick={() => navigateMonth(1)}
-                    className="p-3 rounded-2xl bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-lg active:scale-95"
+                    className="p-3 rounded-2xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg active:scale-95"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
                   </button>
@@ -744,12 +744,12 @@ const MyTeam = () => {
                   <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full border-collapse">
                       <thead>
-                        <tr className="bg-white/5 border-b border-white/10">
-                          <th className="sticky left-0 bg-[#0d1420] px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 min-w-[220px] z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">
+                        <tr className="bg-white/5 border-b border-white/10 dark:border-white/10">
+                          <th className="sticky left-0 bg-[#0d1420] px-6 py-4 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 dark:border-white/10 min-w-[220px] z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">
                             Employee
                           </th>
                           {getDaysInMonth(calendarDate).map(({ day, weekday }) => (
-                            <th key={day} className="px-1.5 py-2.5 text-center min-w-[36px] border-r border-white/5 last:border-r-0">
+                            <th key={day} className="px-1.5 py-2.5 text-center min-w-[36px] border-r border-white/10 last:border-r-0">
                               <div className="flex flex-col items-center">
                                 <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">{weekday}</span>
                                 <span className="text-xs font-black text-slate-200">{day}</span>
@@ -761,7 +761,7 @@ const MyTeam = () => {
                       <tbody className="divide-y divide-white/5">
                         {team.map(member => (
                           <tr key={member.id} className="hover:bg-white/5 transition-colors group">
-                            <td className="sticky left-0 bg-[#0d1420] px-6 py-4 border-r border-white/10 z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">
+                            <td className="sticky left-0 bg-[#0d1420] px-6 py-4 border-r border-white/10 dark:border-white/10 z-10 shadow-[4px_0_10px_rgba(0,0,0,0.3)]">
                               <div className="flex items-center space-x-3">
                                 <div className="w-8 h-8 bg-indigo-500 rounded-xl flex items-center justify-center text-[10px] font-black text-white shadow-lg ring-1 ring-white/20 group-hover:scale-110 transition-transform">
                                   {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
@@ -774,15 +774,15 @@ const MyTeam = () => {
                             {getDaysInMonth(calendarDate).map(({ day }) => {
                               const status = getStatusForDate(member.id, day);
                               return (
-                                <td key={day} className="px-1 py-2.5 text-center border-r border-white/5 last:border-r-0">
+                                <td key={day} className="px-1 py-2.5 text-center border-r border-white/10 last:border-r-0">
                                   <div className={`w-6 h-6 mx-auto rounded-md flex items-center justify-center text-[8px] font-black transition-all duration-300 shadow-md transform hover:scale-125 hover:z-20 relative
                                 ${status === 'PRESENT' ? 'bg-emerald-500 text-white ring-2 ring-emerald-500/50 shadow-emerald-500/20' :
                                       status === 'WFH' ? 'bg-indigo-500 text-white ring-2 ring-indigo-500/50 shadow-indigo-500/20' :
                                         status === 'LEAVE' ? 'bg-amber-500 text-white ring-2 ring-amber-500/50 shadow-amber-500/20' :
                                           status === 'ABSENT' ? 'bg-rose-500 text-white ring-2 ring-rose-500/50 shadow-rose-500/20' :
                                             status === 'HALF_DAY' ? 'bg-rose-500/50 text-white ring-2 ring-rose-500/30' :
-                                              status === 'WEEKOFF' ? 'bg-slate-700/50 text-slate-400 opacity-40 shadow-none' :
-                                                'bg-white/5 text-slate-600 border border-white/5 opacity-20 shadow-none'}
+                                              status === 'WEEKOFF' ? 'bg-slate-200 dark:bg-slate-700/50 text-slate-400 opacity-40 shadow-none' :
+                                                'bg-white/5 text-slate-600 border border-white/10 opacity-20 shadow-none'}
                               `}>
                                     {status === 'PRESENT' ? 'P' :
                                       status === 'WFH' ? 'W' :
@@ -801,7 +801,7 @@ const MyTeam = () => {
                   </div>
                 )}
 
-                <div className="px-8 py-5 bg-white/5 border-t border-white/10 flex flex-wrap gap-x-10 gap-y-4 items-center">
+                <div className="px-8 py-5 bg-white/5 border-t border-white/10 dark:border-white/10 flex flex-wrap gap-x-10 gap-y-4 items-center">
                   <div className="flex items-center space-x-3 group">
                     <div className="w-5 h-5 bg-emerald-500 ring-2 ring-emerald-500/50 rounded-md flex items-center justify-center text-[8px] font-black text-white group-hover:scale-125 transition-transform">P</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Present</span>
@@ -823,11 +823,11 @@ const MyTeam = () => {
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Half Day</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-5 h-5 bg-slate-700/50 border border-white/10 rounded-md flex items-center justify-center text-[8px] font-black text-slate-400 group-hover:scale-125 transition-transform">•</div>
+                    <div className="w-5 h-5 bg-slate-200 dark:bg-slate-700/50 border border-white/10 dark:border-white/10 rounded-md flex items-center justify-center text-[8px] font-black text-slate-400 group-hover:scale-125 transition-transform">•</div>
                     <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Week Off</span>
                   </div>
                   <div className="flex items-center space-x-3 group">
-                    <div className="w-5 h-5 border border-white/5 rounded-md opacity-20"></div>
+                    <div className="w-5 h-5 border border-white/10 rounded-md opacity-20"></div>
                     <span className="text-[11px] text-slate-500 font-bold uppercase tracking-widest">No Data</span>
                   </div>
                 </div>
@@ -838,13 +838,13 @@ const MyTeam = () => {
 
         {/* Team Members List */}
         {teamSize > 0 && (
-          <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
+          <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 dark:border-white/10 p-8 shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-30 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 space-y-6 md:space-y-0 relative z-10">
               <h2 className="text-3xl font-black text-white tracking-tight flex items-center">
                 <UserGroupIcon className="h-10 w-10 text-indigo-500 mr-4" />
                 {userRole === 'MANAGER' ? 'Direct Reports' : 'Team Members'}
-                <span className="ml-4 px-3 py-1 bg-white/10 rounded-xl text-sm font-black text-indigo-400 border border-white/10">{teamSize}</span>
+                <span className="ml-4 px-3 py-1 bg-black/10 dark:bg-white/5/10 rounded-xl text-sm font-black text-indigo-400 border border-white/10 dark:border-white/10">{teamSize}</span>
               </h2>
               <div className="relative w-full md:w-80">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -855,7 +855,7 @@ const MyTeam = () => {
                   placeholder="Search team..."
                   value={teamSearchTerm}
                   onChange={(e) => setTeamSearchTerm(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-3 border border-white/10 rounded-[1.25rem] leading-5 bg-white/5 placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 text-sm transition-all shadow-inner"
+                  className="block w-full pl-12 pr-4 py-3 border border-white/10 dark:border-white/10 rounded-[1.25rem] leading-5 bg-white/5 placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 text-sm transition-all shadow-inner"
                 />
               </div>
             </div>
@@ -872,7 +872,7 @@ const MyTeam = () => {
               }).map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center space-x-5 p-6 bg-white/5 rounded-[2rem] border border-white/5 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] transform transition-all duration-300 group shadow-lg"
+                  className="flex items-center space-x-5 p-6 bg-white/5 rounded-[2rem] border border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 hover:scale-[1.02] transform transition-all duration-300 group shadow-lg"
                 >
                   <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-2xl flex-shrink-0 ring-4 ring-white/5 group-hover:rotate-6 transition-transform">
                     {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
@@ -887,7 +887,7 @@ const MyTeam = () => {
                       <p className="text-[11px] text-indigo-400/70 truncate mt-1 italic">{member.user_info?.email}</p>
                     </div>
                     {member.department && (
-                      <div className="mt-3 inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      <div className="mt-3 inline-block px-2 py-0.5 bg-white/5 border border-white/10 dark:border-white/10 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-widest">
                         {member.department.name}
                       </div>
                     )}
@@ -913,7 +913,7 @@ const MyTeam = () => {
         )}
 
         {teamSize === 0 && (
-          <div className="bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 p-24 shadow-2xl text-center relative overflow-hidden group">
+          <div className="bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 dark:border-white/10 p-24 shadow-2xl text-center relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-all duration-700 group-hover:bg-indigo-500/10"></div>
             <UserGroupIcon className="w-24 h-24 text-white/5 mx-auto mb-8 animate-pulse" />
             <p className="text-3xl font-black text-white tracking-tight">No team members found</p>
@@ -933,8 +933,8 @@ const MyTeam = () => {
               onClick={closePanel}
             ></div>
 
-            <div className="relative bg-[#070B14] w-full max-w-[95%] md:max-w-6xl h-full shadow-2xl border-l border-white/10 flex flex-col animate-slide-in-right">
-              <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between bg-white/5 backdrop-blur-xl">
+            <div className="relative bg-[#070B14] w-full max-w-[95%] md:max-w-6xl h-full shadow-2xl border-l border-white/10 dark:border-white/10 flex flex-col animate-slide-in-right">
+              <div className="px-8 py-6 border-b border-white/10 dark:border-white/10 flex items-center justify-between bg-white/5 backdrop-blur-xl">
                 <div>
                   <h3 className="text-2xl font-black text-white tracking-tight uppercase">
                     View Employees
@@ -947,7 +947,7 @@ const MyTeam = () => {
                 <button
                   type="button"
                   onClick={closePanel}
-                  className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all shadow-lg active:scale-95"
+                  className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-400 hover:text-white hover:bg-black/10 dark:bg-white/5/10 transition-all shadow-lg active:scale-95"
                 >
                   <XMarkIcon className="w-7 h-7" />
                 </button>
@@ -964,25 +964,25 @@ const MyTeam = () => {
                       placeholder="Search by name, ID, or department"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3 border border-white/10 rounded-2xl leading-5 bg-white/5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 text-sm transition-all shadow-inner"
+                      className="block w-full pl-12 pr-4 py-3 border border-white/10 dark:border-white/10 rounded-2xl leading-5 bg-white/5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 text-sm transition-all shadow-inner"
                     />
                   </div>
                 </div>
 
                 <div className="flex-1 overflow-auto custom-scrollbar px-4 pb-6">
-                  <div className="bg-white/5 rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl">
+                  <div className="bg-white/5 rounded-[2rem] border border-white/10 dark:border-white/10 overflow-hidden shadow-2xl">
                     {(selectedCategory === 'late' || selectedCategory === 'on_time') ? (
                       <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full table-fixed border-collapse">
                           <thead>
-                            <tr className="bg-white/5 border-b border-white/10 text-left">
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] sticky left-0 bg-[#0d1420] z-20 border-r border-white/10 min-w-[160px]">Employee</th>
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[105px]">Department</th>
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[115px]">Team</th>
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[85px]">Location</th>
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/5 min-w-[115px]">Job</th>
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[95px]">Clock</th>
-                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/5 min-w-[135px]">Shift</th>
+                            <tr className="bg-white/5 border-b border-white/10 dark:border-white/10 text-left">
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] sticky left-0 bg-[#0d1420] z-20 border-r border-white/10 dark:border-white/10 min-w-[160px]">Employee</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 min-w-[105px]">Department</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 min-w-[115px]">Team</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 min-w-[85px]">Location</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-r border-white/10 min-w-[115px]">Job</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/10 min-w-[95px]">Clock</th>
+                              <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center border-r border-white/10 min-w-[135px]">Shift</th>
                               <th className="px-3 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center min-w-[75px]">Delay</th>
                             </tr>
                           </thead>
@@ -1007,28 +1007,28 @@ const MyTeam = () => {
 
                               return (
                                 <tr key={member.id} className="hover:bg-white/5 transition-colors group">
-                                  <td className="px-3 py-3 sticky left-0 bg-[#0d1420] z-10 border-r border-white/10">
+                                  <td className="px-3 py-3 sticky left-0 bg-[#0d1420] z-10 border-r border-white/10 dark:border-white/10">
                                     <div className="flex flex-col">
                                       <span className="text-[12px] font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight truncate">{member.user_info?.full_name}</span>
                                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{member.employee_id}</span>
                                     </div>
                                   </td>
-                                  <td className="px-3 py-3 text-[11px] text-slate-300 font-bold border-r border-white/5 italic truncate">
+                                  <td className="px-3 py-3 text-[11px] text-slate-300 font-bold border-r border-white/10 italic truncate">
                                     {member.department?.name || 'N/A'}
                                   </td>
-                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/5 truncate">
+                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/10 truncate">
                                     {member.manager?.user_info?.full_name || 'Individual'}
                                   </td>
-                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/5 truncate">
+                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/10 truncate">
                                     {member.location || 'Hyderabad'}
                                   </td>
-                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/5 italic truncate">
+                                  <td className="px-3 py-3 text-[11px] text-slate-400 font-medium border-r border-white/10 italic truncate">
                                     {member.position || 'Software Developer'}
                                   </td>
-                                  <td className="px-3 py-3 text-[11px] text-emerald-400 font-black text-center border-r border-white/5">
+                                  <td className="px-3 py-3 text-[11px] text-emerald-400 font-black text-center border-r border-white/10">
                                     {record?.check_in_time ? formatTime(record.check_in_time) : 'N/A'}
                                   </td>
-                                  <td className="px-3 py-3 text-center border-r border-white/5">
+                                  <td className="px-3 py-3 text-center border-r border-white/10">
                                     <div className="flex flex-col items-center">
                                       <span className="text-[11px] font-black text-slate-300 tracking-widest">10AM-7PM</span>
                                       <span className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">(10-7)</span>
@@ -1046,7 +1046,7 @@ const MyTeam = () => {
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
                         {getFilteredTeamMembers().map((member) => (
-                          <div key={member.id} className="flex items-center space-x-5 p-6 bg-white/5 rounded-3xl border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all group shadow-xl">
+                          <div key={member.id} className="flex items-center space-x-5 p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-all group shadow-xl">
                             <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg group-hover:rotate-6 transition-transform">
                               {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
                             </div>
@@ -1066,17 +1066,17 @@ const MyTeam = () => {
                   </div>
                 </div>
 
-                <div className="px-3 py-2 bg-white/5 border-t border-white/10 flex justify-between items-center mt-auto backdrop-blur-xl">
+                <div className="px-3 py-2 bg-white/5 border-t border-white/10 dark:border-white/10 flex justify-between items-center mt-auto backdrop-blur-xl">
                   <div className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     Showing 1 to {getFilteredTeamMembers().length} of {getFilteredTeamMembers().length} employees
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="flex space-x-2">
-                      <button className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-600 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled>
+                      <button className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-600 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled>
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
                       </button>
-                      <span className="text-[11px] font-black text-white bg-indigo-500/80 px-4 py-2 rounded-xl shadow-lg shadow-indigo-500/20 border border-white/10 flex items-center">PAGE 1 OF 1</span>
-                      <button className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-600 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled>
+                      <span className="text-[11px] font-black text-white bg-indigo-500/80 px-4 py-2 rounded-xl shadow-lg shadow-indigo-500/20 border border-white/10 dark:border-white/10 flex items-center">PAGE 1 OF 1</span>
+                      <button className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-600 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled>
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
                       </button>
                     </div>

@@ -146,7 +146,7 @@ const Navbar = ({ onMenuToggle }) => {
   };
 
   return (
-    <nav className={`bg-[#0B1120]/80 shadow-2xl border-b border-white/5 sticky top-0 z-40 backdrop-blur-md`}>
+    <nav className={`bg-[#0B1120]/80 shadow-2xl border-b border-white/10 sticky top-0 z-40 backdrop-blur-md`}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Left side */}
@@ -184,17 +184,17 @@ const Navbar = ({ onMenuToggle }) => {
 
               {/* Dropdown Results */}
               {(showDropdown && searchQuery.trim()) && (
-                <div className="absolute mt-2 w-full bg-[#0B1120]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute mt-2 w-full bg-[#0B1120]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 dark:border-white/10 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="max-h-[min(80vh,500px)] overflow-y-auto custom-scrollbar px-3 py-3">
                     {/* Quick Links Section */}
                     {searchResults.links.length > 0 && (
                       <div className="mb-4">
-                        <h3 className="px-3 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quick Jump</h3>
+                        <h3 className="px-3 py-2 text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Quick Jump</h3>
                         {searchResults.links.map((link) => (
                           <button
                             key={link.path}
                             onClick={() => handleResultClick(link.path)}
-                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-slate-200 hover:text-white transition-all group"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-slate-200 hover:text-white transition-all group"
                           >
                             <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
                               <link.icon className="h-4 w-4 text-indigo-500" />
@@ -208,12 +208,12 @@ const Navbar = ({ onMenuToggle }) => {
                     {/* Employees Section */}
                     {searchResults.employees.length > 0 && (
                       <div>
-                        <h3 className="px-3 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Employees</h3>
+                        <h3 className="px-3 py-2 text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Employees</h3>
                         {searchResults.employees.map((emp) => (
                           <button
                             key={emp.id}
                             onClick={() => handleResultClick(`/employees/${emp.id}`)}
-                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-slate-200 hover:text-white transition-all group"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-white/10 text-slate-200 hover:text-white transition-all group"
                           >
                             <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md border border-white/20">
                               {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
@@ -234,7 +234,7 @@ const Navbar = ({ onMenuToggle }) => {
 
                     {searchResults.links.length === 0 && searchResults.employees.length === 0 && !isSearching && (
                       <div className="py-8 text-center">
-                        <p className="text-sm text-gray-500">No results found for "{searchQuery}"</p>
+                        <p className="text-sm text-slate-400">No results found for "{searchQuery}"</p>
                       </div>
                     )}
                   </div>
@@ -252,7 +252,7 @@ const Navbar = ({ onMenuToggle }) => {
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-3 p-1.5 rounded-lg text-slate-300 hover:bg-white/5 focus:outline-none transition-all duration-300"
+                className="flex items-center space-x-3 p-1.5 rounded-lg text-slate-200 hover:bg-white/5 focus:outline-none transition-all duration-300"
               >
                 <div className="flex items-center space-x-3">
                   <div className="hidden sm:block text-right">
@@ -264,17 +264,17 @@ const Navbar = ({ onMenuToggle }) => {
                     </div>
                   </div>
                   <div className="h-9 w-9 bg-slate-800 rounded-full flex items-center justify-center overflow-hidden border border-white/10 shadow-lg">
-                    <span className="text-gray-600 font-bold text-sm">
+                    <span className="text-white font-bold text-sm">
                       {getInitials(user?.first_name, user?.last_name)}
                     </span>
                   </div>
-                  <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                  <ChevronDownIcon className="h-4 w-4 text-slate-400" />
                 </div>
               </button>
 
               {/* User dropdown */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-3 w-64 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl py-2 z-50 border border-white/10 overflow-hidden">
+                <div className="absolute right-0 mt-3 w-[90vw] max-w-[260px] sm:w-64 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl py-2 z-50 border border-white/10 overflow-hidden">
                   <div className="px-4 py-4 border-b border-white/5 bg-slate-800/20">
                     <div className="flex items-center space-x-3 mb-3">
                       <div className={`h-12 w-12 bg-gradient-to-r ${theme.avatarGradient} rounded-full flex items-center justify-center shadow-lg`}>
@@ -321,7 +321,7 @@ const Navbar = ({ onMenuToggle }) => {
 
                   <Link
                     to="/resource-management"
-                    className="block px-4 py-3 text-sm text-slate-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 transition-all duration-300"
+                    className="block px-4 py-3 text-sm text-slate-300 hover:bg-white/5 transition-all duration-300"
                     onClick={() => setShowUserMenu(false)}
                   >
                     <div className="flex items-center space-x-3">
@@ -332,7 +332,7 @@ const Navbar = ({ onMenuToggle }) => {
                     </div>
                   </Link>
 
-                  <div className="border-t border-white/5 mt-2 pt-2">
+                  <div className="border-t border-white/10 mt-2 pt-2">
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-3 text-sm text-indigo-400 hover:bg-white/5 transition-all duration-300"
@@ -356,7 +356,7 @@ const Navbar = ({ onMenuToggle }) => {
       <div className="md:hidden px-4 pb-4 overflow-visible">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </div>
           <input
             type="text"
@@ -370,22 +370,22 @@ const Navbar = ({ onMenuToggle }) => {
 
           {/* Mobile Search Dropdown */}
           {showDropdown && (searchQuery.trim()) && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/5 rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
               <div className="max-h-64 overflow-y-auto p-2">
                 {searchResults.links.map(link => (
-                  <button key={link.path} onClick={() => handleResultClick(link.path)} className="w-full flex items-center space-x-3 p-3 hover:bg-white/5 rounded-lg text-slate-300 transition-colors">
+                  <button key={link.path} onClick={() => handleResultClick(link.path)} className="w-full flex items-center space-x-3 p-3 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
                     <link.icon className="h-5 w-5 text-indigo-400" />
                     <span className="text-sm font-medium">{link.name}</span>
                   </button>
                 ))}
                 {searchResults.employees.map(emp => (
-                  <button key={emp.id} onClick={() => handleResultClick(`/employees/${emp.id}`)} className="w-full flex items-center space-x-3 p-3 hover:bg-white/5 rounded-lg text-slate-300 transition-colors">
-                    <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white/20">
+                  <button key={emp.id} onClick={() => handleResultClick(`/employees/${emp.id}`)} className="w-full flex items-center space-x-3 p-3 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
+                    <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-black/20 dark:border-white/20">
                       {getInitials(emp.user_info?.first_name, emp.user_info?.last_name)}
                     </div>
                     <div className="text-left">
                       <p className="text-sm font-semibold">{emp.user_info?.full_name || `${emp.user_info?.first_name} ${emp.user_info?.last_name}`}</p>
-                      <p className="text-[10px] text-gray-500">{emp.position}</p>
+                      <p className="text-[10px] text-slate-400">{emp.position}</p>
                     </div>
                   </button>
                 ))}

@@ -452,6 +452,50 @@ class UserProfileReadSerializer(serializers.ModelSerializer):
 # =====================================================
 # User serializers
 # =====================================================
+class LoginProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['role']
+
+
+class LoginUserSerializer(serializers.ModelSerializer):
+    profile = LoginProfileSerializer(read_only=True)
+    groups = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField()
+    employee_id = serializers.SerializerMethodField()
+    employee_pk = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email',
+            'first_name', 'last_name',
+            'is_superuser',
+            'must_change_password',
+            'role',
+            'profile',
+            'groups',
+            'employee_id',
+            'employee_pk'
+        ]
+
+    def get_groups(self, obj):
+        prefetched_groups = getattr(obj, '_prefetched_objects_cache', {}).get('groups')
+        groups = prefetched_groups if prefetched_groups is not None else obj.groups.all()
+        return [group.name for group in groups]
+
+    def get_role(self, obj):
+        return getattr(getattr(obj, 'profile', None), 'role', None)
+
+    def get_employee_id(self, obj):
+        employee = getattr(obj, 'employee', None)
+        return employee.employee_id if employee else None
+
+    def get_employee_pk(self, obj):
+        employee = getattr(obj, 'employee', None)
+        return employee.id if employee else None
+
+
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     groups = serializers.SerializerMethodField()
@@ -474,7 +518,9 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def get_groups(self, obj):
-        return list(obj.groups.values_list('name', flat=True))
+        prefetched_groups = getattr(obj, '_prefetched_objects_cache', {}).get('groups')
+        groups = prefetched_groups if prefetched_groups is not None else obj.groups.all()
+        return [group.name for group in groups]
 
     def get_role(self, obj):
         return getattr(getattr(obj, 'profile', None), 'role', None)

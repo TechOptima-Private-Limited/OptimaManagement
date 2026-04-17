@@ -166,7 +166,7 @@ const LeaveApproval = () => {
     const daysUntilStart = getDaysUntilStart(request.start_date);
 
     return (
-      <div className={`border-l-4 p-8 mb-6 rounded-r-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-white/5 backdrop-blur-xl border border-white/10 ${getUrgencyColor(request)}`}>
+      <div className={`border-l-4 p-8 mb-6 rounded-r-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-white/5 backdrop-blur-xl border border-white/10 dark:border-white/10 ${getUrgencyColor(request)}`}>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-6 flex-1">
             <div className="flex-shrink-0">
@@ -214,7 +214,7 @@ const LeaveApproval = () => {
                 </div>
               </div>
 
-              <div className="text-sm text-slate-300 mb-3 bg-[#0A0F1A] p-4 rounded-2xl border border-white/5 shadow-inner">
+              <div className="text-sm text-slate-300 mb-3 bg-[#0A0F1A] p-4 rounded-2xl border border-white/10 shadow-inner">
                 <span className="font-bold text-slate-500 uppercase tracking-wider text-xs block mb-1">Reason:</span>
                 <span className="leading-relaxed">
                   {request.reason.length > 120 ? `${request.reason.substring(0, 120)}...` : request.reason}
@@ -225,7 +225,7 @@ const LeaveApproval = () => {
                 <CheckCircleIcon className="h-4 w-4 mr-1 opacity-50" />
                 Applied on {formatDate(request.applied_on)}
                 {request.employee?.employee_id && (
-                  <span className="ml-4 pl-4 border-l border-white/10 flex items-center">
+                  <span className="ml-4 pl-4 border-l border-white/10 dark:border-white/10 flex items-center">
                     <UserIcon className="h-4 w-4 mr-1 opacity-50" />
                     ID: {request.employee.employee_id}
                   </span>
@@ -334,14 +334,14 @@ const LeaveApproval = () => {
       )}
 
       {/* Enhanced Filters */}
-      <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 shadow-2xl">
+      <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 dark:border-white/10 shadow-2xl">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Status</label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Status</option>
               <option value="PENDING">Pending</option>
@@ -356,7 +356,7 @@ const LeaveApproval = () => {
             <select
               value={filters.leave_type}
               onChange={(e) => handleFilterChange('leave_type', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Types</option>
               {leaveTypes.map((type) => (
@@ -374,14 +374,14 @@ const LeaveApproval = () => {
               value={filters.employee}
               onChange={(e) => handleFilterChange('employee', e.target.value)}
               placeholder="Search employee..."
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
             />
           </div>
 
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="w-full px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl shadow-lg border border-white/10 transition-all transform hover:scale-105"
+              className="w-full px-4 py-3 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:scale-105"
             >
               Clear Filters
             </button>
@@ -390,13 +390,13 @@ const LeaveApproval = () => {
       </div>
 
       {/* Enhanced Tabs */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-white/10 dark:border-white/10">
         <nav className="-mb-px flex space-x-10">
           <button
             onClick={() => setActiveTab('pending')}
             className={`py-4 px-2 border-b-2 font-bold text-[15px] uppercase tracking-wider transition-all ${activeTab === 'pending'
               ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-white/20'
+              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-black/20 dark:border-white/20'
               }`}
           >
             <div className="flex items-center">
@@ -411,7 +411,7 @@ const LeaveApproval = () => {
             onClick={() => setActiveTab('all')}
             className={`py-4 px-2 border-b-2 font-bold text-[15px] uppercase tracking-wider transition-all ${activeTab === 'all'
               ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-white/20'
+              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-black/20 dark:border-white/20'
               }`}
           >
             <div className="flex items-center">
@@ -429,7 +429,7 @@ const LeaveApproval = () => {
       <div>
         {activeTab === 'pending' ? (
           pendingRequests.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-white/10 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
                 <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
@@ -480,7 +480,7 @@ const LeaveApproval = () => {
           )
         ) : (
           allRequests.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 relative overflow-hidden">
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-white/10 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
                 <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
@@ -530,29 +530,29 @@ const LeaveApproval = () => {
 
             {/* Leave Details Grid */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
                 <label className="block text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Leave Type</label>
                 <p className="text-xl font-bold text-white">{selectedRequest.leave_type?.name}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
                 <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Duration</label>
                 <p className="text-xl font-bold text-white capitalize">
                   {selectedRequest.leave_duration?.replace('_', ' ')}
                 </p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
                 <label className="block text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Start Date</label>
                 <p className="text-xl font-bold text-white">{formatDate(selectedRequest.start_date)}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
                 <label className="block text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">End Date</label>
                 <p className="text-xl font-bold text-white">{formatDate(selectedRequest.end_date)}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
                 <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">Days Requested</label>
                 <p className="text-xl font-bold text-white">{selectedRequest.days_requested} days</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg hover:bg-white/10 transition-colors">
+              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Applied On</label>
                 <p className="text-xl font-bold text-white">{formatDate(selectedRequest.applied_on)}</p>
               </div>
@@ -561,7 +561,7 @@ const LeaveApproval = () => {
             {/* Reason block */}
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Reason</label>
-              <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/5 shadow-inner">
+              <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/10 shadow-inner">
                 <p className="text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.reason}</p>
               </div>
             </div>
@@ -570,7 +570,7 @@ const LeaveApproval = () => {
             {selectedRequest.employee_comments && (
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Employee Comments</label>
-                <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/5 shadow-inner">
+                <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/10 shadow-inner">
                   <p className="text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.employee_comments}</p>
                 </div>
               </div>
@@ -594,7 +594,7 @@ const LeaveApproval = () => {
 
             {/* Quick Actions Footer */}
             {selectedRequest.status === 'PENDING' && (
-              <div className="border-t border-white/10 pt-8 mt-4">
+              <div className="border-t border-white/10 dark:border-white/10 pt-8 mt-4">
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
                   <button
                     onClick={() => setShowApprovalModal(true)}
@@ -670,15 +670,15 @@ const LeaveApproval = () => {
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium placeholder-slate-500 p-4 transition-all"
                 placeholder="Add any comments for the employee..."
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10 dark:border-white/10">
               <button
                 onClick={() => setShowApprovalModal(false)}
-                className="flex-1 px-6 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 transition-all transform hover:-translate-y-1"
+                className="flex-1 px-6 py-4 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
               >
                 Cancel
               </button>
@@ -730,16 +730,16 @@ const LeaveApproval = () => {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-2xl text-white shadow-inner focus:ring-rose-500 focus:border-rose-500 font-medium placeholder-slate-500 p-4 transition-all"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-rose-500 focus:border-rose-500 font-medium placeholder-slate-500 p-4 transition-all"
                 placeholder="Examine the reason for rejection here..."
                 required
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10 dark:border-white/10">
               <button
                 onClick={() => setShowRejectionModal(false)}
-                className="flex-1 px-6 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 transition-all transform hover:-translate-y-1"
+                className="flex-1 px-6 py-4 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
               >
                 Cancel
               </button>

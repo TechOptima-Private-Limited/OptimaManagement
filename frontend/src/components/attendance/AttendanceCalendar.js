@@ -94,7 +94,7 @@ const AttendanceCalendar = () => {
 
   const getDateStatusColor = (date) => {
     const attendance = getAttendanceForDate(date);
-    if (!attendance.length) return 'bg-slate-800/50 text-slate-500';
+    if (!attendance.length) return 'bg-white/5 dark:bg-slate-800/50 text-slate-500';
 
     const hasPresent = attendance.some(a => a.status === 'PRESENT');
     const hasLate = attendance.some(a => a.status === 'LATE');
@@ -106,7 +106,7 @@ const AttendanceCalendar = () => {
     if (hasAbsent) return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
     if (hasHalfDay) return 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
 
-    return 'bg-slate-800/50 text-slate-500';
+    return 'bg-white/5 dark:bg-slate-800/50 text-slate-500';
   };
 
   const handleDateClick = (date) => {
@@ -158,16 +158,16 @@ const AttendanceCalendar = () => {
         </p>
       </div>
 
-      <div className="bg-slate-900/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+      <div className="bg-white/5 dark:bg-slate-900/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
         {/* Calendar Navigation */}
-        <div className="px-8 py-6 border-b border-white/5 bg-slate-900/40 flex items-center justify-between">
+        <div className="px-8 py-6 border-b border-white/10 bg-white/5 dark:bg-slate-900/40 flex items-center justify-between">
           <h2 className="text-2xl font-black text-white tracking-tight uppercase">
             {monthNames[currentDate.getMonth()]} <span className="text-indigo-500">{currentDate.getFullYear()}</span>
           </h2>
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigateMonth(-1)}
-              className="p-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all shadow-lg"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
             >
               <ChevronLeftIcon className="h-5 w-5" />
             </button>
@@ -179,7 +179,7 @@ const AttendanceCalendar = () => {
             </button>
             <button
               onClick={() => navigateMonth(1)}
-              className="p-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all shadow-lg"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
             >
               <ChevronRightIcon className="h-5 w-5" />
             </button>
@@ -210,7 +210,7 @@ const AttendanceCalendar = () => {
                     ${!date ? 'opacity-0 pointer-events-none' : ''}
                     ${selectedDate?.toDateString() === date?.toDateString()
                       ? 'bg-indigo-500/20 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
-                      : 'bg-slate-900/60 border-white/5 hover:border-white/10 hover:translate-y-[-2px]'}
+                      : 'bg-white/5 dark:bg-slate-900/60 border-white/10 hover:border-white/10 dark:border-white/10 hover:translate-y-[-2px]'}
                   `}
                   onClick={() => handleDateClick(date)}
                 >
@@ -255,7 +255,7 @@ const AttendanceCalendar = () => {
         </div>
 
         {/* Dynamic Legend */}
-        <div className="px-8 py-6 border-t border-white/5 bg-slate-900/40">
+        <div className="px-8 py-6 border-t border-white/10 bg-white/5 dark:bg-slate-900/40">
           <div className="flex flex-wrap items-center gap-8 justify-center">
             {[
               { label: 'Present', color: 'bg-emerald-500' },
@@ -274,8 +274,8 @@ const AttendanceCalendar = () => {
 
       {/* Detail Inspector Sidebar/Overlay */}
       {selectedDate && (
-        <div className="mt-8 bg-slate-900/60 backdrop-blur-3xl rounded-[2.5rem] border border-indigo-500/20 overflow-hidden shadow-2xl animate-in slide-in-from-bottom-5 duration-500">
-          <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+        <div className="mt-8 bg-white/5 dark:bg-slate-900/60 backdrop-blur-3xl rounded-[2.5rem] border border-indigo-500/20 overflow-hidden shadow-2xl animate-in slide-in-from-bottom-5 duration-500">
+          <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between">
             <div>
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Chronicle Detail</p>
               <h3 className="text-2xl font-black text-white tracking-tight uppercase">
@@ -284,7 +284,7 @@ const AttendanceCalendar = () => {
             </div>
             <button
               onClick={() => { setSelectedDate(null); setSelectedDateData(null); }}
-              className="p-2 rounded-full bg-white/5 text-slate-400 hover:text-white transition-colors border border-white/5"
+              className="p-2 rounded-full bg-white/5 text-slate-400 hover:text-white transition-colors border border-white/10"
             >
               <XCircleIcon className="w-8 h-8" />
             </button>
@@ -294,10 +294,10 @@ const AttendanceCalendar = () => {
             {selectedDateData && selectedDateData.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {selectedDateData.map((a, index) => (
-                  <div key={index} className="bg-slate-950/40 p-6 rounded-[2rem] border border-white/5 relative group hover:border-indigo-500/20 transition-all text-slate-300">
+                  <div key={index} className="bg-slate-950/40 p-6 rounded-[2rem] border border-white/10 relative group hover:border-indigo-500/20 transition-all text-slate-300">
                     {isHRManager() && (
                       <div className="flex items-center mb-6">
-                        <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-xl flex items-center justify-center mr-4 shadow-lg text-white font-black uppercase border border-white/10">
+                        <div className="h-12 w-12 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-xl flex items-center justify-center mr-4 shadow-lg text-white font-black uppercase border border-white/10 dark:border-white/10">
                           {a.employee?.user?.first_name?.[0]}{a.employee?.user?.last_name?.[0]}
                         </div>
                         <div>
@@ -329,7 +329,7 @@ const AttendanceCalendar = () => {
                     </div>
 
                     {a.notes && (
-                      <div className="mt-6 pt-6 border-t border-white/5">
+                      <div className="mt-6 pt-6 border-t border-white/10">
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 text-slate-500">Observations</p>
                         <p className="text-sm text-slate-300 italic font-medium leading-relaxed">"{a.notes}"</p>
                       </div>

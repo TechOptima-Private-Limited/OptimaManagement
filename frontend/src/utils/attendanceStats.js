@@ -9,16 +9,22 @@ export function recordDurationMinutes(r) {
   return Math.max(0, Math.floor((end - start) / 60000));
 }
 
+/** Returns local YYYY-MM-DD string for a Date object. */
+export function toLocalDateStr(date) {
+  if (!date) return '';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 /** Monday date (YYYY-MM-DD) of the ISO-style week containing dateStr, local calendar. */
 export function mondayKey(dateStr) {
   const d = new Date(`${dateStr}T12:00:00`);
   const day = d.getDay();
   const daysFromMonday = day === 0 ? 6 : day - 1;
   d.setDate(d.getDate() - daysFromMonday);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dayNum = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dayNum}`;
+  return toLocalDateStr(d);
 }
 
 export function filterRecordsForEmployee(records, targetEmployeeId) {
@@ -48,8 +54,7 @@ export function getAvgMinutesPerDayInWeek(records, targetEmployeeId) {
   if (workingRecords.length === 0) return 0;
 
   const pad2 = (n) => String(n).padStart(2, '0');
-  const todayLocal = new Date();
-  const todayStr = `${todayLocal.getFullYear()}-${pad2(todayLocal.getMonth() + 1)}-${pad2(todayLocal.getDate())}`;
+  const todayStr = toLocalDateStr(new Date());
   const thisWeekMonday = mondayKey(todayStr);
   const recordsThisWeek = workingRecords.filter((r) => mondayKey(r.date) === thisWeekMonday);
 
@@ -98,8 +103,7 @@ export function getTotalMinutesThisWeek(records, targetEmployeeId) {
   if (workingRecords.length === 0) return 0;
 
   const pad2 = (n) => String(n).padStart(2, '0');
-  const todayLocal = new Date();
-  const todayStr = `${todayLocal.getFullYear()}-${pad2(todayLocal.getMonth() + 1)}-${pad2(todayLocal.getDate())}`;
+  const todayStr = toLocalDateStr(new Date());
   const thisWeekMonday = mondayKey(todayStr);
 
   return workingRecords
@@ -153,8 +157,125 @@ export function getStatsForPeriod(records, employeeId, startDate, endDate) {
   return { avgMinutes, onTimePercent };
 }
 
+
 export function formatMinutesAsHhMm(m) {
   const h = Math.floor(m / 60);
   const min = m % 60;
   return `${h}h ${min}m`;
+}
+
+/**
+ * Returns an array of daily stats for the last 7 days (including today).
+ * [{ date: 'Mon', hours: 8.5, isLate: false, status: 'PRESENT' }, ...]
+ */
+export function getDailyStatsForLast7Days(records, targetEmployeeId) {
+  const mine = filterRecordsForEmployee(records, targetEmployeeId);
+  const now = new Date();
+  const days = [];
+  
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const dateStr = toLocalDateStr(d);
+    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+    
+    const dayRecords = mine.filter(r => r.date === dateStr);
+    const totalMins = dayRecords.reduce((sum, r) => sum + recordDurationMinutes(r), 0);
+    const hours = Number((totalMins / 60).toFixed(1));
+    
+    // Check if late on this day (take the earliest check-in)
+    let isLate = false;
+    if (dayRecords.length > 0) {
+      const earliestIn = dayRecords
+        .filter(r => r.check_in_time)
+        .sort((a, b) => a.check_in_time.localeCompare(b.check_in_time))[0];
+      
+      if (earliestIn) {
+        const [h, m] = earliestIn.check_in_time.split(':').map(Number);
+        isLate = h > 10 || (h === 10 && m > 0);
+      }
+    }
+
+    days.push({
+      date: dayName,
+      fullDate: dateStr,
+      hours,
+      isLate,
+      status: dayRecords.length > 0 ? (isLate ? 'LATE' : 'PRESENT') : 'ABSENT'
+    });
+  }
+  
+  return days;
+}
+
+/**
+ * Calculates the current attendance streak (consecutive days present).
+ * Skips weekends unless the user worked on them.
+ */
+export function getAttendanceStreak(records, targetEmployeeId) {
+  const mine = filterRecordsForEmployee(records, targetEmployeeId);
+  const presentDates = new Set();
+  mine.forEach(r => {
+    if (r.check_in_time && r.date) {
+      const raw = String(r.date);
+      const isoDateMatch = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (isoDateMatch) presentDates.add(isoDateMatch[1]);
+    }
+  });
+  
+  let streak = 0;
+  let curr = new Date();
+  
+  // Start from today or yesterday if today hasn't been recorded yet
+  const todayStr = toLocalDateStr(curr);
+  if (!presentDates.has(todayStr)) {
+    curr.setDate(curr.getDate() - 1);
+  }
+
+  while (streak < 1000) { // Safety break
+    const dateStr = toLocalDateStr(curr);
+    const day = curr.getDay(); // 0=Sun, 6=Sat
+    
+    if (presentDates.has(dateStr)) {
+      streak++;
+    } else if (day === 0 || day === 6) {
+      // It's a weekend, don't break the streak, just skip back
+    } else {
+      // Weekday absence breaks the streak
+      break;
+    }
+    curr.setDate(curr.getDate() - 1);
+  }
+  
+  return streak;
+}
+
+/**
+ * Calculates on-time score for the current month.
+ */
+export function getMonthlyOnTimeScore(records, targetEmployeeId) {
+  const now = new Date();
+  const startOfMonth = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+  const endOfMonth = toLocalDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+  
+  return getStatsForPeriod(records, targetEmployeeId, startOfMonth, endOfMonth).onTimePercent;
+}
+
+/**
+ * Determines the monthly performance badge based on attendance metrics.
+ */
+export function getMonthlyBadge(records, targetEmployeeId) {
+  const now = new Date();
+  const startOfMonth = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+  const endOfMonth = toLocalDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+  
+  const stats = getStatsForPeriod(records, targetEmployeeId, startOfMonth, endOfMonth);
+  const streak = getAttendanceStreak(records, targetEmployeeId);
+
+  if (stats.onTimePercent >= 98 && stats.avgMinutes >= 540) return { name: 'Platinum Elite', icon: '🏆', color: 'text-indigo-400' };
+  if (stats.onTimePercent >= 90 && stats.avgMinutes >= 510) return { name: 'Gold Master', icon: '🥇', color: 'text-amber-400' };
+  if (stats.onTimePercent >= 80 || streak >= 10) return { name: 'Silver Pro', icon: '🥈', color: 'text-slate-300' };
+  if (streak >= 5) return { name: 'Iron Consistent', icon: '🥉', color: 'text-orange-400' };
+  
+  return null;
 }

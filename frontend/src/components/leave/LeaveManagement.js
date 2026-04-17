@@ -183,13 +183,13 @@ const LeaveManagement = () => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient}`}>
       {/* Hero Header */}
-      <div className={`border-b border-white/10 text-white relative overflow-hidden`}>
+      <div className={`border-b border-white/10 dark:border-white/10 text-white relative overflow-hidden`}>
         <div className={`absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br ${theme.primaryGradient} opacity-10 rounded-full blur-3xl`}></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-4 mb-4">
-                <div className="p-3 bg-white/20 rounded-2xl">
+                <div className="p-3 bg-black/20 dark:bg-white/5/20 rounded-2xl">
                   <CalendarDaysIcon className="h-10 w-10" />
                 </div>
                 <div>
@@ -209,14 +209,14 @@ const LeaveManagement = () => {
               {isHROrManager() && stats.pendingApprovals > 0 && (
                 <div className="flex items-center space-x-3 mt-4">
                   <SparklesIcon className="h-6 w-6 text-yellow-300" />
-                  <span className="text-lg font-medium bg-white/20 px-4 py-2 rounded-full">
+                  <span className="text-lg font-medium bg-black/20 dark:bg-white/5/20 px-4 py-2 rounded-full">
                     {stats.pendingApprovals} {isManager() ? 'team ' : ''}requests need your attention
                   </span>
                 </div>
               )}
             </div>
             <div className="mt-6 md:mt-0 md:ml-6">
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
+              <div className="bg-black/20 dark:bg-white/5/20 backdrop-blur-sm rounded-2xl p-4 border border-black/30 dark:border-white/30">
                 <div className="flex items-center space-x-3">
                   <CalendarDaysIcon className="h-6 w-6" />
                   <span className="text-lg font-semibold">
@@ -263,7 +263,7 @@ const LeaveManagement = () => {
                               </div>
                             </div>
                           </div>
-                          <div className={`p-4 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-[0_0_20px_rgba(0,0,0,0.3)] border border-white/20`}>
+                          <div className={`p-4 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-[0_0_20px_rgba(0,0,0,0.3)] border border-black/20 dark:border-white/20`}>
                             <IconComponent className="h-8 w-8 text-white" />
                           </div>
                         </div>
@@ -330,10 +330,10 @@ const LeaveManagement = () => {
         )}
 
         {/* Main Content Tabs */}
-        <div className="bg-[#0A0F1A] rounded-[2rem] shadow-2xl border border-white/10 overflow-hidden relative z-10 backdrop-blur-xl">
+        <div className="bg-[#0A0F1A] rounded-[2rem] shadow-2xl border border-white/10 dark:border-white/10 overflow-hidden relative z-10 backdrop-blur-xl">
           <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
             {/* Tab Navigation */}
-            <div className="bg-white/5 border-b border-white/10 p-2">
+            <div className="bg-white/5 border-b border-white/10 dark:border-white/10 p-2">
               <Tab.List className="flex space-x-2">
                 {tabs.map((tab, index) => (
                   <Tab
@@ -347,7 +347,7 @@ const LeaveManagement = () => {
                       )
                     }
                   >
-                    <div className={`p-2 rounded-xl ${selectedIndex === index ? `bg-gradient-to-r ${tab.gradient} shadow-lg shadow-indigo-500/20` : 'bg-white/10'}`}>
+                    <div className={`p-2 rounded-xl ${selectedIndex === index ? `bg-gradient-to-r ${tab.gradient} shadow-lg shadow-indigo-500/20` : 'bg-black/10 dark:bg-white/5/10'}`}>
                       <tab.icon className={`h-5 w-5 ${selectedIndex === index ? 'text-white' : 'text-slate-400'}`} />
                     </div>
                     <span>{tab.name}</span>
@@ -381,7 +381,7 @@ const LeaveManagement = () => {
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-[#0A0F1A] border border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl z-10">
+        <div className="mt-8 bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-xl z-10">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
           <div className="flex items-start space-x-6 relative z-10">
             <div className="p-4 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl">

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useMemo } from 'react';
 import { authAPI } from '../services/api';
 import { getCurrentUser, setCurrentUser, removeTokens, setTokens } from '../utils/auth';
 
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'UPDATE_USER', payload: userData });
   };
 
-  const value = {
+  const value = React.useMemo(() => ({
     user: state.user,
     loading: state.loading,
     error: state.error,
@@ -93,7 +93,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUser,
-  };
+  }), [state.user, state.loading, state.error]);
+
 
   return (
     <AuthContext.Provider value={value}>

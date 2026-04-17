@@ -58,10 +58,10 @@ const ForceChangePassword = () => {
     };
 
     const inputClass =
-        'appearance-none block w-full px-4 py-4 rounded-xl border border-white/5 bg-black/40 text-white placeholder-gray-600 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 transition-all duration-300 text-sm font-medium';
+        'appearance-none block w-full px-4 py-4 rounded-xl border border-white/10 bg-black/40 text-white placeholder-gray-600 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 transition-all duration-300 text-sm font-medium';
 
     return (
-        <div className="min-h-screen flex bg-[#070B14] overflow-hidden relative font-sans selection:bg-indigo-500/30">
+        <div className="min-h-screen flex bg-[#070B14] dark:bg-[#070B14] overflow-hidden relative font-sans selection:bg-indigo-500/30">
             {/* ── Background Architecture ── */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
                 <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
@@ -95,7 +95,7 @@ const ForceChangePassword = () => {
                         </span>
                     </h2>
 
-                    <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-lg mb-12">
+                    <p className="text-xl text-slate-400 font-medium leading-relaxed max-w-lg mb-12">
                         This is your first login. To maintain system integrity, you must replace your temporary token with a personalized security credential.
                     </p>
                 </div>
@@ -109,18 +109,18 @@ const ForceChangePassword = () => {
             {/* ── Right: Change Password Card ── */}
             <div className="w-full lg:w-[45%] flex items-center justify-center p-6 relative z-10">
                 <div className="w-full max-w-[480px]">
-                    <div className="bg-slate-900/40 backdrop-blur-[40px] rounded-[3rem] border border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
+                    <div className="bg-white/5 dark:bg-slate-900/40 backdrop-blur-[40px] rounded-[3rem] border border-white/10 dark:border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
 
                         <div className="mb-10 text-center sm:text-left">
                             <h1 className="text-4xl font-black text-white tracking-tight mb-2">First-Time Setup.</h1>
-                            <p className="text-gray-500 font-medium text-sm">Please update your temporary password to proceed.</p>
+                            <p className="text-slate-400 font-medium text-sm">Please update your temporary password to proceed.</p>
                         </div>
 
                         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                             {/* Old Password */}
                             <div>
-                                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">
+                                <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">
                                     Temporary Password
                                 </label>
                                 <div className="relative">
@@ -138,7 +138,7 @@ const ForceChangePassword = () => {
 
                             {/* New Password */}
                             <div>
-                                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">
+                                <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">
                                     New Security Token
                                 </label>
                                 <div className="relative">
@@ -167,13 +167,13 @@ const ForceChangePassword = () => {
                                 )}
                                 {/* Live complexity checklist */}
                                 {password && password.length > 0 && (
-                                    <div className="mt-3 space-y-1.5 p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <div className="mt-3 space-y-1.5 p-3 rounded-xl bg-white/5 border border-white/10">
                                         {rulesStatus.map((rule) => (
                                             <div key={rule.id} className="flex items-center space-x-2">
                                                 {rule.passed
                                                     ? <CheckCircleIcon className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
                                                     : <XCircleIcon className="h-3.5 w-3.5 text-gray-600 flex-shrink-0" />}
-                                                <span className={`text-[10px] font-medium ${rule.passed ? 'text-emerald-400' : 'text-gray-500'}`}>
+                                                <span className={`text-[10px] font-medium ${rule.passed ? 'text-emerald-400' : 'text-slate-400'}`}>
                                                     {rule.label}
                                                 </span>
                                             </div>
@@ -184,7 +184,7 @@ const ForceChangePassword = () => {
 
                             {/* Confirm Password */}
                             <div>
-                                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">
+                                <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">
                                     Verify New Token
                                 </label>
                                 <div className="relative">
@@ -220,8 +220,8 @@ const ForceChangePassword = () => {
                         </form>
 
                         <div className="mt-8 flex items-center justify-center space-x-3 opacity-20 group cursor-default">
-                            <ShieldCheckIcon className="h-4 w-4 text-gray-400 group-hover:text-indigo-400 transition-colors" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] group-hover:text-indigo-400 transition-colors">Secured by OptimaGuard</span>
+                            <ShieldCheckIcon className="h-4 w-4 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400 transition-colors" />
+                            <span className="text-[10px] font-black text-gray-600 dark:text-gray-400 uppercase tracking-[0.3em] group-hover:text-indigo-400 transition-colors">Secured by OptimaGuard</span>
                         </div>
                     </div>
                 </div>

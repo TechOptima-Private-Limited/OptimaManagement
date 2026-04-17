@@ -944,15 +944,15 @@ const AssetManagement = () => {
   const getAssetTypeColor = (type) => {
     switch (type) {
       case 'laptop':
-        return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+        return 'bg-white/50/10 text-blue-400 border border-blue-500/20';
       case 'mouse':
         return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
       case 'id_card':
         return 'bg-violet-500/10 text-violet-400 border border-violet-500/20';
       case 'keyboard':
-        return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+        return 'bg-amber-500/100/10 text-amber-400 border border-amber-500/20';
       default:
-        return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
+        return 'bg-[#070B14]0/10 text-slate-400 border border-slate-500/20';
     }
   };
 
@@ -960,10 +960,10 @@ const AssetManagement = () => {
     const s = String(status || '').toUpperCase();
     if (s === 'AVAILABLE') return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
     if (s === 'ASSIGNED') return 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
-    if (s === 'DAMAGED' || s === 'REPAIR') return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+    if (s === 'DAMAGED' || s === 'REPAIR') return 'bg-amber-500/100/10 text-amber-400 border border-amber-500/20';
     if (s === 'LOST') return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
-    if (s === 'DISPOSED') return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
-    return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
+    if (s === 'DISPOSED') return 'bg-[#070B14]0/10 text-slate-400 border border-slate-500/20';
+    return 'bg-[#070B14]0/10 text-slate-400 border border-slate-500/20';
   };
 
   const getCategoryFor = (asset) => {
@@ -1124,11 +1124,11 @@ const AssetManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 p-4 lg:p-8 transition-colors duration-500">
+    <div className="min-h-screen bg-[#070B14] dark:bg-[#070B14] text-slate-200 dark:text-slate-100 p-4 lg:p-8 transition-colors duration-500">
       {/* Header */}
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-slate-800 dark:from-white dark:to-slate-400">
             Asset Management
           </h1>
           <p className="text-lg text-slate-400 font-medium">
@@ -1184,7 +1184,7 @@ const AssetManagement = () => {
                   background: selected ? 'rgba(99, 102, 241, 0.1)' : theme.surfaceGradient,
                   borderColor: selected ? '#6366f1' : 'rgba(255, 255, 255, 0.1)'
                 }}
-                className={`text-left rounded-2xl p-6 transition-all duration-300 backdrop-blur-xl border flex flex-col justify-between group h-full ${selected ? 'shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'hover:bg-white/10 hover:border-white/20'}`}
+                className={`text-left rounded-2xl p-6 transition-all duration-300 backdrop-blur-xl border flex flex-col justify-between group h-full ${selected ? 'shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20'}`}
               >
                 <div className="font-bold text-lg text-white mb-4 group-hover:text-indigo-400 transition-colors uppercase tracking-wider">{item.label}</div>
                 <div className="flex items-center justify-end gap-3">
@@ -1195,7 +1195,7 @@ const AssetManagement = () => {
                   >
                     Add
                   </button>
-                  <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${selected ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/5 text-slate-400 border-white/10 group-hover:border-white/20'}`}>
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${selected ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/5 text-slate-400 border-white/10 dark:border-white/10 group-hover:border-black/20 dark:border-white/20'}`}>
                     Manage
                   </span>
                 </div>
@@ -1206,7 +1206,7 @@ const AssetManagement = () => {
       )}
 
       {isAssetManager && activeSection === 'types' && (
-        <div className="max-w-7xl mx-auto bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl p-6">
+        <div className="max-w-7xl mx-auto bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 overflow-hidden shadow-2xl p-6">
           {assetTypes.length === 0 ? (
             <div className="text-center py-12 text-slate-500">No asset types yet</div>
           ) : (
@@ -1269,7 +1269,7 @@ const AssetManagement = () => {
           {(() => {
             const sw = (assets || []).filter(a => a._assetTypeCategory === 'SOFTWARE');
             if (sw.length === 0) return (
-              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10">
                 <RectangleStackIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
                 <h3 className="text-xl font-bold text-white">No software assets yet</h3>
               </div>
@@ -1277,7 +1277,7 @@ const AssetManagement = () => {
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sw.map(s => (
-                  <div key={s.id} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-white/10 transition-all group border-l-4 border-l-indigo-500 shadow-xl">
+                  <div key={s.id} className="bg-white/5 border border-white/10 dark:border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all group border-l-4 border-l-indigo-500 shadow-xl">
                     <div className="flex justify-between items-start mb-4">
                       <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400">
                         <CommandLineIcon className="h-6 w-6" />
@@ -1299,7 +1299,7 @@ const AssetManagement = () => {
                         </div>
                       )}
                     </div>
-                    <div className="mt-6 pt-4 border-t border-white/5 flex justify-end">
+                    <div className="mt-6 pt-4 border-t border-white/10 flex justify-end">
                       <button onClick={() => openAssetDetails(s)} className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
                         View Details <ChevronRightIcon className="h-3 w-3" />
                       </button>
@@ -1339,7 +1339,7 @@ const AssetManagement = () => {
             })();
 
             if (grouped.length === 0) return (
-              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10">
                 <UserGroupIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
                 <h3 className="text-xl font-bold text-white">No active assignments</h3>
               </div>
@@ -1352,7 +1352,7 @@ const AssetManagement = () => {
                   const typesLabel = (g.asset_types || []).map(id => typeNameById.get(id) || id);
 
                   return (
-                    <div key={g.employee} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-white/10 transition-all shadow-xl group">
+                    <div key={g.employee} className="bg-white/5 border border-white/10 dark:border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all shadow-xl group">
                       <div className="flex items-center gap-4 mb-6">
                         <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-indigo-500/20">
                           {emp?.name?.charAt(0) || emp?.username?.charAt(0) || 'E'}
@@ -1369,7 +1369,7 @@ const AssetManagement = () => {
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Requested Types</p>
                             <div className="flex flex-wrap gap-2">
                               {typesLabel.map((t, idx) => (
-                                <span key={idx} className="px-2 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-[10px] font-bold border border-white/5">
+                                <span key={idx} className="px-2 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-[10px] font-bold border border-white/10">
                                   {t}
                                 </span>
                               ))}
@@ -1382,7 +1382,7 @@ const AssetManagement = () => {
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Assigned Assets</p>
                             <div className="space-y-2">
                               {assetsFiltered.map((as, idx) => (
-                                <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+                                <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/10">
                                   <div className="text-indigo-400 bg-indigo-500/10 p-1.5 rounded-lg">
                                     {getAssetIcon(as.asset_type)}
                                   </div>
@@ -1397,7 +1397,7 @@ const AssetManagement = () => {
                         )}
 
                         {g.notes && (
-                          <div className="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                          <div className="mt-4 p-3 rounded-xl bg-amber-500/100/5 border border-amber-500/10">
                             <p className="text-[10px] font-bold text-amber-500/60 uppercase tracking-widest mb-1 italic">Notes</p>
                             <p className="text-xs text-slate-400 leading-relaxed italic line-clamp-2">{g.notes}</p>
                           </div>
@@ -1415,7 +1415,7 @@ const AssetManagement = () => {
       {isAssetManager && activeSection === 'returns' && (
         <div className="max-w-7xl mx-auto">
           {returnsList.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10">
               <ArrowPathIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
               <h3 className="text-xl font-bold text-white">No returns recorded</h3>
             </div>
@@ -1428,10 +1428,10 @@ const AssetManagement = () => {
                   return a ? { type: a.asset_type, info: a.serial_number || a.description || a.id } : { type: 'Unknown', info: `Asset ${id}` };
                 });
                 return (
-                  <div key={r.id} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-white/10 transition-all shadow-xl group">
+                  <div key={r.id} className="bg-white/5 border border-white/10 dark:border-white/10 backdrop-blur-xl rounded-2xl p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all shadow-xl group">
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-sm font-bold border border-orange-500/20">
+                        <div className="h-10 w-10 rounded-xl bg-orange-500/100/10 text-orange-400 flex items-center justify-center text-sm font-bold border border-orange-500/20">
                           {emp?.name?.charAt(0) || 'U'}
                         </div>
                         <div>
@@ -1439,7 +1439,7 @@ const AssetManagement = () => {
                           <p className="text-[10px] text-slate-500 uppercase tracking-widest">{new Date(r.created_at || Date.now()).toLocaleDateString()}</p>
                         </div>
                       </div>
-                      <span className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${r.is_offboarded ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                      <span className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${r.is_offboarded ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/100/10 text-amber-400 border-amber-500/20'}`}>
                         {r.is_offboarded ? 'OFFBOARDED' : 'IN PROGRESS'}
                       </span>
                     </div>
@@ -1447,7 +1447,7 @@ const AssetManagement = () => {
                     <div className="space-y-3">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Returned Assets</p>
                       {labels.map((l, idx) => (
-                        <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+                        <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/10">
                           <div className="p-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg">
                             {getAssetIcon(l.type)}
                           </div>
@@ -1460,7 +1460,7 @@ const AssetManagement = () => {
                     </div>
 
                     {r.remarks && (
-                      <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                      <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/10">
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 italic">Remarks</p>
                         <p className="text-xs text-slate-400 italic line-clamp-2">{r.remarks}</p>
                       </div>
@@ -1480,8 +1480,8 @@ const AssetManagement = () => {
       {showAddHardwareModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddHardwareModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddHardwareModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Add Hardware Asset</h3>
@@ -1497,13 +1497,13 @@ const AssetManagement = () => {
                       <select
                         value={hardwareForm.asset_type}
                         onChange={(e) => setHardwareForm({ ...hardwareForm, asset_type: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="" className="bg-[#1a1c2e]">Select Type</option>
+                        <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Type</option>
                         {(assetTypes || [])
                           .filter(t => (t.category === 'HARDWARE' || t.category === 'Hardware'))
                           .map(t => (
-                            <option key={t.id} value={t.name} className="bg-[#1a1c2e]">{t.name}</option>
+                            <option key={t.id} value={t.name} className="bg-[#070B14] dark:bg-[#1a1c2e]">{t.name}</option>
                           ))}
                       </select>
                     </div>
@@ -1515,7 +1515,7 @@ const AssetManagement = () => {
                         placeholder="e.g. MacBook Pro M3"
                         value={hardwareForm.name}
                         onChange={(e) => setHardwareForm({ ...hardwareForm, name: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
 
@@ -1526,7 +1526,7 @@ const AssetManagement = () => {
                         placeholder="OPT-HW-001"
                         value={hardwareForm.asset_tag}
                         onChange={(e) => setHardwareForm({ ...hardwareForm, asset_tag: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                   </div>
@@ -1539,7 +1539,7 @@ const AssetManagement = () => {
                         placeholder="S/N: XXXXXXXX"
                         value={hardwareForm.serial_number}
                         onChange={(e) => setHardwareForm({ ...hardwareForm, serial_number: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
 
@@ -1548,11 +1548,11 @@ const AssetManagement = () => {
                       <select
                         value={hardwareForm.status}
                         onChange={(e) => setHardwareForm({ ...hardwareForm, status: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="available" className="bg-[#1a1c2e]">Available</option>
-                        <option value="assigned" className="bg-[#1a1c2e]">Assigned</option>
-                        <option value="repair" className="bg-[#1a1c2e]">Repair</option>
+                        <option value="available" className="bg-[#070B14] dark:bg-[#1a1c2e]">Available</option>
+                        <option value="assigned" className="bg-[#070B14] dark:bg-[#1a1c2e]">Assigned</option>
+                        <option value="repair" className="bg-[#070B14] dark:bg-[#1a1c2e]">Repair</option>
                       </select>
                     </div>
 
@@ -1562,7 +1562,7 @@ const AssetManagement = () => {
                         type="date"
                         value={hardwareForm.purchased_date}
                         onChange={(e) => setHardwareForm({ ...hardwareForm, purchased_date: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
                       />
                     </div>
                   </div>
@@ -1575,11 +1575,11 @@ const AssetManagement = () => {
                     placeholder="Technical specifications, damage reports, etc."
                     value={hardwareForm.custom_attributes}
                     onChange={(e) => setHardwareForm({ ...hardwareForm, custom_attributes: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                   />
                 </div>
 
-                <div className="mt-6 flex items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div className="mt-6 flex items-center p-4 bg-white/5 rounded-2xl border border-white/10">
                   <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
                     <input
                       type="checkbox"
@@ -1587,14 +1587,14 @@ const AssetManagement = () => {
                       checked={hardwareForm.is_active}
                       onChange={(e) => setHardwareForm({ ...hardwareForm, is_active: e.target.checked })}
                     />
-                    <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hardwareForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
-                    <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${hardwareForm.is_active ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                    <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#070B14] shadow ring-0 transition duration-200 ease-in-out ${hardwareForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                    <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${hardwareForm.is_active ? 'bg-indigo-600' : 'bg-white/5/10 dark:bg-slate-700'}`}></span>
                   </div>
                   <label className="ml-3 block text-sm font-medium text-slate-300">Active Asset</label>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={() => submitHardware('save')}
                   disabled={!hardwareForm.asset_type || !hardwareForm.name}
@@ -1604,7 +1604,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowAddHardwareModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -1617,8 +1617,8 @@ const AssetManagement = () => {
       {showAddTypeModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddTypeModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddTypeModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">{typeForm?.id ? 'Edit Asset Type' : 'Add Asset Type'}</h3>
@@ -1635,7 +1635,7 @@ const AssetManagement = () => {
                       placeholder="e.g. Workstation, Cloud Subscription"
                       value={typeForm.name}
                       onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-semibold"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-semibold"
                     />
                   </div>
 
@@ -1644,11 +1644,11 @@ const AssetManagement = () => {
                     <select
                       value={typeForm.category}
                       onChange={(e) => setTypeForm({ ...typeForm, category: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="Hardware" className="bg-[#1a1c2e]">Hardware</option>
-                      <option value="Software" className="bg-[#1a1c2e]">Software</option>
-                      <option value="Other" className="bg-[#1a1c2e]">Other</option>
+                      <option value="Hardware" className="bg-[#070B14] dark:bg-[#1a1c2e]">Hardware</option>
+                      <option value="Software" className="bg-[#070B14] dark:bg-[#1a1c2e]">Software</option>
+                      <option value="Other" className="bg-[#070B14] dark:bg-[#1a1c2e]">Other</option>
                     </select>
                   </div>
 
@@ -1659,7 +1659,7 @@ const AssetManagement = () => {
                       placeholder="e.g. HW-, SW-"
                       value={typeForm.tag_prefix}
                       onChange={(e) => setTypeForm({ ...typeForm, tag_prefix: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                     />
                   </div>
 
@@ -1670,7 +1670,7 @@ const AssetManagement = () => {
                       placeholder="Briefly describe this asset category"
                       value={typeForm.description}
                       onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
 
@@ -1681,11 +1681,11 @@ const AssetManagement = () => {
                       placeholder="it-support@company.com"
                       value={typeForm.asset_team_email}
                       onChange={(e) => setTypeForm({ ...typeForm, asset_team_email: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
 
-                  <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                  <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10">
                     <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
                       <input
                         type="checkbox"
@@ -1693,15 +1693,15 @@ const AssetManagement = () => {
                         checked={typeForm.is_active}
                         onChange={(e) => setTypeForm({ ...typeForm, is_active: e.target.checked })}
                       />
-                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${typeForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
-                      <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${typeForm.is_active ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#070B14] shadow ring-0 transition duration-200 ease-in-out ${typeForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                      <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${typeForm.is_active ? 'bg-indigo-600' : 'bg-white/5/10 dark:bg-slate-700'}`}></span>
                     </div>
                     <label className="ml-3 block text-sm font-medium text-slate-300">Active Type</label>
                   </div>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={() => submitType('save')}
                   disabled={!typeForm.name}
@@ -1711,7 +1711,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowAddTypeModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -1724,8 +1724,8 @@ const AssetManagement = () => {
       {showAddSoftwareModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddSoftwareModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAddSoftwareModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Add Software Asset</h3>
@@ -1740,13 +1740,13 @@ const AssetManagement = () => {
                     <select
                       value={softwareForm.asset_type}
                       onChange={(e) => setSoftwareForm({ ...softwareForm, asset_type: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="" className="bg-[#1a1c2e]">Select Type</option>
+                      <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Type</option>
                       {(assetTypes || [])
                         .filter(t => (t.category === 'SOFTWARE' || t.category === 'Software'))
                         .map(t => (
-                          <option key={t.id} value={t.name} className="bg-[#1a1c2e]">{t.name}</option>
+                          <option key={t.id} value={t.name} className="bg-[#070B14] dark:bg-[#1a1c2e]">{t.name}</option>
                         ))}
                     </select>
                   </div>
@@ -1758,7 +1758,7 @@ const AssetManagement = () => {
                       placeholder="e.g. Adobe Creative Cloud"
                       value={softwareForm.name}
                       onChange={(e) => setSoftwareForm({ ...softwareForm, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-semibold"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-semibold"
                     />
                   </div>
 
@@ -1770,7 +1770,7 @@ const AssetManagement = () => {
                         placeholder="OPT-SW-001"
                         value={softwareForm.asset_tag}
                         onChange={(e) => setSoftwareForm({ ...softwareForm, asset_tag: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono text-sm"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono text-sm"
                       />
                     </div>
                     <div>
@@ -1780,7 +1780,7 @@ const AssetManagement = () => {
                         placeholder="XXXX-XXXX-XXXX"
                         value={softwareForm.serial_number}
                         onChange={(e) => setSoftwareForm({ ...softwareForm, serial_number: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono text-sm"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono text-sm"
                       />
                     </div>
                   </div>
@@ -1790,11 +1790,11 @@ const AssetManagement = () => {
                     <select
                       value={softwareForm.status}
                       onChange={(e) => setSoftwareForm({ ...softwareForm, status: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="available" className="bg-[#1a1c2e]">Available</option>
-                      <option value="assigned" className="bg-[#1a1c2e]">Assigned</option>
-                      <option value="disabled" className="bg-[#1a1c2e]">Disabled</option>
+                      <option value="available" className="bg-[#070B14] dark:bg-[#1a1c2e]">Available</option>
+                      <option value="assigned" className="bg-[#070B14] dark:bg-[#1a1c2e]">Assigned</option>
+                      <option value="disabled" className="bg-[#070B14] dark:bg-[#1a1c2e]">Disabled</option>
                     </select>
                   </div>
 
@@ -1805,11 +1805,11 @@ const AssetManagement = () => {
                       placeholder="Renewal dates, user limits, etc."
                       value={softwareForm.custom_attributes}
                       onChange={(e) => setSoftwareForm({ ...softwareForm, custom_attributes: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
 
-                  <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                  <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10">
                     <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
                       <input
                         type="checkbox"
@@ -1817,15 +1817,15 @@ const AssetManagement = () => {
                         checked={softwareForm.is_active}
                         onChange={(e) => setSoftwareForm({ ...softwareForm, is_active: e.target.checked })}
                       />
-                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${softwareForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
-                      <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${softwareForm.is_active ? 'bg-indigo-600' : 'bg-slate-700'}`}></span>
+                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#070B14] shadow ring-0 transition duration-200 ease-in-out ${softwareForm.is_active ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                      <span className={`pointer-events-none absolute inset-0 rounded-full transition-colors duration-200 ease-in-out ${softwareForm.is_active ? 'bg-indigo-600' : 'bg-white/5/10 dark:bg-slate-700'}`}></span>
                     </div>
                     <label className="ml-3 block text-sm font-medium text-slate-300">Active License</label>
                   </div>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={() => submitSoftware('save')}
                   disabled={!softwareForm.asset_type || !softwareForm.name}
@@ -1835,7 +1835,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowAddSoftwareModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -1848,8 +1848,8 @@ const AssetManagement = () => {
       {showAssignmentModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAssignmentModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowAssignmentModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Create Assignment</h3>
@@ -1864,10 +1864,10 @@ const AssetManagement = () => {
                     <select
                       value={assignmentForm.employee}
                       onChange={(e) => setAssignmentForm({ ...assignmentForm, employee: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="" className="bg-[#1a1c2e]">Select Employee</option>
-                      {(employees || []).map(emp => (<option key={emp.id} value={emp.id} className="bg-[#1a1c2e]">{emp.name}</option>))}
+                      <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Employee</option>
+                      {(employees || []).map(emp => (<option key={emp.id} value={emp.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">{emp.name}</option>))}
                     </select>
                   </div>
 
@@ -1888,11 +1888,11 @@ const AssetManagement = () => {
                           isSoftware: isSoftware
                         }));
                       }}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="" className="bg-[#1a1c2e]">Select Asset Type</option>
+                      <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Asset Type</option>
                       {(assetTypes.length ? assetTypes : []).map(type => (
-                        <option key={type.id} value={type.id} className="bg-[#1a1c2e]">
+                        <option key={type.id} value={type.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">
                           {type.name} ({type.category})
                         </option>
                       ))}
@@ -1903,7 +1903,7 @@ const AssetManagement = () => {
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Available Asset</label>
                     {assignmentForm.isSoftware ? (
                       <div className="mt-1 space-y-2">
-                        <div className="max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-3 scrollbar-none">
+                        <div className="max-h-48 overflow-y-auto bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-3 scrollbar-none">
                           {!assignmentForm.asset_type ? (
                             <div className="text-sm text-slate-500 italic p-2">Select an asset type first</div>
                           ) : (
@@ -1940,7 +1940,7 @@ const AssetManagement = () => {
                                                 : prev.assets.filter(id => id !== a.id)
                                             }));
                                           }}
-                                          className="h-4 w-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500/50 transition-all"
+                                          className="h-4 w-4 rounded border-black/20 dark:border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500/50 transition-all"
                                         />
                                       </div>
                                       <div className="min-w-0">
@@ -1968,10 +1968,10 @@ const AssetManagement = () => {
                           ...prev,
                           asset: e.target.value ? Number(e.target.value) : null
                         }))}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                         disabled={!assignmentForm.asset_type}
                       >
-                        <option value="" className="bg-[#1a1c2e]">
+                        <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">
                           {!assignmentForm.asset_type
                             ? 'Select an asset type first'
                             : 'Select Asset Instance'}
@@ -1986,7 +1986,7 @@ const AssetManagement = () => {
                           })
                           .filter(asset => !asset.employee_name)
                           .map(a => (
-                            <option key={a.id} value={a.id} className="bg-[#1a1c2e]">
+                            <option key={a.id} value={a.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">
                               {a.asset_type} • {a.serial_number || a.description || a.id}
                             </option>
                           ))}
@@ -2002,7 +2002,7 @@ const AssetManagement = () => {
                         placeholder="reporting@company.com"
                         value={assignmentForm.manager_email}
                         onChange={(e) => setAssignmentForm({ ...assignmentForm, manager_email: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
                   </div>
@@ -2014,13 +2014,13 @@ const AssetManagement = () => {
                       placeholder="Special instructions or delivery notes..."
                       value={assignmentForm.notes}
                       onChange={(e) => setAssignmentForm({ ...assignmentForm, notes: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={() => submitAssignment('save')}
                   disabled={!assignmentForm.employee || (assignmentForm.isSoftware ? !assignmentForm.assets.length : !assignmentForm.asset)}
@@ -2030,7 +2030,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowAssignmentModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -2043,8 +2043,8 @@ const AssetManagement = () => {
       {showReturnModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowReturnModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowReturnModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Return Asset</h3>
@@ -2059,13 +2059,13 @@ const AssetManagement = () => {
                     <select
                       value={returnForm.asset}
                       onChange={(e) => setReturnForm({ ...returnForm, asset: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="" className="bg-[#1a1c2e]">Select Assigned Asset</option>
+                      <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Assigned Asset</option>
                       {(assets || [])
                         .filter(a => !!a.employee_name)
                         .map(a => (
-                          <option key={a.id} value={a.id} className="bg-[#1a1c2e]">
+                          <option key={a.id} value={a.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">
                             {a.asset_type} • {a.serial_number || a.id} (Assigned to {a.employee_name})
                           </option>
                         ))}
@@ -2077,12 +2077,12 @@ const AssetManagement = () => {
                     <select
                       value={returnForm.status}
                       onChange={(e) => setReturnForm({ ...returnForm, status: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="available" className="bg-[#1a1c2e]">Available (Good Condition)</option>
-                      <option value="damaged" className="bg-[#1a1c2e]">Damaged / Need Repair</option>
-                      <option value="lost" className="bg-[#1a1c2e]">Lost / Stolen</option>
-                      <option value="retired" className="bg-[#1a1c2e]">Retired / End of Life</option>
+                      <option value="available" className="bg-[#070B14] dark:bg-[#1a1c2e]">Available (Good Condition)</option>
+                      <option value="damaged" className="bg-[#070B14] dark:bg-[#1a1c2e]">Damaged / Need Repair</option>
+                      <option value="lost" className="bg-[#070B14] dark:bg-[#1a1c2e]">Lost / Stolen</option>
+                      <option value="retired" className="bg-[#070B14] dark:bg-[#1a1c2e]">Retired / End of Life</option>
                     </select>
                   </div>
 
@@ -2093,13 +2093,13 @@ const AssetManagement = () => {
                       placeholder="Condition upon return, missing cables, etc."
                       value={returnForm.remarks}
                       onChange={(e) => setReturnForm({ ...returnForm, remarks: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={() => submitReturn()}
                   disabled={!returnForm.asset}
@@ -2109,7 +2109,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowReturnModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -2124,8 +2124,8 @@ const AssetManagement = () => {
         showStatusModal && (
           <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
             <div className="flex items-center justify-center min-h-screen">
-              <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowStatusModal(false)}></div>
-              <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10">
+              <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowStatusModal(false)}></div>
+              <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/10 dark:border-white/10">
                 <div className="px-8 pt-8 pb-6">
                   <div className="flex justify-between items-center mb-8">
                     <h3 className="text-2xl font-bold text-white tracking-tight">Add Employee Status</h3>
@@ -2139,10 +2139,10 @@ const AssetManagement = () => {
                       <select
                         value={statusForm.employee}
                         onChange={(e) => setStatusForm({ ...statusForm, employee: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="" className="bg-[#1a1c2e]">Select Employee</option>
-                        {(employees || []).map(emp => (<option key={emp.id} value={emp.id} className="bg-[#1a1c2e]">{emp.name}</option>))}
+                        <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Employee</option>
+                        {(employees || []).map(emp => (<option key={emp.id} value={emp.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">{emp.name}</option>))}
                       </select>
                     </div>
                     <div>
@@ -2151,7 +2151,7 @@ const AssetManagement = () => {
                         type="text"
                         value={statusForm.status}
                         onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
                     <div>
@@ -2160,14 +2160,14 @@ const AssetManagement = () => {
                         rows={3}
                         value={statusForm.notes}
                         onChange={(e) => setStatusForm({ ...statusForm, notes: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
                   </div>
                 </div>
-                <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                   <button onClick={submitStatus} disabled={!statusForm.employee || !statusForm.status} className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100">Add</button>
-                  <button onClick={() => setShowStatusModal(false)} className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all">Cancel</button>
+                  <button onClick={() => setShowStatusModal(false)} className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all">Cancel</button>
                 </div>
               </div>
             </div>
@@ -2190,7 +2190,7 @@ const AssetManagement = () => {
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={stat.key} className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 transition-all duration-300 hover:bg-white/10 hover:border-white/20 group">
+                  <div key={stat.key} className="bg-white/5 border border-white/10 dark:border-white/10 backdrop-blur-xl rounded-2xl p-6 transition-all duration-300 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 group">
                     <div className="flex flex-col items-center text-center">
                       <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 mb-3 group-hover:scale-110 transition-transform">
                         <Icon className="h-6 w-6" />
@@ -2217,7 +2217,7 @@ const AssetManagement = () => {
                     placeholder="Search serial, tag, description..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl leading-5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-md"
+                    className="block w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl leading-5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-md"
                   />
                 </div>
               </div>
@@ -2226,19 +2226,19 @@ const AssetManagement = () => {
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-md appearance-none"
+                  className="block w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-md appearance-none"
                 >
-                  <option value="all" className="bg-[#1a1c2e]">All Statuses</option>
-                  <option value="AVAILABLE" className="bg-[#1a1c2e]">Available</option>
-                  <option value="ASSIGNED" className="bg-[#1a1c2e]">Assigned</option>
-                  <option value="DAMAGED" className="bg-[#1a1c2e]">Repair</option>
-                  <option value="DAMAGED" className="bg-[#1a1c2e]">Damaged</option>
-                  <option value="LOST" className="bg-[#1a1c2e]">Lost</option>
+                  <option value="all" className="bg-[#070B14] dark:bg-[#1a1c2e]">All Statuses</option>
+                  <option value="AVAILABLE" className="bg-[#070B14] dark:bg-[#1a1c2e]">Available</option>
+                  <option value="ASSIGNED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Assigned</option>
+                  <option value="DAMAGED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Repair</option>
+                  <option value="DAMAGED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Damaged</option>
+                  <option value="LOST" className="bg-[#070B14] dark:bg-[#1a1c2e]">Lost</option>
                 </select>
               </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 overflow-hidden shadow-2xl">
               {filteredAssets.length === 0 ? (
                 <div className="text-center py-20">
                   <WrenchScrewdriverIcon className="mx-auto h-16 w-16 text-slate-600 mb-4" />
@@ -2271,7 +2271,7 @@ const AssetManagement = () => {
                       {filteredAssets.map((asset) => (
                         <tr
                           key={asset.id}
-                          className="hover:bg-white/5 cursor-pointer transition-colors group/row border-b border-white/5 last:border-0"
+                          className="hover:bg-white/5 cursor-pointer transition-colors group/row border-b border-white/10 last:border-0"
                           onClick={() => openAssetDetails(asset)}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
@@ -2279,7 +2279,7 @@ const AssetManagement = () => {
                               <div className="flex-shrink-0 p-2 bg-indigo-500/10 rounded-xl text-indigo-400 group-hover/row:bg-indigo-500/20 transition-all">
                                 {getAssetIcon(asset.asset_type)}
                               </div>
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getAssetTypeColor(asset.asset_type)} border border-white/10 shadow-sm`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getAssetTypeColor(asset.asset_type)} border border-white/10 dark:border-white/10 shadow-sm`}>
                                 {asset.asset_type.replace('_', ' ')}
                               </span>
                             </div>
@@ -2289,7 +2289,7 @@ const AssetManagement = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             {asset.status && (
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getAssetStatusColor(asset.status)} border border-white/10 shadow-sm`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getAssetStatusColor(asset.status)} border border-white/10 dark:border-white/10 shadow-sm`}>
                                 {String(asset.status).toUpperCase()}
                               </span>
                             )}
@@ -2324,7 +2324,7 @@ const AssetManagement = () => {
                             {(() => {
                               const age = getAssetAgeYears(asset);
                               return age !== null && age !== undefined ? (
-                                <span className={`px-2 py-0.5 rounded-lg border border-white/10 bg-white/5 text-xs font-bold ${age > 3 ? 'text-orange-400' : 'text-emerald-400'}`}>
+                                <span className={`px-2 py-0.5 rounded-lg border border-white/10 dark:border-white/10 bg-white/5 text-xs font-bold ${age > 3 ? 'text-orange-400' : 'text-emerald-400'}`}>
                                   {age}y
                                 </span>
                               ) : '-';
@@ -2351,7 +2351,7 @@ const AssetManagement = () => {
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleReportRepair(asset); }}
-                                  className="p-2 text-orange-400 hover:bg-orange-500/20 rounded-xl transition-all"
+                                  className="p-2 text-orange-400 hover:bg-orange-500/100/20 rounded-xl transition-all"
                                   title="Report Repair"
                                 >
                                   <WrenchScrewdriverIcon className="h-4 w-4" />
@@ -2391,16 +2391,16 @@ const AssetManagement = () => {
                     placeholder="Search disposed assets..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-xl"
+                    className="block w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all backdrop-blur-xl"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
+            <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 dark:border-white/10 overflow-hidden shadow-2xl">
               {filteredAssets.length === 0 ? (
                 <div className="text-center py-24">
-                  <div className="h-20 w-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-white/10">
+                  <div className="h-20 w-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-white/10 dark:border-white/10">
                     <TrashIcon className="h-10 w-10 text-slate-600" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">No disposed assets</h3>
@@ -2474,19 +2474,19 @@ const AssetManagement = () => {
         showDetailsModal && detailsAsset && (
           <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
             <div className="flex items-center justify-center min-h-screen">
-              <div className="fixed inset-0 transition-opacity bg-[#070B14]/90 backdrop-blur-md" onClick={() => setShowDetailsModal(false)}></div>
-              <div className="relative inline-block align-bottom bg-[#0B1120] rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-white/10">
+              <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/90 backdrop-blur-md" onClick={() => setShowDetailsModal(false)}></div>
+              <div className="relative inline-block align-bottom bg-[#0B1120] rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-white/10 dark:border-white/10">
                 {/* Header Gradient */}
                 <div className="h-32 bg-gradient-to-br from-indigo-600/20 via-violet-600/20 to-transparent relative overflow-hidden">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent)]"></div>
                   <div className="absolute top-8 right-8">
-                    <button onClick={() => setShowDetailsModal(false)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-slate-400 hover:text-white transition-all backdrop-blur-xl border border-white/10">
+                    <button onClick={() => setShowDetailsModal(false)} className="p-3 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 rounded-2xl text-slate-400 hover:text-white transition-all backdrop-blur-xl border border-white/10 dark:border-white/10">
                       <XMarkIcon className="h-6 w-6" />
                     </button>
                   </div>
                   <div className="absolute bottom-6 left-10">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+                      <div className="p-3 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10">
                         {getAssetIcon(detailsAsset.asset_type, 'h-8 w-8 text-indigo-400')}
                       </div>
                       <div>
@@ -2506,7 +2506,7 @@ const AssetManagement = () => {
                         <div className="space-y-5">
                           <div className="flex justify-between items-center group">
                             <span className="text-slate-400 text-sm">Serial Number</span>
-                            <span className="text-white font-mono text-sm bg-white/5 px-2 py-0.5 rounded border border-white/5">{detailsAsset.serial_number || 'N/A'}</span>
+                            <span className="text-white font-mono text-sm bg-white/5 px-2 py-0.5 rounded border border-white/10">{detailsAsset.serial_number || 'N/A'}</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-slate-400 text-sm">Model/Description</span>
@@ -2514,7 +2514,7 @@ const AssetManagement = () => {
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-slate-400 text-sm">Category</span>
-                            <span className="px-2.5 py-1 bg-white/5 rounded-lg text-xs font-bold text-indigo-300 border border-white/10">{detailsAsset.category}</span>
+                            <span className="px-2.5 py-1 bg-white/5 rounded-lg text-xs font-bold text-indigo-300 border border-white/10 dark:border-white/10">{detailsAsset.category}</span>
                           </div>
                         </div>
                       </div>
@@ -2522,11 +2522,11 @@ const AssetManagement = () => {
                       <div>
                         <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Lifecycle Status</h4>
                         <div className="space-y-3">
-                          <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
+                          <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className={`w-2.5 h-2.5 rounded-full ${detailsAsset.status === 'AVAILABLE' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
                                 detailsAsset.status === 'ASSIGNED' ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' :
-                                  'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                                  'bg-amber-500/100 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
                                 }`}></div>
                               <span className="text-slate-200 font-bold uppercase text-xs tracking-widest">{detailsAsset.status}</span>
                             </div>
@@ -2544,7 +2544,7 @@ const AssetManagement = () => {
                     <div className="space-y-8">
                       <div>
                         <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Current Custody</h4>
-                        <div className="p-6 bg-white/5 rounded-[2rem] border border-white/10 relative group overflow-hidden">
+                        <div className="p-6 bg-white/5 rounded-[2rem] border border-white/10 dark:border-white/10 relative group overflow-hidden">
                           <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
                           {detailsAsset.employee_name ? (
                             <div className="relative">
@@ -2557,7 +2557,7 @@ const AssetManagement = () => {
                                   <p className="text-indigo-400 text-xs font-medium">Assigned Personnel</p>
                                 </div>
                               </div>
-                              <div className="space-y-2 pt-4 border-t border-white/5">
+                              <div className="space-y-2 pt-4 border-t border-white/10">
                                 <div className="flex justify-between text-xs">
                                   <span className="text-slate-500 font-medium tracking-wide">ASSIGNED ON</span>
                                   <span className="text-slate-300 font-mono italic">{formatDateTime(detailsAsset.assigned_date)}</span>
@@ -2566,7 +2566,7 @@ const AssetManagement = () => {
                             </div>
                           ) : (
                             <div className="flex flex-col items-center justify-center py-4 text-center">
-                              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mb-3">
+                              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-3">
                                 <UserIcon className="h-8 w-8 text-slate-600" />
                               </div>
                               <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Unassigned</p>
@@ -2579,7 +2579,7 @@ const AssetManagement = () => {
                       {detailsAsset.custom_attributes && (
                         <div>
                           <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Notes & Metadata</h4>
-                          <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-slate-300 text-sm leading-relaxed italic">
+                          <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-slate-300 text-sm leading-relaxed italic">
                             "{detailsAsset.custom_attributes}"
                           </div>
                         </div>
@@ -2587,7 +2587,7 @@ const AssetManagement = () => {
                     </div>
                   </div>
 
-                  <div className="mt-12 pt-8 border-t border-white/5 flex justify-between items-center">
+                  <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
                     <div className="text-[10px] text-slate-600 font-mono flex flex-col gap-1">
                       <span>CREATED: {formatDateTime(detailsAsset.created_at)}</span>
                       <span>LAST UPDATED: {formatDateTime(detailsAsset.updated_at)}</span>
@@ -2598,7 +2598,7 @@ const AssetManagement = () => {
                           setShowDetailsModal(false);
                           openEditModal(detailsAsset);
                         }}
-                        className="px-6 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold border border-white/10 transition-all flex items-center gap-2"
+                        className="px-6 py-2.5 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 rounded-xl text-white font-bold border border-white/10 dark:border-white/10 transition-all flex items-center gap-2"
                       >
                         <PencilIcon className="h-4 w-4 text-indigo-400" />
                         Edit Details
@@ -2622,8 +2622,8 @@ const AssetManagement = () => {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Add New Asset</h3>
@@ -2637,11 +2637,11 @@ const AssetManagement = () => {
                     <select
                       value={newAsset.employee}
                       onChange={(e) => setNewAsset({ ...newAsset, employee: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="" className="bg-[#1a1c2e]">Select Employee</option>
+                      <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Employee</option>
                       {(employees || []).map((employee) => (
-                        <option key={employee.id} value={employee.id} className="bg-[#1a1c2e]">
+                        <option key={employee.id} value={employee.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">
                           {employee.name}
                         </option>
                       ))}
@@ -2652,13 +2652,13 @@ const AssetManagement = () => {
                     <select
                       value={newAsset.asset_type}
                       onChange={(e) => setNewAsset({ ...newAsset, asset_type: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="laptop" className="bg-[#1a1c2e]">Laptop</option>
-                      <option value="phone" className="bg-[#1a1c2e]">Phone</option>
-                      <option value="id_card" className="bg-[#1a1c2e]">ID Card</option>
-                      <option value="access_card" className="bg-[#1a1c2e]">Access Card</option>
-                      <option value="other" className="bg-[#1a1c2e]">Other</option>
+                      <option value="laptop" className="bg-[#070B14] dark:bg-[#1a1c2e]">Laptop</option>
+                      <option value="phone" className="bg-[#070B14] dark:bg-[#1a1c2e]">Phone</option>
+                      <option value="id_card" className="bg-[#070B14] dark:bg-[#1a1c2e]">ID Card</option>
+                      <option value="access_card" className="bg-[#070B14] dark:bg-[#1a1c2e]">Access Card</option>
+                      <option value="other" className="bg-[#070B14] dark:bg-[#1a1c2e]">Other</option>
                     </select>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -2669,7 +2669,7 @@ const AssetManagement = () => {
                         value={newAsset.serial_number}
                         placeholder="S/N: XXXXX"
                         onChange={(e) => setNewAsset({ ...newAsset, serial_number: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                     <div>
@@ -2678,7 +2678,7 @@ const AssetManagement = () => {
                         type="date"
                         value={newAsset.issued_date}
                         onChange={(e) => setNewAsset({ ...newAsset, issued_date: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
                       />
                     </div>
                   </div>
@@ -2689,12 +2689,12 @@ const AssetManagement = () => {
                       onChange={(e) => setNewAsset({ ...newAsset, description: e.target.value })}
                       rows={3}
                       placeholder="Notes or technical details..."
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
                 </div>
               </div>
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={createAsset}
                   disabled={!newAsset.employee || !newAsset.asset_type}
@@ -2704,7 +2704,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -2718,8 +2718,8 @@ const AssetManagement = () => {
       {showEditModal && selectedAsset && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowEditModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowEditModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Edit Asset</h3>
@@ -2733,11 +2733,11 @@ const AssetManagement = () => {
                     <select
                       value={selectedAsset.employee}
                       onChange={(e) => setSelectedAsset({ ...selectedAsset, employee: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="" className="bg-[#1a1c2e]">Select Employee</option>
+                      <option value="" className="bg-[#070B14] dark:bg-[#1a1c2e]">Select Employee</option>
                       {(employees || []).map((employee) => (
-                        <option key={employee.id} value={employee.id} className="bg-[#1a1c2e]">
+                        <option key={employee.id} value={employee.id} className="bg-[#070B14] dark:bg-[#1a1c2e]">
                           {employee.name}
                         </option>
                       ))}
@@ -2748,13 +2748,13 @@ const AssetManagement = () => {
                     <select
                       value={selectedAsset.asset_type}
                       onChange={(e) => setSelectedAsset({ ...selectedAsset, asset_type: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                     >
-                      <option value="laptop" className="bg-[#1a1c2e]">Laptop</option>
-                      <option value="phone" className="bg-[#1a1c2e]">Phone</option>
-                      <option value="id_card" className="bg-[#1a1c2e]">ID Card</option>
-                      <option value="access_card" className="bg-[#1a1c2e]">Access Card</option>
-                      <option value="other" className="bg-[#1a1c2e]">Other</option>
+                      <option value="laptop" className="bg-[#070B14] dark:bg-[#1a1c2e]">Laptop</option>
+                      <option value="phone" className="bg-[#070B14] dark:bg-[#1a1c2e]">Phone</option>
+                      <option value="id_card" className="bg-[#070B14] dark:bg-[#1a1c2e]">ID Card</option>
+                      <option value="access_card" className="bg-[#070B14] dark:bg-[#1a1c2e]">Access Card</option>
+                      <option value="other" className="bg-[#070B14] dark:bg-[#1a1c2e]">Other</option>
                     </select>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -2764,7 +2764,7 @@ const AssetManagement = () => {
                         type="text"
                         value={selectedAsset.serial_number || ''}
                         onChange={(e) => setSelectedAsset({ ...selectedAsset, serial_number: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                     <div>
@@ -2772,12 +2772,12 @@ const AssetManagement = () => {
                       <select
                         value={selectedAsset.status || 'AVAILABLE'}
                         onChange={(e) => setSelectedAsset({ ...selectedAsset, status: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="AVAILABLE" className="bg-[#1a1c2e]">Available</option>
-                        <option value="ASSIGNED" className="bg-[#1a1c2e]">Assigned</option>
-                        <option value="DAMAGED" className="bg-[#1a1c2e]">Repair / Damaged</option>
-                        <option value="LOST" className="bg-[#1a1c2e]">Lost</option>
+                        <option value="AVAILABLE" className="bg-[#070B14] dark:bg-[#1a1c2e]">Available</option>
+                        <option value="ASSIGNED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Assigned</option>
+                        <option value="DAMAGED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Repair / Damaged</option>
+                        <option value="LOST" className="bg-[#070B14] dark:bg-[#1a1c2e]">Lost</option>
                       </select>
                     </div>
                   </div>
@@ -2787,7 +2787,7 @@ const AssetManagement = () => {
                       type="date"
                       value={selectedAsset.purchased_date || ''}
                       onChange={(e) => setSelectedAsset({ ...selectedAsset, purchased_date: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
                     />
                   </div>
                   <div>
@@ -2796,12 +2796,12 @@ const AssetManagement = () => {
                       value={selectedAsset.description || ''}
                       onChange={(e) => setSelectedAsset({ ...selectedAsset, description: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
                 </div>
               </div>
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={updateAsset}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-bold hover:scale-[1.02] transition-all"
@@ -2810,7 +2810,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 transition-all"
                 >
                   Cancel
                 </button>
@@ -2823,8 +2823,8 @@ const AssetManagement = () => {
       {showRepairModal && repairForm.asset && (
         <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0">
           <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 transition-opacity bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowRepairModal(false)}></div>
-            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+            <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-[#070B14]/80 backdrop-blur-sm" onClick={() => setShowRepairModal(false)}></div>
+            <div className="relative inline-block align-bottom bg-[#0B1120] rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10 dark:border-white/10">
               <div className="px-8 pt-8 pb-6">
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-bold text-white tracking-tight">{repairForm.id ? 'Edit Asset Repair' : 'Report Asset Repair'}</h3>
@@ -2836,7 +2836,7 @@ const AssetManagement = () => {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset</label>
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm">
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-sm">
                       <div className="text-indigo-400 font-mono font-bold mb-1">{repairForm.asset.asset_tag}</div>
                       <div className="text-slate-300">{repairForm.asset.description || repairForm.asset.name}</div>
                     </div>
@@ -2849,7 +2849,7 @@ const AssetManagement = () => {
                       value={repairForm.issue_description}
                       onChange={(e) => setRepairForm({ ...repairForm, issue_description: e.target.value })}
                       placeholder="Describe the issue with the asset..."
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-medium"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-medium"
                     />
                   </div>
 
@@ -2859,15 +2859,15 @@ const AssetManagement = () => {
                       <select
                         value={repairForm.status}
                         onChange={(e) => setRepairForm({ ...repairForm, status: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all appearance-none"
                       >
-                        <option value="PENDING" className="bg-[#1a1c2e]">Pending</option>
-                        <option value="PICKED_UP" className="bg-[#1a1c2e]">Picked Up</option>
-                        <option value="AT_VENDOR" className="bg-[#1a1c2e]">At Vendor</option>
-                        <option value="IN_PROGRESS" className="bg-[#1a1c2e]">In Progress</option>
-                        <option value="COMPLETED" className="bg-[#1a1c2e]">Completed</option>
-                        <option value="FAILED" className="bg-[#1a1c2e]">Failed</option>
-                        <option value="CANCELLED" className="bg-[#1a1c2e]">Cancelled</option>
+                        <option value="PENDING" className="bg-[#070B14] dark:bg-[#1a1c2e]">Pending</option>
+                        <option value="PICKED_UP" className="bg-[#070B14] dark:bg-[#1a1c2e]">Picked Up</option>
+                        <option value="AT_VENDOR" className="bg-[#070B14] dark:bg-[#1a1c2e]">At Vendor</option>
+                        <option value="IN_PROGRESS" className="bg-[#070B14] dark:bg-[#1a1c2e]">In Progress</option>
+                        <option value="COMPLETED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Completed</option>
+                        <option value="FAILED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Failed</option>
+                        <option value="CANCELLED" className="bg-[#070B14] dark:bg-[#1a1c2e]">Cancelled</option>
                       </select>
                     </div>
 
@@ -2877,7 +2877,7 @@ const AssetManagement = () => {
                         type="date"
                         value={repairForm.estimated_completion}
                         onChange={(e) => setRepairForm({ ...repairForm, estimated_completion: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all [color-scheme:dark]"
                       />
                     </div>
                   </div>
@@ -2890,7 +2890,7 @@ const AssetManagement = () => {
                         value={repairForm.repair_vendor}
                         onChange={(e) => setRepairForm({ ...repairForm, repair_vendor: e.target.value })}
                         placeholder="Repair shop name"
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                       />
                     </div>
 
@@ -2901,7 +2901,7 @@ const AssetManagement = () => {
                         value={repairForm.repair_cost}
                         onChange={(e) => setRepairForm({ ...repairForm, repair_cost: e.target.value })}
                         placeholder="0.00"
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all font-mono"
                       />
                     </div>
                   </div>
@@ -2913,13 +2913,13 @@ const AssetManagement = () => {
                       value={repairForm.repair_notes}
                       onChange={(e) => setRepairForm({ ...repairForm, repair_notes: e.target.value })}
                       placeholder="Additional notes for IT/Finance..."
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+              <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row-reverse gap-3">
                 <button
                   onClick={handleRepairSubmit}
                   disabled={!repairForm.issue_description}
@@ -2929,7 +2929,7 @@ const AssetManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowRepairModal(false)}
-                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+                  className="flex-1 px-6 py-3 bg-white/5 text-slate-300 hover:text-white rounded-xl font-bold border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all"
                 >
                   Cancel
                 </button>

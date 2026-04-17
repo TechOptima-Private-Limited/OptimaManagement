@@ -57,13 +57,13 @@ const Layout = ({ children }) => {
           <footer className="bg-slate-900/80 backdrop-blur-md border-t border-white/5 mt-auto relative z-10">
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 md:px-8">
               <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-                <div className="flex items-center space-x-6 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                <div className="flex items-center space-x-3 sm:space-x-6 text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                   <span>© 2024 OptimaManagement</span>
-                  <span className="text-slate-700">•</span>
+                  <span className="text-slate-200">•</span>
                   <a href="/privacy" className="hover:text-indigo-400 transition-colors">
                     Privacy
                   </a>
-                  <span className="text-slate-700">•</span>
+                  <span className="text-slate-200">•</span>
                   <a href="/terms" className="hover:text-indigo-400 transition-colors">
                     Terms
                   </a>

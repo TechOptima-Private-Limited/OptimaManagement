@@ -5,9 +5,6 @@ from django.http import JsonResponse
 from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework_simplejwt.exceptions import TokenError
 
-from authentication.models import UserTokenState
-
-
 class SecurityHeadersMiddleware:
     """
     Adds security-related HTTP headers safely.
@@ -108,19 +105,5 @@ class JWTRequestValidationMiddleware:
         for claim in required_claims:
             if claim not in payload:
                 return False, f"Missing required claim: {claim}."
-
-        user_id = payload.get("user_id")
-        token_jti = payload.get("jti")
-
-        state = (
-            UserTokenState.objects
-            .filter(user_id=user_id)
-            .only("current_jti")
-            .first()
-        )
-
-        # Check if token is still valid
-        if not state or state.current_jti != token_jti:
-            return False, "Token is no longer valid."
 
         return True, ""

@@ -2,7 +2,7 @@ from rest_framework import exceptions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
 
-from authentication.models import User, UserTokenState
+from authentication.models import User
 
 
 class SecureJWTAuthentication(JWTAuthentication):
@@ -31,14 +31,14 @@ class SecureJWTAuthentication(JWTAuthentication):
             raise exceptions.AuthenticationFailed("Invalid token claims.", code="invalid_token")
 
         try:
-            user = User.objects.select_related("profile").get(id=user_id)
+            user = User.objects.select_related("profile", "token_state").get(id=user_id)
         except User.DoesNotExist as exc:
             raise exceptions.AuthenticationFailed("User not found.", code="user_not_found") from exc
 
         if not user.is_active:
             raise exceptions.AuthenticationFailed("User is inactive.", code="user_inactive")
 
-        token_state = UserTokenState.objects.filter(user=user).first()
+        token_state = getattr(user, "token_state", None)
         if not token_state or token_state.current_jti != token_jti:
             raise exceptions.AuthenticationFailed("Token is no longer valid.", code="token_revoked")
 

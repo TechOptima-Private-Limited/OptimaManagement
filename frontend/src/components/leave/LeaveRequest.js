@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -15,7 +15,7 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { leaveAPI } from '../../services/api';
-import { isHRManager } from '../../utils/auth';
+import { isHRManager, getCurrentUser } from '../../utils/auth';
 import { formatDate } from '../../utils/formatters';
 import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -50,12 +50,6 @@ const LeaveRequest = () => {
     end_date: ''
   });
 
-  useEffect(() => {
-    const employeeParam = employeeFromUrlRef.current;
-    if (!employeeParam) return;
-    setFilters((prev) => ({ ...prev, employee_id: employeeParam }));
-  }, [location.search]);
-
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
 
   const startDate = watch('start_date');
@@ -63,40 +57,38 @@ const LeaveRequest = () => {
   const leaveDuration = watch('leave_duration', 'FULL_DAY');
   const selectedLeaveType = watch('leave_type');
 
-  useEffect(() => {
-    fetchLeaveRequests();
-    fetchLeaveTypes();
-    if (!isHRManager()) {
-      fetchLeaveBalances();
-    }
-  }, []);
-
-  const fetchLeaveBalances = async () => {
+  const fetchLeaveBalances = useCallback(async () => {
     try {
-      const response = await leaveAPI.initializeMyBalances({ year: new Date().getFullYear() });
+      const user = getCurrentUser();
+      const currentEmployeeId = user?.employee_id || user?.employee_pk || user?.id;
+      const params = { year: new Date().getFullYear() };
+
+      if (isHRManager() && currentEmployeeId) {
+        params.employee_id = currentEmployeeId;
+      }
+
+      const response = await leaveAPI.initializeMyBalances(params);
       setLeaveBalances(response.data.balances);
     } catch (error) {
       console.error('Error initializing balances, trying regular fetch:', error);
       try {
-        const response = await leaveAPI.getLeaveBalances({ year: new Date().getFullYear() });
+        const user = getCurrentUser();
+        const currentEmployeeId = user?.employee_id || user?.employee_pk || user?.id;
+        const params = { year: new Date().getFullYear() };
+
+        if (isHRManager() && currentEmployeeId) {
+          params.employee_id = currentEmployeeId;
+        }
+
+        const response = await leaveAPI.getLeaveBalances(params);
         setLeaveBalances(response.data.results || response.data);
       } catch (fetchError) {
         console.error('Error fetching leave balances:', fetchError);
       }
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    fetchLeaveRequests();
-  }, [filters]);
-
-  useEffect(() => {
-    if (startDate && endDate && leaveDuration) {
-      calculateDays();
-    }
-  }, [startDate, endDate, leaveDuration]);
-
-  const fetchLeaveRequests = async () => {
+  const fetchLeaveRequests = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -106,7 +98,15 @@ const LeaveRequest = () => {
       if (filters.end_date) params.end_date = filters.end_date;
 
       const effectiveEmployeeId = filters.employee_id || employeeFromUrlRef.current;
-      if (effectiveEmployeeId) params.employee_id = effectiveEmployeeId;
+      if (effectiveEmployeeId) {
+        params.employee_id = effectiveEmployeeId;
+      } else if (isHRManager()) {
+        const user = getCurrentUser();
+        const currentEmployeeId = user?.employee_id || user?.employee_pk || user?.id;
+        if (currentEmployeeId) {
+          params.employee_id = currentEmployeeId;
+        }
+      }
 
       const response = await leaveAPI.getLeaveRequests(params);
       setLeaveRequests(response.data.results || response.data);
@@ -116,19 +116,30 @@ const LeaveRequest = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  const fetchLeaveTypes = async () => {
+  const fetchLeaveTypes = useCallback(async () => {
     try {
       const response = await leaveAPI.getLeaveTypes();
       setLeaveTypes(response.data.results || response.data);
     } catch (error) {
-      toast.error('Failed to fetch leave types');
-      console.error('Error fetching leave types:', error);
+      console.error('Failed to fetch leave types:', error);
     }
-  };
+  }, []);
 
-  const calculateDays = () => {
+  useEffect(() => {
+    const employeeParam = employeeFromUrlRef.current;
+    if (!employeeParam) return;
+    setFilters((prev) => ({ ...prev, employee_id: employeeParam }));
+  }, [location.search]);
+
+  useEffect(() => {
+    fetchLeaveRequests();
+    fetchLeaveTypes();
+    fetchLeaveBalances();
+  }, [fetchLeaveRequests, fetchLeaveTypes, fetchLeaveBalances]);
+
+  const calculateDays = useCallback(() => {
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -141,7 +152,13 @@ const LeaveRequest = () => {
 
       setValue('days_requested', days > 0 ? days : 0);
     }
-  };
+  }, [startDate, endDate, leaveDuration, setValue]);
+
+  useEffect(() => {
+    if (startDate && endDate && leaveDuration) {
+      calculateDays();
+    }
+  }, [startDate, endDate, leaveDuration, calculateDays]);
 
   const getAvailableBalance = (leaveTypeId) => {
     const id = parseInt(leaveTypeId);
@@ -176,9 +193,6 @@ const LeaveRequest = () => {
     const num = Number(value ?? 0);
     const isInteger = Number.isFinite(num) && Math.abs(num - Math.round(num)) < 1e-9;
 
-    // Match the UI style you shared:
-    // - decimals like `0.83 day`
-    // - integers like `2 days`, but also show `0 day`
     let dayWord = 'days';
     if (!Number.isFinite(num)) {
       dayWord = 'days';
@@ -244,7 +258,7 @@ const LeaveRequest = () => {
     const daysRequested = parseFloat(data.days_requested);
     const leaveTypeId = data.leave_type;
 
-    if (!isHRManager() && !validateLeaveBalance(leaveTypeId, daysRequested)) {
+    if (!validateLeaveBalance(leaveTypeId, daysRequested)) {
       const availableBalance = getAvailableBalance(leaveTypeId);
       toast.error("Insufficient leave balance. Available: " + availableBalance + " days, Requested: " + daysRequested + " days");
       return;
@@ -270,9 +284,8 @@ const LeaveRequest = () => {
       setShowRequestModal(false);
       fetchLeaveRequests();
 
-      if (!isHRManager()) {
-        fetchLeaveBalances();
-      }
+      fetchLeaveRequests();
+      fetchLeaveBalances();
     } catch (error) {
       if (error.response?.data) {
         const errorData = error.response.data;
@@ -305,9 +318,8 @@ const LeaveRequest = () => {
         toast.success('Leave request cancelled successfully!');
         fetchLeaveRequests();
 
-        if (!isHRManager()) {
-          fetchLeaveBalances();
-        }
+        fetchLeaveRequests();
+        fetchLeaveBalances();
       } catch (error) {
         const errorMessage = error.response?.data?.error || 'Failed to cancel leave request';
         toast.error(errorMessage);
@@ -327,7 +339,7 @@ const LeaveRequest = () => {
         toast.success('Leave request deleted successfully!');
         fetchLeaveRequests();
 
-        if (status === 'APPROVED' && !isHRManager()) {
+        if (status === 'APPROVED') {
           fetchLeaveBalances();
         }
       } catch (error) {
@@ -355,7 +367,7 @@ const LeaveRequest = () => {
     const daysRequested = watch('days_requested');
     const leaveTypeId = selectedLeaveType;
 
-    if (!leaveTypeId || !daysRequested || isHRManager()) {
+    if (!leaveTypeId || !daysRequested) {
       return null;
     }
 
@@ -420,23 +432,21 @@ const LeaveRequest = () => {
         <div>
           <h3 className="text-2xl font-black text-white tracking-tight">Leave Requests</h3>
           <p className="mt-1 font-medium text-slate-400">
-            {isHRManager() ? 'Manage all leave requests' : 'View and manage your leave requests'}
+            View and manage your leave requests
           </p>
         </div>
-        {!isHRManager() && (
-          <button
-            onClick={() => setShowRequestModal(true)}
-            className="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-[0_0_15px_rgba(79,70,229,0.4)] border border-indigo-400/50 transition-all transform hover:scale-105"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            Request Leave
-          </button>
-        )}
+        <button
+          onClick={() => setShowRequestModal(true)}
+          className="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-[0_0_15px_rgba(79,70,229,0.4)] border border-indigo-400/50 transition-all transform hover:scale-105"
+        >
+          <PlusIcon className="h-5 w-5 mr-2" />
+          Request Leave
+        </button>
       </div>
 
       {/* Enhanced Balance Overview */}
-      {!isHRManager() && leaveBalances.length > 0 && (
-        <div className="bg-[#0A0F1A] border border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl">
+      {leaveBalances.length > 0 && (
+        <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
           <div className="flex items-center mb-6 relative z-10">
             <div className="p-3 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl shadow-lg">
@@ -465,7 +475,7 @@ const LeaveRequest = () => {
               return (
                 <div
                   key={balance.leave_type?.code ?? idx}
-                  className={`bg-white/5 p-4 rounded-[2rem] border border-white/10 shadow-lg hover:shadow-indigo-500/10 transition-all hover:-translate-y-1 ${accent.glow}`}
+                  className={`bg-white/5 p-4 rounded-[2rem] border border-white/10 dark:border-white/10 shadow-lg hover:shadow-indigo-500/10 transition-all hover:-translate-y-1 ${accent.glow}`}
                 >
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="min-w-0">
@@ -517,7 +527,7 @@ const LeaveRequest = () => {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-2 gap-y-4 gap-x-3 pt-5 border-t border-white/10">
+                  <div className="mt-5 grid grid-cols-2 gap-y-4 gap-x-3 pt-5 border-t border-white/10 dark:border-white/10">
                     <div>
                       <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{isUnpaid ? 'TYPE' : 'AVAILABLE'}</div>
                       <div className="text-sm font-black text-white mt-1">{isUnpaid ? 'Unpaid (LOP)' : dayLabel(remaining)}</div>
@@ -545,8 +555,8 @@ const LeaveRequest = () => {
       {showBalanceDetails && (
         <div className="fixed inset-0 z-[60] bg-[#0A0F1A]/80 backdrop-blur-md">
           <div className="h-full overflow-auto px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-[#0A0F1A] border border-white/10 rounded-[2.25rem] shadow-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+            <div className="max-w-6xl mx-auto bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-[2.25rem] shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 dark:border-white/10">
                 <div className="flex items-center space-x-3">
                   <SparklesIcon className="h-7 w-7 text-indigo-300" />
                   <div>
@@ -566,7 +576,7 @@ const LeaveRequest = () => {
                     setBalanceDetailsData(null);
                     setBalanceDetailsLeaveTypeId(null);
                   }}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white/5 border border-white/10 dark:border-white/10 text-white hover:bg-black/10 dark:bg-white/5/10 transition-all"
                   aria-label="Close"
                   title="Close"
                 >
@@ -576,7 +586,7 @@ const LeaveRequest = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] h-full">
                 {/* Left nav */}
-                <div className="border-b md:border-b-0 md:border-r border-white/10 bg-white/5">
+                <div className="border-b md:border-b-0 md:border-r border-white/10 dark:border-white/10 bg-white/5">
                   <div className="p-4">
                     {leaveBalances.map((b) => {
                       const isActive = String(b?.leave_type?.id ?? '') === String(balanceDetailsLeaveTypeId ?? '');
@@ -586,8 +596,8 @@ const LeaveRequest = () => {
                           type="button"
                           onClick={() => openBalanceDetails(b)}
                           className={`w-full text-left px-4 py-3 rounded-2xl border transition-all mb-2 ${isActive
-                            ? 'bg-white/10 border-white/20 text-white'
-                            : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:border-white/10'
+                            ? 'bg-black/10 dark:bg-white/5/10 border-black/20 dark:border-white/20 text-white'
+                            : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:border-white/10 dark:border-white/10'
                             }`}
                         >
                           <div className="text-sm font-black truncate">{b.leave_type?.name ?? b.leave_type_name}</div>
@@ -610,7 +620,7 @@ const LeaveRequest = () => {
                       onClick={() => setBalanceDetailsTab('history')}
                       className={`px-4 py-2 rounded-xl font-bold border transition-all ${balanceDetailsTab === 'history'
                         ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        : 'bg-white/5 border-white/10 dark:border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10'
                         }`}
                     >
                       Balance history
@@ -620,7 +630,7 @@ const LeaveRequest = () => {
                       onClick={() => setBalanceDetailsTab('policy')}
                       className={`px-4 py-2 rounded-xl font-bold border transition-all ${balanceDetailsTab === 'policy'
                         ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        : 'bg-white/5 border-white/10 dark:border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10'
                         }`}
                     >
                       Policy
@@ -630,8 +640,8 @@ const LeaveRequest = () => {
                   {balanceDetailsLoading ? (
                     <div className="py-16 text-center text-slate-400 font-bold">Loading…</div>
                   ) : balanceDetailsTab === 'history' ? (
-                    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-                      <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                    <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl overflow-hidden">
+                      <div className="px-5 py-4 border-b border-white/10 dark:border-white/10 flex items-center justify-between">
                         <div className="text-white font-black">Transactions</div>
                         <div className="text-slate-400 text-sm font-bold">Year {balanceDetailsData?.year ?? ''}</div>
                       </div>
@@ -684,16 +694,16 @@ const LeaveRequest = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                    <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-2xl p-5">
                       <div className="text-white font-black mb-3">Leave policy</div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                           <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Annual quota</div>
                           <div className="text-lg font-black text-white mt-2">
                             {formatDays(balanceDetailsData?.policy?.annual_quota_days ?? 0)} days
                           </div>
                         </div>
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                           <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Carry forward</div>
                           <div className="text-lg font-black text-white mt-2">
                             {(balanceDetailsData?.policy?.carry_forward_enabled ? 'Enabled' : 'No')}
@@ -713,14 +723,14 @@ const LeaveRequest = () => {
       )}
 
       {/* Enhanced Filters */}
-      <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 shadow-2xl">
+      <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 dark:border-white/10 shadow-2xl">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Status</label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Status</option>
               <option value="PENDING">Pending</option>
@@ -735,7 +745,7 @@ const LeaveRequest = () => {
             <select
               value={filters.leave_type}
               onChange={(e) => handleFilterChange('leave_type', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
             >
               <option value="">All Types</option>
               {leaveTypes.map((type) => (
@@ -750,7 +760,7 @@ const LeaveRequest = () => {
               type="date"
               value={filters.start_date}
               onChange={(e) => handleFilterChange('start_date', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
             />
           </div>
 
@@ -760,14 +770,14 @@ const LeaveRequest = () => {
               type="date"
               value={filters.end_date}
               onChange={(e) => handleFilterChange('end_date', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
+              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
             />
           </div>
 
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="w-full px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl shadow-lg border border-white/10 transition-all transform hover:scale-105"
+              className="w-full px-4 py-3 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:scale-105"
             >
               Clear Filters
             </button>
@@ -776,7 +786,7 @@ const LeaveRequest = () => {
       </div>
 
       {/* Enhanced Requests List */}
-      <div className="bg-white/5 backdrop-blur-xl shadow-2xl rounded-[2rem] border border-white/10 overflow-hidden">
+      <div className="bg-white/5 backdrop-blur-xl shadow-2xl rounded-[2rem] border border-white/10 dark:border-white/10 overflow-hidden">
         <ul className="divide-y divide-white/5">
           {leaveRequests.length === 0 ? (
             <li className="p-16 text-center relative overflow-hidden">
@@ -903,7 +913,7 @@ const LeaveRequest = () => {
               </label>
               <select
                 {...register('leave_type', { required: 'Leave type is required' })}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
               >
                 <option value="">Select Leave Type</option>
                 {leaveTypes.map((type) => {
@@ -929,7 +939,7 @@ const LeaveRequest = () => {
               </label>
               <select
                 {...register('leave_duration')}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
               >
                 <option value="FULL_DAY">Full Day</option>
                 <option value="HALF_DAY_MORNING">Half Day - Morning</option>
@@ -946,7 +956,7 @@ const LeaveRequest = () => {
                 type="number"
                 step="0.5"
                 readOnly
-                className="block w-full bg-white/5 border-white/10 rounded-xl text-slate-400 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium cursor-not-allowed"
+                className="block w-full bg-white/5 border-white/10 dark:border-white/10 rounded-xl text-slate-400 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium cursor-not-allowed"
               />
             </div>
 
@@ -958,7 +968,7 @@ const LeaveRequest = () => {
                 {...register('start_date', { required: 'Start date is required' })}
                 type="date"
                 min={new Date().toISOString().split('T')[0]}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
               />
               {errors.start_date && (
                 <p className="mt-2 text-sm text-rose-500 font-semibold">{errors.start_date.message}</p>
@@ -973,7 +983,7 @@ const LeaveRequest = () => {
                 {...register('end_date', { required: 'End date is required' })}
                 type="date"
                 min={startDate || new Date().toISOString().split('T')[0]}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:dark]"
               />
               {errors.end_date && (
                 <p className="mt-2 text-sm text-rose-500 font-semibold">{errors.end_date.message}</p>
@@ -989,7 +999,7 @@ const LeaveRequest = () => {
               <label className="block text-sm font-bold text-slate-300 mb-2">
                 Supporting Document <span className="text-slate-500 font-normal">(Optional)</span>
               </label>
-              <div className="border-2 border-dashed border-white/20 bg-white/5 rounded-2xl p-8 text-center hover:border-indigo-400/50 transition-colors">
+              <div className="border-2 border-dashed border-black/20 dark:border-white/20 bg-white/5 rounded-2xl p-8 text-center hover:border-indigo-400/50 transition-colors">
                 <DocumentArrowUpIcon className="mx-auto h-16 w-16 text-slate-500" />
                 <div className="mt-4">
                   <label className="cursor-pointer bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-300 px-6 py-3 rounded-xl font-bold transition-all inline-block hover:-translate-y-0.5 shadow-lg">
@@ -1014,7 +1024,7 @@ const LeaveRequest = () => {
               <textarea
                 {...register('reason', { required: 'Reason is required' })}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
                 placeholder="Please provide a detailed reason for your leave request..."
               />
               {errors.reason && (
@@ -1029,17 +1039,17 @@ const LeaveRequest = () => {
               <textarea
                 {...register('employee_comments')}
                 rows={3}
-                className="block w-full bg-[#0A0F1A] border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
+                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
                 placeholder="Any additional comments or special requests..."
               />
             </div>
           </div>
 
-          <div className="flex justify-end space-x-4 pt-8 border-t border-white/10 mt-8">
+          <div className="flex justify-end space-x-4 pt-8 border-t border-white/10 dark:border-white/10 mt-8">
             <button
               type="button"
               onClick={() => setShowRequestModal(false)}
-              className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/10 transition-all"
+              className="px-8 py-3 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl border border-white/10 dark:border-white/10 transition-all"
             >
               Cancel
             </button>
@@ -1065,7 +1075,7 @@ const LeaveRequest = () => {
           <div className="space-y-8">
             {/* Employee Info */}
             {isHRManager() && (
-              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg">
+              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg">
                 <div className="flex items-center space-x-4">
                   <div className="h-16 w-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.3)]">
                     <span className="text-indigo-300 font-black text-xl">
@@ -1084,29 +1094,29 @@ const LeaveRequest = () => {
 
             {/* Leave Details */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-[#0A0F1A] border border-white/10 p-5 rounded-2xl shadow-inner">
+              <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 p-5 rounded-2xl shadow-inner">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Leave Type</label>
                 <p className="text-lg font-bold text-white">{selectedRequest.leave_type?.name}</p>
               </div>
-              <div className="bg-[#0A0F1A] border border-white/10 p-5 rounded-2xl shadow-inner">
+              <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 p-5 rounded-2xl shadow-inner">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Duration</label>
                 <p className="text-lg font-bold text-white">
                   {selectedRequest.leave_duration?.replace('_', ' ')}
                 </p>
               </div>
-              <div className="bg-[#0A0F1A] border border-white/10 p-5 rounded-2xl shadow-inner">
+              <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 p-5 rounded-2xl shadow-inner">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Start Date</label>
                 <p className="text-lg font-bold text-white">{formatDate(selectedRequest.start_date)}</p>
               </div>
-              <div className="bg-[#0A0F1A] border border-white/10 p-5 rounded-2xl shadow-inner">
+              <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 p-5 rounded-2xl shadow-inner">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">End Date</label>
                 <p className="text-lg font-bold text-white">{formatDate(selectedRequest.end_date)}</p>
               </div>
-              <div className="bg-[#0A0F1A] border border-white/10 p-5 rounded-2xl shadow-inner">
+              <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 p-5 rounded-2xl shadow-inner">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Days Requested</label>
                 <p className="text-lg font-bold text-white">{selectedRequest.days_requested} days</p>
               </div>
-              <div className="bg-[#0A0F1A] border border-white/10 p-5 rounded-2xl shadow-inner">
+              <div className="bg-[#0A0F1A] border border-white/10 dark:border-white/10 p-5 rounded-2xl shadow-inner">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Status</label>
                 <div className="mt-1">
                   <StatusBadge status={selectedRequest.status} />
@@ -1128,7 +1138,7 @@ const LeaveRequest = () => {
             {selectedRequest.employee_comments && (
               <div>
                 <label className="block text-sm font-bold text-slate-300 mb-3">Employee Comments</label>
-                <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-inner">
+                <div className="bg-white/5 p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-inner">
                   <p className="text-slate-300 leading-relaxed font-medium">
                     {selectedRequest.employee_comments}
                   </p>
@@ -1150,7 +1160,7 @@ const LeaveRequest = () => {
 
             {/* Approval Info */}
             {selectedRequest.approved_by_name && (
-              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg flex justify-between items-center">
+              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg flex justify-between items-center">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Approved By</label>
                   <p className="text-lg font-bold text-white">{selectedRequest.approved_by_name}</p>

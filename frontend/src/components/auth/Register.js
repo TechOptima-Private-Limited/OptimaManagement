@@ -24,10 +24,10 @@ const Register = () => {
   };
 
   const inputClass =
-    'appearance-none block w-full px-4 py-4 rounded-xl border border-white/5 bg-black/40 text-white placeholder-gray-600 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 transition-all duration-300 text-sm font-medium';
+    'appearance-none block w-full px-4 py-4 rounded-xl border border-white/10 bg-black/40 text-white placeholder-gray-600 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 transition-all duration-300 text-sm font-medium';
 
   return (
-    <div className="min-h-screen flex bg-[#070B14] overflow-hidden relative font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen flex bg-[#070B14] dark:bg-[#070B14] overflow-hidden relative font-sans selection:bg-indigo-500/30">
       <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-violet-700/10 rounded-full blur-[120px]" />
@@ -52,31 +52,31 @@ const Register = () => {
               future of work.
             </span>
           </h2>
-          <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-lg">
+          <p className="text-xl text-slate-400 font-medium leading-relaxed max-w-lg">
             Create your account to access the next-generation workforce management ecosystem.
           </p>
         </div>
 
         <div className="flex items-center space-x-6">
-          <p className="text-[10px] font-black text-gray-700 uppercase tracking-widest"> 2026 TechOptima Global</p>
+          <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest"> 2026 TechOptima Global</p>
           <div className="h-px flex-1 bg-white/5" />
         </div>
       </div>
 
       <div className="w-full lg:w-[50%] flex items-center justify-center p-6 relative z-10">
         <div className="w-full max-w-[480px]">
-          <div className="bg-slate-900/40 backdrop-blur-[40px] rounded-[3rem] border border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
+          <div className="bg-white/5 backdrop-blur-[40px] rounded-[3rem] border border-white/10 shadow-[0_35px_80px_-15px_rgba(0,0,0,0.6)] p-10 sm:p-12 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
 
             <div className="mb-8 text-center sm:text-left">
               <h1 className="text-4xl font-black text-white tracking-tight mb-2">Create Account.</h1>
-              <p className="text-gray-500 font-medium text-sm">Join TechOptima workforce management.</p>
+              <p className="text-slate-400 font-medium text-sm">Join TechOptima workforce management.</p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">First Name</label>
+                  <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">First Name</label>
                   <input
                     {...register('first_name', { required: 'Required' })}
                     type="text"
@@ -86,7 +86,7 @@ const Register = () => {
                   {errors.first_name && <p className="mt-1 text-[10px] font-black text-rose-500 uppercase">{errors.first_name.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">Last Name</label>
+                  <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">Last Name</label>
                   <input
                     {...register('last_name', { required: 'Required' })}
                     type="text"
@@ -98,7 +98,7 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">Work Email</label>
+                <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">Work Email</label>
                 <input
                   {...register('email', {
                     required: 'Email required',
@@ -112,7 +112,7 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">Password</label>
+                <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">Password</label>
                 <div className="relative">
                   <input
                     {...register('password', { required: 'Password required', minLength: { value: 8, message: 'Min 8 characters' } })}
@@ -132,7 +132,7 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-500/80 mb-2 uppercase tracking-[0.2em]">Confirm Password</label>
+                <label className="block text-[10px] font-black text-slate-400/80 mb-2 uppercase tracking-[0.2em]">Confirm Password</label>
                 <input
                   {...register('confirm_password', {
                     required: 'Confirmation required',
@@ -154,8 +154,8 @@ const Register = () => {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-white/5 text-center">
-              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Already registered?</span>{' '}
+            <div className="mt-8 pt-6 border-t border-white/10 text-center">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Already registered?</span>{' '}
               <Link to="/login" className="ml-2 text-xs font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-colors">
                 Sign In
               </Link>

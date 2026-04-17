@@ -47,8 +47,8 @@
 //     };
 
 //     return (
-//       <div className="bg-white rounded-lg border border-gray-200 p-6">
-//         <h3 className="text-lg font-semibold text-gray-900 mb-4">Add resource type</h3>
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-6">
+//         <h3 className="text-lg font-semibold text-white mb-4">Add resource type</h3>
 
 //         <div className="space-y-4">
 //           <div>
@@ -84,7 +84,7 @@
 //               onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
 //               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 //             />
-//             <label htmlFor="is_active_rt" className="ml-2 block text-sm text-gray-900">
+//             <label htmlFor="is_active_rt" className="ml-2 block text-sm text-white">
 //               Is active
 //             </label>
 //           </div>
@@ -143,8 +143,8 @@
 //     };
 
 //     return (
-//       <div className="bg-white rounded-lg border border-gray-200 p-6">
-//         <h3 className="text-lg font-semibold text-gray-900 mb-4">Add access level</h3>
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-6">
+//         <h3 className="text-lg font-semibold text-white mb-4">Add access level</h3>
 
 //         <div className="space-y-4">
 //           <div>
@@ -256,8 +256,8 @@
 //     ];
 
 //     return (
-//       <div className="bg-white rounded-lg border border-gray-200 p-6">
-//         <h3 className="text-lg font-semibold text-gray-900 mb-4">Add resource</h3>
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-6">
+//         <h3 className="text-lg font-semibold text-white mb-4">Add resource</h3>
 
 //         <div className="space-y-4">
 //           <div>
@@ -360,7 +360,7 @@
 //                 onChange={(e) => setFormData({ ...formData, requires_approval: e.target.checked })}
 //                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 //               />
-//               <label htmlFor="requires_approval" className="ml-2 block text-sm text-gray-900">
+//               <label htmlFor="requires_approval" className="ml-2 block text-sm text-white">
 //                 Requires approval
 //               </label>
 //             </div>
@@ -373,7 +373,7 @@
 //                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
 //                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 //               />
-//               <label htmlFor="is_active_resource" className="ml-2 block text-sm text-gray-900">
+//               <label htmlFor="is_active_resource" className="ml-2 block text-sm text-white">
 //                 Is active
 //               </label>
 //             </div>
@@ -416,8 +416,8 @@
 //   return (
 //     <div className="p-6 space-y-6">
 //       {/* Form Selector */}
-//       <div className="bg-white rounded-lg border border-gray-200 p-4">
-//         <h2 className="text-lg font-semibold text-gray-900 mb-4">Admin Forms</h2>
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-4">
+//         <h2 className="text-lg font-semibold text-white mb-4">Admin Forms</h2>
 //         <div className="flex flex-wrap gap-2">
 //           {adminForms.map((form) => (
 //             <button
@@ -550,10 +550,10 @@
 //     };
 
 //     return (
-//       <div className="bg-white rounded-lg border border-gray-200 p-6">
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-6">
 //         <div className="flex items-center justify-between mb-4">
-//           <h3 className="text-lg font-semibold text-gray-900">Add Resource Type</h3>
-//           <div className="flex items-center space-x-2 text-sm text-gray-500">
+//           <h3 className="text-lg font-semibold text-white">Add Resource Type</h3>
+//           <div className="flex items-center space-x-2 text-sm text-slate-400">
 //             <ShieldCheckIcon className="h-4 w-4" />
 //             <span>Admin Only</span>
 //           </div>
@@ -595,7 +595,7 @@
 //               onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
 //               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 //             />
-//             <label htmlFor="is_active_rt" className="ml-2 block text-sm text-gray-900">
+//             <label htmlFor="is_active_rt" className="ml-2 block text-sm text-white">
 //               Is active
 //             </label>
 //           </div>
@@ -656,10 +656,10 @@
 //     };
 
 //     return (
-//       <div className="bg-white rounded-lg border border-gray-200 p-6">
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-6">
 //         <div className="flex items-center justify-between mb-4">
-//           <h3 className="text-lg font-semibold text-gray-900">Add Access Level</h3>
-//           <div className="flex items-center space-x-2 text-sm text-gray-500">
+//           <h3 className="text-lg font-semibold text-white">Add Access Level</h3>
+//           <div className="flex items-center space-x-2 text-sm text-slate-400">
 //             <ShieldCheckIcon className="h-4 w-4" />
 //             <span>Admin Only</span>
 //           </div>
@@ -779,10 +779,10 @@
 //     ];
 
 //     return (
-//       <div className="bg-white rounded-lg border border-gray-200 p-6">
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-6">
 //         <div className="flex items-center justify-between mb-4">
-//           <h3 className="text-lg font-semibold text-gray-900">Add Resource</h3>
-//           <div className="flex items-center space-x-2 text-sm text-gray-500">
+//           <h3 className="text-lg font-semibold text-white">Add Resource</h3>
+//           <div className="flex items-center space-x-2 text-sm text-slate-400">
 //             <ShieldCheckIcon className="h-4 w-4" />
 //             <span>Admin Only</span>
 //           </div>
@@ -897,7 +897,7 @@
 //                 onChange={(e) => setFormData({ ...formData, requires_approval: e.target.checked })}
 //                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 //               />
-//               <label htmlFor="requires_approval" className="ml-2 block text-sm text-gray-900">
+//               <label htmlFor="requires_approval" className="ml-2 block text-sm text-white">
 //                 Requires approval
 //               </label>
 //             </div>
@@ -910,7 +910,7 @@
 //                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
 //                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 //               />
-//               <label htmlFor="is_active_resource" className="ml-2 block text-sm text-gray-900">
+//               <label htmlFor="is_active_resource" className="ml-2 block text-sm text-white">
 //                 Is active
 //               </label>
 //             </div>
@@ -982,8 +982,8 @@
 //       </div>
 
 //       {/* Form Selector */}
-//       <div className="bg-white rounded-lg border border-gray-200 p-4">
-//         <h3 className="text-lg font-semibold text-gray-900 mb-4">Admin Forms</h3>
+//       <div className="bg-white/5 rounded-lg border border-gray-200 p-4">
+//         <h3 className="text-lg font-semibold text-white mb-4">Admin Forms</h3>
 //         <div className="flex flex-wrap gap-2">
 //           {adminForms.map((form) => {
 //             const Icon = form.icon;
@@ -1108,7 +1108,7 @@ const AdminForms = () => {
                 <span className="text-white font-medium">Administrator, HR Manager, or IT Supporter</span>
               </p>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Please contact your system administrator if you believe you should have access to this section.
             </p>
           </div>
@@ -1150,7 +1150,7 @@ const AdminForms = () => {
 
     return (
       <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">Add Resource Type</h3>
           <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
@@ -1160,7 +1160,7 @@ const AdminForms = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Name *
             </label>
             <input
@@ -1168,38 +1168,38 @@ const AdminForms = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="e.g., Database, Application, Server"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Describe this resource type..."
             />
           </div>
 
-          <div className="flex items-center bg-black/20 p-4 rounded-xl border border-white/5">
+          <div className="flex items-center bg-black/20 p-4 rounded-xl border border-white/10">
             <input
               type="checkbox"
               id="is_active_rt"
               checked={formData.is_active}
               onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-              className="h-5 w-5 bg-black/40 border-white/20 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900 rounded"
+              className="h-5 w-5 bg-black/40 border-black/20 dark:border-white/20 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900 rounded"
             />
             <label htmlFor="is_active_rt" className="ml-3 block text-sm font-medium text-white">
               Is active
             </label>
           </div>
 
-          <div className="flex space-x-3 pt-6 border-t border-white/10">
+          <div className="flex space-x-3 pt-6 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
@@ -1214,7 +1214,7 @@ const AdminForms = () => {
                 setFormData({ name: '', description: '', is_active: true });
               }}
               disabled={createMutation.isLoading}
-              className="bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-white/20 font-bold tracking-wide transition-colors border border-white/10"
+              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1260,7 +1260,7 @@ const AdminForms = () => {
 
     return (
       <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">Add Access Level</h3>
           <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
@@ -1270,7 +1270,7 @@ const AdminForms = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Name *
             </label>
             <input
@@ -1278,25 +1278,25 @@ const AdminForms = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="e.g., Read, Write, Admin"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Describe the permissions for this access level..."
             />
           </div>
 
-          <div className="flex space-x-3 pt-6 border-t border-white/10">
+          <div className="flex space-x-3 pt-6 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
@@ -1311,7 +1311,7 @@ const AdminForms = () => {
                 setFormData({ name: '', description: '' });
               }}
               disabled={createMutation.isLoading}
-              className="bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-white/20 font-bold tracking-wide transition-colors border border-white/10"
+              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1392,7 +1392,7 @@ const AdminForms = () => {
 
     return (
       <div className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 shadow-xl backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 dark:border-white/10">
           <h3 className="text-lg font-bold text-white">Add Resource</h3>
           <div className="flex items-center space-x-2 text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/20">
             <ShieldCheckIcon className="h-4 w-4" />
@@ -1403,7 +1403,7 @@ const AdminForms = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
                 Name *
               </label>
               <input
@@ -1411,13 +1411,13 @@ const AdminForms = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
                 placeholder="Resource name"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
                 Resource Type *
               </label>
               <div className="flex items-center space-x-3">
@@ -1425,7 +1425,7 @@ const AdminForms = () => {
                   value={formData.resource_type}
                   onChange={(e) => setFormData({ ...formData, resource_type: e.target.value })}
                   required
-                  className="flex-1 px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800 [&>option]:text-white"
+                  className="flex-1 px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-white/5 dark:bg-slate-800 [&>option]:text-white"
                 >
                   <option value="">--------</option>
                   {resourceTypes.map(type => (
@@ -1445,40 +1445,40 @@ const AdminForms = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="Resource description..."
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
                 Endpoint
               </label>
               <input
                 type="url"
                 value={formData.endpoint}
                 onChange={(e) => setFormData({ ...formData, endpoint: e.target.value })}
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
                 placeholder="https://example.com/api"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
                 Environment
               </label>
               <select
                 value={formData.environment}
                 onChange={(e) => setFormData({ ...formData, environment: e.target.value })}
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-slate-800 [&>option]:text-white"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors [&>option]:bg-white/5 dark:bg-slate-800 [&>option]:text-white"
                 required
               >
                 {environments.map(env => (
@@ -1489,39 +1489,39 @@ const AdminForms = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
               Resource Team Email
             </label>
             <input
               type="email"
               value={formData.resource_team_email}
               onChange={(e) => setFormData({ ...formData, resource_team_email: e.target.value })}
-              className="w-full px-4 py-3 bg-black/20 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
+              className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
               placeholder="team@example.com"
             />
           </div>
 
-          <div className="flex items-center space-x-6 bg-black/20 p-4 rounded-xl border border-white/5">
+          <div className="flex items-center space-x-6 bg-black/20 p-4 rounded-xl border border-white/10">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="requires_approval"
                 checked={formData.requires_approval}
                 onChange={(e) => setFormData({ ...formData, requires_approval: e.target.checked })}
-                className="h-5 w-5 bg-black/40 border-white/20 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900 rounded"
+                className="h-5 w-5 bg-black/40 border-black/20 dark:border-white/20 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900 rounded"
               />
               <label htmlFor="requires_approval" className="ml-3 block text-sm font-medium text-white">
                 Requires approval
               </label>
             </div>
 
-            <div className="flex items-center pl-6 border-l border-white/10">
+            <div className="flex items-center pl-6 border-l border-white/10 dark:border-white/10">
               <input
                 type="checkbox"
                 id="is_active_resource"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="h-5 w-5 bg-black/40 border-white/20 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900 rounded"
+                className="h-5 w-5 bg-black/40 border-black/20 dark:border-white/20 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-900 rounded"
               />
               <label htmlFor="is_active_resource" className="ml-3 block text-sm font-medium text-white">
                 Is active
@@ -1529,7 +1529,7 @@ const AdminForms = () => {
             </div>
           </div>
 
-          <div className="flex space-x-3 pt-6 border-t border-white/10">
+          <div className="flex space-x-3 pt-6 border-t border-white/10 dark:border-white/10">
             <button
               type="submit"
               disabled={createMutation.isLoading}
@@ -1553,7 +1553,7 @@ const AdminForms = () => {
                 });
               }}
               disabled={createMutation.isLoading}
-              className="bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-white/20 font-bold tracking-wide transition-colors border border-white/10"
+              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1583,8 +1583,8 @@ const AdminForms = () => {
               Manage resource types, access levels, and system resources
             </p>
           </div>
-          <div className="flex items-center space-x-4 bg-black/20 px-6 py-4 rounded-2xl border border-white/10 backdrop-blur-md">
-            <div className="p-3 bg-white/10 rounded-xl">
+          <div className="flex items-center space-x-4 bg-black/20 px-6 py-4 rounded-2xl border border-white/10 dark:border-white/10 backdrop-blur-md">
+            <div className="p-3 bg-black/10 dark:bg-white/5/10 rounded-xl">
               <ShieldCheckIcon className="h-8 w-8 text-white" />
             </div>
             <div className="text-right">
@@ -1609,10 +1609,10 @@ const AdminForms = () => {
                 onClick={() => setActiveForm(form.id)}
                 className={`flex items-center px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 border ${activeForm === form.id
                     ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-lg shadow-indigo-500/10'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border-transparent'
+                    : 'bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white border-transparent'
                   }`}
               >
-                <Icon className={`h-5 w-5 mr-2.5 ${activeForm === form.id ? 'text-indigo-400' : 'text-gray-500'}`} />
+                <Icon className={`h-5 w-5 mr-2.5 ${activeForm === form.id ? 'text-indigo-400' : 'text-slate-400'}`} />
                 {form.name}
               </button>
             );

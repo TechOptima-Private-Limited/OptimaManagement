@@ -31,7 +31,7 @@ const Table = ({
         <tbody className="bg-transparent divide-y divide-white/5">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-6 py-4 text-center text-gray-500">
+              <td colSpan={columns.length} className="px-6 py-4 text-center text-slate-500">
                 {emptyMessage}
               </td>
             </tr>

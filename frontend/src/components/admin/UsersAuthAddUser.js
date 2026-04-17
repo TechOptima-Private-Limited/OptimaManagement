@@ -87,7 +87,7 @@ const UsersAuthAddUser = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] p-8">
+    <div className="min-h-screen bg-[#070B14] dark:bg-[#070B14] p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
@@ -100,7 +100,7 @@ const UsersAuthAddUser = () => {
               Back to Users and Authentication
             </button>
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
+              <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
                 <UserPlusIcon className="h-8 w-8 text-indigo-400" />
               </div>
               <div>
@@ -113,14 +113,14 @@ const UsersAuthAddUser = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">UserID</label>
                 <input
                   type="text"
-                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={form.username}
                   onChange={(e) => handleChange('username', e.target.value)}
                   placeholder="e.g. jdoe"
@@ -134,7 +134,7 @@ const UsersAuthAddUser = () => {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
                 <input
                   type="email"
-                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={form.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   placeholder="jdoe@example.com"
@@ -148,7 +148,7 @@ const UsersAuthAddUser = () => {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">First Name</label>
                 <input
                   type="text"
-                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={form.first_name}
                   onChange={(e) => handleChange('first_name', e.target.value)}
                   placeholder="John"
@@ -158,7 +158,7 @@ const UsersAuthAddUser = () => {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Last Name</label>
                 <input
                   type="text"
-                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={form.last_name}
                   onChange={(e) => handleChange('last_name', e.target.value)}
                   placeholder="Doe"
@@ -171,7 +171,7 @@ const UsersAuthAddUser = () => {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Security Password</label>
                 <input
                   type="password"
-                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={form.password}
                   onChange={(e) => handleChange('password', e.target.value)}
                   placeholder="••••••••"
@@ -184,7 +184,7 @@ const UsersAuthAddUser = () => {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Confirm Identity</label>
                 <input
                   type="password"
-                  className="block w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
+                  className="block w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all shadow-inner"
                   value={form.password_confirm}
                   onChange={(e) => handleChange('password_confirm', e.target.value)}
                   placeholder="••••••••"
@@ -194,11 +194,11 @@ const UsersAuthAddUser = () => {
             </div>
           </div>
 
-          <div className="px-8 py-6 bg-white/5 border-t border-white/5 flex justify-end space-x-4">
+          <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex justify-end space-x-4">
             <button
               type="button"
               onClick={() => navigate('/users-auth')}
-              className="px-8 py-3 text-xs font-black rounded-2xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
+              className="px-8 py-3 text-xs font-black rounded-2xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all transform active:scale-95"
             >
               CANCEL
             </button>
