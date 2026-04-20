@@ -109,7 +109,7 @@ const PermissionDetail = () => {
           <button
             type="button"
             onClick={() => navigate('/users-auth/permissions')}
-            className="px-8 py-3 text-xs font-black rounded-2xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all transform active:scale-95 uppercase tracking-widest"
+            className="px-8 py-3 text-xs font-black rounded-2xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all transform active:scale-95 uppercase tracking-widest"
           >
             CANCEL
           </button>

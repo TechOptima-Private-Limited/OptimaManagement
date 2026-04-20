@@ -59,12 +59,12 @@ const AttendanceApprovals = () => {
 
   if (!isHRManager() && !isManager()) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
         <div className="text-center p-12 bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-[2.5rem] shadow-2xl max-w-md">
           <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-rose-500/30">
             <XCircleIcon className="w-10 h-10 text-rose-500" />
           </div>
-          <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Access Denied</h3>
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight mb-2">Access Denied</h3>
           <p className="text-slate-400 font-medium">Only HR Managers and Team Managers can manage attendance approvals.</p>
         </div>
       </div>
@@ -73,21 +73,21 @@ const AttendanceApprovals = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-slate-950 flex justify-center items-center`}>
+      <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 flex justify-center items-center`}>
         <LoadingSpinner text="Querying pending approvals..." />
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-black text-slate-300 pb-12`}>
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-black text-slate-700 dark:text-slate-300 pb-12`}>
       {/* Premium Header */}
       <div className="relative overflow-hidden bg-white/5 dark:bg-slate-900/20 border-b border-white/10 pt-16 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex items-center space-x-6">
             <div className="p-4 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-2xl shadow-2xl shadow-indigo-500/20 transform -rotate-3 border border-black/20 dark:border-white/20">
-              <ClockIcon className="w-10 h-10 text-white" />
+              <ClockIcon className="w-10 h-10 text-slate-900 dark:text-white" />
             </div>
             <div>
               <div className="flex items-center space-x-3 mb-2">
@@ -98,7 +98,7 @@ const AttendanceApprovals = () => {
                   Verification Required
                 </span>
               </div>
-              <h1 className="text-4xl font-black text-white tracking-tight uppercase">Attendance Approvals</h1>
+              <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Attendance Approvals</h1>
               <p className="mt-2 text-slate-400 font-medium max-w-2xl">
                 Review and authorize manual attendance adjustments and biometric corrections.
               </p>
@@ -114,7 +114,7 @@ const AttendanceApprovals = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Queue Status</p>
-                <p className="text-3xl font-black text-white tracking-tighter">{pendingApprovals.length}</p>
+                <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{pendingApprovals.length}</p>
                 <p className="text-[10px] font-bold text-indigo-400 uppercase mt-1">Pending Review</p>
               </div>
               <div className="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 text-indigo-400">
@@ -138,7 +138,7 @@ const AttendanceApprovals = () => {
               <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
                 <CheckCircleIcon className="w-12 h-12 text-slate-600" />
               </div>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight">Queue is Empty</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Queue is Empty</h3>
               <p className="text-slate-500 font-medium mt-2">All attendance requests have been processed successfully.</p>
             </div>
           ) : (
@@ -150,13 +150,13 @@ const AttendanceApprovals = () => {
                       <div className="flex-1">
                         <div className="flex items-start space-x-6">
                           <div className="flex-shrink-0">
-                            <div className="h-16 w-16 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/10 border border-white/10 dark:border-white/10 group-hover:scale-105 transition-transform duration-500 text-white text-2xl font-black uppercase">
+                            <div className="h-16 w-16 bg-gradient-to-br from-indigo-500 to-violet-700 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/10 border border-white/10 dark:border-white/10 group-hover:scale-105 transition-transform duration-500 text-slate-900 dark:text-white text-2xl font-black uppercase">
                               {approval.employee_name?.charAt(0)}
                             </div>
                           </div>
                           <div className="flex-1">
                             <div className="flex flex-wrap items-center gap-3 mb-2">
-                              <h4 className="text-2xl font-black text-white tracking-tight">{approval.employee_name}</h4>
+                              <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{approval.employee_name}</h4>
                               <span className="px-3 py-0.5 bg-white/5 rounded-lg text-xs font-black text-slate-500 border border-white/10 dark:border-white/10 tracking-widest">{approval.employee_id}</span>
                             </div>
                             <div className="flex flex-wrap items-center gap-6 text-xs text-slate-500 font-black uppercase tracking-widest">
@@ -174,15 +174,15 @@ const AttendanceApprovals = () => {
 
                         {/* Comparative Flow */}
                         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="p-6 bg-slate-950/50 rounded-3xl border border-white/10 relative overflow-hidden">
+                          <div className="p-6 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-white/10 relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-10">
                               <XCircleIcon className="w-12 h-12 text-slate-400" />
                             </div>
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Current Record</p>
                             <div className="space-y-3">
-                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-600 uppercase">Check In</span> <span className="text-sm font-black text-slate-300">{approval.original_check_in || '—'}</span></div>
-                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-600 uppercase">Check Out</span> <span className="text-sm font-black text-slate-300">{approval.original_check_out || '—'}</span></div>
-                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-600 uppercase">Status</span> <span className="text-sm font-black text-slate-300">{approval.original_status || 'NEW'}</span></div>
+                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-600 uppercase">Check In</span> <span className="text-sm font-black text-slate-700 dark:text-slate-300">{approval.original_check_in || '—'}</span></div>
+                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-600 uppercase">Check Out</span> <span className="text-sm font-black text-slate-700 dark:text-slate-300">{approval.original_check_out || '—'}</span></div>
+                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-slate-600 uppercase">Status</span> <span className="text-sm font-black text-slate-700 dark:text-slate-300">{approval.original_status || 'NEW'}</span></div>
                             </div>
                           </div>
 
@@ -192,9 +192,9 @@ const AttendanceApprovals = () => {
                             </div>
                             <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4">Proposed Adjustment</p>
                             <div className="space-y-3">
-                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-indigo-400/60 uppercase">Check In</span> <span className="text-sm font-black text-white">{approval.pending_check_in || '—'}</span></div>
-                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-indigo-400/60 uppercase">Check Out</span> <span className="text-sm font-black text-white">{approval.pending_check_out || '—'}</span></div>
-                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-indigo-400/60 uppercase">Status</span> <span className="text-sm font-black text-white">{approval.pending_status}</span></div>
+                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-indigo-400/60 uppercase">Check In</span> <span className="text-sm font-black text-slate-900 dark:text-white">{approval.pending_check_in || '—'}</span></div>
+                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-indigo-400/60 uppercase">Check Out</span> <span className="text-sm font-black text-slate-900 dark:text-white">{approval.pending_check_out || '—'}</span></div>
+                              <div className="flex justify-between items-center"><span className="text-xs font-bold text-indigo-400/60 uppercase">Status</span> <span className="text-sm font-black text-slate-900 dark:text-white">{approval.pending_status}</span></div>
                             </div>
                           </div>
                         </div>
@@ -202,7 +202,7 @@ const AttendanceApprovals = () => {
                         {approval.edit_reason && (
                           <div className="mt-4 p-5 bg-white/5 border border-white/10 rounded-2xl">
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Justification</p>
-                            <p className="text-sm text-slate-300 italic font-medium">"{approval.edit_reason}"</p>
+                            <p className="text-sm text-slate-700 dark:text-slate-300 italic font-medium">"{approval.edit_reason}"</p>
                           </div>
                         )}
                       </div>
@@ -212,7 +212,7 @@ const AttendanceApprovals = () => {
                         <button
                           onClick={() => handleApproval(approval.id, 'APPROVED')}
                           disabled={submitting}
-                          className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-500/30 rounded-2xl text-xs font-black text-white uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50"
+                          className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-500/30 rounded-2xl text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50"
                         >
                           <CheckCircleIcon className="h-5 w-5 mr-2" />
                           Authorize
@@ -220,7 +220,7 @@ const AttendanceApprovals = () => {
                         <button
                           onClick={() => handleApproval(approval.id, 'REJECTED')}
                           disabled={submitting}
-                          className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-white/5 dark:bg-slate-800 border border-white/10 rounded-2xl text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-rose-600 hover:text-white hover:border-rose-500 hover:shadow-lg hover:shadow-rose-600/20 transition-all duration-300 disabled:opacity-50"
+                          className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-white/5 dark:bg-slate-800 border border-white/10 rounded-2xl text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-rose-600 hover:text-slate-900 dark:text-white hover:border-rose-500 hover:shadow-lg hover:shadow-rose-600/20 transition-all duration-300 disabled:opacity-50"
                         >
                           <XCircleIcon className="h-5 w-5 mr-2" />
                           Decline

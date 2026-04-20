@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { authAPI } from '../../services/api';
 import { toast } from 'react-toastify';
@@ -28,8 +28,8 @@ const getStrength = (password) => {
   if (passed <= 1) return { score: 1, label: 'Very Weak', color: 'bg-red-500' };
   if (passed === 2) return { score: 2, label: 'Weak', color: 'bg-orange-500' };
   if (passed === 3) return { score: 3, label: 'Fair', color: 'bg-yellow-500' };
-  if (passed === 4) return { score: 4, label: 'Strong', color: 'bg-emerald-400' };
-  return { score: 5, label: 'Very Strong', color: 'bg-emerald-500' };
+  if (passed === 4) return { score: 4, label: 'Strong', color: 'bg-emerald-500' };
+  return { score: 5, label: 'Very Strong', color: 'bg-emerald-400' };
 };
 
 const validatePassword = (password) => {
@@ -85,21 +85,21 @@ const Settings = () => {
   };
 
   const inputClass =
-    'block w-full rounded-xl border border-white/10 dark:border-white/10 bg-white/5 text-white placeholder-gray-500 shadow-inner px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-200 pr-10';
+    'block w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-gray-500 shadow-inner px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-200 pr-10';
 
   return (
     <div className="min-h-[80vh] space-y-8">
       {/* Page Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0a0f1e] via-indigo-950/60 to-[#070B14] border border-white/10 dark:border-white/10 px-8 py-8 shadow-2xl">
-        <div className="absolute top-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full -translate-x-24 -translate-y-24 pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-100 via-indigo-50/50 to-slate-200 dark:from-[#0a0f1e] dark:via-indigo-950/60 dark:to-[#070B14] border border-slate-200 dark:border-white/10 px-8 py-8 shadow-2xl">
+        <div className={`absolute top-0 left-0 w-48 h-48 ${theme.info.bg.replace('/20', '/10')} rounded-full -translate-x-24 -translate-y-24 pointer-events-none`} />
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full translate-x-32 translate-y-32 pointer-events-none" />
         <div className="relative flex items-center space-x-4">
-          <div className="p-3 rounded-xl bg-indigo-500/20 border border-indigo-500/30 shadow-lg">
-            <Cog6ToothIcon className="h-7 w-7 text-indigo-400" />
+          <div className={`p-3 rounded-xl ${theme.info.bg} border ${theme.info.border} shadow-lg`}>
+            <Cog6ToothIcon className={`h-7 w-7 ${theme.info.text}`} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">Settings</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your personal preferences and security.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Settings</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Manage your personal preferences and security.</p>
           </div>
         </div>
       </div>
@@ -108,17 +108,17 @@ const Settings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Account Card */}
-        <div className="bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 overflow-hidden shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
-          <div className="px-6 py-4 border-b border-white/10 dark:border-white/10 bg-white/5 flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-indigo-500/20 border border-indigo-500/30">
-              <UserCircleIcon className="h-5 w-5 text-indigo-400" />
+        <div className="bg-white dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
+          <div className={`px-6 py-4 border-b ${theme.cardBorder} ${theme.muted.bg} flex items-center space-x-3`}>
+            <div className={`p-2 rounded-lg ${theme.info.bg} border ${theme.info.border}`}>
+              <UserCircleIcon className={`h-5 w-5 ${theme.info.text}`} />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white">Account</h2>
-              <p className="text-xs text-gray-600 dark:text-gray-400">View and edit your profile details.</p>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Account</h2>
+              <p className="text-xs text-slate-500 dark:text-gray-400">View and edit your profile details.</p>
             </div>
           </div>
-          <div className="px-6 py-6 text-sm text-gray-300">
+          <div className="px-6 py-6 text-sm text-slate-700 dark:text-gray-300">
             <p className="leading-relaxed">
               You can update your personal information, profile picture, and contact details on the Profile page.
             </p>
@@ -133,20 +133,20 @@ const Settings = () => {
         </div>
 
         {/* Change Password Card */}
-        <div className="bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-white/10 dark:border-white/10 overflow-hidden shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
-          <div className="px-6 py-4 border-b border-white/10 dark:border-white/10 bg-white/5 flex items-center space-x-3">
+        <div className="bg-white dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-violet-500/20 border border-violet-500/30">
               <KeyIcon className="h-5 w-5 text-violet-400" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white">Change Password</h2>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Update your account password.</p>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Change Password</h2>
+              <p className="text-xs text-slate-500 dark:text-gray-400">Update your account password.</p>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="px-6 py-6 space-y-4 text-sm">
             {/* Current Password */}
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1.5">Current password</label>
+              <label className="block text-xs font-medium text-slate-700 dark:text-gray-300 mb-1.5">Current password</label>
               <div className="relative">
                 <input
                   type={showOld ? 'text' : 'password'}
@@ -169,7 +169,7 @@ const Settings = () => {
             {/* New / Confirm */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1.5">New password</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-gray-300 mb-1.5">New password</label>
                 <div className="relative">
                   <input
                     type={showNew ? 'text' : 'password'}
@@ -189,7 +189,7 @@ const Settings = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1.5">Confirm new password</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-gray-300 mb-1.5">Confirm new password</label>
                 <div className="relative">
                   <input
                     type={showConfirm ? 'text' : 'password'}
@@ -212,11 +212,11 @@ const Settings = () => {
 
             {/* ── Password Strength Meter ── */}
             {form.new_password.length > 0 && (
-              <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10 dark:border-white/10">
+              <div className="space-y-3 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                 {/* Bar */}
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Password Strength</span>
-                  <span className={`text-xs font-bold ${strength.score >= 4 ? 'text-emerald-400' : strength.score === 3 ? 'text-yellow-400' : 'text-red-400'}`}>
+                  <span className={`text-xs font-bold ${strength.score >= 4 ? theme.success.text : strength.score === 3 ? 'text-yellow-400' : theme.danger.text}`}>
                     {strength.label}
                   </span>
                 </div>
@@ -224,7 +224,7 @@ const Settings = () => {
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
-                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= strength.score ? strength.color : 'bg-black/10 dark:bg-white/5/10'}`}
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= strength.score ? strength.color : 'bg-black/10 dark:bg-white/10'}`}
                     />
                   ))}
                 </div>
@@ -233,9 +233,9 @@ const Settings = () => {
                   {rulesStatus.map((rule) => (
                     <div key={rule.id} className="flex items-center space-x-2">
                       {rule.passed
-                        ? <CheckCircleIcon className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                        ? <CheckCircleIcon className={`h-3.5 w-3.5 ${theme.success.text} flex-shrink-0`} />
                         : <XCircleIcon className="h-3.5 w-3.5 text-gray-600 flex-shrink-0" />}
-                      <span className={`text-xs ${rule.passed ? 'text-emerald-400' : 'text-slate-400'}`}>
+                      <span className={`text-xs ${rule.passed ? theme.success.text : 'text-slate-400'}`}>
                         {rule.label}
                       </span>
                     </div>
@@ -245,8 +245,8 @@ const Settings = () => {
                 {form.new_password_confirm.length > 0 && (
                   <div className="flex items-center space-x-2 pt-1 border-t border-white/10">
                     {form.new_password === form.new_password_confirm
-                      ? <><CheckCircleIcon className="h-3.5 w-3.5 text-emerald-400" /><span className="text-xs text-emerald-400">Passwords match</span></>
-                      : <><XCircleIcon className="h-3.5 w-3.5 text-red-400" /><span className="text-xs text-red-400">Passwords do not match</span></>}
+                      ? <><CheckCircleIcon className={`h-3.5 w-3.5 ${theme.success.text}`} /><span className={`text-xs ${theme.success.text}`}>Passwords match</span></>
+                      : <><XCircleIcon className={`h-3.5 w-3.5 ${theme.danger.text}`} /><span className={`text-xs ${theme.danger.text}`}>Passwords do not match</span></>}
                   </div>
                 )}
               </div>
@@ -254,8 +254,8 @@ const Settings = () => {
 
             {/* Security hint (shown when no password entered yet) */}
             {form.new_password.length === 0 && (
-              <div className="flex items-start space-x-2 p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10">
-                <ShieldCheckIcon className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start space-x-2 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                <ShieldCheckIcon className={`h-4 w-4 ${theme.success.text} mt-0.5 flex-shrink-0`} />
                 <p className="text-xs text-gray-600 dark:text-gray-400">
                   Password must be at least 8 characters and include uppercase, lowercase, number, and special character.
                 </p>
@@ -266,7 +266,11 @@ const Settings = () => {
               <button
                 type="submit"
                 disabled={saving || strength.score < 5}
-                className={`inline-flex items-center px-5 py-2.5 rounded-xl bg-gradient-to-r ${theme.primaryGradient} text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/25 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
+                className={`inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-medium transform transition-all duration-200 
+                  ${(saving || strength.score < 5) 
+                    ? 'bg-slate-200 dark:bg-white/5 text-slate-400 dark:text-slate-600 cursor-not-allowed shadow-none' 
+                    : `bg-gradient-to-r ${theme.primaryGradient} text-white hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-105`
+                  }`}
               >
                 <KeyIcon className="h-4 w-4 mr-2" />
                 {saving ? 'Saving…' : 'Change Password'}

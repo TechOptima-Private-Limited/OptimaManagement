@@ -1,8 +1,10 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { workFromHomeAPI } from '../../services/api'; // Add this import
+import { workFromHomeAPI } from '../../services/api'; 
+import { useTheme } from '../../context/ThemeContext';
 
 const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     start_date: '',
     end_date: '',
@@ -142,17 +144,17 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
           onClick={onClose}
         ></div>
 
-        <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div className="bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 px-6 pt-6 pb-4">
+        <div className={`inline-block align-bottom ${theme.modalBg} border ${theme.muted.border} dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full`}>
+          <div className={`bg-gradient-to-br ${theme.headerGradient} px-6 pt-6 pb-4 opacity-90`}>
             <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className={`w-10 h-10 ${theme.info.bg} rounded-full flex items-center justify-center mr-4`}>
+                <svg className={`w-6 h-6 ${theme.info.text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Apply for Work From Home</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Submit your request to work remotely</p>
+                <p className="text-sm text-gray-400">Submit your request to work remotely</p>
               </div>
             </div>
 
@@ -219,9 +221,9 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
                 </p>
               </div>
 
-              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4">
+              <div className={`${theme.info.bg} border ${theme.info.border} rounded-xl p-4`}>
                 <div className="flex">
-                  <svg className="w-5 h-5 text-indigo-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-5 h-5 ${theme.info.text} mr-2 mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="text-sm text-gray-300">
@@ -237,12 +239,12 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          <div className="bg-[#05080f] px-6 py-4 border-t border-white/10 sm:flex sm:flex-row-reverse rounded-b-2xl">
+          <div className={`${theme.surfaceGradient.split(' ')[1].replace('to-', 'bg-')} px-6 py-4 border-t ${theme.muted.border} sm:flex sm:flex-row-reverse rounded-b-2xl`}>
             <button
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-base font-medium text-white hover:shadow-lg hover:shadow-indigo-500/25 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
+              className={`w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-3 bg-gradient-to-r ${theme.primaryGradient} text-base font-medium text-white hover:shadow-lg hover:shadow-indigo-500/25 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200`}
             >
               {loading ? (
                 <div className="flex items-center">
@@ -259,7 +261,7 @@ const WorkFromHomePopup = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-3 bg-black/10 dark:bg-white/5/10 text-base font-medium text-white hover:bg-black/20 dark:bg-white/5/20 focus:outline-none focus:ring-4 focus:ring-white/20 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
+              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-3 bg-black/10 dark:bg-white/10 text-base font-medium text-white hover:bg-black/20 dark:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all duration-200"
             >
               Cancel
             </button>

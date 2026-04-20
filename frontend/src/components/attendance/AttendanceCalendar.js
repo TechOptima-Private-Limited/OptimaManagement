@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -167,7 +167,7 @@ const AttendanceCalendar = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigateMonth(-1)}
-              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all shadow-lg"
             >
               <ChevronLeftIcon className="h-5 w-5" />
             </button>
@@ -179,7 +179,7 @@ const AttendanceCalendar = () => {
             </button>
             <button
               onClick={() => navigateMonth(1)}
-              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all shadow-lg"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-300 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all shadow-lg"
             >
               <ChevronRightIcon className="h-5 w-5" />
             </button>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { adminUserAPI } from '../../services/api';
 import { toast } from 'react-toastify';
@@ -359,7 +359,7 @@ const UsersAuthManagement = () => {
         <button
           type="button"
           onClick={() => window.location.assign('/users-auth/groups')}
-          className="group relative flex flex-col items-stretch text-left bg-white/5 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 transform hover:-translate-y-1"
+          className="group relative flex flex-col items-stretch text-left bg-white/5 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="px-6 py-4 flex items-center justify-between">
             <span className="text-sm font-bold text-white uppercase tracking-widest">Groups</span>
@@ -381,7 +381,7 @@ const UsersAuthManagement = () => {
         <button
           type="button"
           onClick={() => window.location.assign('/users-auth/permissions')}
-          className="group relative flex flex-col items-stretch text-left bg-white/5 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 transform hover:-translate-y-1"
+          className="group relative flex flex-col items-stretch text-left bg-white/5 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="px-6 py-4 flex items-center justify-between">
             <span className="text-sm font-bold text-white uppercase tracking-widest">Permissions</span>
@@ -427,7 +427,7 @@ const UsersAuthManagement = () => {
               <div className="px-6 py-4 bg-white/5 border-t border-white/10 flex justify-end space-x-3">
                 <button
                   type="button"
-                  className="px-4 py-2 text-xs font-bold rounded-xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all"
+                  className="px-4 py-2 text-xs font-bold rounded-xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all"
                   onClick={() => {
                     setShowConfirmModal(false);
                     setPendingChanges([]);
@@ -830,7 +830,7 @@ const UsersAuthManagement = () => {
                   type="button"
                   onClick={handleCancel}
                   disabled={saving}
-                  className="px-6 py-2.5 text-xs font-black rounded-xl border border-white/10 text-slate-400 hover:bg-white/5/10 hover:text-white transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 text-xs font-black rounded-xl border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-all disabled:opacity-50"
                 >
                   DISCARD CHANGES
                 </button>
@@ -908,7 +908,7 @@ const UsersAuthManagement = () => {
               <button
                 type="button"
                 onClick={() => setShowPasswordModal(false)}
-                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/5/10 hover:text-white transition-all"
+                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
               >
                 CANCEL
               </button>

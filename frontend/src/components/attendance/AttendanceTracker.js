@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -53,11 +53,11 @@ const getDefaultFilters = () => {
     employee_id: ''
   };
 };
-const AttendanceVisual = ({ logs }) => {
-  if (!logs || logs.length === 0) return <div className="h-4 w-full bg-white/5 rounded-full border border-white/10"></div>;
+const AttendanceVisual = ({ logs, theme }) => {
+  if (!logs || logs.length === 0) return <div className={`${theme.muted.bg} h-4 w-full rounded-full border ${theme.muted.border}`}></div>;
   const sortedLogs = [...logs].sort((a, b) => a.time.localeCompare(b.time));
   const START_MIN = 8 * 60; // 08:00
-  const END_MIN = 20 * 60;   // 20:00
+  const END_MIN = 20 * 60; // 20:00
   const TOTAL_MIN = END_MIN - START_MIN;
   const toMins = (timeStr) => {
     if (!timeStr) return 0;
@@ -71,11 +71,11 @@ const AttendanceVisual = ({ logs }) => {
     segments.push({ start, end, startTime: sortedLogs[i].time, endTime: sortedLogs[i + 1]?.time });
   }
   return (
-    <div className="relative h-4 w-48 bg-white/5 rounded-full overflow-hidden border border-white/10 backdrop-blur-sm shadow-inner mt-1">
+    <div className={`relative h-4 w-48 ${theme.muted.bg} rounded-full overflow-hidden border ${theme.muted.border} backdrop-blur-sm shadow-inner mt-1`}>
       {[...Array(11)].map((_, i) => (
         <div
           key={i}
-          className="absolute h-full border-l border-white/10 z-10"
+          className={`absolute h-full border-l ${theme.muted.border} z-10`}
           style={{ left: `${((i + 1) * 60) / TOTAL_MIN * 100}%` }}
         ></div>
       ))}
@@ -97,7 +97,7 @@ const AttendanceVisual = ({ logs }) => {
         return (
           <div
             key={idx}
-            className="absolute top-0 h-full bg-indigo-500/80 shadow-[0_0_10px_rgba(99,102,241,0.5)] transition-all hover:bg-indigo-400"
+            className={`absolute top-0 h-full ${theme.info.bg.replace('20', '80')} shadow-[0_0_10px_rgba(99,102,241,0.5)] transition-all hover:bg-indigo-400`}
             style={{ left: `${clippedLeft}%`, width: `${clippedWidth}%` }}
             title={`${seg.startTime} - ${seg.endTime || 'Ongoing'}`}
           />
@@ -594,17 +594,17 @@ const AttendanceTracker = () => {
     }
   };
   const StatCard = ({ title, value, icon: Icon, gradient, percentage, trend }) => (
-    <div className="relative bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden group hover:border-black/20 dark:border-white/20 transition-all duration-300 shadow-2xl backdrop-blur-xl">
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5 group-hover:opacity-10 transition-opacity`}></div>
+    <div className={`relative ${theme.cardBg} rounded-[2.5rem] border ${theme.cardBorder} overflow-hidden group hover:border-black/20 dark:border-white/20 transition-all duration-300 shadow-2xl backdrop-blur-xl`}>
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient || theme.primaryGradient} opacity-5 group-hover:opacity-10 transition-opacity`}></div>
       <div className="relative p-8">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{title}</p>
             <div className="flex items-baseline space-x-2">
-              <p className="text-3xl font-black text-white dark:text-white uppercase tracking-tight">{value}</p>
+              <p className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{value}</p>
               {percentage !== undefined && (
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 uppercase tracking-tighter">
-                  {percentage}%
+                <span className={`text-[10px] font-black ${theme.success.text} ${theme.success.bg} px-2 py-0.5 rounded-full border ${theme.success.border} uppercase tracking-tighter`}>
+                   {percentage}%
                 </span>
               )}
             </div>
@@ -612,8 +612,8 @@ const AttendanceTracker = () => {
               <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-2">{trend}</p>
             )}
           </div>
-          <div className={`p-4 rounded-2xl bg-gradient-to-br ${gradient} shadow-lg shadow-black/20`}>
-            <Icon className="h-6 w-6 text-white dark:text-white stroke-[2.5]" />
+          <div className={`p-4 rounded-2xl bg-gradient-to-br ${gradient || theme.primaryGradient} shadow-lg shadow-black/20`}>
+            <Icon className="h-6 w-6 text-slate-900 dark:text-white stroke-[2.5]" />
           </div>
         </div>
       </div>
@@ -626,8 +626,8 @@ const AttendanceTracker = () => {
       accessor: 'employee',
       render: (employee, row) => (
         <div className="flex items-center">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mr-3">
-            <span className="text-white dark:text-white text-sm font-medium">
+          <div className={`h-10 w-10 rounded-full bg-gradient-to-br ${theme.avatarGradient} flex items-center justify-center mr-3`}>
+            <span className="text-slate-900 dark:text-white text-sm font-medium">
               {employee ? (
                 // Has employee record - use employee name
                 `${employee?.user_info?.first_name?.[0] || ''}${employee?.user_info?.last_name?.[0] || ''}`
@@ -640,7 +640,7 @@ const AttendanceTracker = () => {
             </span>
           </div>
           <div>
-            <div className="text-sm font-bold text-white dark:text-white">
+            <div className="text-sm font-bold text-slate-900 dark:text-white">
               {/* ✅ Use display_name from API - handles both employee and biometric */}
               {row.display_name || 'Unknown'}
             </div>
@@ -656,8 +656,8 @@ const AttendanceTracker = () => {
       accessor: 'date',
       render: (date) => (
         <div className="flex items-center">
-          <div className="p-1 rounded-lg bg-red-50 mr-2">
-            <CalendarIcon className="h-4 w-4 text-red-600" />
+          <div className={`p-1 rounded-lg ${theme.danger.bg} mr-2`}>
+            <CalendarIcon className={`h-4 w-4 ${theme.danger.text}`} />
           </div>
           <span className="font-medium">{formatDate(date)}</span>
         </div>
@@ -670,10 +670,10 @@ const AttendanceTracker = () => {
         if (row._isWeekOff) return <span className="text-slate-400">—</span>;
         return (
           <div className="flex items-center">
-            <div className="p-1 rounded-lg bg-green-50 mr-2">
-              <ClockIcon className="h-4 w-4 text-green-600" />
+            <div className={`p-1 rounded-lg ${theme.success.bg} mr-2`}>
+              <ClockIcon className={`h-4 w-4 ${theme.success.text}`} />
             </div>
-            <span className={time ? 'text-white dark:text-white font-bold tracking-wide' : 'text-slate-500 italic'}>
+            <span className={time ? 'text-slate-900 dark:text-white font-bold tracking-wide' : 'text-slate-500 italic'}>
               {formatTimeDisplay(time) || 'Not checked in'}
             </span>
           </div>
@@ -692,7 +692,7 @@ const AttendanceTracker = () => {
         const cutoffMinutes = 10 * 60; // 10:00 AM
         if (checkInMinutes <= cutoffMinutes) {
           return (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${theme.success.bg} ${theme.success.text} border ${theme.success.border}`}>
               ✓ On Time
             </span>
           );
@@ -704,7 +704,7 @@ const AttendanceTracker = () => {
           ? `${lateHrs}h ${lateMins}m late`
           : `${lateMins}m late`;
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20">
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${theme.warning.bg} ${theme.warning.text} border ${theme.warning.border}`}>
             ⏰ {lateLabel}
           </span>
         );
@@ -717,10 +717,10 @@ const AttendanceTracker = () => {
         if (row._isWeekOff) return <span className="text-slate-400">—</span>;
         return (
           <div className="flex items-center">
-            <div className="p-1 rounded-lg bg-red-50 mr-2">
-              <ClockIcon className="h-4 w-4 text-red-600" />
+            <div className={`p-1 rounded-lg ${theme.danger.bg} mr-2`}>
+              <ClockIcon className={`h-4 w-4 ${theme.danger.text}`} />
             </div>
-            <span className={time ? 'text-white dark:text-white font-bold tracking-wide' : 'text-slate-500 italic'}>
+            <span className={time ? 'text-slate-900 dark:text-white font-bold tracking-wide' : 'text-slate-500 italic'}>
               {formatTimeDisplay(time) || 'Not checked out'}
             </span>
           </div>
@@ -740,18 +740,18 @@ const AttendanceTracker = () => {
         return (
           <div className="flex items-center">
             {type === 'BIOMETRIC' && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-black/10 dark:bg-white/5/10 text-slate-200 border border-black/20 dark:border-white/20">
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${theme.muted.bg} text-slate-900 dark:text-slate-200 border ${theme.muted.border}`}>
                 <ServerIcon className="w-3 h-3 mr-1" />
                 Biometric
               </span>
             )}
             {type === 'MANUAL' && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${theme.danger.bg} ${theme.danger.text} border ${theme.danger.border}`}>
                 Manual
               </span>
             )}
             {type === 'QR_CODE' && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100">
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${theme.warning.bg} ${theme.warning.text} border ${theme.warning.border}`}>
                 QR Code
               </span>
             )}
@@ -766,14 +766,14 @@ const AttendanceTracker = () => {
         if (row._isWeekOff) return <span className="text-slate-400">—</span>;
         if (isPending) {
           return (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${theme.warning.bg} ${theme.warning.text} border ${theme.warning.border}`}>
               <ClockIcon className="w-3 h-3 mr-1" />
               Pending
             </span>
           );
         }
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${theme.success.bg} ${theme.success.text} border ${theme.success.border}`}>
             <CheckCircleIcon className="w-3 h-3 mr-1" />
             Approved
           </span>
@@ -783,7 +783,7 @@ const AttendanceTracker = () => {
     {
       header: 'Attendance Visual',
       accessor: 'biometric_logs',
-      render: (logs) => <AttendanceVisual logs={logs} />,
+      render: (logs) => <AttendanceVisual logs={logs} theme={theme} />,
     },
     {
       header: 'Effective Hours',
@@ -804,7 +804,7 @@ const AttendanceTracker = () => {
         const h = Math.floor(totalMinutes / 60);
         const m = totalMinutes % 60;
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-sm font-semibold">
+          <span className={`inline-flex items-center px-2 py-1 rounded-lg ${theme.success.bg} ${theme.success.text} text-sm font-semibold`}>
             {h}h {m}m
           </span>
         );
@@ -821,7 +821,7 @@ const AttendanceTracker = () => {
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-sm font-medium">
+          <span className={`inline-flex items-center px-2 py-1 rounded-lg ${theme.info.bg} ${theme.info.text} text-sm font-medium`}>
             {hours}h {minutes}m
           </span>
         );
@@ -830,26 +830,26 @@ const AttendanceTracker = () => {
   ];
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070B14] flex flex-col items-center justify-center space-y-4 text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
-        <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest animate-pulse">Syncing Employee Lifecycle…</div>
+      <div className={`min-h-screen ${theme.surfaceGradient.split(' ')[1].replace('to-', 'bg-')} flex flex-col items-center justify-center space-y-4 text-slate-900 dark:text-white`}>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${theme.info.border.replace('border', 'border-b')} shadow-[0_0_15px_rgba(99,102,241,0.5)]`}></div>
+        <div className={`text-[10px] font-black ${theme.info.text} uppercase tracking-widest animate-pulse`}>Syncing Employee Lifecycle…</div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-200">
+    <div className={`min-h-screen ${theme.surfaceGradient.split(' ')[1].replace('to-', 'bg-')} text-slate-900 dark:text-slate-900 dark:text-slate-200 underline-offset-4 ring-offset-white`}>
       {/* Hero Section */}
-      <div className={`relative overflow-hidden bg-gradient-to-br from-[#0B1120] to-[#070B14] border-b border-white/10 p-12 mb-8`}>
+      <div className={`relative overflow-hidden bg-gradient-to-br ${theme.surfaceGradient} border-b ${theme.cardBorder} p-12 mb-8`}>
         <div className={`absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br ${theme.primaryGradient} opacity-10 rounded-full blur-3xl`}></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center space-x-6">
-              <div className="p-5 bg-white/5 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl">
-                <ClockIcon className="h-12 w-12 text-indigo-400 stroke-[1.5]" />
+            <div className={`p-5 ${theme.muted.bg} rounded-3xl border ${theme.cardBorder} shadow-2xl backdrop-blur-xl`}>
+                <ClockIcon className={`h-12 w-12 ${theme.info.text} stroke-[1.5]`} />
               </div>
               <div>
-                <h1 className="text-5xl font-black text-white uppercase tracking-tighter leading-none mb-3">Attendance Registry</h1>
-                <p className="text-sm font-black text-indigo-400 uppercase tracking-[0.2em] opacity-80">
+                <h1 className="text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none mb-3">Attendance Registry</h1>
+                <p className={`text-sm font-black ${theme.info.text} uppercase tracking-[0.2em]`}>
                   {isHRManager() ? 'Global Organizational Lifecycle Synchronization' :
                     isManager() ? 'Team Node Presence & Performance Monitor' :
                       'Personal Node Chronology & Attendance Verification'}
@@ -858,11 +858,11 @@ const AttendanceTracker = () => {
             </div>
             <div className="flex items-center space-x-4">
               {isManagementRole && biometricDevices.length > 0 && (
-                <div className="flex items-center space-x-3 px-6 py-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl transition-all">
-                  <ServerIcon className="h-5 w-5 text-indigo-400" />
+                <div className={`flex items-center space-x-3 px-6 py-4 ${theme.muted.bg} rounded-2xl border ${theme.cardBorder} backdrop-blur-xl transition-all`}>
+                  <ServerIcon className={`h-5 w-5 ${theme.info.text}`} />
                   <div className="text-left">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Biometric Stream</p>
-                    <p className="text-xs font-bold text-white dark:text-white uppercase">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white uppercase">
                       Active ({biometricDevices.length} Nodes)
                     </p>
                   </div>
@@ -870,17 +870,17 @@ const AttendanceTracker = () => {
               )}
               <button
                 onClick={exportAttendance}
-                className="group flex items-center px-10 py-5 bg-white/5 border border-white/10 dark:border-white/10 text-white dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
+                className={`group flex items-center px-10 py-5 ${theme.muted.bg} border ${theme.muted.border} text-slate-900 dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black/10 transition-all transform hover:scale-105 active:scale-95 shadow-2xl`}
               >
-                <DocumentChartBarIcon className="h-5 w-5 mr-3 text-indigo-400 group-hover:scale-125 transition-transform" />
+                <DocumentChartBarIcon className={`h-5 w-5 mr-3 ${theme.info.text} group-hover:scale-125 transition-transform`} />
                 Export Dataset
               </button>
               <button
                 onClick={() => setShowAnalytics(v => !v)}
-                className={`group flex items-center px-8 py-5 border text-white dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-2xl ${
+                className={`group flex items-center px-8 py-5 border text-slate-900 dark:text-white rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 shadow-2xl ${
                   showAnalytics
-                    ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                    : 'bg-white/5 border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20'
+                    ? `${theme.info.bg} ${theme.info.border.replace('/30', '/40')} ${theme.info.text}`
+                    : `${theme.muted.bg} ${theme.muted.border} hover:bg-black/10`
                 }`}
               >
                 <SparklesIcon className="h-5 w-5 mr-3 text-indigo-400 group-hover:scale-125 transition-transform" />
@@ -895,17 +895,17 @@ const AttendanceTracker = () => {
         {/* Management Role Pending Approvals Alert */}
         {canViewApprovals && pendingApprovalsCount > 0 && (
           <div className="mb-8">
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6">
+            <div className={`${theme.warning.bg.replace('/20', '/10')} border ${theme.warning.border.replace('/20', '/30')} rounded-2xl p-6`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="p-2 bg-amber-500/20 border border-amber-500/30 rounded-xl">
-                    <ExclamationTriangleIcon className="h-6 w-6 text-amber-400" />
+                  <div className={`p-2 ${theme.warning.bg} border ${theme.warning.border} rounded-xl`}>
+                    <ExclamationTriangleIcon className={`h-6 w-6 ${theme.warning.text}`} />
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-amber-300">Action Required</h3>
-                  <p className="text-amber-400/80 mt-1">
-                    You have <span className="font-bold text-amber-300">{pendingApprovalsCount}</span> attendance edit request{pendingApprovalsCount > 1 ? 's' : ''} waiting for your approval
+                  <h3 className={`text-lg font-semibold ${theme.warning.text}`}>Action Required</h3>
+                  <p className={`${theme.warning.text} opacity-80 mt-1`}>
+                    You have <span className={`font-bold ${theme.warning.text}`}>{pendingApprovalsCount}</span> attendance edit request{pendingApprovalsCount > 1 ? 's' : ''} waiting for your approval
                     {(isManager() && !hasPerm('attendance.view_attendancerecord')) ? ' from your team members' : ''}.
                   </p>
                 </div>
@@ -916,12 +916,12 @@ const AttendanceTracker = () => {
         {/* Overview Row: Stats Summary, Timings, Actions */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-12">
           {/* Attendance Stats (Me vs Team) - Redesigned to match sample */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
+          <div className={`${theme.cardBg} rounded-[2.5rem] border ${theme.cardBorder} p-8 shadow-2xl relative overflow-hidden group`}>
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl font-black text-white uppercase tracking-tight">Attendance Stats</h3>
-              <div className="flex items-center space-x-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 dark:border-white/10">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Attendance Stats</h3>
+              <div className={`flex items-center space-x-2 px-3 py-1 ${theme.muted.bg} rounded-full border ${theme.muted.border}`}>
                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Last Week</span>
-                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                <div className={`w-2 h-2 rounded-full ${theme.info.text.replace('text', 'bg')} animate-pulse`}></div>
               </div>
             </div>
 
@@ -936,42 +936,42 @@ const AttendanceTracker = () => {
               </div>
 
               {/* Me Row */}
-              <div className="group/row flex items-center justify-between p-4 bg-white/5 rounded-[1.5rem] border border-white/10 hover:border-indigo-500/30 transition-all">
+              <div className={`group/row flex items-center justify-between p-4 ${theme.muted.bg} rounded-[1.5rem] border ${theme.muted.border} hover:border-indigo-500/30 transition-all`}>
                 <div className="w-1/3 flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
-                    <UserIcon className="h-5 w-5 text-amber-500" />
+                  <div className={`h-10 w-10 rounded-full ${theme.warning.bg.replace('/20', '/10')} border ${theme.warning.border.replace('/30', '/20')} flex items-center justify-center`}>
+                    <UserIcon className={`h-5 w-5 ${theme.warning.text}`} />
                   </div>
-                  <span className="text-sm font-black text-white uppercase tracking-wider">Me</span>
+                  <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Me</span>
                 </div>
                 <div className="flex-1 flex justify-around items-center">
-                  <span className="text-lg font-black text-white dark:text-white tracking-tight">{minutesToHHMM(stats.lastWeekMe.avgMinutes)}</span>
-                  <span className="text-lg font-black text-white tracking-tight">{stats.lastWeekMe.onTimePercent}%</span>
+                  <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{minutesToHHMM(stats.lastWeekMe.avgMinutes)}</span>
+                  <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{stats.lastWeekMe.onTimePercent}%</span>
                 </div>
               </div>
 
               {/* Team Row */}
-              <div className="group/row flex items-center justify-between p-4 bg-white/5 rounded-[1.5rem] border border-white/10 hover:border-blue-500/30 transition-all opacity-80 hover:opacity-100">
+              <div className={`group/row flex items-center justify-between p-4 ${theme.muted.bg} rounded-[1.5rem] border ${theme.muted.border} hover:border-blue-500/30 transition-all opacity-80 hover:opacity-100`}>
                 <div className="w-1/3 flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                    <SparklesIcon className="h-5 w-5 text-blue-400" />
+                  <div className={`h-10 w-10 rounded-full ${theme.info.bg.replace('/20', '/10')} border ${theme.info.border.replace('/30', '/20')} flex items-center justify-center`}>
+                    <SparklesIcon className={`h-5 w-5 ${theme.info.text}`} />
                   </div>
-                  <span className="text-sm font-black text-slate-200 uppercase tracking-wider">My Team</span>
+                  <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">My Team</span>
                 </div>
                 <div className="flex-1 flex justify-around items-center">
-                  <span className="text-lg font-black text-slate-200 tracking-tight">{minutesToHHMM(stats.lastWeekTeam.avgMinutes)}</span>
-                  <span className="text-lg font-black text-slate-200 tracking-tight">{stats.lastWeekTeam.onTimePercent}%</span>
+                  <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{minutesToHHMM(stats.lastWeekTeam.avgMinutes)}</span>
+                  <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{stats.lastWeekTeam.onTimePercent}%</span>
                 </div>
               </div>
             </div>
 
             <div className="absolute top-0 right-0 p-4">
-              <div className="h-6 w-6 rounded-full border border-white/10 dark:border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-600 hover:text-white dark:text-white hover:border-black/30 dark:border-white/30 cursor-help transition-colors">
+              <div className={`h-6 w-6 rounded-full border ${theme.cardBorder} flex items-center justify-center text-[10px] font-bold text-slate-600 hover:text-slate-900 dark:text-white hover:border-black/30 dark:border-white/30 cursor-help transition-colors`}>
                 i
               </div>
             </div>
           </div>
           {/* Timings */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
+          <div className={`${theme.cardBg} rounded-[2.5rem] border ${theme.cardBorder} p-8 shadow-2xl relative overflow-hidden group`}>
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chronological Status</h3>
               <div className="flex space-x-1.5">
@@ -979,58 +979,58 @@ const AttendanceTracker = () => {
                   const jsDay = new Date().getDay();
                   const active = idx === jsDay;
                   return (
-                    <span key={idx} className={`text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-lg border transition-all ${active ? 'bg-indigo-500 text-white dark:text-white border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/5 text-slate-600 border-white/10 grayscale'}`}>{d}</span>
+                    <span key={idx} className={`text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-lg border transition-all ${active ? `${theme.info.text.replace('text', 'bg')} text-slate-900 dark:text-white border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]` : `${theme.muted.bg} text-slate-600 ${theme.muted.border} grayscale`}`}>{d}</span>
                   );
                 })}
               </div>
             </div>
             <div className="space-y-6">
               <div className="flex items-end justify-between">
-                <p className="text-xs font-bold text-slate-200 uppercase tracking-tight">
+                <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-tight">
                   Node Status Today
                 </p>
                 <span className="text-[10px] font-medium text-slate-500 italic">
                   {todayRecord?.check_in_time ? `${formatTimeDisplay(todayRecord.check_in_time)} - ${todayRecord?.check_out_time ? formatTimeDisplay(todayRecord.check_out_time) : 'Active'}` : 'Inactive'}
                 </span>
               </div>
-              <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden border border-white/10 shadow-inner p-1">
+              <div className={`h-4 w-full ${theme.muted.bg} rounded-full overflow-hidden border ${theme.muted.border} shadow-inner p-1`}>
                 {(() => {
                   const percent = Math.max(0, Math.min(100, Math.round((todayDurationMinutes / (9 * 60)) * 100)));
                   return <div className={`h-full bg-gradient-to-r ${theme.primaryGradient} rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]`} style={{ width: `${percent}%` }} />
                 })()}
               </div>
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                <span className="text-slate-400">Duration: <span className="text-white">{minutesToHHMM(todayDurationMinutes)}</span></span>
-                <span className="text-slate-500">Objective: <span className="text-indigo-400">9.0H</span></span>
+                <span className="text-slate-400">Duration: <span className="text-slate-900 dark:text-white">{minutesToHHMM(todayDurationMinutes)}</span></span>
+                <span className="text-slate-500">Objective: <span className={`${theme.info.text}`}>9.0H</span></span>
               </div>
             </div>
           </div>
           {/* Actions */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden group">
+          <div className={`${theme.cardBg} rounded-[2.5rem] border ${theme.cardBorder} p-8 shadow-2xl relative overflow-hidden group`}>
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Control Interface</h3>
               <button
                 type="button"
                 onClick={() => setUse24Hour(!use24Hour)}
-                className={`group flex items-center space-x-2 px-3 py-1 rounded-full border transition-all ${use24Hour ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5 border-white/10'}`}
+                className={`group flex items-center space-x-2 px-3 py-1 rounded-full border transition-all ${use24Hour ? `${theme.info.bg} border-indigo-500/30` : `${theme.muted.bg} ${theme.muted.border}`}`}
               >
-                <span className={`text-[9px] font-black uppercase tracking-tighter ${use24Hour ? 'text-indigo-400' : 'text-slate-500'}`}>24H Format</span>
-                <div className={`w-6 h-3.5 rounded-full relative transition-colors ${use24Hour ? 'bg-indigo-500' : 'bg-white/5 dark:bg-slate-800'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-tighter ${use24Hour ? `${theme.info.text}` : 'text-slate-500'}`}>24H Format</span>
+                <div className={`w-6 h-3.5 rounded-full relative transition-colors ${use24Hour ? `${theme.info.text.replace('text', 'bg')}` : `${theme.muted.bg} dark:bg-slate-800`}`}>
                   <div className={`absolute top-0.5 h-2.5 w-2.5 bg-white/5 rounded-full transition-transform ${use24Hour ? 'left-[13px]' : 'left-[3px]'}`} />
                 </div>
               </button>
             </div>
             <div className="flex flex-col items-center mb-10">
-              <p className="text-4xl font-black text-white uppercase tracking-tighter leading-none">{formatNow().split(' ')[0]}</p>
+              <p className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">{formatNow().split(' ')[0]}</p>
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mt-2 opacity-80">{formatNow().split(' ')[1] || ''}</p>
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-4">Node Clock: {new Date().toDateString()}</p>
+              <p className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mt-4">Node Clock: {new Date().toDateString()}</p>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              <button onClick={() => handleQuickAction('clockin')} className="w-full text-left px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white dark:text-white hover:border-black/20 dark:border-white/20 transition-all flex items-center group/btn">
-                <ClockIcon className="h-4 w-4 text-indigo-400 mr-3 group-hover/btn:scale-125 transition-transform" /> Quick Clock-In
+              <button onClick={() => handleQuickAction('clockin')} className={`w-full text-left px-5 py-3 rounded-2xl ${theme.muted.bg} border ${theme.muted.border} text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 hover:text-slate-900 dark:text-white hover:border-black/20 transition-all flex items-center group/btn`}>
+                <ClockIcon className={`h-4 w-4 ${theme.info.text} mr-3 group-hover/btn:scale-125 transition-transform`} /> Quick Clock-In
               </button>
-              <button onClick={() => handleQuickAction('wfh')} className="w-full text-left px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white dark:text-white hover:border-black/20 dark:border-white/20 transition-all flex items-center group/btn">
-                <CalendarIcon className="h-4 w-4 text-indigo-400 mr-3 group-hover/btn:scale-125 transition-transform" /> Sync Remote Node
+              <button onClick={() => handleQuickAction('wfh')} className={`w-full text-left px-5 py-3 rounded-2xl ${theme.muted.bg} border ${theme.muted.border} text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 hover:text-slate-900 dark:text-white hover:border-black/20 transition-all flex items-center group/btn`}>
+                <CalendarIcon className={`h-4 w-4 ${theme.info.text} mr-3 group-hover/btn:scale-125 transition-transform`} /> Sync Remote Node
               </button>
             </div>
           </div>
@@ -1077,7 +1077,7 @@ const AttendanceTracker = () => {
 
         {/* ── Analytics Section ── */}
         {showAnalytics && (
-          <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 p-8 mb-12 shadow-2xl">
+          <div className={`${theme.cardBg} rounded-[2.5rem] border ${theme.cardBorder} p-8 mb-12 shadow-2xl`}>
             <AttendanceTrends
               theme={theme}
               attendanceRecords={attendanceRecords}
@@ -1088,35 +1088,35 @@ const AttendanceTracker = () => {
 
         {/* Pending Edit Requests Section - Always show if requests exist, or for regular employees always */}
         {(!isManagementRole || userPendingRequests.length > 0) && (
-          <div className="bg-black/20 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-8 shadow-xl">
-            <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
-              <ClockIcon className="h-6 w-6 mr-2 text-amber-400" />
+          <div className={`${theme.cardBg} rounded-2xl border ${theme.cardBorder} p-6 mb-8 shadow-xl`}>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-6 flex items-center">
+              <ClockIcon className={`h-6 w-6 mr-2 ${theme.warning.text}`} />
               Your Pending Edit Requests
             </h3>
             {userPendingRequests.length > 0 ? (
               <div className="space-y-4">
                 {userPendingRequests
                   .map((record) => (
-                    <div key={record.id} className="flex items-center justify-between p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <div key={record.id} className={`flex items-center justify-between p-4 ${theme.warning.bg.replace('/20', '/10')} border ${theme.warning.border.replace('/20', '/30')} rounded-xl`}>
                       <div className="flex items-center space-x-4">
-                        <div className="p-2 bg-amber-500/20 border border-amber-500/30 rounded-lg">
-                          <ClockIcon className="h-5 w-5 text-amber-400" />
+                        <div className={`p-2 ${theme.warning.bg} border ${theme.warning.border} rounded-lg`}>
+                          <ClockIcon className={`h-5 w-5 ${theme.warning.text}`} />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-amber-300">
+                          <p className={`text-sm font-semibold ${theme.warning.text}`}>
                             Edit request for {formatDate(record.date)}
                           </p>
-                          <p className="text-xs text-amber-400/80 mt-1">
+                          <p className={`text-xs ${theme.warning.text} opacity-80 mt-1`}>
                             Waiting for {isHRManager() ? 'HR' : 'Manager'} approval
                           </p>
                           {record.edit_reason && (
-                            <p className="text-xs text-amber-400/70 mt-1 italic">
+                            <p className={`text-xs ${theme.warning.text} opacity-70 mt-1 italic`}>
                               "{record.edit_reason}"
                             </p>
                           )}
                         </div>
                       </div>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-500/20 border border-amber-500/30 text-amber-300">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${theme.warning.bg} border ${theme.warning.border} ${theme.warning.text}`}>
                         <ClockIcon className="w-3 h-3 mr-1" />
                         Pending
                       </span>
@@ -1125,10 +1125,10 @@ const AttendanceTracker = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <CheckCircleIcon className="h-8 w-8 text-emerald-400" />
+                <div className={`p-3 ${theme.success.bg} border ${theme.success.border} rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}>
+                  <CheckCircleIcon className={`h-8 w-8 ${theme.success.text}`} />
                 </div>
-                <p className="text-white dark:text-white font-medium">All caught up!</p>
+                <p className="text-slate-900 dark:text-white font-medium">All caught up!</p>
                 <p className="text-sm text-slate-400">No pending edit requests</p>
               </div>
             )}
@@ -1142,7 +1142,7 @@ const AttendanceTracker = () => {
                   <CheckCircleIcon className="h-8 w-8 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-black text-white dark:text-white uppercase tracking-tight flex items-center">
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center">
                     Registry Verification Queue
                     {isManager() && <span className="text-[10px] font-black text-slate-500 ml-4 uppercase tracking-[0.2em] bg-white/5 px-3 py-1 rounded-full border border-white/10">Team Nodes</span>}
                   </h3>
@@ -1160,14 +1160,14 @@ const AttendanceTracker = () => {
                 {attendanceRecords
                   .filter(record => record.is_pending_approval)
                   .map((record) => (
-                    <div key={record.id} className="bg-white/5 border border-white/10 rounded-[2rem] p-8 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 shadow-inner group">
+                    <div key={record.id} className="bg-white/5 border border-white/10 rounded-[2rem] p-8 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 shadow-inner group">
                       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
                         <div className="flex items-center space-x-5">
-                          <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 text-xl font-black text-white dark:text-white uppercase transform group-hover:rotate-6 transition-transform">
+                          <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 text-xl font-black text-slate-900 dark:text-white uppercase transform group-hover:rotate-6 transition-transform">
                             {record.display_name?.split(' ').map(n => n[0]).join('') || 'N/A'}
                           </div>
                           <div>
-                            <h4 className="text-2xl font-black text-white dark:text-white uppercase tracking-tight">
+                            <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
                               {record.display_name || 'Unknown Node'}
                             </h4>
                             <div className="flex items-center space-x-3 mt-2">
@@ -1180,7 +1180,7 @@ const AttendanceTracker = () => {
                           <button
                             onClick={() => openApprovalModal(record, 'approve')}
                             disabled={submitting || !canActOnApprovals}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white dark:text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 flex items-center space-x-3 shadow-xl shadow-emerald-500/20 transform hover:scale-105 active:scale-95"
+                            className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 dark:text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 flex items-center space-x-3 shadow-xl shadow-emerald-500/20 transform hover:scale-105 active:scale-95"
                           >
                             <CheckCircleIcon className="h-4 w-4 stroke-[3]" />
                             <span>Validate Node</span>
@@ -1200,7 +1200,7 @@ const AttendanceTracker = () => {
                           <div className="absolute top-0 right-4 -translate-y-1/2 bg-[#1A1F2E] px-3 py-1 rounded-full border border-white/10">
                             <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Employee Rationalization</span>
                           </div>
-                          <p className="text-sm font-bold text-slate-200 italic leading-relaxed">
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-900 dark:text-slate-200 italic leading-relaxed">
                             "{record.edit_reason}"
                           </p>
                         </div>
@@ -1236,11 +1236,11 @@ const AttendanceTracker = () => {
                           <div className="space-y-4">
                             <div className="flex justify-between items-center pb-2 border-b border-indigo-500/10">
                               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Check In</span>
-                              <span className="text-xs font-black text-white dark:text-white uppercase font-mono shadow-[0_0_10px_rgba(255,255,255,0.1)]">{record.check_in_time || 'Null'}</span>
+                              <span className="text-xs font-black text-slate-900 dark:text-white uppercase font-mono shadow-[0_0_10px_rgba(255,255,255,0.1)]">{record.check_in_time || 'Null'}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-indigo-500/10">
                               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Check Out</span>
-                              <span className="text-xs font-black text-white dark:text-white uppercase font-mono shadow-[0_0_10px_rgba(255,255,255,0.1)]">{record.check_out_time || 'Null'}</span>
+                              <span className="text-xs font-black text-slate-900 dark:text-white uppercase font-mono shadow-[0_0_10px_rgba(255,255,255,0.1)]">{record.check_out_time || 'Null'}</span>
                             </div>
                             <div className="flex justify-between items-center">
                               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Protocol Status</span>
@@ -1257,7 +1257,7 @@ const AttendanceTracker = () => {
                 <div className="p-6 bg-emerald-500/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center border border-emerald-500/20 shadow-2xl">
                   <CheckCircleIcon className="h-10 w-10 text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-black text-white dark:text-white uppercase tracking-tight">Queue Synchronized</h3>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Queue Synchronized</h3>
                 <p className="text-slate-500 mt-2 font-medium tracking-tight">
                   Zero pending verification requests in the current organizational node.
                 </p>
@@ -1267,14 +1267,14 @@ const AttendanceTracker = () => {
         )}
         {/* Mark/Edit Attendance Form - Only for Employees (not for HR Manager or Manager) */}
         {!isManagementRole && (
-          <div className="bg-black/20 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-8 shadow-xl">
+          <div className={`${theme.cardBg} backdrop-blur-xl rounded-2xl border ${theme.cardBorder} p-6 mb-8 shadow-xl`}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
                 <div className={`p-2 bg-gradient-to-br ${theme.primaryGradient} rounded-xl`}>
-                  <PlusIcon className="h-6 w-6 text-white" />
+                  <PlusIcon className="h-6 w-6 text-slate-900 dark:text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white">
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
                     {hasExistingRecord ? 'Edit Attendance' : 'Mark Attendance'}
                   </h2>
                   <p className="text-sm text-slate-400">
@@ -1283,7 +1283,7 @@ const AttendanceTracker = () => {
                 </div>
               </div>
               {hasExistingRecord && (
-                <div className="bg-amber-500/20 border border-amber-500/30 text-amber-300 px-4 py-2 rounded-full text-sm font-medium">
+                <div className="bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full text-sm font-medium">
                   ⚠️ Requires Approval
                 </div>
               )}
@@ -1291,58 +1291,58 @@ const AttendanceTracker = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Date</label>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">Date</label>
                   <input
                     {...register('date', { required: 'Date is required' })}
                     type="date"
-                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
                     max={getLocalDateString()}
                   />
                   {errors.date && <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Check In Time</label>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">Check In Time</label>
                   <input
                     {...register('check_in_time')}
                     type="time"
-                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Check Out Time</label>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">Check Out Time</label>
                   <input
                     {...register('check_out_time')}
                     type="time"
-                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:dark]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Status</label>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">Status</label>
                   <select
                     {...register('status', { required: 'Status is required' })}
-                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-[#0B1120] text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors"
+                    className={`w-full px-4 py-3 border ${theme.muted.border} rounded-xl bg-white/5 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors [color-scheme:${theme.isDark ? 'dark' : 'light'}]`}
                   >
-                    <option value="PRESENT">Present</option>
-                    <option value="ABSENT">Absent</option>
-                    <option value="LATE">Late</option>
-                    <option value="HALF_DAY">Half Day</option>
+                    <option value="PRESENT" className={`${theme.modalBg} text-slate-900 dark:text-white`}>Present</option>
+                    <option value="ABSENT" className={`${theme.modalBg} text-slate-900 dark:text-white`}>Absent</option>
+                    <option value="LATE" className={`${theme.modalBg} text-slate-900 dark:text-white`}>Late</option>
+                    <option value="HALF_DAY" className={`${theme.modalBg} text-slate-900 dark:text-white`}>Half Day</option>
                   </select>
                   {errors.status && <p className="text-red-400 text-sm mt-1">{errors.status.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Notes</label>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">Notes</label>
                   <input
                     {...register('notes')}
                     type="text"
                     placeholder="Optional notes..."
-                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors placeholder-slate-500"
+                    className="w-full px-4 py-3 border border-white/10 rounded-xl bg-white/5 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-colors placeholder-slate-500"
                   />
                 </div>
               </div>
               {/* Edit Reason Field - Only show if editing existing record OR past date */}
               {showEditReason && (
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                  <label className="block text-sm font-semibold text-amber-300 mb-2">
+                  <label className="block text-sm font-semibold text-amber-700 dark:text-amber-300 mb-2">
                     Reason for Edit <span className="text-rose-400">*</span>
                   </label>
                   <textarea
@@ -1351,10 +1351,10 @@ const AttendanceTracker = () => {
                     })}
                     rows={3}
                     placeholder="Please explain why you need to edit this attendance record..."
-                    className="w-full px-4 py-3 border border-amber-500/30 rounded-xl bg-white/5 text-white shadow-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors placeholder-amber-500/40 resize-none"
+                    className="w-full px-4 py-3 border border-amber-500/30 rounded-xl bg-white/5 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-colors placeholder-amber-500/40 resize-none"
                   />
                   {errors.edit_reason && <p className="text-red-400 text-sm mt-1">{errors.edit_reason.message}</p>}
-                  <p className="text-xs text-amber-400/80 mt-2 flex items-center">
+                  <p className="text-xs text-amber-700 dark:text-amber-400/80 mt-2 flex items-center">
                     <ExclamationTriangleIcon className="h-4 w-4 mr-1" />
                     This edit request will be sent to HR and your manager for approval.
                   </p>
@@ -1364,7 +1364,7 @@ const AttendanceTracker = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`bg-gradient-to-r ${theme.primaryGradient} hover:opacity-90 text-white dark:text-white px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2`}
+                  className={`bg-gradient-to-r ${theme.primaryGradient} hover:opacity-90 text-slate-900 dark:text-white px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2`}
                 >
                   {submitting ? (
                     <>
@@ -1390,12 +1390,12 @@ const AttendanceTracker = () => {
         )}
         {/* Admin / HR / C-level: explicit filters (defaults to last 7 days vs. full history) */}
         {isOrgWideAttendanceRole() && (
-          <div className="mb-8 rounded-3xl overflow-hidden border border-indigo-500/20 bg-indigo-500/5 backdrop-blur-xl shadow-2xl">
-            <div className="px-6 py-4 border-b border-white/10 bg-white/5">
+          <div className={`mb-8 rounded-3xl overflow-hidden border ${theme.info.border.replace('/30', '/20')} ${theme.info.bg.replace('/20', '/5')} backdrop-blur-xl shadow-2xl`}>
+            <div className={`px-6 py-4 border-b ${theme.cardBorder} bg-white/5`}>
               <div className="flex items-center gap-3">
                 <FunnelIcon className="h-5 w-5 text-indigo-400" />
                 <div>
-                  <h3 className="text-sm font-black text-white dark:text-white uppercase tracking-tight">Organization filters</h3>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Organization filters</h3>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
                     Employee, date range, and status — loads last 7 days by default
                   </p>
@@ -1408,7 +1408,7 @@ const AttendanceTracker = () => {
                 <select
                   value={filters.employee_id}
                   onChange={(e) => handleFilterChange('employee_id', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 [color-scheme:dark]"
                 >
                   <option value="">All employees</option>
                   {orgEmployeeOptions.map((emp) => {
@@ -1427,7 +1427,7 @@ const AttendanceTracker = () => {
                   type="date"
                   value={filters.start_date}
                   onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
                 />
               </div>
               <div>
@@ -1436,7 +1436,7 @@ const AttendanceTracker = () => {
                   type="date"
                   value={filters.end_date}
                   onChange={(e) => handleFilterChange('end_date', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
                 />
               </div>
               <div>
@@ -1444,7 +1444,7 @@ const AttendanceTracker = () => {
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
                 >
                   <option value="">All statuses</option>
                   <option value="PRESENT">Present</option>
@@ -1457,7 +1457,7 @@ const AttendanceTracker = () => {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-white/5/10 border border-white/10 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-200 hover:bg-white/5/15 hover:text-white dark:text-white transition-all"
+                  className="w-full px-4 py-3 rounded-2xl bg-black/10 dark:bg-white/10 border border-white/10 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white hover:bg-white/15 hover:text-slate-900 dark:text-white transition-all"
                 >
                   Reset filters
                 </button>
@@ -1518,13 +1518,13 @@ const AttendanceTracker = () => {
                 ? `${months[activeMonthIndex].label} ${months[activeMonthIndex].year}`
                 : 'CUSTOM SPEC';
           return (
-            <div className="mb-8 rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
+            <div className={`mb-8 rounded-3xl overflow-hidden border ${theme.cardBorder} ${theme.cardBg} shadow-2xl`}>
               <div className="flex flex-col md:flex-row md:items-center px-10 py-6 gap-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
-                    <FunnelIcon className="h-4 w-4 text-indigo-400" />
+                  <div className={`p-2 ${theme.info.bg.replace('/20', '/10')} rounded-xl border ${theme.info.border.replace('/30', '/20')}`}>
+                    <FunnelIcon className={`h-4 w-4 ${theme.info.text}`} />
                   </div>
-                  <span className="text-white dark:text-white text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                  <span className="text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
                     Timeline Query: {timelineLabel}
                   </span>
                 </div>
@@ -1533,7 +1533,7 @@ const AttendanceTracker = () => {
                     <button
                       type="button"
                       onClick={setLast7}
-                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast7Active ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5 text-slate-500 border border-white/10 hover:border-black/20 dark:border-white/20'}`}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast7Active ? `${theme.info.text.replace('text', 'bg')} text-slate-900 dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : `${theme.muted.bg} text-slate-500 border ${theme.muted.border} hover:border-black/20`}`}
                     >
                       7 DAYS
                     </button>
@@ -1541,7 +1541,7 @@ const AttendanceTracker = () => {
                   <button
                     type="button"
                     onClick={setLast30}
-                    className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast30Active ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5 text-slate-500 border border-white/10 hover:border-black/20 dark:border-white/20'}`}
+                    className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${isLast30Active ? `${theme.info.text.replace('text', 'bg')} text-slate-900 dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : `${theme.muted.bg} text-slate-500 border ${theme.muted.border} hover:border-black/20`}`}
                   >
                     30 CYCLES
                   </button>
@@ -1550,7 +1550,7 @@ const AttendanceTracker = () => {
                       type="button"
                       key={i}
                       onClick={() => setMonth(m)}
-                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${activeMonthIndex === i ? `bg-indigo-500 text-white dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : 'bg-white/5 text-slate-500 border border-white/10 hover:border-black/20 dark:border-white/20 hover:text-white dark:text-white'}`}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all uppercase ${activeMonthIndex === i ? `${theme.info.text.replace('text', 'bg')} text-slate-900 dark:text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]` : `${theme.muted.bg} text-slate-500 border ${theme.muted.border} hover:border-black/20 hover:text-slate-900 dark:text-white`}`}
                     >
                       {m.label}
                     </button>
@@ -1560,21 +1560,21 @@ const AttendanceTracker = () => {
             </div>
           );
         })()}
-        <div className="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
-          <div className="px-10 py-8 border-b border-white/10 bg-white/5">
+        <div className={`${theme.cardBg} rounded-[2.5rem] border ${theme.cardBorder} overflow-hidden shadow-2xl`}>
+          <div className={`px-10 py-8 border-b ${theme.cardBorder} bg-white/5`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
-                  <DocumentChartBarIcon className="h-6 w-6 text-indigo-400" />
+                <div className={`p-3 ${theme.muted.bg} rounded-2xl border ${theme.muted.border}`}>
+                  <DocumentChartBarIcon className={`h-6 w-6 ${theme.info.text}`} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white uppercase tracking-tight">System Records</h3>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">System Records</h3>
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Lifecycle event logs for current node query</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 px-4 py-2 bg-white/5 rounded-2xl border border-white/10">
-                <CalendarIcon className="h-4 w-4 text-indigo-400" />
-                <span className="text-xs font-black text-white uppercase tracking-[0.15em]">{getDisplayRecords().length} LOGS</span>
+              <div className={`flex items-center space-x-3 px-4 py-2 ${theme.muted.bg} rounded-2xl border ${theme.muted.border}`}>
+                <CalendarIcon className={`h-4 w-4 ${theme.info.text}`} />
+                <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.15em]">{getDisplayRecords().length} LOGS</span>
               </div>
             </div>
           </div>
@@ -1615,13 +1615,13 @@ const AttendanceTracker = () => {
               <div className="mb-6">
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center">
-                    <span className="text-white dark:text-white font-semibold">
+                    <span className="text-slate-900 dark:text-white font-semibold">
                       {/* ✅ Use employee_name from selectedApproval (already has display_name) */}
                       {selectedApproval.employee_name?.split(' ').map(n => n[0]).join('') || 'N/A'}
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white text-lg">
+                    <h4 className="font-semibold text-slate-900 dark:text-white text-lg">
                       {selectedApproval.employee_name}
                     </h4>
                     <p className="text-sm text-gray-600">
@@ -1764,8 +1764,8 @@ const AttendanceTracker = () => {
                   type="submit"
                   disabled={submitting}
                   className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 flex items-center justify-center space-x-2 ${selectedApproval.action === 'approve'
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white dark:text-white'
-                    : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white dark:text-white'
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-slate-900 dark:text-white'
+                    : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-slate-900 dark:text-white'
                     }`}
                 >
                   {submitting ? (
@@ -1811,7 +1811,7 @@ const AttendanceTracker = () => {
               onClick={() => {
                 document.querySelector('[data-approvals-section]')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white dark:text-white rounded-full p-4 shadow-lg transition-all transform hover:scale-105"
+              className="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-slate-900 dark:text-white rounded-full p-4 shadow-lg transition-all transform hover:scale-105"
               title={`${attendanceRecords.filter(r => r.is_pending_approval).length} pending approvals`}
             >
               <div className="relative">

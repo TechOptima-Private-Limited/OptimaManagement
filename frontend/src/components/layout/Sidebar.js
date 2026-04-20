@@ -280,17 +280,17 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b ${theme.sidebarGradient}
         transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        shadow-2xl border-r border-white/10 dark:border-white/10 flex flex-col
+        shadow-2xl border-r ${theme.muted.border} dark:border-white/10 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="relative z-10 flex items-center justify-start h-20 px-6 bg-slate-900/50 backdrop-blur-md border-b border-white/5">
-          <Link to="/dashboard" onClick={onClose} className="flex items-center space-x-3 hover:opacity-90">
-            <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 border border-indigo-400/30">
+        <div className={`relative z-10 flex items-center justify-start h-20 px-6 ${theme.sidebarBg} backdrop-blur-md border-b ${theme.muted.border}`}>
+          <Link to="/dashboard" onClick={onClose} className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
+            <div className="h-10 w-10 bg-indigo-600 dark:bg-indigo-500/80 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 border border-indigo-400/30">
               <span className="text-white font-bold text-sm">OMH</span>
             </div>
             <div>
-              <h1 className="text-white text-lg font-black leading-tight">Optima</h1>
-              <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest leading-none">ManagementHub</p>
+              <h1 className="text-slate-900 dark:text-white text-lg font-black leading-tight">Optima</h1>
+              <p className="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest leading-none">ManagementHub</p>
             </div>
           </Link>
         </div>
@@ -306,7 +306,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   key={section.name}
                   to={section.href}
                   onClick={onClose}
-                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all relative overflow-hidden ${active ? 'bg-indigo-500/10 text-white border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all relative overflow-hidden ${active ? `${theme.info.bg} text-indigo-700 dark:text-white border ${theme.info.border}` : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-indigo-600 dark:hover:text-white'
                     }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 bg-gradient-to-r ${section.color} opacity-80 group-hover:opacity-100`}>
@@ -326,7 +326,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <div key={section.name} className="space-y-1">
                 <button
                   onClick={() => toggleSection(section.name)}
-                  className={`w-full group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${hasActiveChild ? 'text-indigo-400' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  className={`w-full group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${hasActiveChild ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 bg-gradient-to-r ${section.color} opacity-80 group-hover:opacity-100`}>
@@ -346,7 +346,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           key={child.name}
                           to={child.href}
                           onClick={onClose}
-                          className={`block py-2 text-xs font-bold transition-all uppercase tracking-widest ${childActive ? 'text-indigo-400' : 'text-slate-400 hover:text-white'
+                          className={`block py-2 text-xs font-bold transition-all uppercase tracking-widest ${childActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white'
                             }`}
                         >
                           {child.name}
@@ -360,18 +360,18 @@ const Sidebar = ({ isOpen, onClose }) => {
           })}
         </nav>
 
-        <div className="relative z-10 p-4 border-t border-white/5 bg-slate-900/50 backdrop-blur-sm">
+        <div className={`relative z-10 p-4 border-t ${theme.muted.border} ${theme.sidebarBg} backdrop-blur-sm`}>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-slate-500">
               <span>Status</span>
-              <span className="text-emerald-400 flex items-center">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></div>
+              <span className={`${theme.success.text} flex items-center`}>
+                <div className={`w-1.5 h-1.5 ${theme.success.text.replace('text', 'bg')} rounded-full mr-1.5 animate-pulse`}></div>
                 Live
               </span>
             </div>
             <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-black text-slate-500">
               <span>Version</span>
-              <span className="text-indigo-300">v1.0.0</span>
+              <span className={theme.info.text}>v1.0.0</span>
             </div>
           </div>
         </div>

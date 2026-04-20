@@ -1,4 +1,4 @@
-// Role categorization matching backend
+﻿// Role categorization matching backend
 export const ROLE_CATEGORIES = {
   C_LEVEL: ['CEO', 'CTO', 'CIO', 'COO', 'CFO'],
   VP_LEVEL: ['VP_ENGINEERING'],

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {
   SignalIcon,
@@ -216,12 +216,12 @@ const BiometricIntegration = () => {
 
   if (!(isHRManager() || isAdmin())) {
     return (
-      <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black text-slate-300 flex items-center justify-center -mt-16">
-        <div className="text-center py-12 px-6 bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-2xl shadow-2xl max-w-md w-full">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 dark:from-indigo-900/20 via-slate-50 dark:via-slate-900 to-white dark:to-black text-slate-800 dark:text-slate-300 flex items-center justify-center -mt-16">
+        <div className="text-center py-12 px-6 bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl max-w-md w-full">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-rose-500/20 border border-rose-500/30 rounded-full mb-6 shadow-inner">
             <ExclamationTriangleIcon className="h-10 w-10 text-rose-500" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">Access Denied</h3>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h3>
           <p className="text-sm text-slate-400">Only HR Managers or Admins can access biometric integration.</p>
         </div>
       </div>
@@ -230,21 +230,21 @@ const BiometricIntegration = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 from-indigo-900/20 via-slate-900 to-black flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 from-indigo-900/10 dark:from-indigo-900/20 via-slate-50 dark:via-slate-900 to-white dark:to-black flex items-center justify-center">
         <LoadingSpinner text="Loading biometric devices..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black text-slate-300 pb-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 dark:from-indigo-900/20 via-slate-50 dark:via-slate-900 to-white dark:to-black text-slate-800 dark:text-slate-300 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Biometric Integration</h1>
-            <p className="mt-1 text-sm text-slate-400">Sync attendance from ZK biometric devices directly</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Biometric Integration</h1>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Sync attendance from ZK biometric devices directly</p>
           </div>
           <button
             onClick={() => {
@@ -271,14 +271,14 @@ const BiometricIntegration = () => {
               color: 'violet',
             },
           ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-2xl p-6 hover:bg-white/5 dark:bg-slate-900/80 transition-all group">
+            <div key={label} className="bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-6 hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-all group shadow-sm dark:shadow-none">
               <div className="flex items-center">
                 <div className={`flex-shrink-0 p-3 rounded-xl bg-${color}-500/20 border border-${color}-500/30 text-${color}-400 group-hover:scale-110 transition-transform`}>
                   <Icon className="h-8 w-8" />
                 </div>
                 <div className="ml-5">
-                  <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
-                  <p className="text-3xl font-bold text-white mt-1">{value}</p>
+                  <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</p>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{value}</p>
                 </div>
               </div>
             </div>
@@ -286,28 +286,28 @@ const BiometricIntegration = () => {
         </div>
 
         {/* Global sync date picker */}
-        <div className="mb-6 flex items-center space-x-4 bg-white/5 dark:bg-slate-900/50 border border-white/10 dark:border-white/10 rounded-xl px-5 py-3">
-          <CalendarDaysIcon className="h-5 w-5 text-indigo-400 flex-shrink-0" />
-          <label className="text-sm font-semibold text-slate-300">Sync Date:</label>
+        <div className="mb-6 flex items-center space-x-4 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl px-5 py-3">
+          <CalendarDaysIcon className="h-5 w-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Sync Date:</label>
           <input
             type="date"
             value={syncDate}
             onChange={e => setSyncDate(e.target.value)}
-            className="bg-black/30 border border-white/10 dark:border-white/10 rounded-lg text-white px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark]"
+            className="bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg text-slate-900 dark:text-white px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500/50 dark:[color-scheme:dark]"
           />
           <span className="text-xs text-slate-500 italic">Used for manual sync. Auto-sync always uses today.</span>
         </div>
 
         {/* Devices List */}
-        <div className="bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl shadow-xl overflow-hidden rounded-2xl border border-white/10 dark:border-white/10 mb-8">
-          <div className="px-6 py-5 border-b border-white/10 dark:border-white/10 bg-white/5">
-            <h3 className="text-xl font-bold text-white">Registered Devices</h3>
+        <div className="bg-white dark:bg-slate-900/60 backdrop-blur-xl shadow-xl border border-slate-200 dark:border-white/10 mb-8 rounded-2xl overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Registered Devices</h3>
           </div>
 
           {devices.length === 0 ? (
             <div className="text-center py-16">
-              <ComputerDesktopIcon className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-300">No devices registered</h3>
+              <ComputerDesktopIcon className="h-12 w-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-slate-800 dark:text-slate-300">No devices registered</h3>
               <p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">Add your first ZK biometric device to start syncing attendance data.</p>
               <button
                 onClick={() => {
@@ -322,18 +322,18 @@ const BiometricIntegration = () => {
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-slate-200 dark:divide-white/5">
               {devices.map(device => {
                 const isSyncing = syncingDevice === device.id;
                 const result = syncResults[device.id];
 
                 return (
-                  <div key={device.id} className="p-6 hover:bg-white/5 transition-colors group">
+                  <div key={device.id} className="p-6 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors uppercase tracking-tight">{device.device_name}</h4>
+                          <h4 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors uppercase tracking-tight">{device.device_name}</h4>
                           <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                             <button
                               onClick={() => handleEditDevice(device)}
@@ -351,11 +351,11 @@ const BiometricIntegration = () => {
                             </button>
                           </div>
                         </div>
-                        <div className="mt-2 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-400">
-                          <div><span className="font-semibold text-slate-500 mr-1">ID:</span><span className="font-mono text-slate-300 text-xs bg-black/20 px-1.5 py-0.5 rounded">{device.device_id}</span></div>
-                          <div><span className="font-semibold text-slate-500 mr-1">Status:</span><span className="text-slate-300">{getDeviceStatusText(device)}</span></div>
-                          <div><span className="font-semibold text-slate-500 mr-1">IP:</span><span className="font-mono text-slate-300 text-xs bg-black/20 px-1.5 py-0.5 rounded">{device.ip_address}</span></div>
-                          <div><span className="font-semibold text-slate-500 mr-1">Location:</span>{device.location}</div>
+                        <div className="mt-2 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 dark:text-slate-400">
+                          <div><span className="font-semibold text-slate-500 dark:text-slate-500 mr-1">ID:</span><span className="font-mono text-slate-700 dark:text-slate-300 text-xs bg-slate-100 dark:bg-black/20 px-1.5 py-0.5 rounded">{device.device_id}</span></div>
+                          <div><span className="font-semibold text-slate-500 dark:text-slate-500 mr-1">Status:</span><span className="text-slate-700 dark:text-slate-300">{getDeviceStatusText(device)}</span></div>
+                          <div><span className="font-semibold text-slate-500 dark:text-slate-500 mr-1">IP:</span><span className="font-mono text-slate-700 dark:text-slate-300 text-xs bg-slate-100 dark:bg-black/20 px-1.5 py-0.5 rounded">{device.ip_address}</span></div>
+                          <div><span className="font-semibold text-slate-500 dark:text-slate-500 mr-1">Location:</span>{device.location}</div>
                         </div>
                         {device.last_sync && (
                           <p className="mt-2 text-xs text-slate-500 flex items-center">
@@ -381,7 +381,7 @@ const BiometricIntegration = () => {
                         <button
                           onClick={() => syncDevice(device, syncDate)}
                           disabled={isSyncing}
-                          className="inline-flex items-center justify-center px-4 py-2 border border-white/10 dark:border-white/10 text-sm font-semibold rounded-xl text-slate-300 bg-black/20 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center px-4 py-2 border border-slate-200 dark:border-white/10 text-sm font-semibold rounded-xl text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-black/20 hover:bg-slate-200 dark:hover:bg-black/10 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSyncing ? (
                             <><ArrowPathIcon className="h-4 w-4 mr-2 animate-spin" /> Syncing...</>
@@ -395,10 +395,10 @@ const BiometricIntegration = () => {
                             value={device.sync_interval_minutes || 15}
                             disabled={device.auto_sync_enabled}
                             onChange={e => setAutoSyncInterval(device, Number(e.target.value))}
-                            className="flex-1 bg-black/30 border border-white/10 dark:border-white/10 rounded-lg text-slate-300 text-xs px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50"
+                            className="flex-1 bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg text-slate-600 dark:text-slate-300 text-xs px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50"
                           >
                             {SYNC_INTERVALS.map(opt => (
-                              <option key={opt.value} value={opt.value} className="bg-white/5 dark:bg-slate-900">{opt.label}</option>
+                              <option key={opt.value} value={opt.value} className="bg-white dark:bg-slate-900">{opt.label}</option>
                             ))}
                           </select>
                           <button
@@ -432,15 +432,15 @@ const BiometricIntegration = () => {
         </div>
 
         {/* Info box */}
-        <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-2xl p-6">
+        <div className="bg-indigo-500/10 dark:bg-indigo-900/20 border border-indigo-500/20 dark:border-indigo-500/30 rounded-2xl p-6">
           <div className="flex">
-            <SignalIcon className="h-6 w-6 text-indigo-400 flex-shrink-0" />
+            <SignalIcon className="h-6 w-6 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
             <div className="ml-4">
-              <h3 className="text-base font-bold text-indigo-300">How it works</h3>
-              <ul className="mt-2 text-sm text-indigo-200/80 space-y-1 list-disc list-inside">
-                <li><strong>Sync Now</strong> — pulls logs for the selected date from the ZK device IP and creates/updates attendance records instantly.</li>
-                <li><strong>Auto Sync</strong> — runs on a background timer. Always syncs <em>today's</em> data so checkout times stay updated automatically.</li>
-                <li>Times are stored in <strong>IST</strong>. Punch times from the device are converted to the correct local time before saving.</li>
+              <h3 className="text-base font-bold text-indigo-900 dark:text-indigo-300">How it works</h3>
+              <ul className="mt-2 text-sm text-slate-600 dark:text-indigo-200/80 space-y-1 list-disc list-inside">
+                <li><strong className="text-indigo-700 dark:text-indigo-400">Sync Now</strong> — pulls logs for the selected date from the ZK device IP and creates/updates attendance records instantly.</li>
+                <li><strong className="text-indigo-700 dark:text-indigo-400">Auto Sync</strong> — runs on a background timer. Always syncs <em>today's</em> data so checkout times stay updated automatically.</li>
+                <li>Times are stored in <strong className="text-indigo-700 dark:text-indigo-400">IST</strong>. Punch times from the device are converted to the correct local time before saving.</li>
               </ul>
             </div>
           </div>
@@ -450,15 +450,15 @@ const BiometricIntegration = () => {
         {showAddDevice && (
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-              <div className="fixed inset-0 bg-white/5 dark:bg-slate-900/90 backdrop-blur-sm" onClick={() => {
+              <div className="fixed inset-0 bg-black/60 dark:bg-slate-900/90 backdrop-blur-md" onClick={() => {
                 setShowAddDevice(false);
                 setEditingDevice(null);
                 setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
               }} />
-              <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full relative z-10">
+              <div className="inline-block align-bottom bg-white dark:bg-[#0A0F1A] border border-slate-200 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full relative z-10">
                 <div className="px-8 pt-8 pb-6">
-                  <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-                    <h3 className="text-xl font-bold text-white">{editingDevice ? 'Edit' : 'Add'} Biometric Device</h3>
+                  <div className="flex items-center justify-between mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{editingDevice ? 'Edit' : 'Add'} Biometric Device</h3>
                     <button onClick={() => {
                       setShowAddDevice(false);
                       setEditingDevice(null);
@@ -475,20 +475,20 @@ const BiometricIntegration = () => {
                       { label: 'IP Address', key: 'ip_address', placeholder: 'e.g. 192.168.1.100' },
                     ].map(({ label, key, placeholder }) => (
                       <div key={key}>
-                        <label className="block text-sm font-medium text-slate-300 mb-1.5">{label}</label>
+                        <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1.5">{label}</label>
                         <input
                           type="text"
                           required
                           value={newDevice[key]}
                           onChange={e => setNewDevice(prev => ({ ...prev, [key]: e.target.value }))}
-                          className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl py-2.5 px-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                          className="block w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl py-2.5 px-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                           placeholder={placeholder}
                         />
                       </div>
                     ))}
                   </form>
                 </div>
-                <div className="bg-white/5 border-t border-white/10 dark:border-white/10 px-6 py-4 flex flex-row-reverse gap-3">
+                <div className="bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10 px-6 py-4 flex flex-row-reverse gap-3">
                   <button type="submit" form="addDeviceForm" className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-sm font-bold text-white hover:from-indigo-400 hover:to-purple-500 transition-all">
                     {editingDevice ? 'Save Changes' : 'Add Device'}
                   </button>
@@ -496,7 +496,7 @@ const BiometricIntegration = () => {
                     setShowAddDevice(false);
                     setEditingDevice(null);
                     setNewDevice({ device_name: '', device_id: '', location: '', ip_address: '' });
-                  }} className="px-6 py-2.5 rounded-xl border border-white/10 dark:border-white/10 bg-white/5 text-sm font-medium text-slate-300 hover:bg-black/10 dark:bg-white/5/10 transition-all">
+                  }} className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-black/10 transition-all">
                     Cancel
                   </button>
                 </div>

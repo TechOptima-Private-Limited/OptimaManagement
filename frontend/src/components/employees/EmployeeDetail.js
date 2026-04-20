@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowUpTrayIcon,
@@ -23,7 +23,7 @@ import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Modal from '../common/Modal';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http:/127.0.0.1:8080/api';
 
 const InfoCard = ({ title, children, className = '' }) => (
   <div className={`bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 dark:border-white/10 p-6 ${className}`}>
@@ -46,7 +46,7 @@ const InfoItem = ({ icon: Icon, label, value }) => (
 
 const quickActionStyles = {
   blue: {
-    card: 'bg-white/5 border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-indigo-500/30',
+    card: 'bg-white/5 border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/10 hover:border-indigo-500/30',
     icon: 'text-indigo-400',
     title: 'text-white',
     desc: 'text-slate-400',
@@ -480,7 +480,7 @@ const EmployeeDetail = () => {
                     type="button"
                     onClick={cancelEditing}
                     disabled={saving}
-                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/5/10 disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/10 disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -498,7 +498,7 @@ const EmployeeDetail = () => {
                   <button
                     type="button"
                     onClick={startEditing}
-                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/5/10"
+                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-200 text-sm font-black hover:bg-black/10 dark:bg-white/10"
                   >
                     Edit
                   </button>
@@ -808,7 +808,7 @@ const EmployeeDetail = () => {
                       <div className="px-6 py-4">
                         <div className="flex items-center mb-3">
                           <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Existing Files</span>
-                          <span className="ml-2 px-2 py-0.5 rounded-full bg-black/10 dark:bg-white/5/10 text-[10px] font-bold text-white">{documents.length}</span>
+                          <span className="ml-2 px-2 py-0.5 rounded-full bg-black/10 dark:bg-white/10 text-[10px] font-bold text-white">{documents.length}</span>
                         </div>
                         {documentsLoading ? (
                           <div className="flex items-center space-x-2 text-indigo-400 py-2">
@@ -820,7 +820,7 @@ const EmployeeDetail = () => {
                             {documents.map((doc) => (
                               <div
                                 key={`${doc.field}-${doc.doc_type}`}
-                                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 transition-colors group"
+                                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 bg-white/5 hover:bg-black/10 dark:bg-white/10 transition-colors group"
                               >
                                 <div className="flex items-center space-x-2 truncate">
                                   <PaperClipIcon className="h-4 w-4 text-slate-400 shrink-0" />
@@ -868,7 +868,7 @@ const EmployeeDetail = () => {
                               type="file"
                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                               onChange={(e) => updateDocumentInput(item.id, 'file', e.target.files?.[0] || null)}
-                              className="w-full text-sm text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-black/10 dark:bg-white/5/10 file:text-white hover:file:bg-black/20 dark:bg-white/5/20 file:cursor-pointer file:transition-colors cursor-pointer"
+                              className="w-full text-sm text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-black/10 dark:bg-white/10 file:text-white hover:file:bg-black/20 dark:bg-white/20 file:cursor-pointer file:transition-colors cursor-pointer"
                             />
                           </div>
                           <div className="flex shrink-0">
@@ -891,7 +891,7 @@ const EmployeeDetail = () => {
                           type="button"
                           onClick={uploadDocuments}
                           disabled={uploadingDocuments || documentInputs.every((d) => !d.file || !d.docType)}
-                          className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold text-white bg-black/10 dark:bg-white/5/10 hover:bg-black/20 dark:bg-white/5/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-white/10 hover:border-black/20 dark:border-white/20"
+                          className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold text-white bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-white/10 hover:border-black/20 dark:border-white/20"
                         >
                           {uploadingDocuments ? 'Uploading...' : 'Upload Files'}
                         </button>
@@ -985,7 +985,7 @@ const EmployeeDetail = () => {
             </button>
             <button
               onClick={() => setShowDeleteModal(false)}
-              className="flex-1 bg-black/10 dark:bg-white/5/10 text-slate-200 px-4 py-2 rounded-xl text-sm font-black hover:bg-white/5/15"
+              className="flex-1 bg-black/10 dark:bg-white/10 text-slate-200 px-4 py-2 rounded-xl text-sm font-black hover:bg-white/15"
             >
               Cancel
             </button>

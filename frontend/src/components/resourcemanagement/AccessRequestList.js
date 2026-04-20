@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+﻿import React, { useState, useEffect, Fragment } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
@@ -164,7 +164,7 @@ const AccessRequestList = () => {
                 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center space-x-2
                 ${statusFilter === option.value
                   ? `bg-indigo-500/20 text-indigo-400 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]`
-                  : 'bg-white/5 text-gray-600 dark:text-gray-400 border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20'
+                  : 'bg-white/5 text-gray-600 dark:text-gray-400 border border-white/10 dark:border-white/10 hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20'
                 }
               `}
             >
@@ -173,7 +173,7 @@ const AccessRequestList = () => {
                 px-2 py-0.5 rounded-full text-xs font-bold
                 ${statusFilter === option.value
                   ? 'bg-indigo-500/30 text-indigo-300'
-                  : 'bg-black/10 dark:bg-white/5/10 text-slate-400'
+                  : 'bg-black/10 dark:bg-white/10 text-slate-400'
                 }
               `}>
                 {option.count}
@@ -212,11 +212,11 @@ const AccessRequestList = () => {
           {filteredRequests.map((request) => (
             <div
               key={request.id}
-              className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-black/10 dark:bg-white/5/10 transition-all duration-300 group`}
+              className={`bg-white/5 border ${theme.cardBorder} rounded-2xl p-6 hover:bg-black/10 dark:bg-white/10 transition-all duration-300 group`}
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-white/5 rounded-xl group-hover:bg-black/10 dark:bg-white/5/10 transition-colors">
+                  <div className="p-3 bg-white/5 rounded-xl group-hover:bg-black/10 dark:bg-white/10 transition-colors">
                     {getStatusIcon(request.status)}
                   </div>
                   <div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -127,7 +127,7 @@ const BirthdayBanner = ({ data, theme }) => {
   if (!data.birthdays.has_birthdays_today) return null;
 
   return (
-    <div className={`mb-6 bg-gradient-to-r ${theme.headerGradient} rounded-2xl p-6 text-white relative overflow-hidden shadow-2xl border border-white/10 group`}>
+    <div className={`mb-6 bg-gradient-to-r ${theme.headerGradient} rounded-2xl p-6 text-slate-900 dark:text-white relative overflow-hidden shadow-2xl border border-white/10 group`}>
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-2 left-10 text-6xl animate-bounce">🎂</div>
         <div className="absolute top-8 right-20 text-4xl animate-pulse">🎈</div>
@@ -140,20 +140,20 @@ const BirthdayBanner = ({ data, theme }) => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-2 flex items-center">
-              <CakeIcon className="w-8 h-8 mr-3" />
+              <CakeIcon className="w-8 h-8 mr-3 text-indigo-500" />
               🎉 Birthday Celebration! 🎉
             </h2>
             <div className="space-y-2">
               {data.birthdays.todays_birthdays.map((birthday) => (
                 <div key={birthday.id} className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-white/5/20 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-white/30">
+                  <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center text-lg font-bold backdrop-blur-sm border border-indigo-500/20 text-indigo-600 dark:text-white">
                     {birthday.avatar_initials}
                   </div>
                   <div>
                     <p className="text-xl font-semibold">
                       Happy {birthday.age_today}th Birthday, {birthday.employee_name}! 🎂
                     </p>
-                    <p className="text-white/90 text-sm">
+                    <p className="text-slate-600 dark:text-white/90 text-sm">
                       {birthday.employee_department} • Wishing you joy, success, and happiness! 🌟
                     </p>
                   </div>
@@ -198,7 +198,7 @@ const FestivalBanner = ({ data, theme }) => {
   );
 };
 
-const UpcomingTimeline = ({ nextHoliday, nextLeave }) => {
+const UpcomingTimeline = ({ nextHoliday, nextLeave, theme }) => {
   if (!nextHoliday && !nextLeave) return null;
 
   const getDaysUntil = (dateStr) => {
@@ -211,7 +211,7 @@ const UpcomingTimeline = ({ nextHoliday, nextLeave }) => {
   };
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-5 border border-white/5 shadow-lg relative overflow-hidden transition-all duration-300 hover:border-white/10 mb-6 card-hover-lift smooth-transition">
+    <div className={`${theme.muted.bg} backdrop-blur-xl rounded-2xl p-5 border ${theme.muted.border} shadow-lg relative overflow-hidden transition-all duration-300 hover:border-white/10 mb-6 card-hover-lift smooth-transition`}>
       <div className="relative z-10">
         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
           <CalendarDaysIcon className="w-3 h-3 mr-2" />
@@ -222,20 +222,20 @@ const UpcomingTimeline = ({ nextHoliday, nextLeave }) => {
           {/* Next Holiday */}
           {nextHoliday && (
             <div className="flex items-center gap-4 group">
-              <div className="flex flex-col items-center justify-center w-12 h-12 bg-indigo-500/20 rounded-xl border border-indigo-500/30 group-hover:bg-indigo-500/30 transition-all duration-300">
-                <span className="text-[10px] font-black text-indigo-300 uppercase leading-none mb-1">
+              <div className={`flex flex-col items-center justify-center w-12 h-12 ${theme.info.bg} rounded-xl border ${theme.info.border} group-hover:bg-indigo-500/30 transition-all duration-300`}>
+                <span className={`text-[10px] font-black ${theme.info.text} uppercase leading-none mb-1 opacity-70`}>
                    {new Date(nextHoliday.date).toLocaleDateString('en-US', { month: 'short' })}
                 </span>
-                <span className="text-lg font-black text-white leading-none">
+                <span className={`text-lg font-black ${theme.isDark ? 'text-white' : theme.info.text} leading-none`}>
                    {new Date(nextHoliday.date).getDate()}
                 </span>
               </div>
               <div className="flex-1">
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Next Holiday</p>
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
                   {nextHoliday.name}
                   {getDaysUntil(nextHoliday.date) <= 3 && (
-                    <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/30 animate-pulse">Soon</span>
+                    <span className={`text-[8px] ${theme.success.bg} ${theme.success.text} px-1.5 py-0.5 rounded-full border ${theme.success.border} animate-pulse`}>Soon</span>
                   )}
                 </h4>
               </div>
@@ -245,24 +245,24 @@ const UpcomingTimeline = ({ nextHoliday, nextLeave }) => {
           {/* Next Leave */}
           {nextLeave ? (
             <div className="flex items-center gap-4 group">
-              <div className="flex flex-col items-center justify-center w-12 h-12 bg-violet-500/20 rounded-xl border border-violet-500/30 group-hover:bg-violet-500/30 transition-all duration-300">
-                <span className="text-[10px] font-black text-violet-300 uppercase leading-none mb-1">
+              <div className={`flex flex-col items-center justify-center w-12 h-12 ${theme.info.bg.replace('indigo', 'violet')} rounded-xl border ${theme.info.border.replace('indigo', 'violet')} group-hover:bg-violet-500/30 transition-all duration-300`}>
+                <span className={`text-[10px] font-black ${theme.info.text.replace('indigo', 'violet')} uppercase leading-none mb-1 opacity-70`}>
                    {new Date(nextLeave.start_date).toLocaleDateString('en-US', { month: 'short' })}
                 </span>
-                <span className="text-lg font-black text-white leading-none">
+                <span className={`text-lg font-black ${theme.isDark ? 'text-white' : theme.info.text.replace('indigo', 'violet')} leading-none`}>
                    {new Date(nextLeave.start_date).getDate()}
                 </span>
               </div>
               <div className="flex-1">
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Your Upcoming Leave</p>
-                <h4 className="text-sm font-bold text-white">{nextLeave.leave_type_name || 'Vacation'}</h4>
+                <h4 className="text-sm font-bold text-slate-800 dark:text-white">{nextLeave.leave_type_name || 'Vacation'}</h4>
                 <p className="text-[9px] text-slate-500 mt-0.5">
                   {getDaysUntil(nextLeave.start_date)} days remaining
                 </p>
               </div>
             </div>
           ) : (
-            <div className="p-3 bg-white/5 rounded-xl border border-white/5 border-dashed text-center">
+            <div className={`p-3 ${theme.muted.bg} rounded-xl border ${theme.muted.border} border-dashed text-center`}>
                <p className="text-[10px] text-slate-600 font-bold uppercase">No upcoming leaves</p>
             </div>
           )}
@@ -272,9 +272,9 @@ const UpcomingTimeline = ({ nextHoliday, nextLeave }) => {
   );
 };
 
-const BirthdayCard = ({ birthday }) => {
+const BirthdayCard = ({ birthday, theme }) => {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-indigo-900 p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group w-full max-w-[320px] mx-auto sm:mx-0">
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.birthdayGradient} p-1 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl group w-full max-w-[320px] mx-auto sm:mx-0`}>
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-3 left-6 text-4xl animate-bounce">🎂</div>
         <div className="absolute top-8 right-8 text-3xl animate-pulse" style={{ animationDelay: '0.5s' }}>🎈</div>
@@ -283,10 +283,10 @@ const BirthdayCard = ({ birthday }) => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-pulse opacity-10">✨</div>
       </div>
 
-      <div className="relative bg-white/5/10 backdrop-blur-sm rounded-2xl p-4 h-full border border-white/20">
+      <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 h-full border border-white/20">
         <div className="flex items-start space-x-4 mb-2">
           <div className="relative">
-            <div className="w-14 h-14 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/30">
+            <div className={`w-14 h-14 bg-gradient-to-br ${theme.avatarGradient} rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/30`}>
               {birthday.avatar_initials}
             </div>
             <div className="absolute -top-1 -right-1 text-xl animate-bounce">🎉</div>
@@ -296,21 +296,21 @@ const BirthdayCard = ({ birthday }) => {
             <h3 className="text-lg font-bold text-white drop-shadow-md mb-0.5">{birthday.employee_name}</h3>
             <div className="text-indigo-200 text-sm mb-2">{birthday.employee_department}</div>
             <div className="flex items-center space-x-2">
-              <span className="px-3 py-1 bg-white/5/20 rounded-full text-xs font-medium text-white/90 backdrop-blur-sm border border-white/30">
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white/90 backdrop-blur-sm border border-white/30">
                 🎂 BIRTHDAY
               </span>
             </div>
           </div>
 
           <div className="text-center">
-            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-2.5 border-2 border-white/30 shadow-lg">
+            <div className={`bg-gradient-to-br ${theme.specialGradient} rounded-xl p-2.5 border-2 border-white/30 shadow-lg`}>
               <div className="text-xl font-black text-white drop-shadow-md">{birthday.age_today}</div>
               <div className="text-xs text-white/90 font-medium">years</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white/5/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 mb-2">
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 mb-2">
           <div className="text-white/90 text-center">
             <div className="text-lg font-semibold mb-1">🎉 Happy Birthday! 🎉</div>
             <div className="text-sm">Wishing you joy, success, and happiness on your special day! 🌟</div>
@@ -335,9 +335,9 @@ const BirthdayCard = ({ birthday }) => {
   );
 };
 
-const QuickAccessCard = ({ title, children, className = "", gradient = false, headerAction = null }) => {
+const QuickAccessCard = ({ title, children, className = "", gradient = false, headerAction = null, theme }) => {
   const hasCustomBg = className.includes('bg-');
-  const defaultBg = gradient ? 'bg-white/5/10 backdrop-blur-xl border border-white/5 shadow-2xl' : 'bg-white/5 backdrop-blur-lg border border-white/5';
+  const defaultBg = gradient ? 'bg-white/10 backdrop-blur-xl border border-white/5 shadow-2xl' : `${theme.muted.bg} backdrop-blur-lg border ${theme.muted.border}`;
 
   return (
     <div className={`${hasCustomBg ? '' : defaultBg} rounded-2xl p-5 hover:border-white/10 transition-all duration-300 group card-hover-lift smooth-transition ${className}`}>
@@ -354,7 +354,7 @@ const QuickAccessCard = ({ title, children, className = "", gradient = false, he
   );
 };
 
-const HolidaysModal = ({ isOpen, onClose, data }) => {
+const HolidaysModal = ({ isOpen, onClose, data, theme }) => {
   if (!isOpen) return null;
 
   const displayHolidays = data || [];
@@ -389,18 +389,18 @@ const HolidaysModal = ({ isOpen, onClose, data }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[#000000]/70 backdrop-blur-md" onClick={onClose} />
-      <div className="relative bg-[#0b1221] w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border border-white/5 animate-in zoom-in-95 duration-200">
+      <div className={`relative ${theme.modalBg} w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border ${theme.muted.border} animate-in zoom-in-95 duration-200`}>
         <div className="p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-6">
-              <h2 className="text-xl font-medium text-white tracking-tight">Holidays</h2>
+              <h2 className="text-xl font-medium text-slate-800 dark:text-white tracking-tight">Holidays</h2>
               <div className="flex items-center space-x-4 text-base">
                 <button className="text-slate-400 hover:text-white transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                   </svg>
                 </button>
-                <span className="font-semibold text-white tracking-wide">2026</span>
+                <span className="font-semibold text-slate-800 dark:text-white tracking-wide">2026</span>
                 <button className="text-slate-400 hover:text-white transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -427,12 +427,12 @@ const HolidaysModal = ({ isOpen, onClose, data }) => {
                     <div className={`h-5 ${getMonthColor(idx)} flex items-center justify-center text-[9px] font-black text-white tracking-[0.1em] opacity-90`}>
                       {getMonthName(h.date)}
                     </div>
-                    <div className="flex-1 bg-[#1a2236] flex items-center justify-center text-xl font-bold text-white tracking-tighter">
+                    <div className={`${theme.isDark ? 'bg-[#1a2236]' : 'bg-slate-200'} flex-1 flex items-center justify-center text-xl font-bold ${theme.isDark ? 'text-white' : 'text-slate-800'} tracking-tighter`}>
                       {getDayNumber(h.date)}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-lg font-medium text-slate-100 group-hover:text-white transition-colors mb-0.5 truncate">{h.name}</h4>
+                    <h4 className="text-lg font-medium text-slate-800 dark:text-slate-100 group-hover:dark:text-white group-hover:text-indigo-600 transition-colors mb-0.5 truncate">{h.name}</h4>
                     <p className="text-slate-500 text-sm font-medium">{getDayName(h.date)}</p>
                   </div>
                 </div>
@@ -462,7 +462,7 @@ const HolidaysModal = ({ isOpen, onClose, data }) => {
   );
 };
 
-const LeaveBalanceCircle = ({ balance }) => {
+const LeaveBalanceCircle = ({ balance, theme }) => {
   const used = balance.used_days;
   const total = balance.total_days;
   const remaining = balance.remaining_days;
@@ -472,7 +472,7 @@ const LeaveBalanceCircle = ({ balance }) => {
   const strokeDashoffset = isNaN(percentage) ? circumference : circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="text-center p-3 rounded-xl border border-white/5 bg-white/5 transition-all duration-300">
+    <div className={`text-center p-3 rounded-xl border ${theme.muted.border} ${theme.muted.bg} transition-all duration-300`}>
       <div className="relative w-20 h-20 mx-auto mb-1.5">
         <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="none" />
@@ -482,21 +482,21 @@ const LeaveBalanceCircle = ({ balance }) => {
           />
           <defs>
             <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#6366f1" />
-              <stop offset="100%" stopColor="#a855f7" />
+              <stop offset="0%" stopColor={theme.accentColor} />
+              <stop offset="100%" stopColor={theme.secondaryColor} />
             </linearGradient>
           </defs>
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className={`font-black text-indigo-400 ${remaining > 500 ? 'text-2xl pt-1' : 'text-lg'}`}>
+            <div className={`font-black ${theme.info.text} ${remaining > 500 ? 'text-2xl pt-1' : 'text-lg'}`}>
               {remaining > 500 ? '∞' : remaining}
             </div>
             <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">left</div>
           </div>
         </div>
       </div>
-      <div className="text-[10px] font-black text-slate-200 uppercase tracking-widest leading-tight">{balance.leave_type?.code}</div>
+      <div className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest leading-tight">{balance.leave_type?.code}</div>
       <div className="text-[9px] text-slate-500 font-bold">
         {total > 500 ? `${used} Days Used` : `${used}/${total} used`}
       </div>
@@ -532,7 +532,7 @@ const AutoAlerts = ({ alerts, dismissedAlerts, onDismiss }) => {
               {alert.actionLabel && (
                 <button
                   onClick={alert.action}
-                  className={`mt-2 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${alert.icon_bg} ${alert.accent} border ${alert.border} hover:bg-white/5/10 transition-colors`}
+                  className={`mt-2 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${alert.icon_bg} ${alert.accent} border ${alert.border} hover:bg-white/10 transition-colors`}
                 >
                   {alert.actionLabel}
                 </button>
@@ -618,12 +618,12 @@ const DailySummaryCard = ({ attendanceState, todayWindow, isManagerOnly, theme }
       const totalMinutes = h * 60 + m;
       const isLate = totalMinutes > (10 * 60 + 5);
       status = isLate ? 'Late' : 'On Time';
-      statusColor = isLate ? 'text-amber-400' : 'text-emerald-400';
+      statusColor = isLate ? theme.warning.text : theme.success.text;
     }
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-lg group relative overflow-hidden transition-all duration-300 hover:border-white/20 mb-6">
+    <div className={`${theme.muted.bg} backdrop-blur-xl rounded-2xl p-5 border ${theme.muted.border} shadow-lg group relative overflow-hidden transition-all duration-300 hover:border-white/20 mb-6`}>
       <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
         <ClockIcon className="w-12 h-12 text-white" />
       </div>
@@ -636,7 +636,7 @@ const DailySummaryCard = ({ attendanceState, todayWindow, isManagerOnly, theme }
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Check-in</p>
-            <p className="text-lg font-black text-white">{formattedCheckIn}</p>
+            <p className="text-lg font-black text-slate-800 dark:text-white">{formattedCheckIn}</p>
           </div>
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Status</p>
@@ -645,11 +645,11 @@ const DailySummaryCard = ({ attendanceState, todayWindow, isManagerOnly, theme }
           <div className="col-span-2">
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Work Hours so far</p>
             <div className="flex items-center gap-3">
-              <p className="text-2xl font-black text-white">
+              <p className="text-2xl font-black text-slate-800 dark:text-white">
                 {workHours}h {workMinutes}m
               </p>
               {isOvertime && (
-                <span className="px-3 py-1 bg-rose-500/20 text-rose-400 text-[10px] font-black uppercase tracking-widest rounded-lg animate-pulse border border-rose-500/30 flex items-center gap-2">
+                <span className={`px-3 py-1 ${theme.danger.bg} ${theme.danger.text} text-[10px] font-black uppercase tracking-widest rounded-lg animate-pulse border ${theme.danger.border} flex items-center gap-2`}>
                   <span className="bg-rose-500 w-1 h-1 rounded-full shadow-[0_0_5px_rgba(244,63,94,0.8)]"></span>
                   Overtime +{otHours}h {String(otMinutes).padStart(2, '0')}m 🔥
                 </span>
@@ -661,7 +661,7 @@ const DailySummaryCard = ({ attendanceState, todayWindow, isManagerOnly, theme }
     </div>
   );
 };
-const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
+const GamificationCard = ({ records, targetEmployeeId, isManagerOnly, theme }) => {
   if (isManagerOnly || !records || records.length === 0) return null;
 
   const streak = getAttendanceStreak(records, targetEmployeeId);
@@ -669,9 +669,9 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
   const badge = getMonthlyBadge(records, targetEmployeeId);
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-5 border border-white/5 shadow-lg relative overflow-hidden transition-all duration-300 hover:border-white/10 mb-6 card-hover-lift smooth-transition">
+    <div className={`${theme.muted.bg} backdrop-blur-xl rounded-2xl p-5 border ${theme.muted.border} shadow-lg relative overflow-hidden transition-all duration-300 hover:border-white/10 mb-6 card-hover-lift smooth-transition`}>
       {/* Background Decorative Element */}
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div className={`absolute -top-10 -right-10 w-32 h-32 ${theme.info.bg.replace('/20', '/10')} rounded-full blur-3xl`}></div>
       
       <div className="relative z-10">
         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
@@ -686,7 +686,7 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
             <div className="flex items-center gap-1">
               {streak > 0 ? (
                 <>
-                  <span className="text-xl font-black text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]">
+                  <span className={`text-xl font-black ${theme.danger.text} drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]`}>
                     {streak}
                   </span>
                   <span className="text-lg animate-flicker transition-transform duration-300">🔥</span>
@@ -694,34 +694,34 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
               ) : (
                 <div className="flex items-center gap-2">
                   <span className="text-lg animate-bounce">🚀</span>
-                  <span className="text-[9px] text-indigo-400 font-black uppercase tracking-tighter leading-tight">
+                  <span className={`text-[9px] ${theme.info.text} font-black uppercase tracking-tighter leading-tight`}>
                     Start your<br/>streak today
                   </span>
                 </div>
               )}
             </div>
             {streak > 0 && (
-              <div className="mt-1 w-full bg-white/5 h-1 rounded-full overflow-hidden">
-                <div className="bg-rose-500 h-full transition-all duration-1000" style={{ width: `${Math.min(100, (streak / 30) * 100)}%` }}></div>
+              <div className={`mt-1 w-full ${theme.muted.bg} h-1 rounded-full overflow-hidden`}>
+                <div className={`${theme.danger.text.replace('text', 'bg')} h-full transition-all duration-1000`} style={{ width: `${Math.min(100, (streak / 30) * 100)}%` }}></div>
               </div>
             )}
           </div>
 
           {/* On-Time Score */}
-          <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+          <div className={`${theme.muted.bg} p-3 rounded-xl border ${theme.muted.border} hover:bg-white/10 transition-colors`}>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Punctuality</p>
             <div className="flex items-center gap-1">
-              <span className="text-xl font-black text-emerald-400">
+              <span className={`text-xl font-black ${theme.success.text}`}>
                 {onTimeScore}%
               </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+              <div className={`w-1.5 h-1.5 rounded-full ${theme.success.text.replace('text', 'bg')} animate-pulse`}></div>
             </div>
             <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">This Month</p>
           </div>
 
           {/* Monthly Badge */}
           {badge ? (
-            <div className="bg-white/5 p-3 rounded-xl border border-white/5 hover:bg-white/5/10 transition-colors flex flex-col items-center justify-center text-center">
+            <div className={`${theme.muted.bg} p-3 rounded-xl border ${theme.muted.border} border-dashed hover:bg-white/10 transition-colors flex flex-col items-center justify-center text-center`}>
               <div className="text-2xl mb-1 drop-shadow-xl transform group-hover:scale-110 transition-transform">
                 {badge.icon}
               </div>
@@ -730,7 +730,7 @@ const GamificationCard = ({ records, targetEmployeeId, isManagerOnly }) => {
               </p>
             </div>
           ) : (
-             <div className="bg-white/5 p-3 rounded-xl border border-white/10 border-dashed flex flex-col items-center justify-center text-center">
+             <div className={`${theme.muted.bg} p-3 rounded-xl border ${theme.muted.border} border-dashed flex flex-col items-center justify-center text-center`}>
                 <div className="text-xs font-bold text-slate-400 uppercase tracking-tighter">No Badge</div>
                 <p className="text-[7px] text-slate-500 mt-1">Keep it up!</p>
              </div>
@@ -1087,12 +1087,12 @@ const Dashboard = () => {
       const phase1 = isManagerOrAbove
         ? [
           employeeAPI.getEmployees({ limit: 10 }),                      // [0]
-          leaveAPI.getLeaveRequests({ status: 'PENDING', limit: 10 }), // [1]
-          leaveAPI.getLeaveRequests({ status: 'APPROVED', limit: 10 }),// [2]
+          leaveAPI.getLeaveRequests({ status: 'PENDING', limit: 10 }), /// [1]
+          leaveAPI.getLeaveRequests({ status: 'APPROVED', limit: 10 }), /// [2]
         ]
         : [
           leaveAPI.getLeaveSummary(),                       // [0]
-          attendanceAPI.getAttendanceRecords({ limit: 7 }), // [1]
+          attendanceAPI.getAttendanceRecords({ limit: 7 }), /// [1]
           leaveAPI.getLeaveRequests({ limit: 5 }),          // [2]
         ];
 
@@ -1717,8 +1717,7 @@ const Dashboard = () => {
     <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient}`}>
       <MicroStyles />
       {/* Enhanced Header with Role-based Greeting */}
-      {/* <div className={`bg-gradient-to-r ${theme.headerGradient} text-white border-b border-white/20 px-6 py-6 shadow-xl`}> */}
-      <div className={`bg-slate-900 text-white border-b border-white/5 px-4 sm:px-8 py-6 sm:py-10 shadow-lg relative overflow-hidden`}>
+      <div className={`bg-gradient-to-r ${theme.headerGradient} border-b ${theme.muted.border} px-4 sm:px-8 py-6 sm:py-10 shadow-lg relative overflow-hidden`}>
         {/* Subtle pattern or overlay to break the solid red */}
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-[120px] -mr-48 -mt-48 opacity-40"></div>
@@ -1728,11 +1727,11 @@ const Dashboard = () => {
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <div className="flex items-center space-x-3 mb-3">
-              <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10 text-indigo-300">
+              <span className={`px-3 py-1 ${theme.muted.bg} rounded-full text-[10px] font-bold uppercase tracking-widest border ${theme.muted.border} ${theme.info.text}`}>
                 {userRole?.replace('_', ' ')}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               {(() => {
                 const hour = new Date().getHours();
                 if (hour < 12) return `Good Morning, ${user?.first_name} 🌅`;
@@ -1741,7 +1740,7 @@ const Dashboard = () => {
               })()}
             </h1>
             <p className="text-slate-400 mt-1 sm:mt-2 text-xs sm:text-sm font-medium flex items-center">
-              <CalendarDaysIcon className="h-4 w-4 mr-2 text-indigo-400" />
+              <CalendarDaysIcon className={`h-4 w-4 mr-2 ${theme.info.text}`} />
               {new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 day: 'numeric',
@@ -1752,7 +1751,7 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center">
             <div className="text-right">
-              <div className="text-xl sm:text-3xl font-bold text-white drop-shadow-lg tabular-nums">
+              <div className="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white drop-shadow-lg tabular-nums">
                 {dashboardData.currentTime.toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -1782,6 +1781,7 @@ const Dashboard = () => {
           records={dashboardData.allAttendance || []}
           targetEmployeeId={user?.employee_id || user?.employee_pk || user?.id}
           isManagerOnly={isManagerOnly}
+          theme={theme}
         />
 
         {/* Birthday Banner */}
@@ -1793,13 +1793,13 @@ const Dashboard = () => {
 
         {/* On Leave and WFH Sections */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-          <QuickAccessCard title="Who's on Leave Today" gradient={true}>
+          <QuickAccessCard title="Who's on Leave Today" gradient={true} theme={theme}>
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar-holiday">
               {(dashboardData.onLeaveToday?.length || 0) > 0 ? (
                 dashboardData.onLeaveToday.map((leave, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/5/10 transition-all duration-300">
+                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all duration-300">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 text-xs font-black">
+                      <div className={`w-10 h-10 ${theme.info.bg.replace('/20', '/10')} border ${theme.info.border.replace('/30', '/20')} rounded-full flex items-center justify-center ${theme.info.text} text-xs font-black`}>
                         {leave.initials}
                       </div>
                       <div>
@@ -1808,14 +1808,14 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">ON LEAVE</span>
+                      <span className={`px-2 py-0.5 ${theme.info.bg.replace('/20', '/10')} ${theme.info.text} border ${theme.info.border.replace('/30', '/20')} rounded-lg text-[10px] font-black uppercase tracking-widest`}>ON LEAVE</span>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 text-center animate-pulse">
-                  <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4 border border-green-500/20 shadow-[0_0_20px_rgba(34,197,94,0.1)]">
-                    <CheckCircleIcon className="w-8 h-8 text-green-500" />
+                  <div className={`w-16 h-16 ${theme.success.bg.replace('/20', '/10')} rounded-full flex items-center justify-center mb-4 border ${theme.success.border.replace('/30', '/20')} shadow-[0_0_20px_rgba(34,197,94,0.1)]`}>
+                    <CheckCircleIcon className={`w-8 h-8 ${theme.success.text}`} />
                   </div>
                   <p className="text-white font-bold text-sm">Full Strength Today! 🎉</p>
                   <p className="text-slate-500 text-[10px] mt-1 uppercase tracking-widest font-black">Everyone is available</p>
@@ -1824,13 +1824,13 @@ const Dashboard = () => {
             </div>
           </QuickAccessCard>
 
-          <QuickAccessCard title="Who's Working From Home Today" gradient={true}>
+          <QuickAccessCard title="Who's Working From Home Today" gradient={true} theme={theme}>
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar-holiday">
               {(dashboardData.wfhToday?.length || 0) > 0 ? (
                 dashboardData.wfhToday.map((wfh, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/5/10 transition-all duration-300">
+                  <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all duration-300">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center text-amber-400 text-xs font-black">
+                      <div className={`w-10 h-10 ${theme.warning.bg.replace('/20', '/10')} border ${theme.warning.border.replace('/30', '/20')} rounded-full flex items-center justify-center ${theme.warning.text} text-xs font-black`}>
                         {wfh.initials}
                       </div>
                       <div>
@@ -1839,14 +1839,14 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">WFH</span>
+                      <span className={`px-2 py-0.5 ${theme.warning.bg.replace('/20', '/10')} ${theme.warning.text} border ${theme.warning.border.replace('/30', '/20')} rounded-lg text-[10px] font-black uppercase tracking-widest`}>WFH</span>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 text-center animate-pulse">
-                  <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-                    <BuildingOfficeIcon className="w-8 h-8 text-indigo-500" />
+                  <div className={`w-16 h-16 ${theme.info.bg.replace('/20', '/10')} rounded-full flex items-center justify-center mb-4 border ${theme.info.border.replace('/30', '/20')} shadow-[0_0_20px_rgba(99,102,241,0.1)]`}>
+                    <BuildingOfficeIcon className={`w-8 h-8 ${theme.info.text}`} />
                   </div>
                   <p className="text-white font-bold text-sm">All Hands at Office 🏢</p>
                   <p className="text-slate-500 text-[10px] mt-1 uppercase tracking-widest font-black">No remote sessions today</p>
@@ -1861,7 +1861,7 @@ const Dashboard = () => {
           <div className="lg:col-span-2 space-y-6">
 
             {!isManagerOnly && attendanceState && (
-              <QuickAccessCard title="⚡ Quick Access" className="bg-[#0F172A] text-white border-white/5 overflow-hidden relative shadow-2xl">
+              <QuickAccessCard title="⚡ Quick Access" className={`${theme.cardBg} ${theme.cardBorder} overflow-hidden relative shadow-2xl`} theme={theme}>
                 <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-indigo-500/20 blur-[70px]" />
                 <div className="absolute -bottom-8 -left-8 h-28 w-28 rounded-full bg-violet-500/10 blur-[55px]" />
 
@@ -1881,11 +1881,11 @@ const Dashboard = () => {
                       }}
                       disabled={submittingAttendance}
                       className={`group relative w-full overflow-hidden flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase card-hover-lift smooth-transition ${effectiveIsCheckedIn
-                        ? 'bg-gradient-to-r from-rose-600 to-rose-500 text-white hover:brightness-110 shadow-xl shadow-rose-600/25 border border-rose-400/20 btn-glow-danger'
-                        : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:brightness-110 shadow-xl shadow-indigo-700/30 border border-indigo-400/20 btn-glow-primary'
+                        ? 'bg-gradient-to-r from-rose-600 to-rose-500 text-[#ffffff] hover:brightness-110 shadow-xl shadow-rose-600/25 border border-rose-400/20 btn-glow-danger'
+                        : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-[#ffffff] hover:brightness-110 shadow-xl shadow-indigo-700/30 border border-indigo-400/20 btn-glow-primary'
                         }`}
                     >
-                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/5/10" />
+                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10" />
                       <span className="relative">{effectiveIsCheckedIn ? '🛑' : '✅'}</span>
                       <span className="relative">
                         {submittingAttendance ? 'PROCESSING...' : (effectiveIsCheckedIn ? 'CHECK OUT' : 'CHECK IN')}
@@ -1895,16 +1895,16 @@ const Dashboard = () => {
                     <button
                       onClick={() => handleCheckIn(true)}
                       disabled={submittingAttendance || effectiveIsCheckedIn}
-                      className="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:brightness-110 border border-amber-300/30 shadow-lg shadow-amber-600/25 disabled:opacity-50 disabled:cursor-not-allowed card-hover-lift smooth-transition btn-glow-primary"
+                      className="group relative w-full overflow-hidden flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-gradient-to-r from-amber-500 to-orange-500 text-[#ffffff] hover:brightness-110 border border-amber-300/30 shadow-lg shadow-amber-600/25 disabled:opacity-50 disabled:cursor-not-allowed card-hover-lift smooth-transition btn-glow-primary"
                     >
-                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/5/10" />
+                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10" />
                       <span className="relative">🏠</span>
                       <span className="relative">WORK FROM HOME</span>
                     </button>
 
                     <Link
                       to="/leave"
-                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200 hover:bg-white/5/10 hover:border-white/20"
+                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-900 dark:text-slate-200 hover:bg-white/10 hover:border-white/20"
                     >
                       <span>📝</span>
                       <span>APPLY LEAVE</span>
@@ -1912,7 +1912,7 @@ const Dashboard = () => {
 
                     <Link
                       to="/attendance"
-                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200 hover:bg-white/5/10 hover:border-white/20"
+                      className="group w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all duration-300 text-sm tracking-wider uppercase bg-white/5 border border-white/10 text-slate-900 dark:text-slate-200 hover:bg-white/10 hover:border-white/20"
                     >
                       <span>📅</span>
                       <span>VIEW ATTENDANCE</span>
@@ -1923,7 +1923,7 @@ const Dashboard = () => {
             )}
 
             {/* Performance Trends Card */}
-            <QuickAccessCard title="📈 Performance Trends" gradient={true}>
+            <QuickAccessCard title="📈 Performance Trends" gradient={true} theme={theme}>
               {/* Visual Attendance Trends */}
               <div className="mb-6">
                 <PerformanceTrends data={dashboardData.dailyStats || []} />
@@ -1932,19 +1932,19 @@ const Dashboard = () => {
             </QuickAccessCard>
 
             {/* Manager/HR Quick Access */}
-            <QuickAccessCard title="🚀 Quick Access" gradient={true}>
+            <QuickAccessCard title="🚀 Quick Access" className={`${theme.cardBg} ${theme.cardBorder} overflow-hidden shadow-2xl`} theme={theme}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Leave Management for Managers */}
                 {isManagerOrAbove && (
                   <Link
                     to="/leave"
-                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/5/10"
+                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/10"
                   >
                     <div className="text-center">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-all duration-500 bg-gradient-to-r ${theme.primaryGradient} group-hover:scale-110`}>
-                        <CalendarDaysIcon className="h-7 w-7 text-white" />
+                        <CalendarDaysIcon className="h-7 w-7 text-[#ffffff]" />
                       </div>
-                      <span className="text-sm font-bold text-slate-200 uppercase tracking-wider">Manage Leaves</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider">Manage Leaves</span>
                     </div>
                   </Link>
                 )}
@@ -1953,13 +1953,13 @@ const Dashboard = () => {
                 <>
                   <Link
                     to="/attendance"
-                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/5/10"
+                    className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/10"
                   >
                     <div className="text-center">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-all duration-500 bg-gradient-to-r ${theme.secondaryGradient} group-hover:scale-110`}>
-                        <ClockIcon className="h-7 w-7 text-white" />
+                        <ClockIcon className="h-7 w-7 text-[#ffffff]" />
                       </div>
-                      <span className="text-sm font-bold text-slate-200 uppercase tracking-wider">View Attendance</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider">View Attendance</span>
                     </div>
                   </Link>
                 </>
@@ -1969,13 +1969,13 @@ const Dashboard = () => {
                   <>
                     <Link
                       to="/leave"
-                      className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/5/10"
+                      className="group flex items-center justify-center p-6 rounded-2xl border border-white/5 transition-all duration-300 transform hover:scale-105 shadow-2xl bg-white/5 backdrop-blur-xl hover:border-white/10 hover:bg-white/10"
                     >
                       <div className="text-center">
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-all duration-500 bg-gradient-to-r ${theme.primaryGradient} group-hover:scale-110`}>
-                          <CalendarDaysIcon className="h-7 w-7 text-white" />
+                          <CalendarDaysIcon className="h-7 w-7 text-[#ffffff]" />
                         </div>
-                        <span className="text-sm font-bold text-slate-200 uppercase tracking-wider">Apply Leave</span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider">Apply Leave</span>
                       </div>
                     </Link>
 
@@ -1989,15 +1989,17 @@ const Dashboard = () => {
             <UpcomingTimeline 
               nextHoliday={dashboardData.nextHoliday}
               nextLeave={dashboardData.nextLeave}
+              theme={theme}
             />
 
             <HolidaysModal
               isOpen={showHolidaysModal}
               onClose={() => setShowHolidaysModal(false)}
               data={allHolidays}
+              theme={theme}
             />
             {/* Enhanced Upcoming Birthdays Card */}
-            <QuickAccessCard title="🎂 Upcoming Birthdays" className="overflow-hidden" gradient={false}>
+            <QuickAccessCard title="🎂 Upcoming Birthdays" className="overflow-hidden" gradient={false} theme={theme}>
               {birthdayFestivalData.birthdays.upcoming_birthdays.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -2012,6 +2014,7 @@ const Dashboard = () => {
                   <BirthdayCard
                     key={birthdayFestivalData.birthdays.upcoming_birthdays[0].id || 'birthday-single'}
                     birthday={birthdayFestivalData.birthdays.upcoming_birthdays[0]}
+                    theme={theme}
                   />
                 </div>
               ) : (
@@ -2022,7 +2025,7 @@ const Dashboard = () => {
                   <div className="overflow-x-auto pb-4 scrollbar-hide">
                     <div className="flex space-x-6 px-2" style={{ width: 'max-content' }}>
                       {birthdayFestivalData.birthdays.upcoming_birthdays.map((birthday) => (
-                        <BirthdayCard key={birthday.id} birthday={birthday} />
+                        <BirthdayCard key={birthday.id} birthday={birthday} theme={theme} />
                       ))}
                     </div>
                   </div>
@@ -2032,19 +2035,19 @@ const Dashboard = () => {
 
             {/* Team Management for Managers */}
             {isManagerOrAbove && (
-              <QuickAccessCard title="👥 Team Overview" gradient={true}>
+              <QuickAccessCard title="👥 Team Overview" gradient={true} theme={theme}>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="p-4 rounded-xl border border-white/5 bg-white/5">
-                      <div className="text-2xl font-black text-indigo-400">{dashboardData.employees?.length || 0}</div>
+                    <div className={`p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg}`}>
+                      <div className={`text-2xl font-black ${theme.info.text}`}>{dashboardData.employees?.length || 0}</div>
                       <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Total Employees</div>
                     </div>
-                    <div className="p-4 rounded-xl border border-white/5 bg-white/5">
-                      <div className="text-2xl font-black text-indigo-400">{dashboardData.pendingLeaves?.length || 0}</div>
+                    <div className={`p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg}`}>
+                      <div className={`text-2xl font-black ${theme.info.text}`}>{dashboardData.pendingLeaves?.length || 0}</div>
                       <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Pending Leaves</div>
                     </div>
-                    <div className="p-4 rounded-xl border border-white/5 bg-white/5">
-                      <div className="text-2xl font-black text-indigo-400">{dashboardData.approvedLeaves?.length || 0}</div>
+                    <div className={`p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg}`}>
+                      <div className={`text-2xl font-black ${theme.info.text}`}>{dashboardData.approvedLeaves?.length || 0}</div>
                       <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Approved Leaves</div>
                     </div>
                   </div>
@@ -2052,7 +2055,7 @@ const Dashboard = () => {
                   <div className="pt-4 border-t border-white/5">
                     <Link
                       to="/employees"
-                      className={`inline-flex items-center px-4 py-2 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg transform hover:scale-105 bg-gradient-to-r ${theme.primaryGradient}`}
+                      className={`inline-flex items-center px-4 py-2 text-[#ffffff] font-semibold rounded-lg transition-all duration-300 shadow-lg transform hover:scale-105 bg-gradient-to-r ${theme.primaryGradient}`}
                     >
                       View Team Details →
                     </Link>
@@ -2067,21 +2070,21 @@ const Dashboard = () => {
             <WorkingFormatCard />
 
             {/* Go to Workplace Card */}
-            <QuickAccessCard title="🏢 Go to Workplace" gradient={true}>
+            <QuickAccessCard title="🏢 Go to Workplace" gradient={true} theme={theme}>
               <div className="space-y-4">
-                <div className="p-5 rounded-xl border border-white/5 shadow-2xl text-center group transition-all duration-300 hover:border-white/10 bg-slate-900/60 backdrop-blur-xl">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-500 bg-indigo-600 text-white">
-                    <HomeIcon className="w-6 h-6 text-white" />
+                <div className={`p-5 rounded-xl border ${theme.muted.border} shadow-2xl text-center group transition-all duration-300 hover:border-white/10 bg-slate-900/60 backdrop-blur-xl`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-500 bg-gradient-to-r ${theme.primaryGradient} text-white`}>
+                    <HomeIcon className="w-6 h-6 text-[#ffffff]" />
                   </div>
                   <h4 className="text-lg font-bold text-white mb-1">Avarta Workplace</h4>
                   <p className="text-xs text-slate-400 mb-4 font-medium">
                     Access your technical workspace and project management tools.
                   </p>
                   <a
-                    href="https://avarta.techoptima.ai/login"
+                    href="https:/avarta.techoptima.ai/login"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center w-full px-6 py-3 text-white font-bold rounded-xl transition-all duration-300 shadow-lg transform hover:scale-[1.02] active:scale-95 bg-gradient-to-r ${theme.primaryGradient}`}
+                    className={`inline-flex items-center justify-center w-full px-6 py-3 text-[#ffffff] font-bold rounded-xl transition-all duration-300 shadow-lg transform hover:scale-[1.02] active:scale-95 bg-gradient-to-r ${theme.primaryGradient}`}
                   >
                     Go to Workplace
                     <span className="ml-2 text-lg">→</span>
@@ -2092,7 +2095,7 @@ const Dashboard = () => {
 
             {/* Leave Balances - Only for Employees and HR Managers */}
             {!isManagerOnly && (
-              <QuickAccessCard title="🏖️ Leave Balances" gradient={true}>
+              <QuickAccessCard title="🏖️ Leave Balances" gradient={true} theme={theme}>
                 <div className="space-y-4">
                   {dashboardData.leaveBalances?.length === 0 ? (
                     <div className="text-center py-8 bg-white/5 rounded-xl border border-white/5 shadow-inner backdrop-blur-md">
@@ -2104,14 +2107,14 @@ const Dashboard = () => {
                   ) : (
                     <div className="grid grid-cols-2 gap-4">
                       {dashboardData.leaveBalances?.slice(0, 4).map((balance, idx) => (
-                        <LeaveBalanceCircle key={balance.id || `leave-${idx}`} balance={balance} />
+                        <LeaveBalanceCircle key={balance.id || `leave-${idx}`} balance={balance} theme={theme} />
                       ))}
                     </div>
                   )}
                   <div className="pt-4 border-t border-white/5">
                     <Link
                       to="/leave"
-                      className={`inline-flex items-center px-6 py-3 text-white font-bold rounded-xl transition-all duration-300 shadow-lg transform hover:scale-105 active:scale-95 bg-gradient-to-r ${theme.primaryGradient}`}
+                      className={`inline-flex items-center px-6 py-3 text-[#ffffff] font-bold rounded-xl transition-all duration-300 shadow-lg transform hover:scale-105 active:scale-95 bg-gradient-to-r ${theme.primaryGradient}`}
                     >
                       Request Leave
                       <span className="ml-2 text-xl">→</span>
@@ -2122,7 +2125,7 @@ const Dashboard = () => {
             )}
 
             {/* Enhanced Birthdays Today & Upcoming */}
-            <QuickAccessCard title="🎂 Birthdays & Celebrations" gradient={true}>
+            <QuickAccessCard title="🎂 Birthdays & Celebrations" gradient={true} theme={theme}>
               <div className="space-y-6">
                 {/* Today's Birthdays */}
                 <div>
@@ -2196,11 +2199,11 @@ const Dashboard = () => {
             </QuickAccessCard>
 
             {/* Enhanced Quick Actions */}
-            <QuickAccessCard title="⚡ Quick Actions" gradient={true}>
+            <QuickAccessCard title="⚡ Quick Actions" gradient={true} theme={theme}>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5">
                   <span className="text-sm font-bold text-slate-400 flex items-center uppercase tracking-tighter">
-                    <ClockIcon className="w-4 h-4 mr-2 text-indigo-400" />
+                    <ClockIcon className={`w-4 h-4 mr-2 ${theme.info.text}`} />
                     Current Time
                   </span>
                   <span className="text-2xl font-black text-white">
@@ -2218,7 +2221,7 @@ const Dashboard = () => {
                     <>
                       <Link
                         to="/leave"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg"
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Manage Team Leaves</span>
                         <CalendarDaysIcon className="w-5 h-5 transition-colors duration-300 text-indigo-400 group-hover:text-indigo-300" />
@@ -2226,18 +2229,18 @@ const Dashboard = () => {
 
                       <Link
                         to="/attendance"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className={`group flex items-center justify-between p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg} hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg`}
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Team Attendance Reports</span>
-                        <ChartBarIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />
+                        <ChartBarIcon className={`w-5 h-5 ${theme.info.text} group-hover:text-indigo-300 transition-colors duration-300`} />
                       </Link>
 
                       <Link
                         to="/employees"
-                        className="group flex items-center justify-between p-4 bg-slate-800/50 border border-white/10 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className={`group flex items-center justify-between p-4 ${theme.muted.bg} border ${theme.muted.border} rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg`}
                       >
                         <span className="text-sm font-semibold">Employee Management</span>
-                        <UserGroupIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />
+                        <UserGroupIcon className={`w-5 h-5 ${theme.info.text} group-hover:text-indigo-300 transition-colors duration-300`} />
                       </Link>
                     </>
                   ) : (
@@ -2245,26 +2248,26 @@ const Dashboard = () => {
                       {/* Employee and HR Manager Quick Actions */}
                       <Link
                         to="/attendance"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className={`group flex items-center justify-between p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg} hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg`}
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">View Attendance Records</span>
-                        <ChartBarIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />
+                        <ChartBarIcon className={`w-5 h-5 ${theme.info.text} group-hover:text-indigo-300 transition-colors duration-300`} />
                       </Link>
 
                       <Link
                         to="/leave"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className={`group flex items-center justify-between p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg} hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg`}
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Apply for Leave</span>
-                        <CalendarDaysIcon className="w-5 h-5 transition-colors duration-300 text-indigo-400 group-hover:text-indigo-300" />
+                        <CalendarDaysIcon className={`w-5 h-5 transition-colors duration-300 ${theme.info.text} group-hover:text-indigo-300`} />
                       </Link>
 
                       <Link
                         to="/work-from-home"
-                        className="group flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/5/10 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        className={`group flex items-center justify-between p-4 rounded-xl border ${theme.muted.border} ${theme.muted.bg} hover:bg-white/10 transition-all duration-300 shadow-sm hover:shadow-lg`}
                       >
                         <span className="text-sm font-bold text-slate-300 uppercase tracking-tight">Work From Home</span>
-                        <HomeIcon className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300" />
+                        <HomeIcon className={`w-5 h-5 ${theme.info.text} group-hover:text-indigo-300 transition-colors duration-300`} />
                       </Link>
                     </>
                   )}
@@ -2273,7 +2276,7 @@ const Dashboard = () => {
             </QuickAccessCard>
 
             {/* Enhanced Recent Activity - Role Based */}
-            <QuickAccessCard title="📈 Recent Activity" gradient={true}>
+            <QuickAccessCard title="📈 Recent Activity" gradient={true} theme={theme}>
               <div className="flex flex-col space-y-4">
                 {/* Activity and Action items updated with deep theme */}
               </div>
@@ -2295,6 +2298,7 @@ const Dashboard = () => {
         isOpen={showHolidaysModal}
         onClose={() => setShowHolidaysModal(false)}
         data={allHolidays}
+        theme={theme}
       />
 
       {/* Enhanced Custom CSS */}

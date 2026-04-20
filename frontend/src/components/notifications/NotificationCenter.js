@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BellIcon,
@@ -175,7 +175,7 @@ const NotificationCenter = () => {
       className={`
         p-3 border-l-4 cursor-pointer transition-all duration-200
         hover:bg-white/5
-        ${notification.is_read ? 'opacity-60' : 'bg-white/5/3'}
+        ${notification.is_read ? 'opacity-60' : 'bg-white/3'}
         ${getAccentColor(notification.notification_type)}
       `}
       onClick={() => handleNotificationClick(notification)}
@@ -237,7 +237,7 @@ const NotificationCenter = () => {
       {/* Bell Button */}
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="p-2.5 text-white/80 hover:text-white hover:bg-black/20 dark:bg-white/5/20 rounded-xl relative focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 backdrop-blur-sm border border-black/20 dark:border-white/20"
+        className="p-2.5 text-white/80 hover:text-white hover:bg-black/20 dark:bg-white/20 rounded-xl relative focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 backdrop-blur-sm border border-black/20 dark:border-white/20"
         aria-label="View notifications"
       >
         <BellIcon className="h-6 w-6" />

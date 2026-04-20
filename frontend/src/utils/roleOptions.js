@@ -1,4 +1,4 @@
-// roleOptions.js
+﻿// roleOptions.js
 import { ROLE_CATEGORIES, getRoleDisplayName } from './roleConfig';
 
 export const getAllRoleOptions = () => {

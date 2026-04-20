@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -18,8 +18,10 @@ import { formatDate } from '../../utils/formatters';
 import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Modal from '../common/Modal';
+import { useTheme } from '../../context/ThemeContext';
 
 const LeaveApproval = () => {
+  const { theme } = useTheme();
   const location = useLocation();
   const employeeFromUrlRef = useRef('');
   useEffect(() => {
@@ -56,11 +58,11 @@ const LeaveApproval = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  // // If you need to add the handleCancelRequest function:
+  // If you need to add the handleCancelRequest function:
   // const handleCancelRequest = async (requestId) => {
   //   try {
   //     setActionLoading(true);
-  //     // Replace with your actual API call
+  //     / Replace with your actual API call
   //     await leaveAPI.cancelLeaveRequest(requestId);
   //     toast.success('Leave request cancelled successfully');
   //     fetchRequests(); // Refresh the list
@@ -166,12 +168,12 @@ const LeaveApproval = () => {
     const daysUntilStart = getDaysUntilStart(request.start_date);
 
     return (
-      <div className={`border-l-4 p-8 mb-6 rounded-r-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-white/5 backdrop-blur-xl border border-white/10 dark:border-white/10 ${getUrgencyColor(request)}`}>
+      <div className={`border-l-4 p-8 mb-6 rounded-r-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${theme.cardBg} backdrop-blur-xl border ${theme.cardBorder} ${getUrgencyColor(request)}`}>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-6 flex-1">
             <div className="flex-shrink-0">
               <div className="h-16 w-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.3)]">
-                <span className="text-indigo-300 font-black text-xl">
+                <span className={`${theme.info.text} font-black text-xl`}>
                   {request.employee?.user_info?.first_name?.[0]}{request.employee?.user_info?.last_name?.[0]}
                 </span>
               </div>
@@ -179,25 +181,25 @@ const LeaveApproval = () => {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-4 mb-3">
-                <h4 className="text-xl font-bold text-white tracking-wide">
+                <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-wide">
                   {request.employee?.user_info?.first_name} {request.employee?.user_info?.last_name}
                 </h4>
                 <StatusBadge status={request.status} />
                 {daysUntilStart <= 3 && daysUntilStart >= 0 && request.status === 'PENDING' && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-rose-500/20 border border-rose-500/30 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.3)]">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black ${theme.danger.bg} border ${theme.danger.border} ${theme.danger.text}`}>
                     <FireIcon className="h-3 w-3 mr-1" />
                     {daysUntilStart === 0 ? 'Starts Today' : daysUntilStart === 1 ? 'Starts Tomorrow' : `${daysUntilStart} days`}
                   </span>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium text-slate-400 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">
                 <div className="flex items-center">
                   <CalendarDaysIcon className="h-5 w-5 mr-2 text-indigo-400" />
                   <div className="flex items-center space-x-2">
                     <span>{request.leave_type?.name}</span>
                     {request.leave_type?.is_unpaid && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-widest shadow-[0_0_10px_rgba(244,63,94,0.3)]">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black ${theme.danger.bg} ${theme.danger.text} border ${theme.danger.border} uppercase tracking-widest shadow-[0_0_10px_rgba(244,63,94,0.3)]`}>
                         Unpaid (LOP)
                       </span>
                     )}
@@ -208,13 +210,13 @@ const LeaveApproval = () => {
                   <span>{request.days_requested} day{request.days_requested !== 1 ? 's' : ''}</span>
                 </div>
                 <div className="col-span-1 md:col-span-1">
-                  <span className="text-white">
+                  <span className="text-slate-900 dark:text-white">
                     {formatDate(request.start_date)} - {formatDate(request.end_date)}
                   </span>
                 </div>
               </div>
 
-              <div className="text-sm text-slate-300 mb-3 bg-[#0A0F1A] p-4 rounded-2xl border border-white/10 shadow-inner">
+              <div className={`text-sm text-slate-700 dark:text-slate-300 mb-3 ${theme.muted.bg} p-4 rounded-2xl border ${theme.cardBorder} shadow-inner`}>
                 <span className="font-bold text-slate-500 uppercase tracking-wider text-xs block mb-1">Reason:</span>
                 <span className="leading-relaxed">
                   {request.reason.length > 120 ? `${request.reason.substring(0, 120)}...` : request.reason}
@@ -237,7 +239,7 @@ const LeaveApproval = () => {
           <div className="flex flex-col space-y-3 ml-6">
             <button
               onClick={() => showRequestDetails(request)}
-              className="inline-flex items-center justify-center p-3 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-indigo-300 rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg w-full"
+              className={`inline-flex items-center justify-center p-3 ${theme.info.bg} hover:opacity-80 border ${theme.info.border} ${theme.info.text} rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg w-full`}
               title="View Details"
             >
               <EyeIcon className="h-5 w-5 mr-2" />
@@ -252,7 +254,7 @@ const LeaveApproval = () => {
                     setShowApprovalModal(true);
                   }}
                   disabled={actionLoading}
-                  className="inline-flex items-center justify-center px-4 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg w-full disabled:opacity-50"
+                  className={`inline-flex items-center justify-center px-4 py-3 ${theme.success.bg} hover:opacity-80 ${theme.success.text} border ${theme.success.border} rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg w-full disabled:opacity-50`}
                   title="Approve"
                 >
                   <CheckCircleIcon className="h-5 w-5 mr-2" />
@@ -264,7 +266,7 @@ const LeaveApproval = () => {
                     setShowRejectionModal(true);
                   }}
                   disabled={actionLoading}
-                  className="inline-flex items-center justify-center px-4 py-3 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg w-full disabled:opacity-50"
+                  className={`inline-flex items-center justify-center px-4 py-3 ${theme.danger.bg} hover:opacity-80 ${theme.danger.text} border ${theme.danger.border} rounded-2xl font-bold transition-all transform hover:scale-105 shadow-lg w-full disabled:opacity-50`}
                   title="Reject"
                 >
                   <XCircleIcon className="h-5 w-5 mr-2" />
@@ -295,35 +297,35 @@ const LeaveApproval = () => {
       {/* Enhanced Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-2xl font-black text-white tracking-tight">Leave Approvals</h3>
-          <p className="mt-1 font-medium text-slate-400">
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Leave Approvals</h3>
+          <p className="mt-1 font-medium text-slate-500 dark:text-slate-400">
             Review and approve employee leave requests
           </p>
         </div>
-        <div className="flex items-center bg-indigo-500/20 border border-indigo-500/30 px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.3)] backdrop-blur-md">
-          <BellIcon className="h-5 w-5 text-indigo-300 mr-2" />
-          <span className="font-bold text-indigo-100">
-            {pendingRequests.length} <span className="text-indigo-300">pending</span>
+        <div className={`flex items-center ${theme.info.bg} border ${theme.info.border} px-5 py-2.5 rounded-full shadow-lg backdrop-blur-md`}>
+          <BellIcon className={`h-5 w-5 ${theme.info.text} mr-2`} />
+          <span className={`font-bold ${theme.info.text}`}>
+            {pendingRequests.length} <span className="opacity-80">pending</span>
           </span>
         </div>
       </div>
 
       {/* Enhanced Quick Actions Alert */}
       {pendingRequests.length > 0 && (
-        <div className="bg-[#0A0F1A]/80 backdrop-blur-xl border border-indigo-500/30 p-6 rounded-[2rem] shadow-[0_0_30px_rgba(79,70,229,0.15)] relative overflow-hidden">
+        <div className={`${theme.cardBg} backdrop-blur-xl border border-indigo-500/30 p-6 rounded-[2rem] shadow-xl relative overflow-hidden`}>
           <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-400 to-purple-500"></div>
           <div className="flex items-center">
             <div className="flex-shrink-0 p-3 bg-indigo-500/20 rounded-2xl mr-4 border border-indigo-500/30">
               <ExclamationTriangleIcon className="h-8 w-8 text-indigo-400" />
             </div>
             <div>
-              <p className="text-white text-lg">
-                <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Action Required:</span> You have{' '}
+              <p className="text-slate-900 dark:text-white text-lg">
+                <span className={`font-black text-transparent bg-clip-text bg-gradient-to-r ${theme.primaryGradient}`}>Action Required:</span> You have{' '}
                 <span className="font-black text-2xl mx-1">{pendingRequests.length}</span> pending request{pendingRequests.length !== 1 ? 's' : ''} waiting for approval.
               </p>
               {pendingRequests.filter(req => getDaysUntilStart(req.start_date) <= 3).length > 0 && (
-                <div className="mt-2 inline-flex items-center px-3 py-1 bg-rose-500/20 border border-rose-500/30 rounded-full">
-                  <span className="font-bold text-rose-300 text-sm">
+                <div className={`mt-2 inline-flex items-center px-3 py-1 ${theme.danger.bg} border ${theme.danger.border} rounded-full`}>
+                  <span className={`font-bold ${theme.danger.text} text-sm`}>
                     {pendingRequests.filter(req => getDaysUntilStart(req.start_date) <= 3).length} request{pendingRequests.filter(req => getDaysUntilStart(req.start_date) <= 3).length !== 1 ? 's' : ''} starting soon!
                   </span>
                 </div>
@@ -334,14 +336,14 @@ const LeaveApproval = () => {
       )}
 
       {/* Enhanced Filters */}
-      <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 dark:border-white/10 shadow-2xl">
+      <div className={`${theme.cardBg} backdrop-blur-xl p-6 rounded-[2rem] border ${theme.cardBorder} shadow-2xl`}>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Status</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Status</label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className={`block w-full ${theme.muted.bg} border ${theme.cardBorder} rounded-xl text-slate-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:${theme.isDark ? 'dark' : 'light'}]`}
             >
               <option value="">All Status</option>
               <option value="PENDING">Pending</option>
@@ -352,11 +354,11 @@ const LeaveApproval = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Leave Type</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Leave Type</label>
             <select
               value={filters.leave_type}
               onChange={(e) => handleFilterChange('leave_type', e.target.value)}
-              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium"
+              className={`block w-full ${theme.muted.bg} border ${theme.cardBorder} rounded-xl text-slate-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium [color-scheme:${theme.isDark ? 'dark' : 'light'}]`}
             >
               <option value="">All Types</option>
               {leaveTypes.map((type) => (
@@ -368,20 +370,20 @@ const LeaveApproval = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Employee</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">Employee</label>
             <input
               type="text"
               value={filters.employee}
               onChange={(e) => handleFilterChange('employee', e.target.value)}
               placeholder="Search employee..."
-              className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-xl text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500"
+              className={`block w-full ${theme.muted.bg} border ${theme.cardBorder} rounded-xl text-slate-900 dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-medium placeholder-slate-500 [color-scheme:${theme.isDark ? 'dark' : 'light'}]`}
             />
           </div>
 
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="w-full px-4 py-3 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:scale-105"
+              className={`w-full px-4 py-3 ${theme.muted.bg} hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-xl shadow-lg border ${theme.cardBorder} transition-all transform hover:scale-105`}
             >
               Clear Filters
             </button>
@@ -396,12 +398,12 @@ const LeaveApproval = () => {
             onClick={() => setActiveTab('pending')}
             className={`py-4 px-2 border-b-2 font-bold text-[15px] uppercase tracking-wider transition-all ${activeTab === 'pending'
               ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-black/20 dark:border-white/20'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:border-black/20 dark:border-white/20'
               }`}
           >
             <div className="flex items-center">
               Pending Approvals
-              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'pending' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/5 text-slate-400'
+              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'pending' ? `${theme.info.bg} ${theme.info.text} border ${theme.info.border}` : `${theme.muted.bg} text-slate-500 dark:text-slate-400`
                 }`}>
                 {pendingRequests.length}
               </span>
@@ -411,12 +413,12 @@ const LeaveApproval = () => {
             onClick={() => setActiveTab('all')}
             className={`py-4 px-2 border-b-2 font-bold text-[15px] uppercase tracking-wider transition-all ${activeTab === 'all'
               ? 'border-indigo-500 text-indigo-400'
-              : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-black/20 dark:border-white/20'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-300 hover:border-black/20 dark:border-white/20'
               }`}
           >
             <div className="flex items-center">
               All Requests
-              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'all' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-white/5 text-slate-400'
+              <span className={`ml-3 px-3 py-1 rounded-full text-xs ${activeTab === 'all' ? `${theme.info.bg} ${theme.info.text} border ${theme.info.border}` : `${theme.muted.bg} text-slate-500 dark:text-slate-400`
                 }`}>
                 {allRequests.length}
               </span>
@@ -429,14 +431,14 @@ const LeaveApproval = () => {
       <div>
         {activeTab === 'pending' ? (
           pendingRequests.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-white/10 relative overflow-hidden">
+            <div className={`text-center py-20 ${theme.cardBg} backdrop-blur-xl rounded-[2.5rem] shadow-2xl border ${theme.cardBorder} relative overflow-hidden`}>
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
                 <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
                   <ClockIcon className="h-16 w-16 text-indigo-400" />
                 </div>
-                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">No pending requests</h3>
-                <p className="text-slate-400 text-lg font-medium">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">No pending requests</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">
                   All leave requests have been processed. Outstanding work! 🎉
                 </p>
               </div>
@@ -450,7 +452,7 @@ const LeaveApproval = () => {
                     <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl shadow-lg">
                       <FireIcon className="h-8 w-8 text-white" />
                     </div>
-                    <h4 className="text-2xl font-bold text-red-700">Urgent - Starting Soon</h4>
+                    <h4 className={`text-2xl font-bold ${theme.danger.text}`}>Urgent - Starting Soon</h4>
                   </div>
                   {pendingRequests
                     .filter(req => getDaysUntilStart(req.start_date) <= 3 && getDaysUntilStart(req.start_date) >= 0)
@@ -464,10 +466,10 @@ const LeaveApproval = () => {
               {/* Regular pending requests */}
               <div>
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+                  <div className={`p-3 bg-gradient-to-r ${theme.primaryGradient} rounded-2xl shadow-lg`}>
                     <SparklesIcon className="h-8 w-8 text-white" />
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-700">Other Pending Requests</h4>
+                  <h4 className="text-2xl font-bold text-slate-900 dark:text-white">Other Pending Requests</h4>
                 </div>
                 {pendingRequests
                   .filter(req => getDaysUntilStart(req.start_date) > 3 || getDaysUntilStart(req.start_date) < 0)
@@ -480,14 +482,14 @@ const LeaveApproval = () => {
           )
         ) : (
           allRequests.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/10 dark:border-white/10 relative overflow-hidden">
+            <div className={`text-center py-20 ${theme.cardBg} backdrop-blur-xl rounded-[2.5rem] shadow-2xl border ${theme.cardBorder} relative overflow-hidden`}>
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
-                <div className="p-8 bg-indigo-500/20 border border-indigo-500/30 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]">
-                  <UserIcon className="h-16 w-16 text-indigo-400" />
+                <div className={`p-8 ${theme.info.bg} border ${theme.info.border} rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.2)]`}>
+                  <UserIcon className={`h-16 w-16 ${theme.info.text}`} />
                 </div>
-                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">No requests found</h3>
-                <p className="text-slate-400 text-lg font-medium">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">No requests found</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">
                   No leave requests have been submitted yet.
                 </p>
               </div>
@@ -510,68 +512,68 @@ const LeaveApproval = () => {
         {selectedRequest && (
           <div className="space-y-8 relative z-10">
             {/* Employee Information */}
-            <div className="bg-[#0A0F1A]/80 backdrop-blur-xl border border-indigo-500/30 p-8 rounded-[2rem] shadow-[0_0_30px_rgba(79,70,229,0.15)] relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-400 to-purple-500"></div>
+            <div className={`${theme.info.bg} backdrop-blur-xl border ${theme.info.border} p-8 rounded-[2rem] shadow-[0_0_30px_rgba(79,70,229,0.15)] relative overflow-hidden`}>
+              <div className={`absolute top-0 left-0 w-2 h-full bg-gradient-to-b ${theme.primaryGradient}`}></div>
               <div className="flex items-center space-x-6 relative z-10">
-                <div className="h-20 w-20 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.3)]">
-                  <span className="text-indigo-300 font-black text-3xl">
+                <div className={`h-20 w-20 rounded-2xl ${theme.info.bg} border ${theme.info.border} flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.3)]`}>
+                  <span className={`font-black text-3xl ${theme.info.text}`}>
                     {selectedRequest.employee?.user_info?.first_name?.[0]}{selectedRequest.employee?.user_info?.last_name?.[0]}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white tracking-wide">
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-wide">
                     {selectedRequest.employee?.user_info?.first_name} {selectedRequest.employee?.user_info?.last_name}
                   </h3>
-                  <p className="text-indigo-300 font-bold mt-1 tracking-wider">{selectedRequest.employee?.employee_id}</p>
-                  <p className="text-slate-400 font-medium">{selectedRequest.employee?.position}</p>
+                  <p className={`${theme.info.text} font-bold mt-1 tracking-wider`}>{selectedRequest.employee?.employee_id}</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium">{selectedRequest.employee?.position}</p>
                 </div>
               </div>
             </div>
 
             {/* Leave Details Grid */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
-                <label className="block text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Leave Type</label>
-                <p className="text-xl font-bold text-white">{selectedRequest.leave_type?.name}</p>
+              <div className={`${theme.muted.bg} backdrop-blur-md p-6 rounded-2xl border ${theme.cardBorder} shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors`}>
+                <label className={`block text-xs font-bold ${theme.info.text} uppercase tracking-wider mb-2`}>Leave Type</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{selectedRequest.leave_type?.name}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
-                <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Duration</label>
-                <p className="text-xl font-bold text-white capitalize">
+              <div className={`${theme.muted.bg} backdrop-blur-md p-6 rounded-2xl border ${theme.cardBorder} shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors`}>
+                <label className={`block text-xs font-bold ${theme.success.text} uppercase tracking-wider mb-2`}>Duration</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white capitalize">
                   {selectedRequest.leave_duration?.replace('_', ' ')}
                 </p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
-                <label className="block text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Start Date</label>
-                <p className="text-xl font-bold text-white">{formatDate(selectedRequest.start_date)}</p>
+              <div className={`${theme.muted.bg} backdrop-blur-md p-6 rounded-2xl border ${theme.cardBorder} shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors`}>
+                <label className="block text-xs font-bold text-purple-400 dark:text-purple-300 uppercase tracking-wider mb-2">Start Date</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatDate(selectedRequest.start_date)}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
-                <label className="block text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">End Date</label>
-                <p className="text-xl font-bold text-white">{formatDate(selectedRequest.end_date)}</p>
+              <div className={`${theme.muted.bg} backdrop-blur-md p-6 rounded-2xl border ${theme.cardBorder} shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors`}>
+                <label className={`block text-xs font-bold ${theme.danger.text} uppercase tracking-wider mb-2`}>End Date</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatDate(selectedRequest.end_date)}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
-                <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">Days Requested</label>
-                <p className="text-xl font-bold text-white">{selectedRequest.days_requested} days</p>
+              <div className={`${theme.muted.bg} backdrop-blur-md p-6 rounded-2xl border ${theme.cardBorder} shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors`}>
+                <label className={`block text-xs font-bold ${theme.warning.text} uppercase tracking-wider mb-2`}>Days Requested</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{selectedRequest.days_requested} days</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 dark:border-white/10 shadow-lg hover:bg-black/10 dark:bg-white/5/10 transition-colors">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Applied On</label>
-                <p className="text-xl font-bold text-white">{formatDate(selectedRequest.applied_on)}</p>
+              <div className={`${theme.muted.bg} backdrop-blur-md p-6 rounded-2xl border ${theme.cardBorder} shadow-lg hover:bg-black/10 dark:bg-white/10 transition-colors`}>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Applied On</label>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatDate(selectedRequest.applied_on)}</p>
               </div>
             </div>
 
             {/* Reason block */}
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Reason</label>
-              <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/10 shadow-inner">
-                <p className="text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.reason}</p>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Reason</label>
+              <div className={`${theme.muted.bg} p-6 rounded-2xl border ${theme.cardBorder} shadow-inner`}>
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.reason}</p>
               </div>
             </div>
 
             {/* Employee Comments */}
             {selectedRequest.employee_comments && (
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Employee Comments</label>
-                <div className="bg-[#0A0F1A] p-6 rounded-2xl border border-white/10 shadow-inner">
-                  <p className="text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.employee_comments}</p>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Employee Comments</label>
+                <div className={`${theme.muted.bg} p-6 rounded-2xl border ${theme.cardBorder} shadow-inner`}>
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-lg">{selectedRequest.employee_comments}</p>
                 </div>
               </div>
             )}
@@ -579,7 +581,7 @@ const LeaveApproval = () => {
             {/* Supporting Document */}
             {selectedRequest.supporting_document && (
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Supporting Document</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Supporting Document</label>
                 <a
                   href={selectedRequest.supporting_document}
                   target="_blank"
@@ -626,17 +628,17 @@ const LeaveApproval = () => {
       >
         {selectedRequest && (
           <div className="space-y-6 relative z-10">
-            <div className="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-[2rem] relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-emerald-400 to-green-500"></div>
+            <div className={`${theme.success.bg} border ${theme.success.border} p-6 rounded-[2rem] relative overflow-hidden`}>
+              <div className={`absolute top-0 left-0 w-2 h-full bg-gradient-to-b ${theme.primaryGradient}`}></div>
               <div className="flex items-center space-x-5 relative z-10">
-                <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
-                  <CheckCircleIcon className="h-8 w-8 text-emerald-400" />
+                <div className={`p-3 ${theme.success.bg} rounded-2xl border ${theme.success.border}`}>
+                  <CheckCircleIcon className={`h-8 w-8 ${theme.success.text}`} />
                 </div>
                 <div>
-                  <h4 className="text-xl font-black text-emerald-400 mb-1">Confirmation Required</h4>
-                  <p className="text-emerald-100/80 leading-relaxed">
-                    You are about to <strong className="text-emerald-300">approve</strong> the leave request for{' '}
-                    <span className="font-bold text-white">
+                  <h4 className={`text-xl font-black ${theme.success.text} mb-1`}>Confirmation Required</h4>
+                  <p className={`${theme.success.text} opacity-80 leading-relaxed`}>
+                    You are about to <strong className="font-bold underline">approve</strong> the leave request for{' '}
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {selectedRequest.employee?.user_info?.first_name} {selectedRequest.employee?.user_info?.last_name}
                     </span>{' '}
                     from {formatDate(selectedRequest.start_date)} to {formatDate(selectedRequest.end_date)}.
@@ -646,15 +648,15 @@ const LeaveApproval = () => {
             </div>
 
             {selectedRequest.leave_type?.is_unpaid && (
-              <div className="bg-rose-500/10 border border-rose-500/30 p-6 rounded-[2rem] relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-rose-400 to-pink-500"></div>
+              <div className={`${theme.danger.bg} border ${theme.danger.border} p-6 rounded-[2rem] relative overflow-hidden`}>
+                <div className={`absolute top-0 left-0 w-2 h-full bg-gradient-to-b ${theme.primaryGradient}`}></div>
                 <div className="flex items-center space-x-5 relative z-10">
-                  <div className="p-3 bg-rose-500/20 rounded-2xl border border-rose-500/30">
-                    <ExclamationTriangleIcon className="h-8 w-8 text-rose-400" />
+                  <div className={`p-3 ${theme.danger.bg} rounded-2xl border ${theme.danger.border}`}>
+                    <ExclamationTriangleIcon className={`h-8 w-8 ${theme.danger.text}`} />
                   </div>
                   <div>
-                    <h4 className="text-xl font-black text-rose-400 mb-1">Unpaid Leave (LOP)</h4>
-                    <p className="text-rose-100/80 leading-relaxed">
+                    <h4 className={`text-xl font-black ${theme.danger.text} mb-1`}>Unpaid Leave (LOP)</h4>
+                    <p className={`${theme.danger.text} opacity-80 leading-relaxed`}>
                       Approving this request will trigger an <strong>automatic salary deduction</strong> (Loss of Pay) for {selectedRequest.days_requested} day(s).
                     </p>
                   </div>
@@ -663,14 +665,14 @@ const LeaveApproval = () => {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">
                 Approval Comments <span className="text-slate-500 lowercase normal-case">(Optional)</span>
               </label>
               <textarea
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium placeholder-slate-500 p-4 transition-all"
+                className={`block w-full ${theme.muted.bg} border ${theme.cardBorder} rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-emerald-500 focus:border-emerald-500 font-medium placeholder-slate-500 p-4 transition-all`}
                 placeholder="Add any comments for the employee..."
               />
             </div>
@@ -678,7 +680,7 @@ const LeaveApproval = () => {
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10 dark:border-white/10">
               <button
                 onClick={() => setShowApprovalModal(false)}
-                className="flex-1 px-6 py-4 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
+                className={`flex-1 px-6 py-4 ${theme.muted.bg} hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-2xl shadow-lg border ${theme.cardBorder} transition-all transform hover:-translate-y-1`}
               >
                 Cancel
               </button>
@@ -703,17 +705,17 @@ const LeaveApproval = () => {
       >
         {selectedRequest && (
           <div className="space-y-6 relative z-10">
-            <div className="bg-rose-500/10 border border-rose-500/20 p-6 rounded-[2rem] relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-rose-400 to-red-500"></div>
+            <div className={`${theme.danger.bg} border ${theme.danger.border} p-6 rounded-[2rem] relative overflow-hidden`}>
+              <div className={`absolute top-0 left-0 w-2 h-full bg-gradient-to-b ${theme.primaryGradient}`}></div>
               <div className="flex items-center space-x-5 relative z-10">
-                <div className="p-3 bg-rose-500/20 rounded-2xl border border-rose-500/30">
-                  <XCircleIcon className="h-8 w-8 text-rose-400" />
+                <div className={`p-3 ${theme.danger.bg} rounded-2xl border ${theme.danger.border}`}>
+                  <XCircleIcon className={`h-8 w-8 ${theme.danger.text}`} />
                 </div>
                 <div>
-                  <h4 className="text-xl font-black text-rose-400 mb-1">Rejection Notice</h4>
-                  <p className="text-rose-100/80 leading-relaxed">
-                    You are about to <strong className="text-rose-300">reject</strong> the leave request for{' '}
-                    <span className="font-bold text-white">
+                  <h4 className={`text-xl font-black ${theme.danger.text} mb-1`}>Rejection Notice</h4>
+                  <p className={`${theme.danger.text} opacity-80 leading-relaxed`}>
+                    You are about to <strong className="font-bold underline">reject</strong> the leave request for{' '}
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {selectedRequest.employee?.user_info?.first_name} {selectedRequest.employee?.user_info?.last_name}
                     </span>.
                     Please provide a clear reason for the rejection below.
@@ -723,14 +725,14 @@ const LeaveApproval = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1 flex items-center">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1 flex items-center">
                 Rejection Reason <span className="text-rose-400 ml-1 text-lg leading-none">*</span>
               </label>
               <textarea
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
-                className="block w-full bg-[#0A0F1A] border-white/10 dark:border-white/10 rounded-2xl text-white shadow-inner focus:ring-rose-500 focus:border-rose-500 font-medium placeholder-slate-500 p-4 transition-all"
+                className={`block w-full ${theme.muted.bg} border ${theme.cardBorder} rounded-2xl text-slate-900 dark:text-white shadow-inner focus:ring-rose-500 focus:border-rose-500 font-medium placeholder-slate-500 p-4 transition-all`}
                 placeholder="Examine the reason for rejection here..."
                 required
               />
@@ -739,7 +741,7 @@ const LeaveApproval = () => {
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 border-t border-white/10 dark:border-white/10">
               <button
                 onClick={() => setShowRejectionModal(false)}
-                className="flex-1 px-6 py-4 bg-white/5 hover:bg-black/10 dark:bg-white/5/10 text-white font-bold rounded-2xl shadow-lg border border-white/10 dark:border-white/10 transition-all transform hover:-translate-y-1"
+                className={`flex-1 px-6 py-4 ${theme.muted.bg} hover:bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white font-bold rounded-2xl shadow-lg border ${theme.cardBorder} transition-all transform hover:-translate-y-1`}
               >
                 Cancel
               </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+﻿import React, { useState, useEffect, Fragment } from 'react';
 import { createPortal } from 'react-dom';
 import { Combobox, Transition } from '@headlessui/react';
 import {
@@ -133,7 +133,7 @@ const RequestDetailModal = ({
           <button
             onClick={onClose}
             title="Close"
-            className="p-2 bg-black/10 dark:bg-white/5/10 hover:bg-indigo-500 text-white rounded-xl transition-all duration-300 group flex items-center justify-center border border-white/10 dark:border-white/10 hover:border-indigo-400 active:scale-95 shadow-xl"
+            className="p-2 bg-black/10 dark:bg-white/10 hover:bg-indigo-500 text-white rounded-xl transition-all duration-300 group flex items-center justify-center border border-white/10 dark:border-white/10 hover:border-indigo-400 active:scale-95 shadow-xl"
           >
             <XMarkIcon className="h-7 w-7 text-white" />
           </button>
@@ -252,7 +252,7 @@ const RequestDetailModal = ({
                     <label className="text-sm font-bold text-indigo-200">Assigned To</label>
                     <Combobox value={assignedTo} onChange={setAssignedTo}>
                       <div className="relative mt-1">
-                        <div className="relative w-full cursor-default overflow-hidden rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20">
+                        <div className="relative w-full cursor-default overflow-hidden rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20">
                           <Combobox.Input
                             className="w-full border-none py-3 pl-4 pr-10 text-sm leading-5 text-white bg-transparent focus:ring-0 placeholder-gray-500"
                             displayValue={(userId) => {
@@ -333,7 +333,7 @@ const RequestDetailModal = ({
                     </Combobox>
                   </div>
                   
-                  <div className="flex items-center gap-3 mt-7 border border-white/10 dark:border-white/10 bg-white/5 px-5 py-3 rounded-xl hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 transition-colors shadow-sm">
+                  <div className="flex items-center gap-3 mt-7 border border-white/10 dark:border-white/10 bg-white/5 px-5 py-3 rounded-xl hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20 transition-colors shadow-sm">
                     <input
                       id="requiresApproval"
                       type="checkbox"
@@ -370,7 +370,7 @@ const RequestDetailModal = ({
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Add internal notes or comments..."
-                      className="px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 placeholder-gray-500 resize-none shadow-sm"
+                      className="px-4 py-3 bg-white/5 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors hover:bg-black/10 dark:bg-white/10 hover:border-black/20 dark:border-white/20 placeholder-gray-500 resize-none shadow-sm"
                     />
                   </div>
                 </div>

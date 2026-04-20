@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { isAuthenticated, hasPermission } from '../../utils/auth';
 import Layout from '../layout/Layout';

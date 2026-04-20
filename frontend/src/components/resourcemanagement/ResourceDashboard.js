@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -169,8 +169,8 @@ const ResourceDashboard = () => {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Support 24/7 Dashboard</h2>
-        <p className="text-gray-600 dark:text-gray-400">Overview of your access requests and system status</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Support 24/7 Dashboard</h2>
+        <p className="text-slate-600 dark:text-gray-400">Overview of your access requests and system status</p>
       </div>
 
       {/* Stats Grid */}
@@ -178,11 +178,11 @@ const ResourceDashboard = () => {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.name} className={`${stat.bgColor} rounded-xl p-6 border border-white/10 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]`}>
+            <div key={stat.name} className={`${stat.bgColor} rounded-xl p-6 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm font-medium ${stat.textColor}`}>{stat.name}</p>
-                  <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{stat.value}</p>
                 </div>
                 <div className={`${stat.color} p-3 rounded-xl shadow-lg`}>
                   <Icon className="h-6 w-6 text-white" />
@@ -207,11 +207,11 @@ const ResourceDashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Requests */}
-        <div className={`bg-white/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
-          <div className="p-6 border-b border-white/10 dark:border-white/10">
+        <div className={`bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl backdrop-blur-sm overflow-hidden`}>
+          <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white">Recent Requests</h3>
-              <ChartBarIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Recent Requests</h3>
+              <ChartBarIcon className="h-5 w-5 text-slate-500 dark:text-gray-400" />
             </div>
           </div>
           <div className="p-6">
@@ -221,15 +221,15 @@ const ResourceDashboard = () => {
                   <div
                     key={request.id}
                     onClick={() => setSelectedRequest(request)}
-                    className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all cursor-pointer group"
+                    className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-black/10 transition-all cursor-pointer group"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-white/5 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
+                      <div className="p-2 bg-white dark:bg-white/5 rounded-lg group-hover:bg-indigo-500/20 transition-colors shadow-sm dark:shadow-none">
                         {getStatusIcon(request.status)}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors">#{request.ticket_number}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                        <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">#{request.ticket_number}</p>
+                        <p className="text-xs text-slate-500 dark:text-gray-400">
                           {request.request_type === 'IT' ? 'IT Support' : request.resource_name}
                         </p>
                       </div>
@@ -258,11 +258,11 @@ const ResourceDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className={`bg-white/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
-          <div className="p-6 border-b border-white/10 dark:border-white/10">
+        <div className={`bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl backdrop-blur-sm overflow-hidden`}>
+          <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white">Quick Actions</h3>
-              <KeyIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Quick Actions</h3>
+              <KeyIcon className="h-5 w-5 text-slate-500 dark:text-gray-400" />
             </div>
           </div>
           <div className="p-6 space-y-4">
@@ -277,7 +277,7 @@ const ResourceDashboard = () => {
                   <ServerIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-white">New Access Request</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">New Access Request</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Request access to resources</p>
                 </div>
               </div>
@@ -297,7 +297,7 @@ const ResourceDashboard = () => {
                   <ExclamationTriangleIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-white">IT Support</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">IT Support</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Get technical assistance</p>
                 </div>
               </div>
@@ -310,14 +310,14 @@ const ResourceDashboard = () => {
               type="button"
               onClick={() => navigate('/resource-management/requests')}
               aria-label="View all access requests"
-              className="w-full flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 dark:border-white/10 hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-lg transition-all duration-300 group"
+              className="w-full flex items-center justify-between p-4 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-200 dark:hover:bg-black/10 hover:shadow-lg transition-all duration-300 group"
             >
               <div className="flex items-center space-x-3">
-                <div className="bg-black/10 dark:bg-white/5/10 p-2.5 rounded-xl group-hover:scale-110 shadow-lg transition-transform border border-white/10 dark:border-white/10">
+                <div className="bg-black/10 dark:bg-white/10 p-2.5 rounded-xl group-hover:scale-110 shadow-lg transition-transform border border-white/10 dark:border-white/10">
                   <ClockIcon className="h-5 w-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-white">View All Requests</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">View All Requests</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Track request status</p>
                 </div>
               </div>
@@ -330,32 +330,32 @@ const ResourceDashboard = () => {
       </div>
 
       {/* System Status */}
-      <div className={`bg-white/5 rounded-2xl border ${theme.cardBorder} shadow-xl backdrop-blur-sm`}>
-        <div className="p-6 border-b border-white/10 dark:border-white/10">
-          <h3 className="text-lg font-bold text-white">System Status</h3>
+      <div className={`bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl backdrop-blur-sm overflow-hidden`}>
+        <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">System Status</h3>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center space-x-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center space-x-3 p-4 bg-slate-50/50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
               <div>
-                <p className="text-sm font-bold text-white">API Status</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">API Status</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">All systems operational</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center space-x-3 p-4 bg-slate-50/50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
               <div>
-                <p className="text-sm font-bold text-white">Email Service</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Email Service</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Notifications active</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center space-x-3 p-4 bg-slate-50/50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
               <div>
-                <p className="text-sm font-bold text-white">Database</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Database</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Performance normal</p>
               </div>
             </div>

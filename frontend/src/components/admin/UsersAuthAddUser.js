@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+﻿import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../services/api';
 import { toast } from 'react-toastify';
@@ -198,7 +198,7 @@ const UsersAuthAddUser = () => {
             <button
               type="button"
               onClick={() => navigate('/users-auth')}
-              className="px-8 py-3 text-xs font-black rounded-2xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all transform active:scale-95"
+              className="px-8 py-3 text-xs font-black rounded-2xl border border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all transform active:scale-95"
             >
               CANCEL
             </button>

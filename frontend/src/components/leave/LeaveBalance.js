@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { 
   CalendarDaysIcon, 
@@ -16,8 +16,10 @@ import { isHRManager } from '../../utils/auth';
 import { formatDate } from '../../utils/formatters';
 import StatusBadge from '../common/StatusBadge';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { useTheme } from '../../context/ThemeContext';
 
 const LeaveBalance = () => {
+  const { theme } = useTheme();
   const [leaveBalances, setLeaveBalances] = useState([]);
   const [leaveSummary, setLeaveSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,9 +56,9 @@ const LeaveBalance = () => {
 
   const getBalanceColor = (remaining, total) => {
     const percentage = (remaining / total) * 100;
-    if (percentage <= 20) return 'text-red-600 bg-gradient-to-r from-red-50 to-pink-50 border-red-200';
-    if (percentage <= 50) return 'text-yellow-600 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200';
-    return 'text-green-600 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200';
+    if (percentage <= 20) return `${theme.isDark ? 'text-red-400 bg-red-400/10 border-red-400/30' : 'text-red-700 bg-red-50 border-red-200'}`;
+    if (percentage <= 50) return `${theme.isDark ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : 'text-yellow-700 bg-yellow-50 border-yellow-200'}`;
+    return `${theme.isDark ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30' : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`;
   };
 
   const getProgressBarGradient = (remaining, total) => {
@@ -80,11 +82,11 @@ const LeaveBalance = () => {
     const remainingPercentage = balance.total_days > 0 ? (balance.remaining_days / balance.total_days) * 100 : 0;
     
     return (
-      <div className="bg-white/5 rounded-3xl shadow-xl border border-gray-100 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+      <div className={`${theme.cardBg} rounded-3xl shadow-xl border ${theme.cardBorder} p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1`}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white">{balance.leave_type_name || balance.leave_type?.name}</h3>
-            <p className="text-sm text-slate-400 font-semibold">{balance.leave_type?.code}</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{balance.leave_type_name || balance.leave_type?.name}</h3>
+            <p className="text-sm text-slate-500 font-semibold">{balance.leave_type?.code}</p>
           </div>
           <div className={`px-4 py-2 rounded-full border ${getBalanceColor(balance.remaining_days, balance.total_days)}`}>
             <span className="text-sm font-bold">
@@ -96,19 +98,19 @@ const LeaveBalance = () => {
         {/* Enhanced Usage Statistics */}
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600 font-semibold">Total Allocated:</span>
-            <span className="font-bold text-white text-lg">{balance.total_days} days</span>
+            <span className="text-slate-500 font-semibold">Total Allocated:</span>
+            <span className="font-bold text-slate-900 dark:text-white text-lg">{balance.total_days} days</span>
           </div>
 
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600 font-semibold">Used:</span>
-            <span className="font-bold text-white text-lg">{balance.used_days} days</span>
+            <span className="text-slate-500 font-semibold">Used:</span>
+            <span className="font-bold text-slate-900 dark:text-white text-lg">{balance.used_days} days</span>
           </div>
 
           {balance.carried_forward_days > 0 && (
-            <div className="flex justify-between text-sm bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-xl border border-blue-200">
-              <span className="text-blue-700 font-semibold">Carried Forward:</span>
-              <span className="font-bold text-blue-800">+{balance.carried_forward_days} days</span>
+            <div className="flex justify-between text-sm bg-indigo-500/10 p-3 rounded-xl border border-indigo-500/20">
+              <span className={`${theme.info.text} font-semibold`}>Carried Forward:</span>
+              <span className={`font-bold ${theme.info.text}`}>+{balance.carried_forward_days} days</span>
             </div>
           )}
         </div>
@@ -129,7 +131,7 @@ const LeaveBalance = () => {
 
         {/* Enhanced Status Indicator */}
         <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-400 font-semibold">Year: {balance.year}</span>
+          <span className="text-slate-500 font-semibold">Year: {balance.year}</span>
           {remainingPercentage <= 20 && (
             <div className="flex items-center text-red-600 bg-red-100 px-3 py-1 rounded-full">
               <ExclamationTriangleIcon className="h-4 w-4 mr-1" />
@@ -156,20 +158,20 @@ const LeaveBalance = () => {
       {/* Enhanced Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-3xl font-bold text-white">Leave Balance</h3>
-          <p className="mt-2 text-gray-600 text-lg">
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Leave Balance</h3>
+          <p className="mt-2 text-slate-500 text-lg">
             View your current leave balance and usage for {selectedYear}
           </p>
         </div>
         <div className="flex items-center space-x-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
               Select Year
             </label>
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 font-medium text-lg"
+              className={`block w-full ${theme.muted.bg} ${theme.cardBorder} rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 font-medium text-lg text-slate-900 dark:text-white [color-scheme:${theme.isDark ? 'dark' : 'light'}]`}
             >
               {generateYearOptions().map(year => (
                 <option key={year} value={year}>{year}</option>
@@ -182,39 +184,39 @@ const LeaveBalance = () => {
       {/* Enhanced Summary Cards */}
       {leaveSummary && !isHRManager() && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-3xl shadow-lg border border-blue-200 hover:shadow-xl transition-all">
+          <div className={`${theme.isDark ? 'bg-indigo-500/10' : 'bg-indigo-50'} p-6 rounded-3xl shadow-lg border border-indigo-200/50 hover:shadow-xl transition-all`}>
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+                <div className={`p-4 bg-gradient-to-r ${theme.primaryGradient} rounded-2xl shadow-lg`}>
                   <CalendarDaysIcon className="h-10 w-10 text-white" />
                 </div>
               </div>
               <div className="ml-6">
-                <p className="text-sm font-bold text-blue-700 uppercase tracking-wider">Pending Requests</p>
-                <p className="text-3xl font-black text-white">
+                <p className={`text-sm font-bold ${theme.info.text} uppercase tracking-wider`}>Pending Requests</p>
+                <p className="text-3xl font-black text-slate-900 dark:text-white">
                   {leaveSummary.pending_requests_count}
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-3xl shadow-lg border border-green-200 hover:shadow-xl transition-all">
+          <div className={`${theme.isDark ? 'bg-emerald-500/10' : 'bg-emerald-50'} p-6 rounded-3xl shadow-lg border border-emerald-200/50 hover:shadow-xl transition-all`}>
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg">
+                <div className="p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl shadow-lg">
                   <CheckCircleIcon className="h-10 w-10 text-white" />
                 </div>
               </div>
               <div className="ml-6">
-                <p className="text-sm font-bold text-green-700 uppercase tracking-wider">Approved This Year</p>
-                <p className="text-3xl font-black text-white">
+                <p className={`text-sm font-bold ${theme.success.text} uppercase tracking-wider`}>Approved This Year</p>
+                <p className="text-3xl font-black text-slate-900 dark:text-white">
                   {leaveSummary.approved_requests_count}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-3xl shadow-lg border border-purple-200 hover:shadow-xl transition-all">
+          <div className={`${theme.isDark ? 'bg-purple-500/10' : 'bg-purple-50'} p-6 rounded-3xl shadow-lg border border-purple-200/50 hover:shadow-xl transition-all`}>
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="p-4 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl shadow-lg">
@@ -222,15 +224,15 @@ const LeaveBalance = () => {
                 </div>
               </div>
               <div className="ml-6">
-                <p className="text-sm font-bold text-purple-700 uppercase tracking-wider">Total Days Taken</p>
-                <p className="text-3xl font-black text-white">
+                <p className="text-sm font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider">Total Days Taken</p>
+                <p className="text-3xl font-black text-slate-900 dark:text-white">
                   {leaveSummary.total_days_taken}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-3xl shadow-lg border border-orange-200 hover:shadow-xl transition-all">
+          <div className={`${theme.isDark ? 'bg-orange-500/10' : 'bg-orange-50'} p-6 rounded-3xl shadow-lg border border-orange-200/50 hover:shadow-xl transition-all`}>
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="p-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-lg">
@@ -238,8 +240,8 @@ const LeaveBalance = () => {
                 </div>
               </div>
               <div className="ml-6">
-                <p className="text-sm font-bold text-orange-700 uppercase tracking-wider">Total Balance</p>
-                <p className="text-3xl font-black text-white">
+                <p className="text-sm font-bold text-orange-700 dark:text-orange-400 uppercase tracking-wider">Total Balance</p>
+                <p className="text-3xl font-black text-slate-900 dark:text-white">
                   {leaveSummary.leave_balances?.reduce((acc, bal) => acc + parseFloat(bal.remaining_days || 0), 0) || 0}
                 </p>
               </div>
@@ -251,19 +253,19 @@ const LeaveBalance = () => {
       {/* Enhanced Leave Balance Cards */}
       <div>
         <div className="flex items-center space-x-4 mb-8">
-          <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+          <div className={`p-3 bg-gradient-to-r ${theme.primaryGradient} rounded-2xl shadow-lg`}>
             <SparklesIcon className="h-8 w-8 text-white" />
           </div>
-          <h4 className="text-2xl font-bold text-white">Leave Types & Balances</h4>
+          <h4 className="text-2xl font-bold text-slate-900 dark:text-white">Leave Types & Balances</h4>
         </div>
         
         {leaveBalances.length === 0 ? (
-          <div className="text-center py-16 bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-lg border border-blue-200">
-            <div className="p-6 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-              <CalendarDaysIcon className="h-12 w-12 text-blue-600" />
+          <div className={`text-center py-16 ${theme.cardBg} rounded-3xl shadow-lg border ${theme.cardBorder}`}>
+            <div className={`p-6 ${theme.muted.bg} rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center`}>
+              <CalendarDaysIcon className={`h-12 w-12 ${theme.info.text}`} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No leave balances found</h3>
-            <p className="text-gray-600">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No leave balances found</h3>
+            <p className="text-slate-500">
               Leave balances for {selectedYear} are not available.
             </p>
           </div>
@@ -278,33 +280,33 @@ const LeaveBalance = () => {
 
       {/* Enhanced Recent Leave Requests */}
       {leaveSummary && leaveSummary.recent_requests && leaveSummary.recent_requests.length > 0 && (
-        <div className="bg-white/5 rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-8 py-6 border-b border-gray-200">
+        <div className={`${theme.cardBg} rounded-3xl shadow-xl border ${theme.cardBorder} overflow-hidden`}>
+          <div className={`${theme.muted.bg} px-8 py-6 border-b ${theme.cardBorder}`}>
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+              <div className={`p-3 bg-gradient-to-r ${theme.primaryGradient} rounded-2xl shadow-lg`}>
                 <ClockIcon className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h4 className="text-2xl font-bold text-white">Recent Leave Requests</h4>
-                <p className="text-gray-600">Your latest leave request activity</p>
+                <h4 className="text-2xl font-bold text-slate-900 dark:text-white">Recent Leave Requests</h4>
+                <p className="text-slate-500">Your latest leave request activity</p>
               </div>
             </div>
           </div>
           <div className="p-8">
             <div className="space-y-6">
               {leaveSummary.recent_requests.slice(0, 5).map((request) => (
-                <div key={request.id} className="flex items-center justify-between py-6 border-b border-gray-100 last:border-b-0 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-2xl px-4 transition-all">
+                <div key={request.id} className={`flex items-center justify-between py-6 border-b ${theme.cardBorder} last:border-b-0 hover:${theme.muted.bg} rounded-2xl px-4 transition-all`}>
                   <div className="flex items-center space-x-6">
                     <div className="flex-shrink-0">
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                      <div className={`h-12 w-12 rounded-full bg-gradient-to-r ${theme.primaryGradient} flex items-center justify-center shadow-lg`}>
                         <CalendarDaysIcon className="h-6 w-6 text-white" />
                       </div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-white">
+                      <div className="text-lg font-bold text-slate-900 dark:text-white">
                         {request.leave_type?.name}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-slate-500 mt-1">
                         {formatDate(request.start_date)} - {formatDate(request.end_date)} 
                         <span className="ml-3 font-semibold">({request.days_requested} day{request.days_requested !== 1 ? 's' : ''})</span>
                       </div>
@@ -324,36 +326,36 @@ const LeaveBalance = () => {
       )}
 
       {/* Enhanced Leave Policy Information */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-200 rounded-3xl p-8 shadow-lg">
+      <div className={`${theme.isDark ? 'bg-indigo-500/10' : 'bg-indigo-50'} border border-indigo-200/50 rounded-3xl p-8 shadow-lg`}>
         <div className="flex items-start space-x-6">
           <div className="flex-shrink-0">
-            <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+            <div className={`p-4 bg-gradient-to-r ${theme.primaryGradient} rounded-2xl shadow-lg`}>
               <ExclamationTriangleIcon className="h-8 w-8 text-white" />
             </div>
           </div>
           <div className="ml-3">
-            <h4 className="text-xl font-bold text-blue-900 mb-4">Leave Policy Reminders</h4>
+            <h4 className="text-xl font-bold text-indigo-900 dark:text-indigo-400 mb-4">Leave Policy Reminders</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ul className="space-y-3 text-blue-800">
-                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
+              <ul className="space-y-3 text-indigo-800 dark:text-indigo-300">
+                <li className="flex items-center space-x-3 bg-white/10 dark:bg-black/10 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
                   <span>Leave requests should be submitted at least 7 days in advance</span>
                 </li>
-                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/10 dark:bg-black/10 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></span>
                   <span>Unused annual leave may be carried forward (check policy for limits)</span>
                 </li>
-                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/10 dark:bg-black/10 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></span>
                   <span>Medical certificates required for sick leave exceeding 3 days</span>
                 </li>
               </ul>
-              <ul className="space-y-3 text-blue-800">
-                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
+              <ul className="space-y-3 text-indigo-800 dark:text-indigo-300">
+                <li className="flex items-center space-x-3 bg-white/10 dark:bg-black/10 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></span>
                   <span>Emergency leave can be applied retroactively with manager approval</span>
                 </li>
-                <li className="flex items-center space-x-3 bg-white/5/60 p-3 rounded-xl">
+                <li className="flex items-center space-x-3 bg-white/10 dark:bg-black/10 p-3 rounded-xl">
                   <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></span>
                   <span>Half-day leaves are available for most leave types</span>
                 </li>
@@ -365,12 +367,12 @@ const LeaveBalance = () => {
 
       {/* Enhanced Balance Insights */}
       {leaveBalances.length > 0 && (
-        <div className="bg-white/5 rounded-3xl shadow-xl border border-gray-100 p-8">
+        <div className={`${theme.cardBg} rounded-3xl shadow-xl border ${theme.cardBorder} p-8`}>
           <div className="flex items-center space-x-4 mb-8">
-            <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl shadow-lg">
+            <div className={`p-3 bg-gradient-to-r ${theme.primaryGradient} rounded-2xl shadow-lg`}>
               <TrophyIcon className="h-8 w-8 text-white" />
             </div>
-            <h4 className="text-2xl font-bold text-white">Balance Insights</h4>
+            <h4 className="text-2xl font-bold text-slate-900 dark:text-white">Balance Insights</h4>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -386,9 +388,9 @@ const LeaveBalance = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <FireIcon className="h-6 w-6 text-red-500" />
-                        <span className="text-lg font-bold text-white">{mostUsed.leave_type_name || mostUsed.leave_type?.name}</span>
+                        <span className="text-lg font-bold text-slate-900 dark:text-white">{mostUsed.leave_type_name || mostUsed.leave_type?.name}</span>
                       </div>
-                      <span className="text-lg font-bold text-gray-700 bg-white/5 px-4 py-2 rounded-xl shadow">
+                      <span className={`text-lg font-bold ${theme.info.text} ${theme.info.bg} border ${theme.info.border} px-4 py-2 rounded-xl shadow`}>
                         {mostUsed.used_days} days used
                       </span>
                     </div>
@@ -399,8 +401,8 @@ const LeaveBalance = () => {
 
             {/* Leave Utilization */}
             <div>
-              <h5 className="text-lg font-bold text-gray-700 mb-4">Overall Utilization</h5>
-              <div className="bg-gradient-to-r from-gray-50 to-purple-50 p-6 rounded-2xl border border-gray-200">
+              <h5 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-4">Overall Utilization</h5>
+              <div className={`${theme.muted.bg} p-6 rounded-2xl border ${theme.cardBorder}`}>
                 {(() => {
                   const totalAllocated = leaveBalances.reduce((sum, bal) => sum + parseFloat(bal.total_days || 0), 0);
                   const totalUsed = leaveBalances.reduce((sum, bal) => sum + parseFloat(bal.used_days || 0), 0);
@@ -410,18 +412,18 @@ const LeaveBalance = () => {
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
-                          <ChartBarIcon className="h-6 w-6 text-purple-500" />
-                          <span className="text-lg font-bold text-white">
+                          <ChartBarIcon className={`h-6 w-6 ${theme.info.text}`} />
+                          <span className="text-lg font-bold text-slate-900 dark:text-white">
                             {totalUsed} of {totalAllocated} days used
                           </span>
                         </div>
-                        <span className="text-lg font-bold text-gray-700 bg-white/5 px-4 py-2 rounded-xl shadow">
+                        <span className={`text-lg font-bold ${theme.info.text} ${theme.info.bg} border ${theme.info.border} px-4 py-2 rounded-xl shadow`}>
                           {Math.round(utilizationPercentage)}%
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className={`w-full ${theme.isDark ? 'bg-black/20' : 'bg-gray-200'} rounded-full h-3`}>
                         <div 
-                          className="bg-gradient-to-r from-purple-500 to-indigo-500 h-3 rounded-full transition-all duration-500"
+                          className={`bg-gradient-to-r ${theme.primaryGradient} h-3 rounded-full transition-all duration-500`}
                           style={{ width: `${Math.min(utilizationPercentage, 100)}%` }}
                         ></div>
                       </div>
@@ -433,7 +435,7 @@ const LeaveBalance = () => {
           </div>
 
           {/* Enhanced Recommendations */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl">
+          <div className={`mt-8 p-6 ${theme.isDark ? 'bg-amber-500/10' : 'bg-amber-50'} border border-amber-500/30 rounded-2xl`}>
             <div className="flex items-center space-x-3 mb-3">
               <StarIcon className="h-6 w-6 text-yellow-600" />
               <h5 className="text-lg font-bold text-yellow-800">Smart Recommendations</h5>
@@ -449,7 +451,7 @@ const LeaveBalance = () => {
 
                 if (lowBalanceTypes.length > 0) {
                   return (
-                    <div className="bg-white/5/70 p-4 rounded-xl">
+                    <div className="bg-white/10 dark:bg-black/10 p-4 rounded-xl">
                       <p className="font-semibold">
                         ⚠️ <strong>Plan Ahead:</strong> Consider planning ahead for {lowBalanceTypes.map(b => b.leave_type_name || b.leave_type?.name).join(', ')} as you have low remaining balance.
                       </p>
@@ -457,7 +459,7 @@ const LeaveBalance = () => {
                   );
                 } else if (highBalanceTypes.length > 0) {
                   return (
-                    <div className="bg-white/5/70 p-4 rounded-xl">
+                    <div className="bg-white/10 dark:bg-black/10 p-4 rounded-xl">
                       <p className="font-semibold">
                         🌟 <strong>Take a Break:</strong> You have substantial unused leave in {highBalanceTypes.map(b => b.leave_type_name || b.leave_type?.name).join(', ')}. Consider taking some time off!
                       </p>
@@ -465,7 +467,7 @@ const LeaveBalance = () => {
                   );
                 } else {
                   return (
-                    <div className="bg-white/5/70 p-4 rounded-xl">
+                    <div className="bg-white/10 dark:bg-black/10 p-4 rounded-xl">
                       <p className="font-semibold">
                         ✅ <strong>Perfect Balance:</strong> Your leave usage is well balanced. Keep maintaining a good work-life balance!
                       </p>

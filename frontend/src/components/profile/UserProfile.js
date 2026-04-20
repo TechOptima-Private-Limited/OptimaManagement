@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   UserIcon,
   PencilIcon,
@@ -77,7 +77,7 @@ const UserProfile = () => {
   //   try {
   //     setLoading(true);
 
-  //     // Fetch user profile
+  //     / Fetch user profile
   //     const profileResponse = await fetch('http://127.0.0.1:8080/api/auth/profile/', {
   //       headers: {
   //         'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -98,14 +98,14 @@ const UserProfile = () => {
   //         emergency_contact: profileData.profile?.emergency_contact || ''
   //       });
 
-  //       // Check if user is HR Manager and fetch appropriate data
+  //       / Check if user is HR Manager and fetch appropriate data
   //       const isHRManager = profileData.profile?.role === 'HR_MANAGER';
 
   //       if (isHRManager) {
-  //         // Fetch all managers with teams for HR Manager
+  //         / Fetch all managers with teams for HR Manager
   //         await fetchAllManagersWithTeams();
   //       } else {
-  //         // Fetch regular employee profile data
+  //         / Fetch regular employee profile data
   //         await fetchEmployeeProfileData();
   //       }
   //     }
@@ -353,11 +353,11 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070B14] py-8 transition-colors duration-500">
+    <div className={`min-h-screen ${theme.surfaceGradient.split(' ')[1].replace('to-', 'bg-')} py-8 transition-colors duration-500`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 pl-1">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-slate-800 dark:from-white dark:to-slate-400">
             My Profile
           </h1>
           <p className="text-lg text-slate-400 font-medium">
@@ -373,11 +373,11 @@ const UserProfile = () => {
               {/* Header with Edit Button */}
               <div className="bg-white/5 px-8 py-6 border-b border-white/10">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white tracking-tight">Personal Information</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Personal Information</h2>
                   {!editMode ? (
                     <button
                       onClick={() => setEditMode(true)}
-                      className="flex items-center px-5 py-2.5 bg-white/5/10 hover:bg-white/5/20 rounded-xl text-white font-bold transition-all duration-300 backdrop-blur-md border border-white/10 hover:scale-105 active:scale-95 shadow-lg"
+                      className="flex items-center px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-slate-900 dark:text-white font-bold transition-all duration-300 backdrop-blur-md border border-white/10 hover:scale-105 active:scale-95 shadow-lg"
                     >
                       <PencilIcon className="w-5 h-5 mr-2 text-indigo-400" />
                       Edit Profile
@@ -413,18 +413,18 @@ const UserProfile = () => {
                 {/* Avatar Section */}
                 <div className="flex items-start space-x-8 mb-10">
                   <div className="relative group">
-                    <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl font-black shadow-2xl border-4 border-white/10 transform transition-transform group-hover:scale-105 group-hover:rotate-3">
+                    <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-[#ffffff] text-4xl font-black shadow-2xl border-4 border-white/10 transform transition-transform group-hover:scale-105 group-hover:rotate-3">
                       {getInitials(profile?.first_name, profile?.last_name)}
                     </div>
-                    <button className="absolute -bottom-3 -right-3 p-3 bg-indigo-600 rounded-2xl text-white hover:bg-indigo-700 transition-all shadow-xl hover:scale-110 active:scale-90 border-4 border-[#070B14]">
+                    <button className="absolute -bottom-3 -right-3 p-3 bg-indigo-600 rounded-2xl text-[#ffffff] hover:bg-indigo-700 transition-all shadow-xl hover:scale-110 active:scale-90 border-4 border-[#f8fafc] dark:border-[#070B14]">
                       <CameraIcon className="w-5 h-5" />
                     </button>
                   </div>
                   <div className="pt-2">
-                    <h3 className="text-3xl font-black text-white tracking-tight leading-tight">
+                    <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                       {profile?.first_name} {profile?.last_name}
                     </h3>
-                    <p className="text-indigo-400 text-xl font-bold mt-1">{employee?.position || 'Position not specified'}</p>
+                    <p className="text-indigo-600 dark:text-indigo-400 text-xl font-bold mt-1">{employee?.position || 'Position not specified'}</p>
                     <div className="mt-4">
                       {getRoleBadge(profile?.profile?.role)}
                     </div>
@@ -448,7 +448,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <UserIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">{profile?.first_name || 'Not specified'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">{profile?.first_name || 'Not specified'}</span>
                       </div>
                     )}
                   </div>
@@ -468,7 +468,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <UserIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">{profile?.last_name || 'Not specified'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">{profile?.last_name || 'Not specified'}</span>
                       </div>
                     )}
                   </div>
@@ -480,7 +480,7 @@ const UserProfile = () => {
                     </label>
                     <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10">
                       <EnvelopeIcon className="w-5 h-5 text-indigo-400 mr-3" />
-                      <span className="text-slate-200 font-semibold">{profile?.email}</span>
+                      <span className="text-slate-800 dark:text-slate-200 font-semibold">{profile?.email}</span>
                     </div>
                     <p className="text-xs text-slate-500 font-bold mt-2 ml-1 italic opacity-60">Email cannot be changed</p>
                   </div>
@@ -506,7 +506,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <PhoneIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">{profile?.profile?.phone_number || 'Not specified'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">{profile?.profile?.phone_number || 'Not specified'}</span>
                       </div>
                     )}
                   </div>
@@ -526,7 +526,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <CalendarDaysIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">{formatDate(profile?.profile?.date_of_birth)}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">{formatDate(profile?.profile?.date_of_birth)}</span>
                       </div>
                     )}
                   </div>
@@ -552,7 +552,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <ExclamationTriangleIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">{profile?.profile?.emergency_contact || 'Not specified'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">{profile?.profile?.emergency_contact || 'Not specified'}</span>
                       </div>
                     )}
                   </div>
@@ -598,7 +598,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <UserIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">
                           {profile?.profile?.gender
                             ? { MALE: 'Male', FEMALE: 'Female', OTHER: 'Other', PREFER_NOT_TO_SAY: 'Prefer not to say' }[profile.profile.gender] || profile.profile.gender
                             : 'Not specified'}
@@ -626,7 +626,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <ShieldCheckIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-semibold">{profile?.profile?.blood_group || 'Not specified'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-semibold">{profile?.profile?.blood_group || 'Not specified'}</span>
                       </div>
                     )}
                   </div>
@@ -651,7 +651,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <ShieldCheckIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-mono font-bold">
+                        <span className="text-slate-800 dark:text-slate-200 font-mono font-bold">
                           {profile?.profile?.aadhaar_number
                             ? `****-****-${String(profile.profile.aadhaar_number).slice(-4)}`
                             : 'Not specified'}
@@ -678,7 +678,7 @@ const UserProfile = () => {
                     ) : (
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-black/20 dark:border-white/20 transition-all">
                         <ShieldCheckIcon className="w-5 h-5 text-indigo-400 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="text-slate-200 font-mono font-bold uppercase">
+                        <span className="text-slate-800 dark:text-slate-200 font-mono font-bold uppercase">
                           {profile?.profile?.pan_number
                             ? `${String(profile.profile.pan_number).slice(0, 5)}*****`
                             : 'Not specified'}
@@ -695,7 +695,7 @@ const UserProfile = () => {
             {employee && (
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 dark:border-white/10 transition-all duration-300 overflow-hidden">
                 <div className="bg-white/5 px-8 py-5 border-b border-white/10">
-                  <h2 className="text-xl font-bold text-white flex items-center tracking-tight">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center tracking-tight">
                     <BriefcaseIcon className="w-6 h-6 mr-3 text-indigo-400" />
                     Employment Details
                   </h2>
@@ -715,7 +715,7 @@ const UserProfile = () => {
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Department</label>
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 transition-all">
                         <BuildingOfficeIcon className="w-5 h-5 text-indigo-400 mr-3" />
-                        <span className="text-slate-200 font-bold">{employee.department?.name || 'Not assigned'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-bold">{employee.department?.name || 'Not assigned'}</span>
                       </div>
                     </div>
                     {/* Position */}
@@ -723,7 +723,7 @@ const UserProfile = () => {
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Position</label>
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 transition-all">
                         <StarIcon className="w-5 h-5 text-indigo-400 mr-3" />
-                        <span className="text-slate-200 font-bold">{employee.position || 'Not specified'}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-bold">{employee.position || 'Not specified'}</span>
                       </div>
                     </div>
                     {/* Hire Date */}
@@ -731,7 +731,7 @@ const UserProfile = () => {
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Hire Date</label>
                       <div className="flex items-center p-4 bg-white/5 rounded-2xl border border-white/10 transition-all">
                         <ClockIcon className="w-5 h-5 text-indigo-400 mr-3" />
-                        <span className="text-slate-200 font-bold">{formatDate(employee.hire_date)}</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-bold">{formatDate(employee.hire_date)}</span>
                       </div>
                     </div>
                   </div>
@@ -743,7 +743,7 @@ const UserProfile = () => {
             {employee && (
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 dark:border-white/10 transition-all duration-300 overflow-hidden">
                 <div className="bg-white/5 px-8 py-5 border-b border-white/10">
-                  <h2 className="text-xl font-bold text-white flex items-center tracking-tight">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center tracking-tight">
                     <ShieldCheckIcon className="w-6 h-6 mr-3 text-indigo-400" />
                     Documents
                   </h2>
@@ -769,7 +769,7 @@ const UserProfile = () => {
                         <tbody className="bg-transparent divide-y divide-white/5">
                           {documents.map((doc) => (
                             <tr key={`${doc.field}-${doc.doc_type}`} className="hover:bg-white/5 transition-colors">
-                              <td className="px-6 py-4 whitespace-nowrap text-slate-200 font-bold">
+                              <td className="px-6 py-4 whitespace-nowrap text-slate-800 dark:text-slate-200 font-bold">
                                 {doc.doc_type}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
@@ -817,18 +817,18 @@ const UserProfile = () => {
             {!isHRManager && manager && (
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 dark:border-white/10 transition-all duration-300 overflow-hidden">
                 <div className="bg-white/5 px-6 py-4 border-b border-white/10">
-                  <h2 className="text-lg font-bold text-white flex items-center tracking-tight">
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center tracking-tight">
                     <UserIcon className="w-5 h-5 mr-2 text-indigo-400" />
                     My Manager
                   </h2>
                 </div>
                 <div className="p-6">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-white/10">
+                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-[#ffffff] text-lg font-black shadow-lg border-2 border-white/10">
                       {getInitials(manager.user_info?.first_name, manager.user_info?.last_name)}
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-white tracking-tight">
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">
                         {manager.user_info?.full_name}
                       </h3>
                       <p className="text-xs text-slate-400 font-bold mt-1">Username: {manager.user?.username || manager.user_info?.username || manager.employee_id}</p>
@@ -841,7 +841,7 @@ const UserProfile = () => {
             {/* Team Members OR All Managers */}
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 dark:border-white/10 transition-all duration-300 overflow-hidden">
               <div className="bg-white/5 px-6 py-4 border-b border-white/10">
-                <h2 className="text-lg font-bold text-white flex items-center tracking-tight">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center tracking-tight">
                   <UserGroupIcon className="w-5 h-5 mr-3 text-indigo-400" />
                   {isHRManager ? `All Managers (${managers.length})` : `My Team (${team.length})`}
                 </h2>
@@ -852,13 +852,13 @@ const UserProfile = () => {
                   managers.length > 0 ? (
                     <div className="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
                       {managers.map((managerItem) => (
-                        <div key={managerItem.id} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all group">
+                        <div key={managerItem.id} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-black/10 dark:bg-white/10 transition-all group">
                           <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center text-white font-black shadow-lg">
+                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center text-[#ffffff] font-black shadow-lg">
                               {getInitials(managerItem.user_info?.first_name, managerItem.user_info?.last_name)}
                             </div>
                             <div className="flex-1">
-                              <h4 className="text-sm font-bold text-white tracking-tight">
+                              <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight">
                                 {managerItem.user_info?.full_name}
                               </h4>
                               <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{managerItem.position}</p>
@@ -886,12 +886,12 @@ const UserProfile = () => {
                   team.length > 0 ? (
                     <div className="space-y-4">
                       {team.map((member) => (
-                        <div key={member.id} className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-black/10 dark:bg-white/5/10 transition-all">
-                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center text-white font-black shadow-lg">
+                        <div key={member.id} className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-black/10 dark:bg-white/10 transition-all">
+                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center text-[#ffffff] font-black shadow-lg">
                             {getInitials(member.user_info?.first_name, member.user_info?.last_name)}
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-sm font-bold text-white tracking-tight">
+                            <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight">
                               {member.user_info?.full_name}
                             </h4>
                             <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{member.position}</p>
@@ -927,7 +927,7 @@ const UserProfile = () => {
                 </div>
                 <div className="flex justify-between items-center group">
                   <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Department</span>
-                  <span className="text-sm font-black text-slate-200">{employee?.department?.name || 'N/A'}</span>
+                  <span className="text-sm font-black text-indigo-700 dark:text-slate-200">{employee?.department?.name || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center group">
                   <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Status</span>

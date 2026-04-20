@@ -72,26 +72,26 @@ const CompanyDocuments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-2">Company Documents</h1>
-        <p className="text-slate-400 mb-6">All employees can view and download documents.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Company Documents</h1>
+        <p className="text-slate-600 dark:text-slate-400 mb-6">All employees can view and download documents.</p>
 
         {canUpload && (
-          <div className="bg-white/5 dark:bg-slate-900/60 border border-white/10 dark:border-white/10 rounded-xl p-4 mb-6">
-            <h2 className="text-lg font-semibold text-white mb-3">Upload Document</h2>
+          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-xl p-4 mb-6 shadow-sm dark:shadow-none">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Upload Document</h2>
             <div className="grid md:grid-cols-3 gap-3">
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Document title"
-                className="bg-black/20 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 text-white"
+                className="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
               />
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="bg-black/20 border border-white/10 dark:border-white/10 rounded-lg px-3 py-2 text-slate-300"
+                className="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-600 dark:text-slate-300"
               />
               <button
                 onClick={handleUpload}
@@ -104,17 +104,17 @@ const CompanyDocuments = () => {
           </div>
         )}
 
-        <div className="bg-white/5 dark:bg-slate-900/60 border border-white/10 dark:border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm dark:shadow-none overflow-hidden">
           {loading ? (
             <div className="p-6 text-slate-400">Loading documents...</div>
           ) : documents.length === 0 ? (
             <div className="p-6 text-slate-400">No documents uploaded yet.</div>
           ) : (
-            <ul className="divide-y divide-white/10">
+            <ul className="divide-y divide-slate-100 dark:divide-white/10">
               {documents.map((doc) => (
-                <li key={doc.id} className="p-4 flex items-center justify-between gap-4">
+                <li key={doc.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                   <div>
-                    <p className="text-white font-medium">{doc.title}</p>
+                    <p className="text-slate-900 dark:text-white font-medium">{doc.title}</p>
                     <p className="text-xs text-slate-400">
                       Uploaded by {doc.uploaded_by_name || 'Unknown'}
                     </p>

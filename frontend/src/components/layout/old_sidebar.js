@@ -1,4 +1,4 @@
-
+ï»¿
 // import React from 'react';
 // import { Link, useLocation } from 'react-router-dom';
 // import {
@@ -39,9 +39,9 @@
 
 //   const hasPerm = (code) => (permissions || []).includes(code);
 //   const allowedByPerms = (href) => {
-//     // Minimal mapping for key modules we know
+//     / Minimal mapping for key modules we know
 //     if (href === '/onboarding/assets') {
-//       // Allow access if user has any meaningful assets permissions
+//       / Allow access if user has any meaningful assets permissions
 //       const assetPerms = [
 //         'assets.view_asset',
 //         'assets.view_assetassignment',
@@ -192,7 +192,7 @@
 //   ];
 //   const filteredNavigation = navigation.filter((item) => {
 //     if (!(item.roles.includes(userRole) || allowedByPerms(item.href))) return false;
-//     // Extra safety: Users and Authentication should only show for real admins
+//     / Extra safety: Users and Authentication should only show for real admins
 //     if (item.href === '/users-auth') {
 //       return isAdmin();
 //     }
@@ -224,15 +224,15 @@
 //   const getRoleIcon = (role) => {
 //     switch (role) {
 //       case 'ADMIN':
-//         return '=ƒææ';
+//         return '=ÂƒÃ¦Ã¦';
 //       case 'HR_MANAGER':
-//         return '=ƒÅó';
+//         return '=ÂƒÃ…Ã³';
 //       case 'IT_SUPPORTER':
-//         return '=ƒÆ+';
+//         return '=ÂƒÃ†+';
 //       case 'MANAGER':
-//         return '=ƒæ¿GÇì=ƒÆ+';
+//         return '=ÂƒÃ¦Â¿GÃ‡Ã¬=ÂƒÃ†+';
 //       default:
-//         return '=ƒæñ';
+//         return '=ÂƒÃ¦Ã±';
 //     }
 //   };
 
@@ -300,7 +300,7 @@
 //                     relative overflow-hidden
 //                     ${isActive
 //                       ? `bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg shadow-blue-500/25 scale-105 border border-white/20`
-//                       : 'text-gray-300 hover:bg-white/5/10 hover:text-white hover:scale-105 hover:shadow-lg hover:border-white/20 border border-transparent'
+//                       : 'text-gray-300 hover:bg-white/10 hover:text-white hover:scale-105 hover:shadow-lg hover:border-white/20 border border-transparent'
 //                     }
 //                   `}
 //                   title={item.description}
@@ -313,7 +313,7 @@
 //                   <div className={`
 //                     relative z-10 w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-300
 //                     ${isActive 
-//                       ? 'bg-white/5/20 shadow-md border border-white/30' 
+//                       ? 'bg-white/20 shadow-md border border-white/30' 
 //                       : `bg-gradient-to-r ${item.color} opacity-80 group-hover:opacity-100 group-hover:shadow-md group-hover:scale-110`
 //                     }
 //                   `}>
@@ -333,7 +333,7 @@
 //                   {isActive && (
 //                     <div className="relative z-10 flex items-center space-x-1">
 //                       <div className="w-2 h-2 bg-white/5 rounded-full animate-pulse"></div>
-//                       <div className="w-1 h-1 bg-white/5/60 rounded-full"></div>
+//                       <div className="w-1 h-1 bg-white/60 rounded-full"></div>
 //                     </div>
 //                   )}
 //                 </Link>
@@ -718,7 +718,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     relative overflow-hidden
                     ${isActive
                       ? `bg-gradient-to-r ${theme.primaryGradient} text-white shadow-lg shadow-blue-500/25 scale-105 border border-white/20`
-                      : 'text-gray-300 hover:bg-white/5/10 hover:text-white hover:scale-105 hover:shadow-lg hover:border-white/20 border border-transparent'
+                      : 'text-gray-300 hover:bg-white/10 hover:text-white hover:scale-105 hover:shadow-lg hover:border-white/20 border border-transparent'
                     }
                   `}
                   title={item.description}
@@ -731,7 +731,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   <div className={`
                     relative z-10 w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all duration-300
                     ${isActive
-                      ? 'bg-white/5/20 shadow-md border border-white/30'
+                      ? 'bg-white/20 shadow-md border border-white/30'
                       : `bg-gradient-to-r ${item.color} opacity-80 group-hover:opacity-100 group-hover:shadow-md group-hover:scale-110`
                     }
                   `}>
@@ -751,7 +751,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                   {isActive && (
                     <div className="relative z-10 flex items-center space-x-1">
                       <div className="w-2 h-2 bg-white/5 rounded-full animate-pulse"></div>
-                      <div className="w-1 h-1 bg-white/5/60 rounded-full"></div>
+                      <div className="w-1 h-1 bg-white/60 rounded-full"></div>
                     </div>
                   )}
                 </Link>

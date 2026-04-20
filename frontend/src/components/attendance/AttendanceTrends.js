@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
@@ -23,13 +23,13 @@ import { attendanceAPI } from '../../services/api';
 const AttendanceTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white/5/95 dark:bg-slate-900/95 border border-indigo-500/30 rounded-xl p-3 shadow-2xl backdrop-blur-xl">
+    <div className="bg-white/95 dark:bg-slate-900/95 border border-indigo-500/30 rounded-xl p-3 shadow-2xl backdrop-blur-xl">
       <p className="text-xs text-slate-400 mb-2 font-semibold uppercase tracking-wider">{label}</p>
       {payload.map((entry, i) => (
         <div key={i} className="flex items-center space-x-2">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-          <span className="text-xs text-slate-300">{entry.name}:</span>
-          <span className="text-xs text-white">
+          <span className="text-xs text-slate-700 dark:text-slate-300">{entry.name}:</span>
+          <span className="text-xs text-slate-900 dark:text-white">
             {entry.name === 'Attendance %' ? `${entry.value}%` : entry.value}
           </span>
         </div>
@@ -47,7 +47,7 @@ const KpiCard = ({ label, value, suffix = '', icon: Icon, color, trend }) => (
     <div className="relative flex items-start justify-between">
       <div>
         <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-1">{label}</p>
-        <p className="text-2xl font-black text-white">
+        <p className="text-2xl font-black text-slate-900 dark:text-white">
           {value}{suffix}
         </p>
         {trend && (
@@ -243,7 +243,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
             <ChartBarIcon className="h-5 w-5 text-indigo-400" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">Attendance Analytics</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Attendance Analytics</h3>
             <p className="text-xs text-slate-400">
               {period === 'weekly' ? 'Last 8 weeks' : 'Last 6 months'} trend
             </p>
@@ -259,8 +259,8 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
                 onClick={() => setPeriod(p)}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-200 ${
                   period === p
-                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-indigo-500 text-slate-900 dark:text-white shadow-lg shadow-indigo-500/30'
+                    : 'text-slate-400 hover:text-slate-900 dark:text-white'
                 }`}
               >
                 {p === 'weekly' ? 'Weekly' : 'Monthly'}
@@ -272,7 +272,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
           <button
             onClick={() => fetchTrends(period)}
             disabled={loading}
-            className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-400 hover:text-white hover:border-indigo-500/40 transition-all"
+            className="p-2 rounded-xl bg-white/5 border border-white/10 dark:border-white/10 text-slate-400 hover:text-slate-900 dark:text-white hover:border-indigo-500/40 transition-all"
             title="Refresh data"
           >
             <SparklesIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -327,8 +327,8 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
             onClick={() => setActiveChart(id)}
             className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
               activeChart === id
-                ? 'bg-black/10 dark:bg-white/5/10 text-white border border-black/20 dark:border-white/20 shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-black/10 dark:bg-white/10 text-slate-900 dark:text-white border border-black/20 dark:border-white/20 shadow'
+                : 'text-slate-400 hover:text-slate-900 dark:text-white'
             }`}
           >
             <Icon className="h-3.5 w-3.5" />
@@ -483,7 +483,7 @@ const AttendanceTrends = ({ theme, attendanceRecords = [], isManagementRole = fa
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-slate-500">Late arrival rate:</span>
-                    <span className="text-xs font-bold text-white">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">
                       {totalPresent > 0 ? `${Math.round((totalLate / totalPresent) * 100)}%` : '—'} of check-ins
                     </span>
                   </div>

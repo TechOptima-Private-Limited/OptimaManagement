@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -207,7 +207,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="p-2 text-slate-400 hover:text-white hover:bg-black/10 dark:bg-white/5/10 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hidden sm:block"
+                className="p-2 text-slate-400 hover:text-white hover:bg-black/10 dark:bg-white/10 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hidden sm:block"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -641,7 +641,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, employee, loading
             <button
               type="button"
               onClick={onClose}
-              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-3 bg-white/5 text-sm font-bold text-slate-300 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all duration-300 focus:outline-none sm:mt-0 sm:w-auto"
+              className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-3 bg-white/5 text-sm font-bold text-slate-300 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all duration-300 focus:outline-none sm:mt-0 sm:w-auto"
             >
               Cancel
             </button>
@@ -761,7 +761,7 @@ const EmployeeList = () => {
       case 'TERMINATED':
         return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
       default:
-        return 'bg-[#070B14]0/10 text-slate-400 border-slate-500/20';
+        return 'bg-[#070B14]/10 text-slate-400 border-slate-500/20';
     }
   };
 
@@ -952,7 +952,7 @@ const EmployeeList = () => {
           <div className="lg:col-span-2">
             <button
               onClick={clearFilters}
-              className="w-full inline-flex items-center justify-center px-6 py-4 bg-white/5 border border-white/10 dark:border-white/10 text-sm font-black text-slate-300 rounded-2xl hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all duration-300 group"
+              className="w-full inline-flex items-center justify-center px-6 py-4 bg-white/5 border border-white/10 dark:border-white/10 text-sm font-black text-slate-300 rounded-2xl hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all duration-300 group"
             >
               <FunnelIcon className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
               Reset Filters
@@ -1029,7 +1029,7 @@ const EmployeeList = () => {
                         <div className="flex items-center space-x-1">
                           <button
                             onClick={() => handleEditEmployee(employee)}
-                            className="p-2 text-slate-500 hover:text-white hover:bg-black/10 dark:bg-white/5/10 rounded-xl transition-all duration-200"
+                            className="p-2 text-slate-500 hover:text-white hover:bg-black/10 dark:bg-white/10 rounded-xl transition-all duration-200"
                             title="Edit"
                           >
                             <PencilIcon className="h-4 w-4" />

@@ -113,7 +113,7 @@ const GroupsManagement = () => {
         </div>
         <button
           type="submit"
-          className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all transform active:scale-95"
+          className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all transform active:scale-95"
         >
           SEARCH
         </button>
@@ -170,7 +170,7 @@ const GroupsManagement = () => {
             <div className="px-8 py-6 bg-white/5 border-t border-white/10 flex justify-end space-x-4">
               <button
                 type="button"
-                className="px-6 py-2 text-xs font-black rounded-xl border border-white/10 dark:border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all"
+                className="px-6 py-2 text-xs font-black rounded-xl border border-white/10 dark:border-white/10 text-slate-400 hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all"
                 onClick={closeConfirm}
                 disabled={!!deletingId}
               >

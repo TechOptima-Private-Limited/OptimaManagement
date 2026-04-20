@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useTheme } from '../../context/ThemeContext';
@@ -371,10 +371,10 @@ const ResourceRequestForm = () => {
   };
 
   const priorityColors = {
-    LOW: 'bg-green-100 text-green-800 border-green-200',
-    MEDIUM: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    HIGH: 'bg-orange-100 text-orange-800 border-orange-200',
-    URGENT: 'bg-red-100 text-red-800 border-red-200'
+    LOW: `${theme.success.bg.replace('/20', '/10')} ${theme.success.text} ${theme.success.border.replace('/30', '/20')}`,
+    MEDIUM: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    HIGH: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+    URGENT: `${theme.danger.bg.replace('/20', '/10')} ${theme.danger.text} ${theme.danger.border.replace('/30', '/20')}`
   };
 
   // Debug logging
@@ -393,8 +393,8 @@ const ResourceRequestForm = () => {
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-black/10 dark:bg-white/5/10 rounded w-1/3"></div>
-            <div className="h-4 bg-black/10 dark:bg-white/5/10 rounded w-2/3"></div>
+            <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+            <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-2/3"></div>
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="h-12 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl"></div>
@@ -411,15 +411,15 @@ const ResourceRequestForm = () => {
     return (
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-6 text-center backdrop-blur-sm">
-            <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-rose-400 mb-4" />
-            <h3 className="text-lg font-bold text-rose-400 mb-2">Failed to Load Form Data</h3>
-            <p className="text-rose-300 mb-4">
+          <div className={`${theme.danger.bg.replace('/20', '/10')} border ${theme.danger.border.replace('/30', '/20')} rounded-xl p-6 text-center backdrop-blur-sm`}>
+            <ExclamationTriangleIcon className={`mx-auto h-12 w-12 ${theme.danger.text} mb-4`} />
+            <h3 className={`text-lg font-bold ${theme.danger.text} mb-2`}>Failed to Load Form Data</h3>
+            <p className={`${theme.danger.text.replace('400', '300')} mb-4`}>
               Unable to load resource types. Please check your connection and try again.
             </p>
             <button
               onClick={() => queryClient.invalidateQueries('resource-types')}
-              className="bg-rose-600/20 text-rose-400 border border-rose-600/30 px-6 py-2 rounded-lg hover:bg-rose-600/30 transition-colors"
+              className={`${theme.danger.bg.replace('/20', '/10')} ${theme.danger.text} border ${theme.danger.border.replace('/30', '/20')} px-6 py-2 rounded-lg hover:bg-rose-600/30 transition-colors`}
             >
               Retry
             </button>
@@ -519,7 +519,7 @@ const ResourceRequestForm = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-gray-300 mb-2">
-                      Resource Type <span className="text-indigo-400">*</span>
+                      Resource Type <span className={theme.info.text}>*</span>
                     </label>
                     <select
                       name="resource_type"
@@ -539,7 +539,7 @@ const ResourceRequestForm = () => {
                       ))}
                     </select>
                     {resourceTypes.length === 0 && !resourceTypesLoading && (
-                      <p className="mt-1 text-sm text-rose-400">
+                      <p className={`mt-1 text-sm ${theme.danger.text}`}>
                         No resource types available. Please contact your administrator.
                       </p>
                     )}
@@ -547,7 +547,7 @@ const ResourceRequestForm = () => {
 
                   <div>
                     <label className="block text-sm font-bold text-gray-300 mb-2">
-                      Resource <span className="text-indigo-400">*</span>
+                      Resource <span className={theme.info.text}>*</span>
                     </label>
                     <select
                       name="resource"
@@ -571,7 +571,7 @@ const ResourceRequestForm = () => {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-300 mb-2">
-                    Access Level <span className="text-indigo-400">*</span>
+                    Access Level <span className={theme.info.text}>*</span>
                   </label>
                   <select
                     name="access_level"
@@ -620,7 +620,7 @@ const ResourceRequestForm = () => {
                   ))}
                 </select>
                 {myAssets.length === 0 && !myAssetsLoading && (
-                  <p className="mt-1 text-sm text-rose-400">
+                  <p className={`mt-1 text-sm ${theme.danger.text}`}>
                     No assigned assets found.
                   </p>
                 )}
@@ -646,10 +646,10 @@ const ResourceRequestForm = () => {
                 <option value="HIGH" className="bg-white/5 dark:bg-slate-800 text-white">High</option>
                 <option value="URGENT" className="bg-white/5 dark:bg-slate-800 text-white">Urgent</option>
               </select>
-              <div className={`mt-3 px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center border ${formData.priority === 'LOW' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
-                formData.priority === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' :
-                  formData.priority === 'HIGH' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
-                    'bg-rose-500/10 text-rose-400 border-rose-500/30'
+              <div className={`mt-3 px-3 py-1.5 rounded-full text-xs font-bold inline-flex items-center border ${formData.priority === 'LOW' ? `${theme.success.bg.replace('/20', '/10')} ${theme.success.text} ${theme.success.border.replace('/30', '/20')}` :
+                formData.priority === 'MEDIUM' ? `${theme.warning.bg.replace('/20', '/10')} ${theme.warning.text} ${theme.warning.border.replace('/30', '/20')}` :
+                  formData.priority === 'HIGH' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                    `${theme.danger.bg.replace('/20', '/10')} ${theme.danger.text} ${theme.danger.border.replace('/30', '/20')}`
                 }`}>
                 <ExclamationTriangleIcon className="h-4 w-4 mr-1.5" />
                 {formData.priority} Priority
@@ -683,7 +683,7 @@ const ResourceRequestForm = () => {
           {/* Justification */}
           <div>
             <label className="block text-sm font-bold text-gray-300 mb-2">
-              Justification / Details <span className="text-indigo-400">*</span>
+              Justification / Details <span className={theme.info.text}>*</span>
             </label>
             <textarea
               name="justification"
@@ -738,7 +738,7 @@ const ResourceRequestForm = () => {
                     <button
                       type="button"
                       onClick={() => removeImage(image.id)}
-                      className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      className={`absolute -top-2 -right-2 ${theme.danger.bg} text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg`}
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

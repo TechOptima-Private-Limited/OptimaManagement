@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Shared attendance metrics so Dashboard and Attendance page stay consistent.
  */
 

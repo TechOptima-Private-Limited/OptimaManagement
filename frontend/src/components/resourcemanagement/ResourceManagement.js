@@ -1,4 +1,4 @@
-// import React, { useState } from 'react';
+﻿// import React, { useState } from 'react';
 // import { Routes, Route, Link, useLocation } from 'react-router-dom';
 // import {
 //   PlusIcon,
@@ -9,8 +9,8 @@
 //   Cog6ToothIcon
 // } from '@heroicons/react/24/outline';
 
-// // Import resource management components (we'll create these next)
-// // import ResourceRequestForm from './ResourceRequestForm';
+// Import resource management components (we'll create these next)
+// import ResourceRequestForm from './ResourceRequestForm';
 // import ResourceRequestForm from './ResourceRequestForm';
 // import ResourceList from './ResourceList';
 // import AccessRequestList from './AccessRequestList';
@@ -64,7 +64,7 @@
 
 //         {/* Header */}
 //         <div className="mb-8">
-//           <div className="bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-6">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-6">
 //             <div className="flex items-center justify-between">
 //               <div>
 //                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -85,7 +85,7 @@
 
 //         {/* Navigation Tabs */}
 //         <div className="mb-8">
-//           <div className="bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-2">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-2">
 //             <nav className="flex space-x-2">
 //               {tabs.map((tab) => {
 //                 const Icon = tab.icon;
@@ -113,7 +113,7 @@
 //         </div>
 
 //         {/* Content */}
-//         <div className="bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 min-h-[600px]">
+//         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 min-h-[600px]">
 //           <Routes>
 //             <Route path="/" element={<ResourceDashboard />} />
 //             <Route path="/request" element={<ResourceRequestForm />} />
@@ -142,7 +142,7 @@
 // } from '@heroicons/react/24/outline';
 // import { getCurrentUser } from '../../utils/auth';
 
-// // Import resource management components
+// Import resource management components
 // import ResourceRequestForm from './ResourceRequestForm';
 // import ResourceList from './ResourceList';
 // import AccessRequestList from './AccessRequestList';
@@ -153,14 +153,14 @@
 //   const location = useLocation();
 //   const user = getCurrentUser();
 
-//   // Check if user has admin access
+//   / Check if user has admin access
 //   const hasAdminAccess = () => {
 //     if (!user) return false;
 //     const userRole = user.role?.toLowerCase();
 //     return userRole === 'admin' || userRole === 'hr_manager' || userRole === 'hr_admin';
 //   };
 
-//   // Base tabs available to all users
+//   / Base tabs available to all users
 //   const baseTabs = [
 //     {
 //       name: 'Dashboard',
@@ -188,7 +188,7 @@
 //     }
 //   ];
 
-//   // Admin tab (only for admin/hr_manager)
+//   / Admin tab (only for admin/hr_manager)
 //   const adminTab = {
 //     name: 'Admin Forms',
 //     href: '/resource-management/admin',
@@ -196,7 +196,7 @@
 //     component: AdminForms
 //   };
 
-//   // Conditionally include admin tab - completely hide from non-admin users
+//   / Conditionally include admin tab - completely hide from non-admin users
 //   const tabs = hasAdminAccess() 
 //     ? [baseTabs[0], adminTab, ...baseTabs.slice(1)] // Insert admin tab after dashboard
 //     : baseTabs;
@@ -206,7 +206,7 @@
 //     (tab.href === '/resource-management' && location.pathname === '/resource-management')
 //   ) || tabs[0];
 
-//   // Protected Route Component for Admin Forms
+//   / Protected Route Component for Admin Forms
 //   const ProtectedAdminRoute = ({ children }) => {
 //     if (!hasAdminAccess()) {
 //       return <Navigate to="/resource-management" replace />;
@@ -220,7 +220,7 @@
 
 //         {/* Header */}
 //         <div className="mb-8">
-//           <div className="bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-6">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-6">
 //             <div className="flex items-center justify-between">
 //               <div>
 //                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -249,7 +249,7 @@
 
 //         {/* Navigation Tabs */}
 //         <div className="mb-8">
-//           <div className="bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-2">
+//           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 p-2">
 //             <nav className="flex space-x-2">
 //               {tabs.map((tab) => {
 //                 const Icon = tab.icon;
@@ -283,7 +283,7 @@
 //         </div>
 
 //         {/* Content */}
-//         <div className="bg-white/5/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 min-h-[600px]">
+//         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-black/20 dark:border-white/20 min-h-[600px]">
 //           <Routes>
 //             <Route path="/" element={<ResourceDashboard />} />
 //             <Route path="/request" element={<ResourceRequestForm />} />
@@ -473,11 +473,11 @@ const ResourceManagement = () => {
                 </p>
                 {hasAdminAccess() && (
                   <div className="mt-3 flex items-center space-x-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${theme.info.bg} ${theme.info.text} border ${theme.info.border}`}>
                       <Cog6ToothIcon className="h-3 w-3 mr-1" />
                       {getUserRoleDisplay()}
                     </span>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${theme.success.bg.replace('/20', '/10')} ${theme.success.text} border ${theme.success.border.replace('/30', '/20')}`}>
                       ⚡ Admin Access
                     </span>
                   </div>
@@ -519,7 +519,7 @@ const ResourceManagement = () => {
                     {isAdminTab && (
                       <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium
                         ${isActive
-                          ? 'bg-black/20 dark:bg-white/5/20 text-white border border-black/30 dark:border-white/30'
+                          ? 'bg-black/20 dark:bg-white/20 text-white border border-black/30 dark:border-white/30'
                           : 'bg-purple-100 text-purple-700 border border-purple-200'
                         }`}>
                         Admin
@@ -554,7 +554,7 @@ const ResourceManagement = () => {
         {hasAdminAccess() && (
           <div className="mt-6 text-center">
             <div className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full shadow-lg border border-white/10 dark:border-white/10">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+              <div className={`w-2 h-2 ${theme.success.bg.replace('/20', '')} rounded-full mr-2 animate-pulse`}></div>
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Administrative privileges active for {getUserRoleDisplay()}
               </span>

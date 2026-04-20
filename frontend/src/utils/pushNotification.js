@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Utility for handling web push notification registration and subscription
  */
 

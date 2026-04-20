@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns';
+﻿import { format, parseISO } from 'date-fns';
 
 export const formatDate = (date, formatString = 'MMM dd, yyyy') => {
   if (!date) return '';

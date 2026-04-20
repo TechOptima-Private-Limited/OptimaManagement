@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { attendanceAPI } from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
 
 const WorkingFormatCard = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total_days: 0,
@@ -56,9 +58,9 @@ const WorkingFormatCard = () => {
   };
 
   return (
-    <div className="bg-[#0b1221] rounded-3xl p-5 shadow-2xl relative overflow-hidden group border border-white/10 hover:border-white/10 dark:border-white/10 transition-all duration-300 min-h-[300px] card-hover-lift smooth-transition">
+    <div className={`${theme.modalBg} rounded-3xl p-5 shadow-2xl relative overflow-hidden group border ${theme.muted.border} hover:border-white/10 dark:border-white/10 transition-all duration-300 min-h-[300px] card-hover-lift smooth-transition`}>
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-purple-500/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 ${theme.info.bg} blur-[100px] rounded-full pointer-events-none`} />
       
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-2">

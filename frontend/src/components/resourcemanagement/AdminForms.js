@@ -1,4 +1,4 @@
-// import React, { useState } from 'react';
+﻿// import React, { useState } from 'react';
 // import { useMutation, useQuery, useQueryClient } from 'react-query';
 // import { toast } from 'react-toastify';
 // import {
@@ -18,7 +18,7 @@
 //   const queryClient = useQueryClient();
 //   const user = getCurrentUser();
 
-//   // Resource Type Form
+//   / Resource Type Form
 //   const ResourceTypeForm = () => {
 //     const [formData, setFormData] = useState({
 //       name: '',
@@ -115,7 +115,7 @@
 //     );
 //   };
 
-//   // Access Level Form
+//   / Access Level Form
 //   const AccessLevelForm = () => {
 //     const [formData, setFormData] = useState({
 //       name: '',
@@ -198,7 +198,7 @@
 //     );
 //   };
 
-//   // Resource Form
+//   / Resource Form
 //   const ResourceForm = () => {
 //     const [formData, setFormData] = useState({
 //       name: '',
@@ -466,7 +466,7 @@
 //   const queryClient = useQueryClient();
 //   const user = getCurrentUser();
 
-//   // Verify admin access
+//   / Verify admin access
 //   useEffect(() => {
 //     const verifyAccess = () => {
 //       if (!user) {
@@ -490,7 +490,7 @@
 //     verifyAccess();
 //   }, [user]);
 
-//   // If user doesn't have access, show access denied message
+//   / If user doesn't have access, show access denied message
 //   if (!accessVerified) {
 //     return (
 //       <div className="p-6">
@@ -518,7 +518,7 @@
 //     );
 //   }
 
-//   // Resource Type Form
+//   / Resource Type Form
 //   const ResourceTypeForm = () => {
 //     const [formData, setFormData] = useState({
 //       name: '',
@@ -625,7 +625,7 @@
 //     );
 //   };
 
-//   // Access Level Form
+//   / Access Level Form
 //   const AccessLevelForm = () => {
 //     const [formData, setFormData] = useState({
 //       name: '',
@@ -718,7 +718,7 @@
 //     );
 //   };
 
-//   // Resource Form
+//   / Resource Form
 //   const ResourceForm = () => {
 //     const [formData, setFormData] = useState({
 //       name: '',
@@ -855,7 +855,7 @@
 //                 value={formData.endpoint}
 //                 onChange={(e) => setFormData({ ...formData, endpoint: e.target.value })}
 //                 className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-//                 placeholder="https://example.com/api"
+//                 placeholder="https:/example.com/api"
 //               />
 //             </div>
 
@@ -1214,7 +1214,7 @@ const AdminForms = () => {
                 setFormData({ name: '', description: '', is_active: true });
               }}
               disabled={createMutation.isLoading}
-              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
+              className="bg-black/10 dark:bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1311,7 +1311,7 @@ const AdminForms = () => {
                 setFormData({ name: '', description: '' });
               }}
               disabled={createMutation.isLoading}
-              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
+              className="bg-black/10 dark:bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1467,7 +1467,7 @@ const AdminForms = () => {
                 value={formData.endpoint}
                 onChange={(e) => setFormData({ ...formData, endpoint: e.target.value })}
                 className="w-full px-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder-gray-600"
-                placeholder="https://example.com/api"
+                placeholder="https:/example.com/api"
               />
             </div>
 
@@ -1553,7 +1553,7 @@ const AdminForms = () => {
                 });
               }}
               disabled={createMutation.isLoading}
-              className="bg-black/10 dark:bg-white/5/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/5/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
+              className="bg-black/10 dark:bg-white/10 text-white px-6 py-2.5 rounded-xl hover:bg-black/20 dark:bg-white/20 font-bold tracking-wide transition-colors border border-white/10 dark:border-white/10"
             >
               Save and add another
             </button>
@@ -1584,7 +1584,7 @@ const AdminForms = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4 bg-black/20 px-6 py-4 rounded-2xl border border-white/10 dark:border-white/10 backdrop-blur-md">
-            <div className="p-3 bg-black/10 dark:bg-white/5/10 rounded-xl">
+            <div className="p-3 bg-black/10 dark:bg-white/10 rounded-xl">
               <ShieldCheckIcon className="h-8 w-8 text-white" />
             </div>
             <div className="text-right">
@@ -1609,7 +1609,7 @@ const AdminForms = () => {
                 onClick={() => setActiveForm(form.id)}
                 className={`flex items-center px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 border ${activeForm === form.id
                     ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-lg shadow-indigo-500/10'
-                    : 'bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 dark:bg-white/5/10 hover:text-white border-transparent'
+                    : 'bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 dark:bg-white/10 hover:text-white border-transparent'
                   }`}
               >
                 <Icon className={`h-5 w-5 mr-2.5 ${activeForm === form.id ? 'text-indigo-400' : 'text-slate-400'}`} />

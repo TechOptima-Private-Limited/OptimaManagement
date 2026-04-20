@@ -1180,13 +1180,13 @@ const AssetManagement = () => {
                 tabIndex={0}
                 key={item.key}
                 onClick={() => setActiveSection(item.route)}
-                style={{
-                  background: selected ? 'rgba(99, 102, 241, 0.1)' : theme.surfaceGradient,
-                  borderColor: selected ? '#6366f1' : 'rgba(255, 255, 255, 0.1)'
-                }}
-                className={`text-left rounded-2xl p-6 transition-all duration-300 backdrop-blur-xl border flex flex-col justify-between group h-full ${selected ? 'shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20'}`}
+                className={`text-left rounded-2xl p-6 transition-all duration-300 border flex flex-col justify-between group h-full ${
+                  selected 
+                    ? 'bg-indigo-500/10 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.2)]' 
+                    : 'bg-white/5 dark:bg-slate-800/10 border-slate-200 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-white/10'
+                }`}
               >
-                <div className="font-bold text-lg text-white mb-4 group-hover:text-indigo-400 transition-colors uppercase tracking-wider">{item.label}</div>
+                <div className={`font-bold text-lg mb-4 group-hover:text-indigo-500 transition-colors uppercase tracking-wider text-slate-900 dark:text-white`}>{item.label}</div>
                 <div className="flex items-center justify-end gap-3">
                   <button
                     type="button"
@@ -1195,7 +1195,11 @@ const AssetManagement = () => {
                   >
                     Add
                   </button>
-                  <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${selected ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/5 text-slate-400 border-white/10 dark:border-white/10 group-hover:border-black/20 dark:border-white/20'}`}>
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${
+                    selected 
+                      ? 'bg-indigo-600 text-white border-indigo-500' 
+                      : 'bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10 group-hover:border-indigo-300 dark:group-hover:border-indigo-500/50'
+                  }`}>
                     Manage
                   </span>
                 </div>
@@ -2190,14 +2194,14 @@ const AssetManagement = () => {
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={stat.key} className="bg-white/5 border border-white/10 dark:border-white/10 backdrop-blur-xl rounded-2xl p-6 transition-all duration-300 hover:bg-black/10 dark:bg-white/5/10 hover:border-black/20 dark:border-white/20 group">
+                  <div key={stat.key} className="bg-white/5 dark:bg-slate-800/10 border border-slate-200 dark:border-white/10 backdrop-blur-xl rounded-2xl p-6 transition-all duration-300 hover:border-indigo-300 dark:hover:border-indigo-500/50 group">
                     <div className="flex flex-col items-center text-center">
-                      <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 mb-3 group-hover:scale-110 transition-transform">
+                      <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-500 dark:text-indigo-400 mb-3 group-hover:scale-110 transition-transform">
                         <Icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-1">{stat.count}</h3>
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</p>
+                        <h3 className="text-2xl font-bold mb-1 text-slate-900 dark:text-white">{stat.count}</h3>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.label}</p>
                       </div>
                     </div>
                   </div>

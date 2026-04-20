@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminUserAPI, employeeAPI } from '../../services/api';
 import { toast } from 'react-toastify';
@@ -157,7 +157,7 @@ const UsersAuthHome = () => {
         {/* Groups card */}
         <Link
           to="/users-auth/groups"
-          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-2xl hover:-translate-y-1"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
         >
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
@@ -177,7 +177,7 @@ const UsersAuthHome = () => {
         {/* Permissions card */}
         <Link
           to="/users-auth/permissions"
-          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/5/10 hover:shadow-2xl hover:-translate-y-1"
+          className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10 hover:shadow-2xl hover:-translate-y-1"
         >
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div>
@@ -310,7 +310,7 @@ const UsersAuthHome = () => {
             <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex justify-end space-x-3">
               <button
                 type="button"
-                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/5/10 hover:text-white transition-all"
+                className="px-4 py-2 text-xs font-bold rounded-xl border border-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
                 onClick={closeConfirm}
                 disabled={!!deletingId}
               >

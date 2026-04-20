@@ -10,8 +10,10 @@ import {
   EyeIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
+import { useTheme } from '../../context/ThemeContext';
 
 const OffboardingManagement = () => {
+  const { theme, isDark } = useTheme();
   const [offboardings, setOffboardings] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -124,9 +126,9 @@ const OffboardingManagement = () => {
 
   const getStatusColor = (lastWorkingDate) => {
     const days = getDaysUntilLastWorking(lastWorkingDate);
-    if (days < 0) return 'bg-red-100 text-red-800';
-    if (days <= 7) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-green-100 text-green-800';
+    if (days < 0) return 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+    if (days <= 7) return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+    return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
   };
 
   const getStatusLabel = (lastWorkingDate) => {
@@ -154,21 +156,23 @@ const OffboardingManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient} flex justify-center items-center`}>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500`}></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black text-slate-300 pb-12">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.surfaceGradient} ${theme.text} pb-12 transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Offboarding Management</h1>
-            <p className="mt-2 text-sm text-slate-400">
-              Manage employee offboarding process and exit procedures
+            <h1 className={`text-4xl font-black ${isDark ? 'text-white' : 'text-slate-900'} tracking-tight uppercase`}>
+                Offboarding <span className="text-rose-500">Management</span>
+            </h1>
+            <p className={`mt-2 text-sm ${theme.muted.text} font-bold uppercase tracking-widest`}>
+              Exit Procedures & Status Tracking
             </p>
           </div>
           <button
@@ -177,7 +181,7 @@ const OffboardingManagement = () => {
               setEmployeeSearchTerm('');
               setShowEmployeeDropdown(false);
             }}
-            className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 border border-rose-500/50 rounded-xl shadow-lg shadow-rose-500/20 text-sm font-bold text-white hover:from-rose-400 hover:to-red-500 hover:shadow-rose-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-rose-600 to-red-600 border border-rose-500/50 rounded-2xl shadow-lg shadow-rose-500/20 text-xs font-black uppercase tracking-widest text-white hover:from-rose-500 hover:to-red-500 hover:shadow-rose-500/40 transition-all duration-300 transform hover:-translate-y-1"
           >
             <PlusIcon className="h-5 w-5 mr-2" />
             Add Offboarding
@@ -186,137 +190,134 @@ const OffboardingManagement = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-          <div className="bg-[#070B14] dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-2xl shadow-lg p-6 hover:bg-[#070B14] dark:bg-slate-900/80 transition-all duration-300 group">
+          <div className={`${theme.cardBg} ${theme.cardBorder} border backdrop-blur-xl rounded-2xl shadow-lg p-6 hover:translate-y-[-4px] transition-all duration-300 group`}>
             <div className="flex items-center">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-indigo-500/20 shadow-inner border border-indigo-500/30 text-indigo-400 group-hover:scale-110 transition-transform duration-300">
-                <UserMinusIcon className="h-7 w-7" />
+              <div className="flex-shrink-0 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
+                <UserMinusIcon className="h-8 w-8" />
               </div>
               <div className="ml-5">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Total</h3>
-                <p className="text-3xl font-bold text-white mt-1">{(offboardings || []).length}</p>
+                <h3 className={`text-[10px] font-black ${theme.muted.text} uppercase tracking-widest`}>Total</h3>
+                <p className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1`}>{(offboardings || []).length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#070B14] dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-2xl shadow-lg p-6 hover:bg-[#070B14] dark:bg-slate-900/80 transition-all duration-300 group">
+          <div className={`${theme.cardBg} ${theme.cardBorder} border backdrop-blur-xl rounded-2xl shadow-lg p-6 hover:translate-y-[-4px] transition-all duration-300 group`}>
             <div className="flex items-center">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-amber-500/100/20 shadow-inner border border-amber-500/30 text-amber-400 group-hover:scale-110 transition-transform duration-300">
-                <CalendarDaysIcon className="h-7 w-7" />
+              <div className="flex-shrink-0 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 group-hover:scale-110 transition-transform duration-300">
+                <CalendarDaysIcon className="h-8 w-8" />
               </div>
               <div className="ml-5">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">This Week</h3>
-                <p className="text-3xl font-bold text-white mt-1">
+                <h3 className={`text-[10px] font-black ${theme.muted.text} uppercase tracking-widest`}>This Week</h3>
+                <p className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1`}>
                   {(offboardings || []).filter(o => getDaysUntilLastWorking(o.last_working_date) >= 0 && getDaysUntilLastWorking(o.last_working_date) <= 7).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#070B14] dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-2xl shadow-lg p-6 hover:bg-[#070B14] dark:bg-slate-900/80 transition-all duration-300 group">
+          <div className={`${theme.cardBg} ${theme.cardBorder} border backdrop-blur-xl rounded-2xl shadow-lg p-6 hover:translate-y-[-4px] transition-all duration-300 group`}>
             <div className="flex items-center">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-emerald-500/20 shadow-inner border border-emerald-500/30 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                <DocumentTextIcon className="h-7 w-7" />
+              <div className="flex-shrink-0 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 group-hover:scale-110 transition-transform duration-300">
+                <DocumentTextIcon className="h-8 w-8" />
               </div>
               <div className="ml-5">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Completed</h3>
-                <p className="text-3xl font-bold text-white mt-1">
+                <h3 className={`text-[10px] font-black ${theme.muted.text} uppercase tracking-widest`}>Completed</h3>
+                <p className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-1`}>
                   {(offboardings || []).filter(o => isOverdue(o.last_working_date)).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#070B14] dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 dark:border-white/10 rounded-2xl shadow-lg p-6 hover:bg-[#070B14] dark:bg-slate-900/80 transition-all duration-300 group">
+          <div className={`${theme.cardBg} ${theme.cardBorder} border backdrop-blur-xl rounded-2xl shadow-lg p-6 hover:translate-y-[-4px] transition-all duration-300 group`}>
             <div className="flex items-center">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-purple-500/100/20 shadow-inner border border-purple-500/30 text-purple-400 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-xl font-bold">
+              <div className="flex-shrink-0 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-500 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl font-black">
                   {(offboardings || []).length > 0 ? Math.round((offboardings || []).reduce((sum, o) => sum + (parseInt(o.notice_period_days || 0) || 0), 0) / (offboardings || []).length) : 0}
                 </span>
               </div>
               <div className="ml-5">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Avg Notice</h3>
-                <p className="text-sm text-slate-500 mt-1 font-medium">Days</p>
+                <h3 className={`text-[10px] font-black ${theme.muted.text} uppercase tracking-widest`}>Avg Notice</h3>
+                <p className={`text-xs ${theme.muted.text} mt-1 font-bold uppercase`}>Days</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" />
+        <div className="mb-8">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+              <MagnifyingGlassIcon className={`h-6 w-6 ${theme.muted.text} group-focus-within:text-indigo-500 transition-colors`} />
             </div>
             <input
               type="text"
               placeholder="Search offboardings by name or remarks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-11 pr-4 py-3 bg-black/20 border border-white/10 dark:border-white/10 rounded-xl leading-5 text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 focus:bg-black/40 transition-all duration-200"
+              className={`block w-full pl-14 pr-6 py-4 ${isDark ? 'bg-slate-900/50' : 'bg-white'} border ${theme.muted.border} rounded-3xl shadow-inner ${theme.text} placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all duration-300`}
             />
           </div>
         </div>
 
         {/* Offboardings List */}
-        <div className="bg-[#070B14] dark:bg-slate-900/60 backdrop-blur-xl shadow-xl overflow-hidden rounded-2xl border border-white/10 dark:border-white/10">
-          <ul className="divide-y divide-white/5">
+        <div className={`${theme.cardBg} ${theme.cardBorder} border backdrop-blur-xl shadow-2xl overflow-hidden rounded-3xl`}>
+          <ul className={`divide-y ${isDark ? 'divide-white/5' : 'divide-slate-100'}`}>
             {filteredOffboardings.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-white/5 border border-white/10 dark:border-white/10 rounded-full mb-4 shadow-inner">
-                  <UserMinusIcon className="h-10 w-10 text-slate-500" />
+              <div className="text-center py-20">
+                <div className={`inline-flex items-center justify-center w-24 h-24 bg-white/5 border ${theme.muted.border} rounded-full mb-6 shadow-inner`}>
+                  <UserMinusIcon className={`h-12 w-12 ${theme.muted.text}`} />
                 </div>
-                <h3 className="mt-4 text-lg font-medium text-slate-300">No offboardings found</h3>
-                <p className="mt-2 text-sm text-slate-500">
+                <h3 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'} uppercase tracking-tight`}>No offboardings found</h3>
+                <p className={`mt-2 text-sm ${theme.muted.text} font-medium`}>
                   No offboarding records match your search criteria.
                 </p>
               </div>
             ) : (
               filteredOffboardings.map((offboarding) => (
-                <li key={offboarding.id} className="px-6 py-5 hover:bg-white/5 transition-colors duration-150 group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-5">
-                      <div className="flex-shrink-0 h-12 w-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 dark:border-white/10 rounded-xl flex items-center justify-center shadow-inner group-hover:border-indigo-500/30 transition-colors">
-                        <span className="text-indigo-300 font-bold text-lg">
+                <li key={offboarding.id} className="px-8 py-6 hover:bg-white/5 transition-all duration-300 group">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                    <div className="flex items-center space-x-6">
+                      <div className={`flex-shrink-0 h-14 w-14 bg-gradient-to-br from-rose-500/10 to-orange-500/10 border ${theme.muted.border} rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-105 transition-all`}>
+                        <span className="text-rose-500 font-black text-xl">
                           {offboarding.employee_name?.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-3">
-                          <h3 className="text-lg font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h3 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'} group-hover:text-rose-500 transition-colors`}>
                             {offboarding.employee_name}
                           </h3>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(offboarding.last_working_date).replace('bg-red-100 text-red-800', 'bg-rose-500/20 text-rose-300 border-rose-500/30')
-                            .replace('bg-yellow-100 text-yellow-800', 'bg-amber-500/100/20 text-amber-300 border-amber-500/30')
-                            .replace('bg-green-100 text-green-800', 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30')
-                            }`}>
+                          <span className={`inline-flex items-center px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(offboarding.last_working_date)}`}>
                             {getStatusLabel(offboarding.last_working_date)}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-slate-400">
-                          <span className="flex items-center">
-                            <CalendarDaysIcon className="w-4 h-4 mr-1.5 text-slate-500" />
-                            Last Working: <span className="text-slate-300 ml-1">{new Date(offboarding.last_working_date).toLocaleDateString()}</span>
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2 text-sm font-bold">
+                          <span className={`flex items-center ${theme.muted.text}`}>
+                            <CalendarDaysIcon className="w-5 h-5 mr-2 opacity-50" />
+                            LWD: <span className={`${isDark ? 'text-slate-300' : 'text-slate-700'} ml-1 tracking-wider`}>{new Date(offboarding.last_working_date).toLocaleDateString()}</span>
                           </span>
-                          <span className="flex items-center">
-                            <DocumentTextIcon className="w-4 h-4 mr-1.5 text-slate-500" />
-                            Notice: <span className="text-slate-300 ml-1">{offboarding.notice_period_days} days</span>
+                          <span className={`flex items-center ${theme.muted.text}`}>
+                            <DocumentTextIcon className="w-5 h-5 mr-2 opacity-50" />
+                            Notice: <span className={`${isDark ? 'text-slate-300' : 'text-slate-700'} ml-1`}>{offboarding.notice_period_days} Days</span>
                           </span>
                         </div>
                         {offboarding.remarks && (
-                          <div className="mt-2 text-sm text-slate-400 truncate bg-black/20 px-3 py-1.5 rounded-lg border border-white/10 inline-block max-w-lg">
-                            {offboarding.remarks}
+                          <div className={`mt-3 text-xs ${theme.muted.text} italic bg-black/5 px-4 py-2 rounded-xl border ${theme.muted.border} inline-block max-w-lg font-medium`}>
+                            "{offboarding.remarks}"
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-3 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center space-x-4">
                       <button
                         onClick={() => {
                           setSelectedOffboarding(offboarding);
                           setShowDetailsModal(true);
                         }}
-                        className="inline-flex items-center px-3 py-2 border border-white/10 dark:border-white/10 rounded-lg text-sm font-medium text-slate-300 bg-black/20 hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-colors"
+                        className={`inline-flex items-center px-6 py-2.5 ${theme.muted.bg} ${theme.cardBorder} border rounded-xl text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-slate-900'} hover:bg-white/10 transition-all shadow-sm`}
                       >
                         <EyeIcon className="h-4 w-4 mr-2" />
                         View
@@ -324,7 +325,7 @@ const OffboardingManagement = () => {
 
                       <button
                         onClick={() => deleteOffboarding(offboarding.id)}
-                        className="inline-flex items-center px-3 py-2 border border-rose-500/30 rounded-lg text-sm font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 hover:text-rose-300 transition-colors"
+                        className="inline-flex items-center px-6 py-2.5 bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500/20 transition-all shadow-sm"
                       >
                         <TrashIcon className="h-4 w-4 mr-2" />
                         Delete
@@ -342,13 +343,13 @@ const OffboardingManagement = () => {
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-slate-900/90 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
-              <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="inline-block align-bottom bg-white dark:bg-[#0A0F1A] border border-slate-200 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div className="px-6 pt-6 pb-4 sm:p-8 sm:pb-6">
                   <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       Add Offboarding Record
                     </h3>
-                    <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                    <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
                       <span className="sr-only">Close</span>
                       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -371,7 +372,7 @@ const OffboardingManagement = () => {
                           }}
                           onFocus={() => setShowEmployeeDropdown(true)}
                           placeholder="Type at least 2 letters to search employee"
-                          className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-300 placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                          className="block w-full bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-700 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                         />
                         {showEmployeeDropdown && (
                           <div className="absolute z-20 mt-1 w-full bg-[#070B14] dark:bg-slate-900 border border-white/10 dark:border-white/10 rounded-xl shadow-lg max-h-56 overflow-y-auto">
@@ -397,7 +398,7 @@ const OffboardingManagement = () => {
                                       setEmployeeSearchTerm(name);
                                       setShowEmployeeDropdown(false);
                                     }}
-                                    className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-black/10 dark:bg-white/5/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-black/10 dark:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {isOffboarded ? `${name} (already offboarded)` : name}
                                   </button>
@@ -414,7 +415,7 @@ const OffboardingManagement = () => {
                         type="date"
                         value={newOffboarding.last_working_date}
                         onChange={(e) => setNewOffboarding({ ...newOffboarding, last_working_date: e.target.value })}
-                        className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                        className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                         style={{ colorScheme: 'dark' }}
                       />
                     </div>
@@ -424,7 +425,7 @@ const OffboardingManagement = () => {
                         type="number"
                         value={newOffboarding.notice_period_days}
                         onChange={(e) => setNewOffboarding({ ...newOffboarding, notice_period_days: parseInt(e.target.value) })}
-                        className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                        className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                         min="0"
                       />
                     </div>
@@ -444,7 +445,7 @@ const OffboardingManagement = () => {
                         value={newOffboarding.remarks}
                         onChange={(e) => setNewOffboarding({ ...newOffboarding, remarks: e.target.value })}
                         rows={3}
-                        className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
+                        className="block w-full bg-black/20 border border-white/10 dark:border-white/10 rounded-xl shadow-sm py-2.5 px-3 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                         placeholder="Additional notes about the offboarding..."
                       />
                     </div>
@@ -454,13 +455,13 @@ const OffboardingManagement = () => {
                   <button
                     onClick={createOffboarding}
                     disabled={!newOffboarding.employee || !newOffboarding.last_working_date}
-                    className="w-full inline-flex justify-center rounded-xl border border-transparent shadow-lg px-6 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 text-base font-bold text-white hover:from-rose-400 hover:to-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0F1A] focus:ring-rose-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="w-full inline-flex justify-center rounded-xl border border-transparent shadow-lg px-6 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 text-base font-bold text-slate-900 dark:text-white hover:from-rose-400 hover:to-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0F1A] focus:ring-rose-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
                     Confirm Offboarding
                   </button>
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-2.5 bg-white/5 text-base font-medium text-slate-300 hover:bg-black/10 dark:bg-white/5/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0F1A] focus:ring-slate-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-all"
+                    className="mt-3 w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-2.5 bg-white/5 text-base font-medium text-slate-300 hover:bg-black/10 dark:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0F1A] focus:ring-slate-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-all"
                   >
                     Cancel
                   </button>
@@ -475,13 +476,13 @@ const OffboardingManagement = () => {
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity bg-[#070B14] dark:bg-slate-900/90 backdrop-blur-sm" onClick={() => setShowDetailsModal(false)}></div>
-              <div className="inline-block align-bottom bg-[#0A0F1A] border border-white/10 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+              <div className="inline-block align-bottom bg-white dark:bg-[#0A0F1A] border border-slate-200 dark:border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
                 <div className="px-6 pt-6 pb-4 sm:p-8 sm:pb-6">
                   <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       Offboarding Details
                     </h3>
-                    <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                    <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 hover:text-slate-900 dark:text-white transition-colors">
                       <span className="sr-only">Close</span>
                       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -489,26 +490,26 @@ const OffboardingManagement = () => {
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
-                    <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4">
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Employee Name</label>
-                      <p className="mt-1.5 text-base font-medium text-white">{selectedOffboarding.employee_name}</p>
+                      <p className="mt-1.5 text-base font-medium text-slate-900 dark:text-white">{selectedOffboarding.employee_name}</p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4">
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</label>
-                      <p className="mt-1.5 text-base font-medium text-white">{selectedOffboarding.employee_email || 'Not available'}</p>
+                      <p className="mt-1.5 text-base font-medium text-slate-900 dark:text-white">{selectedOffboarding.employee_email || 'Not available'}</p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4">
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Working Date</label>
-                      <p className="mt-1.5 text-base font-medium text-white">{new Date(selectedOffboarding.last_working_date).toLocaleDateString()}</p>
+                      <p className="mt-1.5 text-base font-medium text-slate-900 dark:text-white">{new Date(selectedOffboarding.last_working_date).toLocaleDateString()}</p>
                     </div>
                     <div className="bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Notice Period</label>
-                      <p className="mt-1.5 text-base font-medium text-white">{selectedOffboarding.notice_period_days} days</p>
+                      <p className="mt-1.5 text-base font-medium text-slate-900 dark:text-white">{selectedOffboarding.notice_period_days} days</p>
                     </div>
                     <div className="col-span-2 bg-white/5 border border-white/10 dark:border-white/10 rounded-xl p-4">
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Status</label>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(selectedOffboarding.last_working_date).replace('bg-red-100 text-red-800', 'bg-rose-500/20 text-rose-300 border-rose-500/30')
-                        .replace('bg-yellow-100 text-yellow-800', 'bg-amber-500/100/20 text-amber-300 border-amber-500/30')
+                        .replace('bg-yellow-100 text-yellow-800', 'bg-amber-500/20 text-amber-300 border-amber-500/30')
                         .replace('bg-green-100 text-green-800', 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30')
                         }`}>
                         {getStatusLabel(selectedOffboarding.last_working_date)}
@@ -538,7 +539,7 @@ const OffboardingManagement = () => {
                 <div className="bg-white/5 border-t border-white/10 dark:border-white/10 px-6 py-4 sm:flex sm:flex-row-reverse">
                   <button
                     onClick={() => setShowDetailsModal(false)}
-                    className="w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-2.5 bg-white/5 text-base font-medium text-white hover:bg-black/10 dark:bg-white/5/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0F1A] focus:ring-slate-500 sm:ml-3 sm:w-auto sm:text-sm transition-all"
+                    className="w-full inline-flex justify-center rounded-xl border border-white/10 dark:border-white/10 shadow-sm px-6 py-2.5 bg-white/5 text-base font-medium text-slate-900 dark:text-white hover:bg-black/10 dark:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0F1A] focus:ring-slate-500 sm:ml-3 sm:w-auto sm:text-sm transition-all"
                   >
                     Close
                   </button>

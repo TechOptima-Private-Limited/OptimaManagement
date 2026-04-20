@@ -73,7 +73,7 @@ const PermissionsManagement = () => {
         </div>
         <button
           type="submit"
-          className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/5/10 hover:text-white transition-all transform active:scale-95"
+          className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-black/10 dark:bg-white/10 hover:text-white transition-all transform active:scale-95"
         >
           SEARCH
         </button>
