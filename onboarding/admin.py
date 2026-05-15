@@ -1871,3 +1871,184 @@ admin.site.register(OnboardingLink, OnboardingLinkAdmin)
 admin.site.site_header = "Techoptima HR Management"
 admin.site.site_title = "HR Admin"
 admin.site.index_title = "Welcome to HR Management Portal"
+
+
+# ============================================================================
+# RESUME MANAGEMENT (Candidate)
+# ============================================================================
+
+from .models import Candidate, TechStack
+from import_export import resources, fields
+from import_export.widgets import ManyToManyWidget
+from import_export.admin import ImportExportModelAdmin
+
+@admin.register(TechStack)
+class TechStackAdmin(admin.ModelAdmin):
+    list_display = ['name', 'created_at']
+    search_fields = ['name']
+
+class ExperienceRangeFilter(admin.SimpleListFilter):
+    title = 'Experience Range'
+    parameter_name = 'exp_range'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('0-1', '0 - 1 Year'),
+            ('1-3', '1 - 3 Years'),
+            ('3-5', '3 - 5 Years'),
+            ('5-10', '5 - 10 Years'),
+            ('10+', '10+ Years'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '0-1':
+            return queryset.filter(exp_years__gte=0, exp_years__lte=1)
+        if self.value() == '1-3':
+            return queryset.filter(exp_years__gt=1, exp_years__lte=3)
+        if self.value() == '3-5':
+            return queryset.filter(exp_years__gt=3, exp_years__lte=5)
+        if self.value() == '5-10':
+            return queryset.filter(exp_years__gt=5, exp_years__lte=10)
+        if self.value() == '10+':
+            return queryset.filter(exp_years__gt=10)
+        return queryset
+
+class CandidateResource(resources.ModelResource):
+    tech_stacks = fields.Field(
+        column_name='tech_stacks',
+        attribute='tech_stacks',
+        widget=ManyToManyWidget(TechStack, separator=',', field='name')
+    )
+
+    class Meta:
+        model = Candidate
+        fields = (
+            'id', 'full_name', 'first_name', 'last_name', 'email', 'mobile',
+            'exp_years', 'tech_stack', 'tech_stacks', 'location',
+            'preferred_location', 'experience', 'created_at', 'updated_at'
+        )
+        export_order = fields
+
+class CandidateAdmin(ImportExportModelAdmin):
+    resource_class = CandidateResource
+    """
+    Admin for managing candidate resumes.
+
+    HR staff add candidates via the standard Django admin Add/Edit form.
+    The uploaded PDF is saved to local disk (MEDIA_ROOT/cvs/); only the
+    relative file path is stored in the database via Django's FileField.
+    """
+
+    # ---------- List view ----------
+    list_display = [
+        'full_name', 'email', 'mobile', 'exp_years_badge',
+        'tech_stacks_display', 'location', 'cv_view_download_link', 'created_at',
+    ]
+    list_filter = [ExperienceRangeFilter, 'tech_stacks', 'created_at', 'location']
+    filter_horizontal = ('tech_stacks',)
+    search_fields = [
+        'full_name', 'first_name', 'last_name', 'email', 
+        'tech_stack', 'location', 'tech_stacks__name', 'exp_years'
+    ]
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+
+    class Media:
+        js = ('onboarding/js/admin_search_placeholder.js',)
+
+    # ---------- Detail / Edit view ----------
+    readonly_fields = ['created_at', 'updated_at', 'cv_view_download_link_detail']
+
+    fieldsets = (
+        ('Candidate Information', {
+            'fields': (
+                ('full_name', 'first_name', 'last_name'),
+                ('email', 'mobile'),
+                ('exp_years', 'tech_stacks'),
+                ('tech_stack',),
+                ('location', 'preferred_location'),
+                'experience',
+            ),
+        }),
+        ('Resume / CV', {
+            'fields': ('cv_file', 'cv_view_download_link_detail'),
+            'description': (
+                'Upload the candidate\'s resume (PDF). '
+                'The file is saved on local disk (MEDIA_ROOT/cvs/); '
+                'only the file path is stored in the database.'
+            ),
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    # ---------- List-view column helpers ----------
+
+    def exp_years_badge(self, obj):
+        color = '#28a745' if obj.exp_years >= 3 else '#ffc107'
+        return format_html(
+            '<span style="background:{}; color:white; padding:2px 8px; '
+            'border-radius:12px; font-weight:bold;">{} yrs</span>',
+            color, obj.exp_years,
+        )
+    exp_years_badge.short_description = 'Experience'
+    exp_years_badge.admin_order_field = 'exp_years'
+
+    def tech_stacks_display(self, obj):
+        stacks = obj.tech_stacks.all()
+        if not stacks:
+            return format_html('<span style="color:#6c757d; font-style:italic;">None</span>')
+        
+        badges = []
+        for stack in stacks:
+            badges.append(
+                f'<span style="background:#e9ecef; color:#495057; padding:1px 6px; '
+                f'border-radius:4px; font-size:11px; margin-right:3px; border:1px solid #dee2e6;">{stack.name}</span>'
+            )
+        return format_html(" ".join(badges))
+    tech_stacks_display.short_description = 'Tech Stacks'
+
+    def tech_stack_short(self, obj):
+        ts = obj.tech_stack or ''
+        return ts[:60] + ('…' if len(ts) > 60 else '')
+    tech_stack_short.short_description = 'Tech Stack'
+
+    def cv_view_download_link(self, obj):
+        """View + Download buttons shown in the changelist."""
+        if obj.cv_file:
+            return format_html(
+                '<a href="{url}" target="_blank" '
+                'style="color:#007bff; font-weight:600; margin-right:8px;">👁 View</a>'
+                '<a href="{url}" download '
+                'style="color:#28a745; font-weight:600;">⬇ Download</a>',
+                url=obj.cv_file.url,
+            )
+        return format_html('<span style="color:#6c757d; font-style:italic;">No file</span>')
+    cv_view_download_link.short_description = 'CV'
+
+    # ---------- Detail-view helper (readonly field) ----------
+
+    def cv_view_download_link_detail(self, obj):
+        """View + Download links shown in the Add/Edit form."""
+        if obj.cv_file:
+            return format_html(
+                '<a href="{url}" target="_blank" '
+                'style="color:#007bff; font-size:14px; font-weight:600; margin-right:16px;">'
+                '👁 View CV</a>'
+                '<a href="{url}" download '
+                'style="color:#28a745; font-size:14px; font-weight:600;">'
+                '⬇ Download CV</a>'
+                '<br><small style="color:#6c757d; margin-top:4px; display:block;">'
+                'Stored at: <code>{path}</code></small>',
+                url=obj.cv_file.url,
+                path=obj.cv_file.name,
+            )
+        return format_html(
+            '<span style="color:#6c757d; font-style:italic;">No CV uploaded yet.</span>'
+        )
+    cv_view_download_link_detail.short_description = 'View / Download'
+
+
+admin.site.register(Candidate, CandidateAdmin)

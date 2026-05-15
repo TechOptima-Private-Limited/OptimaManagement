@@ -52,11 +52,9 @@ class ImportEmails(threading.Thread):
     def run(self):
         if not settings.TESTING:
             path = Path(settings.MEDIA_ROOT / 'locks')
-            try:
-                path.mkdir(mode=0o775)
-            except FileExistsError:
-                for child in path.glob('*'):
-                    child.unlink()
+            path.mkdir(parents=True, exist_ok=True, mode=0o775)
+            for child in path.glob('*'):
+                child.unlink()
         crmimap = ea = None
         while True:
             try:
