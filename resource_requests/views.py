@@ -162,17 +162,20 @@ def handle_pmo_approval(request, request_id, token, action):
     try:
         delivery_request = get_object_or_404(DeliveryRequest, id=request_id)
         
+        # 1. Check status FIRST
+        if delivery_request.status not in ['PENDING']:
+            logger.warning(f"DeliveryRequest {request_id} already processed with status {delivery_request.status}")
+            return HttpResponse('This request has already been processed.')
+
+        # 2. Validate token
         if delivery_request.approval_token != token:
             logger.warning(f"Invalid approval token for DeliveryRequest {request_id}")
             return HttpResponse('Invalid or expired approval link.', status=403)
 
+        # 3. Validate expiry
         if delivery_request.approval_token_expiry and delivery_request.approval_token_expiry < timezone.now():
             logger.warning(f"Expired approval token for DeliveryRequest {request_id}")
             return HttpResponse('Approval link has expired.', status=403)
-
-        if delivery_request.status not in ['PENDING']:
-            logger.warning(f"DeliveryRequest {request_id} already processed with status {delivery_request.status}")
-            return HttpResponse('This request has already been processed.')
 
         old_status = delivery_request.status
         ri_no = None
