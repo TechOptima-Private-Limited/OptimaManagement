@@ -229,13 +229,22 @@ def handle_pmo_approval(request, request_id, token, action):
             if not requester_email:
                 logger.warning(f"No email found for requester of DeliveryRequest {request_id}")
             
-            send_email(
-                subject=f"Resource Request {delivery_request.id} {status_text.capitalize()}",
-                body=plain_message,
-                recipients=[requester_email] if requester_email else [],
-                html_message=html_message
-            )
-            logger.info(f"Sent status notification to {requester_email} for DeliveryRequest {request_id}")
+            # Build recipient list: requester + IT support
+            recipients = [requester_email] if requester_email else []
+            if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
+                recipients.append(settings.IT_SUPPORT_EMAIL)
+                logger.info(f"Added IT Support email to recipients: {settings.IT_SUPPORT_EMAIL}")
+            
+            if recipients:
+                send_email(
+                    subject=f"Resource Request {delivery_request.id} {status_text.capitalize()}",
+                    body=plain_message,
+                    recipients=recipients,
+                    html_message=html_message
+                )
+                logger.info(f"Sent status notification to {', '.join(recipients)} for DeliveryRequest {request_id}")
+            else:
+                logger.warning(f"No recipients found for status notification of DeliveryRequest {request_id}")
         except TemplateDoesNotExist as e:
             logger.error(f"Template not found: {str(e)}")
         except Exception as e:
@@ -273,16 +282,23 @@ def handle_pmo_approval(request, request_id, token, action):
                 team_html_message = render_to_string('resource_requests/emails/delivery_request_team_notification.html', team_context)
                 team_plain_message = strip_tags(team_html_message)
                 
-                if not settings.TEAM_EMAILS:
-                    logger.warning("No team email recipients configured in settings.TEAM_EMAILS")
+                # Build team recipient list: TEAM_EMAILS + IT Support
+                team_recipients = list(settings.TEAM_EMAILS) if settings.TEAM_EMAILS else []
+                if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
+                    if settings.IT_SUPPORT_EMAIL not in team_recipients:
+                        team_recipients.append(settings.IT_SUPPORT_EMAIL)
+                        logger.info(f"Added IT Support email to team recipients: {settings.IT_SUPPORT_EMAIL}")
+                
+                if not team_recipients:
+                    logger.warning("No team email recipients configured in settings.TEAM_EMAILS or IT_SUPPORT_EMAIL")
                 else:
                     send_email(
                         subject=f"Delivery Request {delivery_request.id} Details - PMO Generated",
                         body=team_plain_message,
-                        recipients=settings.TEAM_EMAILS,
+                        recipients=team_recipients,
                         html_message=team_html_message
                     )
-                    logger.info(f"Sent delivery request details to {', '.join(settings.TEAM_EMAILS)} for DeliveryRequest {request_id}")
+                    logger.info(f"Sent delivery request details to {', '.join(team_recipients)} for DeliveryRequest {request_id}")
             except TemplateDoesNotExist as e:
                 logger.error(f"Team notification template not found: {str(e)}")
             except Exception as e:
