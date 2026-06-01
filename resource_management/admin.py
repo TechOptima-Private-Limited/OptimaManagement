@@ -733,15 +733,19 @@ class AccessRequestAdmin(admin.ModelAdmin):
         # Handle approver email assignment
         approver_changed = False
         if change and obj.approver_email:
+            # Trigger if approver changed OR if status was explicitly changed to APPROVAL_REQUIRED
             if old_approver_email != obj.approver_email:
                 approver_changed = True
-            elif old_approver_email == obj.approver_email and obj.status != 'APPROVAL_REQUIRED':
+            elif old_status != 'APPROVAL_REQUIRED' and obj.status == 'APPROVAL_REQUIRED':
+                approver_changed = True
+            # Also trigger if the admin explicitly wants to re-send (e.g. status is already APPROVAL_REQUIRED but no token)
+            elif obj.status == 'APPROVAL_REQUIRED' and not obj.approval_token:
                 approver_changed = True
             
             if approver_changed:
                 obj.status = 'APPROVAL_REQUIRED'
                 obj.approval_token = uuid.uuid4().hex
-                obj.approval_token_expiry = timezone.now() + datetime.timedelta(days=1)
+                obj.approval_token_expiry = timezone.now() + datetime.timedelta(days=15)
                 
                 action_text = "APPROVAL_REQUESTED" if old_approver_email != obj.approver_email else "APPROVAL_RESENT"
                 AccessHistory.objects.create(

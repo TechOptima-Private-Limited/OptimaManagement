@@ -44,9 +44,11 @@ urlpatterns = [
          handle_approval, name='admin_handle_approval'),
 ]
 
-urlpatterns += static(
-    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-)
+# Serve media files regardless of DEBUG — must be OUTSIDE i18n_patterns
+# so the URL is /media/... not /en/media/...
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
 
 if 'rosetta' in settings.INSTALLED_APPS:
     urlpatterns += [
@@ -76,7 +78,6 @@ urlpatterns += i18n_patterns(
     path('dashboard/', include('dashboard.urls')),
     path('resource-request/', include('resource_requests.urls')),
     path('api/', include('resource_requests.urls')),
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 )
 
 

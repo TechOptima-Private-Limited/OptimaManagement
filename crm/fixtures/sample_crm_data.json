@@ -1,0 +1,299 @@
+[
+  {
+    "model": "crm.productcategory",
+    "pk": 101,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "AI & Machine Learning",
+      "description": "Advanced AI/ML solutions for business automation and insights.",
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.productcategory",
+    "pk": 102,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "Enterprise Software",
+      "description": "Scalable software systems for enterprise resource and relationship management.",
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.product",
+    "pk": 501,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "AI Personalization Engine",
+      "description": "Real-time personalization engine for e-commerce and media.",
+      "price": "15000.00",
+      "currency": 1,
+      "on_sale": true,
+      "type": "S",
+      "product_category": 101,
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.product",
+    "pk": 502,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "Predictive Inventory Optimizer",
+      "description": "Optimize supply chain with AI-driven demand forecasting.",
+      "price": "25000.00",
+      "currency": 1,
+      "on_sale": true,
+      "type": "S",
+      "product_category": 101,
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.product",
+    "pk": 503,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "Custom CRM Module",
+      "description": "Bespoke CRM enhancements tailored to unique business processes.",
+      "price": "10000.00",
+      "currency": 1,
+      "on_sale": true,
+      "type": "S",
+      "product_category": 102,
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.tag",
+    "pk": 801,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "High-Value",
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.tag",
+    "pk": 802,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "AI-Focus",
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.tag",
+    "pk": 803,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "Urgent",
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.company",
+    "pk": 1001,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "full_name": "Apex Retailers Inc.",
+      "alternative_names": "Apex Retail",
+      "website": "https://apexretail.com",
+      "active": true,
+      "phone": "+1-555-200-1000",
+      "city_name": "New York",
+      "registration_number": "NY-887766",
+      "country": 192,
+      "type": 4,
+      "industry": [
+        19
+      ],
+      "email": "contact@apexretail.com",
+      "department": 9,
+      "tags": [
+        801,
+        802
+      ]
+    }
+  },
+  {
+    "model": "crm.contact",
+    "pk": 2001,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "first_name": "Alice",
+      "last_name": "Henderson",
+      "sex": "F",
+      "email": "alice.h@apexretail.com",
+      "phone": "+1-555-200-1001",
+      "title": "CTO",
+      "country": 192,
+      "company": 1001,
+      "department": 9,
+      "tags": [
+        802
+      ]
+    }
+  },
+  {
+    "model": "crm.lead",
+    "pk": 3001,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "first_name": "Charlie",
+      "last_name": "Rivers",
+      "sex": "M",
+      "email": "rivers@fintechglobal.net",
+      "phone": "+44-20-8877-6655",
+      "title": "Head of Innovation",
+      "country": 191,
+      "company_name": "FinTech Global Solutions",
+      "website": "https://fintechglobal.net",
+      "company_phone": "+44-20-8877-6600",
+      "company_email": "hello@fintechglobal.net",
+      "type": 4,
+      "industry": [
+        19
+      ],
+      "department": 9,
+      "tags": [
+        801,
+        803
+      ]
+    }
+  },
+  {
+    "model": "crm.request",
+    "pk": 6001,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "request_for": "AI Integration Inquiry",
+      "first_name": "Alice",
+      "last_name": "Henderson",
+      "email": "alice.h@apexretail.com",
+      "phone": "+1-555-200-1001",
+      "website": "https://apexretail.com",
+      "company_name": "Apex Retailers Inc.",
+      "receipt_date": "2026-02-20",
+      "contact": 2001,
+      "company": 1001,
+      "products": [
+        501,
+        502
+      ],
+      "country": 192,
+      "description": "Looking to integrate AI personalization and inventory optimization for our 2026 Q4 project.",
+      "department": 9
+    }
+  },
+  {
+    "model": "crm.deal",
+    "pk": 4001,
+    "fields": {
+      "creation_date": "2026-02-24T12:00:00Z",
+      "update_date": "2026-02-24T12:00:00Z",
+      "name": "Apex Retail AI Transformation",
+      "next_step": "Proposal Review Session",
+      "next_step_date": "2026-03-05",
+      "description": "Comprehensive AI integration for Apex Retailers.",
+      "stage": null,
+      "stages_dates": "2026-02-24 - Initial Request\n",
+      "amount": "40000.00",
+      "currency": 1,
+      "probability": 40,
+      "ticket": "DL-APEX-001",
+      "country": 192,
+      "contact": 2001,
+      "company": 1001,
+      "request": 6001,
+      "relevant": true,
+      "active": true,
+      "important": true,
+      "department": 9,
+      "tags": [
+        801,
+        802
+      ]
+    }
+  },
+  {
+    "model": "crm.payment",
+    "pk": 7001,
+    "fields": {
+      "deal": 4001,
+      "amount": "10000.00",
+      "currency": 1,
+      "payment_date": "2026-02-24",
+      "status": "r",
+      "contract_number": "CTR-2026-001",
+      "invoice_number": "INV-2026-101",
+      "order_number": "ORD-12345"
+    }
+  },
+  {
+    "model": "crm.output",
+    "pk": 9001,
+    "fields": {
+      "deal": 4001,
+      "product": 501,
+      "quantity": 1,
+      "shipping_date": "2026-03-15",
+      "planned_shipping_date": "2026-03-15",
+      "actual_shipping_date": null,
+      "product_is_shipped": false,
+      "serial_number": "SN-AI-001",
+      "amount": "15000.00",
+      "currency": 1
+    }
+  },
+  {
+    "model": "crm.crmemail",
+    "pk": 1101,
+    "fields": {
+      "creation_date": "2026-02-24T10:00:00Z",
+      "update_date": "2026-02-24T10:00:00Z",
+      "to": "alice.h@apexretail.com",
+      "from_field": "sales@techoptima.ai",
+      "subject": "Proposal for AI Personalization Engine",
+      "content": "Dear Alice,\n\nFollowing our discussion, please find attached the proposal for the AI Personalization Engine.\n\nBest regards,\nTechOptima Sales Team",
+      "sent": true,
+      "incoming": false,
+      "deal": 4001,
+      "contact": 2001,
+      "company": 1001,
+      "department": 9,
+      "is_html": false
+    }
+  },
+  {
+    "model": "crm.crmemail",
+    "pk": 1102,
+    "fields": {
+      "creation_date": "2026-02-24T11:30:00Z",
+      "update_date": "2026-02-24T11:30:00Z",
+      "to": "sales@techoptima.ai",
+      "from_field": "alice.h@apexretail.com",
+      "subject": "Re: Proposal for AI Personalization Engine",
+      "content": "Hi Team,\n\nThank you for the proposal. We are reviewing it and will get back to you by next week.\n\nThanks,\nAlice",
+      "sent": false,
+      "incoming": true,
+      "deal": 4001,
+      "contact": 2001,
+      "company": 1001,
+      "department": 9,
+      "is_html": false
+    }
+  }
+]

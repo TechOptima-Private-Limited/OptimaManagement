@@ -707,8 +707,8 @@ class HSTSSecurityMiddleware:
         # Content Security Policy (basic)
         response['Content-Security-Policy'] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
-            "style-src 'self' 'unsafe-inline'; "
+            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
             "img-src 'self' data: https:; "
             "font-src 'self' data: https://fonts.gstatic.com; "
         )

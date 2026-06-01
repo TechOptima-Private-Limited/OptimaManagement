@@ -361,6 +361,10 @@
 #     """Success page after employee submits onboarding form"""
 #     return render(request, 'onboarding/success.html')
 
+# def employee_onboarding_success(request):
+#     """Success page after employee submits onboarding form"""
+#     return render(request, 'onboarding/success.html')
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -749,3 +753,22 @@ System - Techoptima Pvt Ltd"""
 def employee_onboarding_success(request):
     """Success page after employee submits onboarding form"""
     return render(request, 'onboarding/success.html')
+
+def candidate_autocomplete(request):
+    """View to provide candidate name suggestions for the search bar."""
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return JsonResponse({'results': []})
+    
+    from .models import Candidate
+    from django.db.models import Q
+    
+    candidates = Candidate.objects.filter(
+        Q(full_name__icontains=q) | 
+        Q(first_name__icontains=q) | 
+        Q(last_name__icontains=q)
+    ).values_list('full_name', flat=True)[:10]
+    
+    # Remove duplicates and empty names
+    results = list(set([name for name in candidates if name]))
+    return JsonResponse({'results': sorted(results)})

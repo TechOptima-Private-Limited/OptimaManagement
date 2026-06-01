@@ -1,5 +1,5 @@
 # DESCRIPTION: https://git-scm.com/docs/gitignore
-
+node_modules/
 # Byte-compiled / optimized / DLL files
 */*/*/__pycache__/
 */*/__pycache__/

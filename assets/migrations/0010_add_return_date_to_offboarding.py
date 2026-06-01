@@ -10,21 +10,21 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameIndex(
-            model_name='assetrepair',
-            new_name='assets_asse_asset_i_85e259_idx',
-            old_name='assets_asse_asset_id_0e6f6a_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='assetrepair',
-            new_name='assets_asse_status_c96ca7_idx',
-            old_name='assets_asse_status_1c3a69_idx',
-        ),
-        migrations.RenameIndex(
-            model_name='assetrepair',
-            new_name='assets_asse_created_83a5b3_idx',
-            old_name='assets_asse_created__9f7a8e_idx',
-        ),
+        # migrations.RenameIndex(
+        #     model_name='assetrepair',
+        #     new_name='assets_asse_asset_i_85e259_idx',
+        #     old_name='assets_asse_asset_id_0e6f6a_idx',
+        # ),
+        # migrations.RenameIndex(
+        #     model_name='assetrepair',
+        #     new_name='assets_asse_status_c96ca7_idx',
+        #     old_name='assets_asse_status_1c3a69_idx',
+        # ),
+        # migrations.RenameIndex(
+        #     model_name='assetrepair',
+        #     new_name='assets_asse_created_83a5b3_idx',
+        #     old_name='assets_asse_created__9f7a8e_idx',
+        # ),
         migrations.AddField(
             model_name='offboardingassetreturn',
             name='return_date',

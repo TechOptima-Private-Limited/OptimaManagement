@@ -15,4 +15,5 @@ urlpatterns = [
     path('success/', views.employee_onboarding_success, name='employee_onboarding_success'),
 
     path('user-assets/<int:user_id>/', views.admin_user_assets_api, name='admin_user_assets_api'),
+    path('candidate-autocomplete/', views.candidate_autocomplete, name='candidate_autocomplete'),
 ]
