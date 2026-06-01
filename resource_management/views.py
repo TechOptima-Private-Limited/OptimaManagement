@@ -668,6 +668,8 @@ def send_it_support_notification(access_request, action):
         
         context = {
             'ticket': access_request.ticket_number,
+            'ticket_number': access_request.ticket_number,
+            'subject': subject,
             'requester': access_request.user.get_full_name() or access_request.user.username,
             'requester_employee_id': access_request.user.username,
             'requester_email': access_request.user.email,

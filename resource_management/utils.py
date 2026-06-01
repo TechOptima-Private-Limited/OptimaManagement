@@ -186,7 +186,6 @@ def send_threaded_email_with_images(subject, body, recipients, ticket_number, is
             'References': base_message_id,
             'In-Reply-To': base_message_id if is_reply else None,
             'Thread-Index': thread_index,
-            'Subject': subject,
         }
 
         all_attachments = []
