@@ -1,0 +1,25 @@
+{% extends "resource_management/emails/base_email.html" %}
+
+{% block header %}
+<h2>Access Request Rejected</h2>
+{% endblock %}
+
+{% block content %}
+<p>Hello IT Support,</p>
+<p>The following IT request has been rejected. No provisioning action is required.</p>
+
+<ul>
+    <li><strong>Ticket Number:</strong> {{ ticket }}</li>
+    <li><strong>Requester:</strong> {{ requester }} (Employee ID: {{ requester_employee_id }})</li>
+    <li><strong>Requester Email:</strong> {{ requester_email }}</li>
+    <li><strong>Resource:</strong> {{ resource }}</li>
+    <li><strong>Access Level:</strong> {{ access_level }}</li>
+    <li><strong>Status:</strong> {{ status }}</li>
+    <li><strong>Priority:</strong> {{ priority }}</li>
+</ul>
+
+{% if justification %}
+<p><strong>Justification:</strong></p>
+<div>{{ justification|safe }}</div>
+{% endif %}
+{% endblock %}

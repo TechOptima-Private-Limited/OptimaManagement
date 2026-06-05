@@ -9,9 +9,17 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from .models import *
 from .serializers import *
-from .utils import send_request_notification, send_status_notification, send_email_notification, get_approval_urls
+from .utils import (
+    send_approval_request_notification,
+    send_request_notification,
+    send_status_notification,
+    send_email_notification,
+    get_approval_urls,
+)
 import base64
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -668,6 +676,8 @@ def send_it_support_notification(access_request, action):
         
         context = {
             'ticket': access_request.ticket_number,
+            'ticket_number': access_request.ticket_number,
+            'subject': subject,
             'requester': access_request.user.get_full_name() or access_request.user.username,
             'requester_employee_id': access_request.user.username,
             'requester_email': access_request.user.email,
@@ -874,9 +884,19 @@ class AccessRequestViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Unauthorized'}, status=403)
 
         try:
+            approver_email = (request.data.get('approver_email') or '').strip()
+            if not approver_email:
+                return Response({'error': 'approver_email is required'}, status=400)
+
+            try:
+                validate_email(approver_email)
+            except ValidationError:
+                return Response({'error': 'Enter a valid approver_email'}, status=400)
+
+            notes = request.data.get('notes', '')
             old_status = access_request.status
             access_request.status = 'APPROVAL_REQUIRED'
-            access_request.approver_email = request.data.get('approver_email')
+            access_request.approver_email = approver_email
             access_request.approval_token = uuid.uuid4().hex
             access_request.approval_token_expiry = timezone.now() + datetime.timedelta(days=1)
             access_request.save()
@@ -888,9 +908,18 @@ class AccessRequestViewSet(viewsets.ModelViewSet):
                 notes=f"Approval requested from {access_request.approver_email}"
             )
 
-            send_status_notification(access_request, old_status, notes=f"Approval requested from {access_request.approver_email}")
+            approval_notes = notes or f"Approval requested from {access_request.approver_email}"
+            send_status_notification(access_request, old_status, notes=approval_notes)
+            approval_email_sent = send_approval_request_notification(access_request, approval_notes)
+            if not approval_email_sent:
+                return Response({
+                    'error': f"Approval request saved, but email failed to send to {access_request.approver_email}"
+                }, status=500)
 
-            return Response({'status': 'approval requested'})
+            return Response({
+                'status': 'approval requested',
+                'approver_email': access_request.approver_email
+            })
         except Exception as e:
             print(f"Error requesting approval: {str(e)}")
             return Response({'error': str(e)}, status=500)
