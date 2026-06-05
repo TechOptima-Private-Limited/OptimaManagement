@@ -4,6 +4,8 @@ import datetime
 import os
 import re
 from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -667,6 +669,17 @@ def send_approval_request_notification(obj, notes):
         print(f"🚀 Starting send_approval_request_notification for ticket: {obj.ticket_number}")
         print(f"📧 Approver email: {obj.approver_email}")
         
+        approver_email = (obj.approver_email or '').strip()
+        if not approver_email:
+            print("Approval request email skipped: approver_email is empty")
+            return False
+
+        try:
+            validate_email(approver_email)
+        except ValidationError:
+            print(f"Approval request email skipped: invalid approver_email '{approver_email}'")
+            return False
+
         if not obj.approval_token:
             obj.approval_token = uuid.uuid4().hex
             obj.approval_token_expiry = timezone.now() + datetime.timedelta(days=15)
@@ -712,7 +725,7 @@ def send_approval_request_notification(obj, notes):
             f"Access Request {obj.ticket_number} - Approval Required",
             'approval_required_approver.html',
             context,
-            [obj.approver_email],
+            [approver_email],
             is_reply=True
         )
         
@@ -807,8 +820,8 @@ def send_status_notification(obj, old_status, notes=''):
             is_reply=True
         )
 
-    # REMOVED: Don't send approval request here - it's handled separately
-    # The approval email is sent by send_approval_request_notification() which is called from admin.py
+    # Approval emails are sent by send_approval_request_notification() from
+    # the admin save path or the API request_approval action.
 
 
 def send_final_approval_notification(obj):
