@@ -666,8 +666,8 @@ def send_request_notification(access_request):
 def send_approval_request_notification(obj, notes):
     """Send approval request with proper URLs"""
     try:
-        print(f"🚀 Starting send_approval_request_notification for ticket: {obj.ticket_number}")
-        print(f"📧 Approver email: {obj.approver_email}")
+        print(f"Starting send_approval_request_notification for ticket: {obj.ticket_number}")
+        print(f"Approver email: {obj.approver_email}")
         
         approver_email = (obj.approver_email or '').strip()
         if not approver_email:
@@ -684,25 +684,25 @@ def send_approval_request_notification(obj, notes):
             obj.approval_token = uuid.uuid4().hex
             obj.approval_token_expiry = timezone.now() + datetime.timedelta(days=15)
             obj.save()
-            print(f"🔑 Generated and saved token: {obj.approval_token}")
+            print(f"Generated and saved token: {obj.approval_token}")
 
         approve_url, reject_url = get_approval_urls(obj.id, obj.approval_token)
-        print(f"✅ Generated approve URL: {approve_url}")
-        print(f"❌ Generated reject URL: {reject_url}")
+        print(f"Generated approve URL: {approve_url}")
+        print(f"Generated reject URL: {reject_url}")
 
         # Test the URLs by checking if they contain the expected parts
         expected_approve = f"/api/approve-request/{obj.id}/{obj.approval_token}/approve/"
         expected_reject = f"/api/approve-request/{obj.id}/{obj.approval_token}/reject/"
         
         if expected_approve in approve_url:
-            print("✓ Approve URL format is correct")
+            print("Approve URL format is correct")
         else:
-            print(f"⚠️ Approve URL format issue. Expected: {expected_approve}, Got: {approve_url}")
+            print(f"Approve URL format issue. Expected: {expected_approve}, Got: {approve_url}")
             
         if expected_reject in reject_url:
-            print("✓ Reject URL format is correct")
+            print("Reject URL format is correct")
         else:
-            print(f"⚠️ Reject URL format issue. Expected: {expected_reject}, Got: {reject_url}")
+            print(f"Reject URL format issue. Expected: {expected_reject}, Got: {reject_url}")
 
         context = {
             'ticket': obj.ticket_number,
@@ -717,7 +717,7 @@ def send_approval_request_notification(obj, notes):
             'approval_token_expiry': obj.approval_token_expiry,
         }
 
-        print(f"📧 Sending approval email with context: {list(context.keys())}")
+        print(f"Sending approval email with context: {list(context.keys())}")
 
         # Use the enhanced email function that handles images
         result = send_email_notification(
@@ -730,14 +730,14 @@ def send_approval_request_notification(obj, notes):
         )
         
         if result:
-            print(f"✅ Approval email sent successfully to: {obj.approver_email}")
+            print(f"Approval email sent successfully to: {obj.approver_email}")
             return True
         else:
-            print(f"❌ Failed to send approval email to: {obj.approver_email}")
+            print(f"Failed to send approval email to: {obj.approver_email}")
             return False
             
     except Exception as e:
-        print(f"💥 Failed to send approval request email: {str(e)}")
+        print(f"Failed to send approval request email: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
@@ -746,13 +746,21 @@ def send_status_notification(obj, old_status, notes=''):
     
     base_context = {
         'ticket': obj.ticket_number,
+        'ticket_number': obj.ticket_number,
+        'subject': f"Access Request {obj.ticket_number} - Status Update",
         'user': obj.user,  # Pass the User object
         'user_name': obj.user.get_full_name() or obj.user.username,  # Pass the display name separately
+        'requester': obj.user.get_full_name() or obj.user.username,
+        'requester_employee_id': obj.user.username,
+        'requester_email': obj.user.email,
         'resource': obj.resource.name if obj.resource else 'N/A',
         'access_level': obj.access_level.name if obj.access_level else 'N/A',
         'old_status': old_status,
         'new_status': obj.get_status_display(),
         'updated_by': obj.approved_by.get_full_name() if obj.approved_by else 'System',
+        'justification': obj.justification,
+        'request_type': obj.request_type,
+        'priority': obj.get_priority_display(),
         'notes': notes
     }
 
@@ -783,23 +791,49 @@ def send_status_notification(obj, old_status, notes=''):
         is_reply=True
     )
 
-    # Notify the resource team (only skip for APPROVER_APPROVED and APPROVER_REJECTED)
+    # Notify the resource team / IT support (only skip for intermediate approver states)
     if obj.status not in ['APPROVER_APPROVED', 'APPROVER_REJECTED']:
         team_context = base_context.copy()
         team_context['requester'] = base_context['user_name']
+        team_recipients = []
+
+        if obj.request_type == 'IT' and obj.status in ['APPROVED', 'REJECTED'] and getattr(settings, 'IT_SUPPORT_EMAIL', None):
+            team_recipients.append(settings.IT_SUPPORT_EMAIL)
+
+        if obj.resource and obj.resource.resource_team_email:
+            team_recipients.append(obj.resource.resource_team_email)
+
+        team_subject = f"Access Request {obj.ticket_number} - Status Update"
         if obj.status == 'APPROVAL_REQUIRED':
             template = 'approval_required_team.html'
+        elif obj.request_type == 'IT' and obj.status == 'APPROVED':
+            team_subject = f"Access Request {obj.ticket_number} - APPROVED - Action Required"
+            template = 'it_support_approved_notification.html'
+            team_context.update({
+                'subject': team_subject,
+                'action': 'approved',
+                'status': obj.get_status_display(),
+            })
+        elif obj.request_type == 'IT' and obj.status == 'REJECTED':
+            team_subject = f"Access Request {obj.ticket_number} - REJECTED - Action Required"
+            template = 'it_support_rejected_notification.html'
+            team_context.update({
+                'subject': team_subject,
+                'action': 'rejected',
+                'status': obj.get_status_display(),
+            })
         else:
             template = 'status_update.html'
 
-        if obj.resource and obj.resource.resource_team_email:
-            print(f"Sending notification to resource team: {obj.resource.resource_team_email}")
+        team_recipients = list(dict.fromkeys(email for email in team_recipients if email))
+        if team_recipients:
+            print(f"Sending notification to resource/IT team: {', '.join(team_recipients)}")
             send_email_notification(
                 obj,
-                f"Access Request {obj.ticket_number} - Status Update",
+                team_subject,
                 template,
                 team_context,
-                [obj.resource.resource_team_email],
+                team_recipients,
                 is_reply=True
             )
 
