@@ -513,12 +513,12 @@ def handle_approval(request, request_id, token, action):
             access_request.approved_at = timezone.now()
             action_text = 'APPROVED'
             display_action = 'approved'
-            print(f"✅ Auto-approved request {access_request.ticket_number}")
+            print(f"Auto-approved request {access_request.ticket_number}")
         elif action == 'reject':
             access_request.status = 'REJECTED'
             action_text = 'REJECTED'
             display_action = 'rejected'
-            print(f"❌ Auto-rejected request {access_request.ticket_number}")
+            print(f"Auto-rejected request {access_request.ticket_number}")
         else:
             return render(request, 'resource_management/approval_success.html', {
                 'action': 'error',
@@ -531,7 +531,7 @@ def handle_approval(request, request_id, token, action):
         access_request.approval_token_expiry = None
         access_request.save()
         
-        print(f"💾 Request {access_request.ticket_number} status updated to {access_request.status}")
+        print(f"Request {access_request.ticket_number} status updated to {access_request.status}")
 
         # Log the action in history
         AccessHistory.objects.create(
@@ -574,7 +574,7 @@ def send_approval_completion_notifications(access_request, old_status, action):
     Send notifications to all relevant parties after approval/rejection
     """
     try:
-        print(f"📧 Sending completion notifications for {access_request.ticket_number}")
+        print(f"Sending completion notifications for {access_request.ticket_number}")
         
         # 1. Notify the requester (employee who made the request)
         send_requester_notification(access_request, action)
@@ -588,7 +588,7 @@ def send_approval_completion_notifications(access_request, old_status, action):
         # 4. Send confirmation to approver
         send_approval_confirmation_email(access_request, action, "Approver")
         
-        print("✅ All completion notifications sent successfully")
+        print("All completion notifications sent successfully")
         
     except Exception as e:
         print(f"Error sending completion notifications: {str(e)}")
@@ -626,9 +626,9 @@ def send_requester_notification(access_request, action):
         )
         
         if result:
-            print(f"✅ Requester notification sent to: {access_request.user.email}")
+            print(f"Requester notification sent to: {access_request.user.email}")
         else:
-            print(f"❌ Failed to send requester notification")
+            print(f"Failed to send requester notification")
             
     except Exception as e:
         print(f"Error sending requester notification: {str(e)}")
@@ -644,7 +644,7 @@ def send_it_support_notification(access_request, action):
         from django.conf import settings
         if hasattr(settings, 'IT_SUPPORT_EMAIL') and settings.IT_SUPPORT_EMAIL:
             recipients.append(settings.IT_SUPPORT_EMAIL)
-            print(f"📧 Added IT Support email: {settings.IT_SUPPORT_EMAIL}")
+            print(f"Added IT Support email: {settings.IT_SUPPORT_EMAIL}")
         
         # If it's an IT request, notify the IT team
         if access_request.request_type == 'IT':
@@ -652,7 +652,7 @@ def send_it_support_notification(access_request, action):
                 recipients.append(access_request.resource.resource_team_email)
             else:
                 # Fallback - you might want to set a default IT email
-                print("⚠️ No IT team email found for IT request")
+                print("No IT team email found for IT request")
         
         # If it's a regular access request, notify the resource team
         elif access_request.resource and access_request.resource.resource_team_email:
@@ -661,16 +661,16 @@ def send_it_support_notification(access_request, action):
         # Always notify assigned person if there is one
         if access_request.assigned_to:
             recipients.append(access_request.assigned_to.email)
-            print(f"📧 Added assignee email: {access_request.assigned_to.email}")
+            print(f"Added assignee email: {access_request.assigned_to.email}")
             
         if not recipients:
-            print("⚠️ No IT/Resource team recipients found")
+            print("No IT/Resource team recipients found")
             return
             
         # Remove duplicates
         recipients = list(set(recipients))
         
-        print(f"📧 IT Support notification recipients: {recipients}")
+        print(f"IT Support notification recipients: {recipients}")
         
         subject = f"Access Request {access_request.ticket_number} - {action.upper()} - Action Required"
         
@@ -702,9 +702,9 @@ def send_it_support_notification(access_request, action):
             else:
                 template = 'resource_team_rejected_notification.html'
         
-        print(f"📧 Attempting to send IT notification to: {recipients}")
-        print(f"📧 Subject: {subject}")
-        print(f"📧 Template: {template}")
+        print(f"Attempting to send IT notification to: {recipients}")
+        print(f"Subject: {subject}")
+        print(f"Template: {template}")
         
         result = send_email_notification(
             access_request,
@@ -716,9 +716,9 @@ def send_it_support_notification(access_request, action):
         )
         
         if result:
-            print(f"✅ IT/Resource team notification sent to: {', '.join(recipients)}")
+            print(f"IT/Resource team notification sent to: {', '.join(recipients)}")
         else:
-            print(f"❌ Failed to send IT/Resource team notification")
+            print(f"Failed to send IT/Resource team notification")
             
     except Exception as e:
         print(f"Error sending IT/Resource team notification: {str(e)}")
@@ -729,10 +729,10 @@ def send_assignee_notification(access_request, action):
     try:
         # Check if there's an assignee
         if not access_request.assigned_to:
-            print("📧 No assignee found for this request")
+            print("No assignee found for this request")
             return
             
-        print(f"📧 Sending assignee notification to: {access_request.assigned_to.email}")
+        print(f"Sending assignee notification to: {access_request.assigned_to.email}")
         
         if action == 'approved':
             subject = f"Access Request {access_request.ticket_number} - APPROVED - Action Required"
@@ -756,9 +756,9 @@ def send_assignee_notification(access_request, action):
             'assignee': access_request.assigned_to.get_full_name() or access_request.assigned_to.username,
         }
         
-        print(f"📧 Attempting to send assignee notification to: {access_request.assigned_to.email}")
-        print(f"📧 Subject: {subject}")
-        print(f"📧 Template: {template}")
+        print(f"Attempting to send assignee notification to: {access_request.assigned_to.email}")
+        print(f"Subject: {subject}")
+        print(f"Template: {template}")
         
         result = send_email_notification(
             access_request,
@@ -770,9 +770,9 @@ def send_assignee_notification(access_request, action):
         )
         
         if result:
-            print(f"✅ Assignee notification sent to: {access_request.assigned_to.email}")
+            print(f"Assignee notification sent to: {access_request.assigned_to.email}")
         else:
-            print(f"❌ Failed to send assignee notification")
+            print(f"Failed to send assignee notification")
             
     except Exception as e:
         print(f"Error sending assignee notification: {str(e)}")

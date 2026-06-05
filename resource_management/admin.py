@@ -741,6 +741,9 @@ class AccessRequestAdmin(admin.ModelAdmin):
             # Also trigger if the admin explicitly wants to re-send (e.g. status is already APPROVAL_REQUIRED but no token)
             elif obj.status == 'APPROVAL_REQUIRED' and not obj.approval_token:
                 approver_changed = True
+            # Re-saving an approval-required request should resend the approver email.
+            elif old_status == 'APPROVAL_REQUIRED' and obj.status == 'APPROVAL_REQUIRED':
+                approver_changed = True
             
             if approver_changed:
                 obj.status = 'APPROVAL_REQUIRED'
